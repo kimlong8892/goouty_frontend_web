@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Bell, BellOff, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import { useGlobalToast } from '@/utils/globalToast';
+import { usePWA } from '@/pwa/hooks/usePWA';
 
 interface NotificationSettingsProps {
   onPermissionChange?: (granted: boolean) => void;
@@ -15,6 +16,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   showCard = true,
 }) => {
   const { showToast } = useGlobalToast();
+  const { isPWA } = usePWA();
   
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState<'granted' | 'denied' | 'default' | null>(null);
@@ -30,20 +32,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     devices: any[];
   } | null>(null);
 
-  useEffect(() => {
-    // Check if notifications are supported
-    const supported = notificationService.isNotificationSupported();
-    setIsSupported(supported);
-
-    if (supported) {
-      // Check complete notification status from backend
-      checkCompleteNotificationStatus();
-      
-      // Load user notification preferences
-      loadNotificationPreferences();
-    }
-  }, [onPermissionChange]);
-
+  // Định nghĩa các functions trước khi dùng trong useEffect
   const checkCompleteNotificationStatus = async () => {
     try {
       console.log('Checking both browser permission and device existence...');
@@ -98,6 +87,30 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
       console.error('Error loading notification preferences:', error);
     }
   };
+
+  // Tất cả hooks phải được gọi trước early return
+  useEffect(() => {
+    // Chỉ chạy khi là PWA
+    if (!isPWA) return;
+
+    // Check if notifications are supported
+    const supported = notificationService.isNotificationSupported();
+    setIsSupported(supported);
+
+    if (supported) {
+      // Check complete notification status from backend
+      checkCompleteNotificationStatus();
+      
+      // Load user notification preferences
+      loadNotificationPreferences();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPWA]);
+
+  // Chỉ hiển thị trong PWA - phải đặt SAU tất cả hooks
+  if (!isPWA) {
+    return null;
+  }
 
   const handleRequestPermission = async () => {
     if (!isSupported) {
@@ -183,55 +196,6 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     }
   };
 
-  const handleTestNotificationToAllDevices = async () => {
-    try {
-      console.log('Testing notification to all devices...');
-      const result = await notificationService.sendTestNotificationToAllDevices();
-      
-      if (result.success) {
-        showToast(result.message, 'success');
-        console.log('Test notification result:', result);
-        
-        // Hiển thị thông tin chi tiết trong console
-        console.log(`Sent to ${result.sentCount}/${result.totalDevices} devices`);
-        if (result.errors && result.errors.length > 0) {
-          console.warn('Errors occurred:', result.errors);
-        }
-      } else {
-        showToast(result.message, 'warning');
-      }
-    } catch (error) {
-      console.error('Error testing notification to all devices:', error);
-      showToast(`Không thể gửi thông báo test: ${error.message}`, 'error');
-    }
-  };
-
-  const handleTestNotification = async () => {
-    // Check permission directly from browser
-    const currentPermission = Notification.permission;
-    console.log('Current permission for test:', currentPermission);
-    console.log('Local permission state:', permission);
-    
-    // Update local state to match browser state
-    setPermission(currentPermission);
-    
-    if (currentPermission !== 'granted') {
-      showToast(`Quyền thông báo chưa được cấp. Hiện tại: ${currentPermission}`, 'error');
-      return;
-    }
-
-    try {
-      console.log('Testing notification...');
-      await notificationService.showNotification('Thông báo test từ Goouty', {
-        body: 'Đây là thông báo test để kiểm tra cài đặt thông báo của bạn.',
-        tag: 'test-notification'
-      });
-      showToast('Đã gửi thông báo test!', 'success');
-    } catch (error) {
-      console.error('Error showing test notification:', error);
-      showToast(`Không thể hiển thị thông báo test: ${error.message}`, 'error');
-    }
-  };
 
   const getStatusIcon = () => {
     switch (permission) {
@@ -293,6 +257,88 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     );
   }
 
+  // Nếu showCard=false, render không có Card wrapper (dùng trong Profile page)
+  if (!showCard) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {getStatusIcon()}
+            <span className={`text-sm font-medium ${getStatusColor()}`}>
+              {getStatusText()}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {isSubscribed && (
+              <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                Đã đăng ký push
+              </span>
+            )}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Thông báo:</span>
+              <button
+                onClick={handleToggleNotifications}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  notificationsEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Show button only when both conditions are not met */}
+        {(permission !== 'granted' || !notificationStatus?.hasCurrentDevice) && (
+          <Button
+            onClick={handleRequestPermission}
+            disabled={isLoading || permission === 'denied'}
+            className="w-full"
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Đang xử lý...
+              </>
+            ) : (
+              <>
+                <Bell className="h-4 w-4 mr-2" />
+                {permission === 'denied' 
+                  ? 'Quyền đã bị từ chối' 
+                  : 'Cấp quyền thông báo'
+                }
+              </>
+            )}
+          </Button>
+        )}
+
+        {permission === 'denied' && (
+          <div className="text-xs text-muted-foreground bg-red-50 p-3 rounded-md">
+            <strong>Quyền thông báo đã bị từ chối.</strong> Để bật lại, hãy:
+            <ol className="list-decimal list-inside mt-1 space-y-1">
+              <li>Click vào biểu tượng khóa ở thanh địa chỉ</li>
+              <li>Chọn "Thông báo" và đặt thành "Cho phép"</li>
+              <li>Tải lại trang</li>
+            </ol>
+          </div>
+        )}
+
+        <div className="text-xs text-muted-foreground bg-blue-50 p-3 rounded-md">
+          <strong>Thông báo sẽ bao gồm:</strong>
+          <ul className="list-disc list-inside mt-1 space-y-1">
+            <li>Chuyến đi mới được tạo</li>
+            <li>Cập nhật từ các chuyến đi</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
+  // Render với Card wrapper (default)
   return (
     <Card className="w-full">
       <CardHeader>
@@ -358,34 +404,6 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
               </>
             )}
           </Button>
-        )}
-
-        {/* Show test notification section only when both conditions are met */}
-        {permission === 'granted' && notificationStatus?.hasCurrentDevice && (
-          <div className="space-y-2">
-            <Button
-              onClick={handleTestNotification}
-              variant="outline"
-              className="w-full"
-            >
-              <Bell className="h-4 w-4 mr-2" />
-              Gửi thông báo test
-            </Button>
-            <Button
-              onClick={handleTestNotificationToAllDevices}
-              variant="outline"
-              className="w-full"
-            >
-              <Bell className="h-4 w-4 mr-2" />
-              Test gửi tới tất cả device
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              Nhấn để kiểm tra xem thông báo có hoạt động không
-            </p>
-            <p className="text-xs text-orange-600">
-              ⚠️ Button "Test gửi tới tất cả device" sẽ gửi thông báo tới tất cả device có pushSubscription trong hệ thống
-            </p>
-          </div>
         )}
 
         {permission === 'denied' && (

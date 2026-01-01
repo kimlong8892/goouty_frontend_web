@@ -26,6 +26,7 @@ import {
   Lock
 } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
+import NotificationSettings from '@/components/NotificationSettings';
 import {
   Dialog,
   DialogContent,
@@ -156,6 +157,12 @@ const Profile = () => {
   };
 
   const handleTogglePush = async (checked: boolean) => {
+    // Chỉ cho phép bật thông báo trong PWA
+    if (!isPWA) {
+      toast.error('Thông báo chỉ khả dụng trong PWA');
+      return;
+    }
+
     setPushEnabled(checked);
     try {
       if (checked) {
@@ -271,13 +278,12 @@ const Profile = () => {
             <div>
               <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Ứng dụng</h3>
               <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between p-4 border-b border-gray-50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-yellow-50 rounded-xl text-yellow-600"><Bell className="w-5 h-5" /></div>
-                    <span className="font-semibold text-gray-700">Thông báo đẩy</span>
+                {/* Notification Settings - chỉ hiển thị trong PWA */}
+                {isPWA && (
+                  <div className="p-4 border-b border-gray-50">
+                    <NotificationSettings showCard={false} />
                   </div>
-                  <Switch checked={pushEnabled} onCheckedChange={handleTogglePush} className="data-[state=checked]:bg-[#6c5dd3]" />
-                </div>
+                )}
 
                 {/* Mobile Change Password */}
                 <button
@@ -512,22 +518,8 @@ const Profile = () => {
             </div>
 
             <div className="space-y-6">
-              <Card className="rounded-[24px] border-none shadow-lg overflow-hidden">
-                <div className="bg-[#6c5dd3] px-6 py-4 flex items-center justify-between">
-                  <div className="text-white font-bold flex items-center gap-2">
-                    <Bell className="w-5 h-5" /> Cài đặt thông báo
-                  </div>
-                </div>
-                <CardContent className="p-6 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-bold text-slate-900">Push Notifications</div>
-                      <div className="text-xs text-slate-500 mt-1">Nhận thông báo về chuyến đi</div>
-                    </div>
-                    <Switch checked={pushEnabled} onCheckedChange={handleTogglePush} className="data-[state=checked]:bg-[#6c5dd3]" />
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Notification Settings - chỉ hiển thị trong PWA */}
+              {isPWA && <NotificationSettings />}
 
               <Card className="rounded-[24px] border-none shadow-lg overflow-hidden bg-white">
                 <CardContent className="p-6">

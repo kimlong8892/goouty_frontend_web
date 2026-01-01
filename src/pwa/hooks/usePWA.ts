@@ -9,18 +9,51 @@ export const usePWA = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
       const isIOSStandalone = (window.navigator as any).standalone === true;
       
-      setIsPWA(isStandalone || isIOSStandalone);
+      // Additional checks for PWA
+      const isInWebAppiOS = (window.navigator as any).standalone === true;
+      const isInWebAppChrome = window.matchMedia('(display-mode: standalone)').matches;
+      const isInWebAppSafari = (window.navigator as any).standalone === true;
+      
+      const detected = isStandalone || isIOSStandalone || isInWebAppiOS || isInWebAppChrome || isInWebAppSafari;
+      
+      console.log('[usePWA] PWA Detection:', {
+        isStandalone,
+        isIOSStandalone,
+        isInWebAppiOS,
+        isInWebAppChrome,
+        isInWebAppSafari,
+        detected,
+        userAgent: navigator.userAgent,
+        displayMode: window.matchMedia('(display-mode: standalone)').matches
+      });
+      
+      setIsPWA(detected);
     };
 
+    // Check immediately
     checkPWA();
 
     // Listen for display mode changes
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    const handleChange = () => checkPWA();
+    const handleChange = () => {
+      console.log('[usePWA] Display mode changed');
+      checkPWA();
+    };
     
-    mediaQuery.addEventListener('change', handleChange);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+    } else {
+      // Fallback for older browsers
+      (mediaQuery as any).addListener(handleChange);
+    }
     
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleChange);
+      } else {
+        (mediaQuery as any).removeListener(handleChange);
+      }
+    };
   }, []);
 
   return { isPWA };

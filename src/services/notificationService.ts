@@ -106,6 +106,14 @@ class NotificationService {
       throw new Error('Notifications not supported');
     }
 
+    // Chỉ cho phép yêu cầu quyền trong PWA
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                  (window.navigator as any).standalone === true;
+    
+    if (!isPWA) {
+      throw new Error('Thông báo chỉ khả dụng trong PWA. Vui lòng cài đặt ứng dụng để sử dụng tính năng này.');
+    }
+
     try {
       console.log('Current permission before request:', Notification.permission);
       const permission = await Notification.requestPermission();
@@ -134,6 +142,14 @@ class NotificationService {
   async subscribeToPush(): Promise<PushSubscription | null> {
     if (!this.isSupported || Notification.permission !== 'granted') {
       throw new Error('Notifications not supported or permission not granted');
+    }
+
+    // Chỉ cho phép đăng ký push trong PWA
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                  (window.navigator as any).standalone === true;
+    
+    if (!isPWA) {
+      throw new Error('Thông báo chỉ khả dụng trong PWA. Vui lòng cài đặt ứng dụng để sử dụng tính năng này.');
     }
 
     try {
