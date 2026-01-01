@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Crown, Trash2, Mail, UserPlus, Check, X, Clock } from 'lucide-react';
+import { Plus, Crown, Trash2, Mail, UserPlus, Check, X, Clock, Send } from 'lucide-react';
 import { api } from '@/integrations/api/client';
 import { TripMember, AddMemberRequest } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -99,6 +99,21 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
     },
     onError: (error: any) => {
       const errorMessage = error.response?.data?.message || error.message || 'Có lỗi xảy ra khi từ chối lời mời';
+      toast.error(errorMessage);
+    },
+  });
+
+  // Resend invitation mutation
+  const resendInvitationMutation = useMutation({
+    mutationFn: (memberId: string) => {
+      return api.members.resendInvitation(tripId, memberId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trip-members', tripId] });
+      toast.success('Đã gửi lại lời mời thành công!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Có lỗi xảy ra khi gửi lại lời mời';
       toast.error(errorMessage);
     },
   });
@@ -313,16 +328,28 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                       </div>
                     )}
                     {isOwner && !isCurrentUser && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveMember(member.id, member.user.fullName || member.user.email)}
-                        disabled={removeMemberMutation.isPending}
-                        className="text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full h-10 w-10 transition-colors"
-                        title="Hủy lời mời"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => resendInvitationMutation.mutate(member.id)}
+                          disabled={resendInvitationMutation.isPending}
+                          className="text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full h-10 w-10 transition-colors"
+                          title="Gửi lại lời mời"
+                        >
+                          <Send className="h-5 w-5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveMember(member.id, member.user.fullName || member.user.email)}
+                          disabled={removeMemberMutation.isPending}
+                          className="text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full h-10 w-10 transition-colors"
+                          title="Hủy lời mời"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </Button>
+                      </div>
                     )}
                   </div>
                 );

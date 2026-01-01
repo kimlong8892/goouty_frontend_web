@@ -127,6 +127,9 @@ export const api = {
     acceptInviteByMemberId: async (tripId: string, memberId: string) => {
       return await api.post<any>(`/trips/${tripId}/members/${memberId}/accept`);
     },
+    resendInvitation: async (tripId: string, memberId: string) => {
+      return await api.post<any>(`/trips/${tripId}/members/${memberId}/resend`);
+    },
   },
 
   // Day-specific API methods
