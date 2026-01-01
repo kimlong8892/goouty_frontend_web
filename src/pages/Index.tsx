@@ -72,7 +72,7 @@ const Index = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
+    <div className="relative min-h-screen">
       {isMobileView ? (
         // Mobile/PWA Mode: Show trip templates list
         <PWATripTemplatesList

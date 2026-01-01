@@ -34,7 +34,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
     loadInitialData();
   }, []);
 
-  const observerTarget = useRef<HTMLDivElement>(null);
+
 
   // Search and filter when they change
   useEffect(() => {
@@ -44,23 +44,6 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
     return () => clearTimeout(timeoutId);
   }, [searchTerm, selectedProvince]);
 
-  // Infinite scroll observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loadingMore && pagination.page < pagination.totalPages) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => observer.disconnect();
-  }, [loadingMore, pagination.page, pagination.totalPages]);
 
   const loadInitialData = async () => {
     try {
@@ -236,15 +219,27 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
               ))}
             </div>
 
-            {/* Infinite Scroll Target */}
+            {/* Load More Button */}
             {hasMoreTemplates && (
-              <div ref={observerTarget} className="flex justify-center py-8">
-                {loadingMore && (
-                  <div className="flex items-center space-x-2">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#6347f9]" />
-                    <span className="text-sm text-slate-500 font-medium">Đang tải thêm...</span>
-                  </div>
-                )}
+              <div className="flex justify-center py-8">
+                <Button
+                  variant="outline"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="h-12 px-8 rounded-full border-2 border-[#6347f9] text-[#6347f9] hover:bg-[#6347f9] hover:text-white transition-all font-bold min-w-[200px]"
+                >
+                  {loadingMore ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      Đang tải thêm...
+                    </>
+                  ) : (
+                    <>
+                      Tải thêm template
+                      <ChevronDown className="ml-2 w-5 h-5" />
+                    </>
+                  )}
+                </Button>
               </div>
             )}
           </>

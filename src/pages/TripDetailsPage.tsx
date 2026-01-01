@@ -443,7 +443,7 @@ const TripDetailsPage = () => {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen pt-20 px-4 flex items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
+      <div className="min-h-screen pt-20 px-4 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6347f9]"></div>
       </div>
     );
@@ -455,7 +455,7 @@ const TripDetailsPage = () => {
 
   return (
     <div className={cn(
-      "min-h-screen bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50",
+      "min-h-screen",
       isMobileView ? "pt-0 pb-20" : "pt-4 pb-20 px-4"
     )}>
       {/* Mobile Sticky Header */}

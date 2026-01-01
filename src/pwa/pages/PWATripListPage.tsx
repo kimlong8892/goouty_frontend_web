@@ -305,7 +305,7 @@ const PWATripListPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 pb-20 px-4">
+    <div className="min-h-screen pb-20 px-4">
 
       {/* Search and Filter - Fixed */}
       <div className="fixed top-[48px] left-0 right-0 z-30 bg-white border-b border-gray-200/50 py-4 px-4 shadow-sm">

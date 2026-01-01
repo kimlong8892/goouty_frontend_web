@@ -4,7 +4,7 @@ import { DATABASE_TYPES } from '@/integrations/api/types';
 import { api } from '@/integrations/api/client';
 import { TripTemplateCard } from '@/components/TripTemplateCard';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, MapPin } from 'lucide-react';
+import { Loader2, Search, MapPin, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -32,8 +32,6 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   const { toast } = useToast();
 
   // Ref for infinite scroll
-  const observerRef = useRef<HTMLDivElement>(null);
-  const loadingRef = useRef<HTMLDivElement>(null);
 
   // Load initial data
   useEffect(() => {
@@ -50,23 +48,6 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
     return () => clearTimeout(timeoutId);
   }, [searchTerm, selectedProvince, hasSearched]);
 
-  // Infinite scroll observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loadingMore && pagination.page < pagination.totalPages) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loadingRef.current) {
-      observer.observe(loadingRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [loadingMore, pagination.page, pagination.totalPages]);
 
   const loadInitialData = async () => {
     try {
@@ -253,19 +234,27 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
             ))}
           </div>
 
-          {/* Loading indicator for infinite scroll */}
+          {/* Load More Button */}
           {hasMoreTemplates && (
-            <div ref={loadingRef} className="flex justify-center py-4">
-              {loadingMore ? (
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="text-sm text-muted-foreground">{t('common.loadingMore')}</span>
-                </div>
-              ) : (
-                <div className="text-sm text-muted-foreground">
-                  {t('common.scrollToLoadMore')}
-                </div>
-              )}
+            <div className="flex justify-center py-6">
+              <Button
+                variant="outline"
+                onClick={loadMore}
+                disabled={loadingMore}
+                className="w-full max-w-xs h-12 rounded-xl border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-semibold"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    {t('common.loadingMore')}
+                  </>
+                ) : (
+                  <>
+                    {t('common.loadMore')}
+                    <ChevronDown className="ml-2 w-5 h-5" />
+                  </>
+                )}
+              </Button>
             </div>
           )}
 

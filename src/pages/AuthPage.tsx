@@ -138,7 +138,7 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-8 pb-12 px-4 flex flex-col items-center justify-center bg-[#f0f2f5]">
+    <div className="min-h-screen pt-8 pb-12 px-4 flex flex-col items-center justify-center">
       <AnimatedTransition show={show} animation="slide-up" className="w-full max-w-[1000px]">
         <Card className="w-full grid grid-cols-1 md:grid-cols-2 rounded-[40px] overflow-hidden shadow-[0_12px_40px_rgb(0,0,0,0.06)] border-none bg-white p-6 md:p-8">
 

@@ -39,7 +39,7 @@ const EditProfile = () => {
     bankId: '',
     bankNumber: ''
   });
-  
+
   // Set page title
   useEffect(() => {
     document.title = 'Chỉnh sửa thông tin - Goouty';
@@ -98,7 +98,7 @@ const EditProfile = () => {
     try {
       // Upload the file using new API
       const response = await api.users.uploadAvatar(file);
-      
+
       // Update local profile state
       setProfile(prev => prev ? { ...prev, profilePicture: response.data.user.profilePicture } : null);
       toast.success('Cập nhật ảnh đại diện thành công');
@@ -112,7 +112,7 @@ const EditProfile = () => {
     try {
       // Delete avatar using new API
       const response = await api.users.deleteAvatar();
-      
+
       // Update local profile state
       setProfile(prev => prev ? { ...prev, profilePicture: null } : null);
       toast.success('Xóa ảnh đại diện thành công');
@@ -121,7 +121,7 @@ const EditProfile = () => {
       console.error('Error deleting avatar:', error);
     }
   };
-  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -153,14 +153,14 @@ const EditProfile = () => {
           {/* Header */}
           <div className="fixed top-0 left-0 right-0 z-10 bg-white">
             <div className="flex items-center justify-between px-4 py-3">
-              <button 
+              <button
                 onClick={() => navigate('/profile')}
                 className="text-gray-600 font-medium hover:text-gray-800 transition-colors"
               >
                 Hủy
               </button>
               <h1 className="text-lg font-semibold text-black">Chỉnh sửa thông tin</h1>
-              <button 
+              <button
                 onClick={handleSaveProfile}
                 disabled={saving || !formData.fullName.trim()}
                 className="text-blue-600 font-medium hover:text-blue-800 transition-colors disabled:opacity-50"
@@ -187,36 +187,36 @@ const EditProfile = () => {
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-black font-semibold">Tên</Label>
-                <Input 
-                  id="fullName" 
+                <Input
+                  id="fullName"
                   value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
                   placeholder="Nhập tên của bạn"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-black font-semibold">Email</Label>
-                <Input 
-                  id="email" 
+                <Input
+                  id="email"
                   type="email"
                   value={formData.email}
                   disabled
                   className="bg-gray-100 border-gray-300 rounded-lg h-12 text-gray-500"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber" className="text-black font-semibold">Số điện thoại</Label>
-                <Input 
-                  id="phoneNumber" 
+                <Input
+                  id="phoneNumber"
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => {
                     // Chỉ cho phép nhập số
                     const value = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({...formData, phoneNumber: value});
+                    setFormData({ ...formData, phoneNumber: value });
                   }}
                   className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
                   placeholder="Nhập số điện thoại"
@@ -241,7 +241,7 @@ const EditProfile = () => {
                   onChange={(e) => {
                     // Chỉ cho phép nhập số
                     const value = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({...formData, bankNumber: value});
+                    setFormData({ ...formData, bankNumber: value });
                   }}
                   className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
                   placeholder="Nhập số tài khoản"
@@ -260,7 +260,7 @@ const EditProfile = () => {
       <AnimatedTransition show={showContent} animation="slide-up">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-8">Chỉnh sửa thông tin</h1>
-          
+
           <div className="bg-white rounded-lg shadow-sm border p-6">
             {/* Profile Picture */}
             <div className="text-center mb-8">
@@ -277,36 +277,36 @@ const EditProfile = () => {
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-gray-700 font-medium">Tên</Label>
-                <Input 
-                  id="fullName" 
+                <Input
+                  id="fullName"
                   value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="h-12"
                   placeholder="Nhập tên của bạn"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
-                <Input 
-                  id="email" 
+                <Input
+                  id="email"
                   type="email"
                   value={formData.email}
                   disabled
                   className="h-12 bg-gray-50"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber" className="text-gray-700 font-medium">Số điện thoại</Label>
-                <Input 
-                  id="phoneNumber" 
+                <Input
+                  id="phoneNumber"
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => {
                     // Chỉ cho phép nhập số
                     const value = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({...formData, phoneNumber: value});
+                    setFormData({ ...formData, phoneNumber: value });
                   }}
                   className="h-12"
                   placeholder="Nhập số điện thoại"
@@ -331,7 +331,7 @@ const EditProfile = () => {
                   onChange={(e) => {
                     // Chỉ cho phép nhập số
                     const value = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({...formData, bankNumber: value});
+                    setFormData({ ...formData, bankNumber: value });
                   }}
                   className="h-12"
                   placeholder="Nhập số tài khoản"
@@ -341,14 +341,14 @@ const EditProfile = () => {
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-3 mt-8">
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => navigate('/profile')}
                 className="px-6"
               >
                 Hủy
               </Button>
-              <Button 
+              <Button
                 onClick={handleSaveProfile}
                 disabled={saving || !formData.fullName.trim()}
                 className="px-6"

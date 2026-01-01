@@ -227,7 +227,7 @@ const Profile = () => {
 
   if (isMobileView) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] pb-24">
+      <div className="min-h-screen pb-24">
         <AnimatedTransition show={showContent} animation="fade">
           {/* Header Section */}
           <div className="bg-white px-6 pt-12 pb-8 rounded-b-[40px] shadow-sm border-b border-gray-100 flex flex-col items-center">
@@ -399,7 +399,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50/20 pt-4 pb-24 px-4">
+    <div className="min-h-screen pt-4 pb-24 px-4">
       <AnimatedTransition show={showContent} animation="slide-up">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header Card */}

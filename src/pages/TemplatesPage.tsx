@@ -12,7 +12,7 @@ const TemplatesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 pt-20 pb-12">
+    <div className="min-h-screen pt-20 pb-12">
       <PWATripTemplatesList
         onUseTemplate={handleUseTemplate}
         usingTemplate={false}

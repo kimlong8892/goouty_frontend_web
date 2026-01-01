@@ -49,7 +49,7 @@ const ResetPasswordPage = () => {
     if (!token) return null;
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-4 flex items-start md:items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
+        <div className="min-h-screen pt-24 pb-12 px-4 flex items-start md:items-center justify-center">
             <AnimatedTransition show={show} animation="slide-up" className="w-full">
                 <Card className="max-w-md mx-auto w-full p-8 md:p-12 rounded-[32px] overflow-hidden shadow-2xl border-none bg-white">
                     <div className="mb-6 text-center">

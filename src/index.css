@@ -102,17 +102,18 @@
   html,
   body {
     height: 100%;
-    background: #ffffff;
+    background: transparent;
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply font-sans text-slate-900 antialiased bg-[#edeeff];
+    /* touch-action: manipulation; */
   }
 
   /* Ensure app container covers full viewport */
   #root {
     min-height: 100dvh;
-    background: #ffffff;
+    background: transparent;
   }
 
   /* Hide iPhone home indicator globally */
@@ -129,7 +130,7 @@
       padding-bottom: env(safe-area-inset-bottom);
       padding-left: env(safe-area-inset-left);
       padding-right: env(safe-area-inset-right);
-      background: #ffffff !important;
+      background: transparent !important;
     }
 
     /* Hide home indicator bar */
@@ -140,7 +141,7 @@
     /* Ensure root covers full viewport */
     #root {
       min-height: 100dvh;
-      background: #ffffff !important;
+      background: transparent !important;
     }
 
     /* Prevent scrolling on home page only */
