@@ -504,8 +504,8 @@ const TripDetailsPage = () => {
                 {statusLabels[status as keyof typeof statusLabels]}
               </Badge>
               <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0">
-                {trip.userRole === 'owner' 
-                  ? `Chủ chuyến đi (${(trip.members?.length || 0) + 1})` 
+                {trip.userRole === 'owner'
+                  ? `Chủ chuyến đi (${(trip.members?.length || 0) + 1})`
                   : `Thành viên (${(trip.members?.length || 0) + 1})`}
               </Badge>
             </div>
@@ -580,42 +580,42 @@ const TripDetailsPage = () => {
             )}>
               <TabsList className={cn(
                 "bg-transparent h-auto p-0 gap-3 flex w-full overflow-x-auto scrollbar-hide pb-2",
-                isPWA ? "justify-start" : "justify-between"
+                isMobileView ? "justify-start" : "justify-between"
               )}>
                 <TabsTrigger
                   value="itinerary"
                   className={cn(
                     "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
-                    isPWA 
-                      ? "whitespace-nowrap px-6 py-2.5 text-sm" 
-                      : "flex-1 px-8 py-3.5 text-base"
+                    isMobileView
+                      ? "whitespace-nowrap px-6 py-3.5 text-base"
+                      : "flex-1 px-8 py-4 text-base"
                   )}
                 >
-                  <Clock className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
+                  <Clock className="mr-2 w-5 h-5" />
                   Lịch trình
                 </TabsTrigger>
                 <TabsTrigger
                   value="expenses"
                   className={cn(
                     "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
-                    isPWA 
-                      ? "whitespace-nowrap px-6 py-2.5 text-sm" 
-                      : "flex-1 px-8 py-3.5 text-base"
+                    isMobileView
+                      ? "whitespace-nowrap px-6 py-3.5 text-base"
+                      : "flex-1 px-8 py-4 text-base"
                   )}
                 >
-                  <DollarSign className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
+                  <DollarSign className="mr-2 w-5 h-5" />
                   Chi phí
                 </TabsTrigger>
                 <TabsTrigger
                   value="members"
                   className={cn(
                     "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
-                    isPWA 
-                      ? "whitespace-nowrap px-6 py-2.5 text-sm" 
-                      : "flex-1 px-8 py-3.5 text-base"
+                    isMobileView
+                      ? "whitespace-nowrap px-6 py-3.5 text-base"
+                      : "flex-1 px-8 py-4 text-base"
                   )}
                 >
-                  <Users className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
+                  <Users className="mr-2 w-5 h-5" />
                   Thành viên ({(trip.members?.length || 0) + 1})
                 </TabsTrigger>
                 {trip.userRole === 'owner' && (
@@ -623,12 +623,12 @@ const TripDetailsPage = () => {
                     value="share"
                     className={cn(
                       "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
-                      isPWA 
-                        ? "whitespace-nowrap px-6 py-2.5 text-sm" 
-                        : "flex-1 px-8 py-3.5 text-base"
+                      isMobileView
+                        ? "whitespace-nowrap px-6 py-3.5 text-base"
+                        : "flex-1 px-8 py-4 text-base"
                     )}
                   >
-                    <Share2 className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
+                    <Share2 className="mr-2 w-5 h-5" />
                     Chia sẻ
                   </TabsTrigger>
                 )}
