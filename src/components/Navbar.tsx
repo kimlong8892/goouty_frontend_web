@@ -270,7 +270,7 @@ export const Navbar = () => {
       case '/my-trips':
         return 'Chuyến đi của tôi';
       case '/pwa-trips':
-        return 'Chuyến đi';
+        return 'Chuyến đi của tôi';
       case '/create-trip':
         return 'Tạo chuyến đi';
       case '/notifications':
@@ -360,13 +360,13 @@ export const Navbar = () => {
   ];
 
   const authNavItems = [
-    { to: '/my-trips', icon: <List size={20} />, label: 'Chuyến đi', id: 'my-trips' },
+    { to: '/my-trips', icon: <List size={20} />, label: 'Chuyến đi của tôi', id: 'my-trips' },
   ];
 
   // PWA Navigation Items
   const pwaNavItems = [
     { to: '/', icon: <Home size={24} />, label: 'Trang chủ', id: 'home' },
-    { to: '/pwa-trips', icon: <List size={24} />, label: 'Chuyến đi', id: 'pwa-trips' },
+    { to: '/pwa-trips', icon: <List size={24} />, label: 'Chuyến đi của tôi', id: 'pwa-trips' },
     { to: '/pwa-create-trip', icon: <Plus size={24} />, label: 'Tạo', id: 'create-trip', isHighlighted: true },
     { to: '/notifications', icon: <Bell size={24} />, label: 'Thông báo', id: 'notifications' },
     { to: '/profile', icon: user?.profilePicture ? <img src={user.profilePicture} alt="Avatar" className="w-6 h-6 rounded-full" /> : <User size={24} />, label: 'Hồ sơ', id: 'profile' },
