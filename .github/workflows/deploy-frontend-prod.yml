@@ -123,12 +123,12 @@ jobs:
             git reset --hard origin/prod
           "
           
-          # Upload .env.prod using pipe for reliability
-          echo \"Uploading .env.prod...\"
-          cat .env.prod | sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST \"cat > $DEPLOY_PATH/.env.prod\"
+          # Upload .env.prod
+          echo "Uploading .env.prod..."
+          sshpass -p "$SSH_PASS" scp $SSH_OPTS .env.prod $SSH_USER@$SSH_HOST:$DEPLOY_PATH/.env.prod
           
           # Run the deploy script
-          sshpass -p \"$SSH_PASS\" ssh $SSH_OPTS $SSH_USER@$SSH_HOST \"
+          sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST "
             cd $DEPLOY_PATH
             echo 'Deploying Frontend Prod...'
             chmod +x deploy_cicd_prod.sh
@@ -139,5 +139,5 @@ jobs:
             
             echo '--- Container Logs ---'
             docker compose -p goouty-frontend-prod logs --tail=50
-          \"
+          "
 
