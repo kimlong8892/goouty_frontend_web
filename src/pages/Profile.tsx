@@ -45,6 +45,8 @@ interface UserProfile {
   bankId?: string;
   bankNumber?: string;
   hasPassword?: boolean; // True if user has password, false if registered via Google
+  tripsCount?: number;
+  placesCount?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -248,6 +250,19 @@ const Profile = () => {
             <h1 className="text-2xl font-bold text-gray-900">{profile.fullName}</h1>
             <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
 
+            {/* Stats Card - Mobile */}
+            <div className="mt-6 bg-slate-50 rounded-xl px-6 py-4 flex items-center gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">{profile.tripsCount ?? 0}</div>
+                <div className="text-xs text-gray-500 mt-1">CHUYẾN ĐI</div>
+              </div>
+              <div className="w-px h-10 bg-gray-200"></div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">{profile.placesCount ?? 0}</div>
+                <div className="text-xs text-gray-500 mt-1">ĐỊA ĐIỂM</div>
+              </div>
+            </div>
+
             <Button
               onClick={() => navigate('/profile/edit')}
               variant="outline"
@@ -420,6 +435,19 @@ const Profile = () => {
                   <div className="flex items-center justify-center md:justify-start gap-2 text-slate-500 font-medium mt-1">
                     <span>Việt Nam</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Stats Card - Right */}
+              <div className="bg-slate-50 rounded-xl px-6 py-4 flex items-center gap-4 z-10">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-slate-900">{profile.tripsCount ?? 0}</div>
+                  <div className="text-sm text-slate-500 mt-1">CHUYẾN ĐI</div>
+                </div>
+                <div className="w-px h-12 bg-slate-200"></div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-slate-900">{profile.placesCount ?? 0}</div>
+                  <div className="text-sm text-slate-500 mt-1">ĐỊA ĐIỂM</div>
                 </div>
               </div>
             </div>
