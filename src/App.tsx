@@ -55,28 +55,27 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// PWA Authentication Guard Component
-const PWAAuthGuard = ({ children }: { children: React.ReactNode }) => {
+// Authentication Guard Component
+const AuthGuard = ({ children, forceWebAuth = false }: { children: React.ReactNode; forceWebAuth?: boolean }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const { isPWA } = usePWA();
   const location = useLocation();
 
-  // If not PWA, render children normally
-  if (!isPWA) {
-    return <>{children}</>;
-  }
-
-  // If PWA and still loading auth, show loading
+  // Still loading auth, show loading
   if (isLoading) {
     return <PWASimpleLoading />;
   }
 
-  // If PWA and not authenticated, redirect to auth
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+  // If (it's PWA) OR (it's web but we explicitly want to force auth)
+  if (isPWA || forceWebAuth) {
+    if (!isAuthenticated) {
+      // Encode the current location including search params to redirect back after login
+      const from = location.pathname + location.search;
+      return <Navigate to="/auth" state={{ from }} replace />;
+    }
   }
 
-  // If PWA and authenticated, render children
+  // If not PWA and not forced, or if authenticated, render children
   return <>{children}</>;
 };
 
@@ -86,81 +85,81 @@ const AppRoutes = () => {
       <Route
         path="/"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
               <Index />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/create-trip"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <CreateTripPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/pwa-create-trip"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
               <PWACreateTripPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/templates"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
               <TemplatesPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/template/:id"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
               <TripTemplateDetailPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/my-trips"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <MyTripsPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/pwa-trips"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
               <PWATripListPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/trip/:id"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <TripDetailsPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
@@ -214,41 +213,41 @@ const AppRoutes = () => {
       <Route
         path="/profile"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <Profile />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/profile/edit"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <EditProfile />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/notifications"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <NotificationsPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/settings"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <Settings />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
