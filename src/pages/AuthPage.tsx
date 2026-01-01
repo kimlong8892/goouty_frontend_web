@@ -58,7 +58,6 @@ const AuthPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // If there's an invite token, redirect to accept invitation
       if (inviteToken) {
         navigate(`/invite?token=${inviteToken}`);
       } else if (fromPath) {
@@ -87,7 +86,6 @@ const AuthPage = () => {
     if (mode === 'login') {
       const { error } = await login(email, password);
       if (error) {
-        // Xử lý thông báo lỗi rõ ràng hơn
         let errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
         if (error.message) {
           if (error.message.includes('Email hoặc mật khẩu không đúng') || error.message.includes('Invalid credentials')) {
@@ -106,16 +104,14 @@ const AuthPage = () => {
         showToast(errorMessage, 'error');
       } else {
         showToast('Đăng nhập thành công! Đang chuyển hướng...', 'success');
-        // Navigation will be handled by useEffect when isAuthenticated changes
       }
     } else {
       if (!fullName) {
         showToast('Vui lòng nhập họ tên', 'error');
         return;
       }
-      const { error } = await signup(email, password, fullName); // Pass fullName to signup
+      const { error } = await signup(email, password, fullName);
       if (error) {
-        // Xử lý thông báo lỗi rõ ràng hơn
         let errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
         if (error.message) {
           if (error.message.includes('Email đã tồn tại') || error.message.includes('already exists')) {
@@ -142,49 +138,48 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 flex items-start md:items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
-      <AnimatedTransition show={show} animation="slide-up" className="w-full">
-        <Card className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 rounded-[32px] overflow-hidden shadow-2xl border-none">
+    <div className="min-h-screen pt-12 pb-12 px-4 flex flex-col items-center justify-center bg-[#f8f9fa]">
+      <AnimatedTransition show={show} animation="slide-up" className="w-full max-w-[1000px]">
+        <Card className="w-full grid grid-cols-1 md:grid-cols-2 rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] border-none bg-white p-4">
 
-          {/* Mascot Image - Conditional Order */}
-          <div className={`hidden md:block relative h-full min-h-[600px] bg-sky-100 ${mode === 'signup' ? 'md:order-2' : 'md:order-1'}`}>
+          {/* Mascot Image Section */}
+          <div className={`hidden md:block relative h-auto min-h-[500px] overflow-hidden rounded-[24px] ${mode === 'signup' ? 'md:order-2' : 'md:order-1'}`}>
             <img
               src="/create_trip_mascot.png"
               alt="Goouty Mascot"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
           </div>
 
-          {/* Form Content - Conditional Order */}
-          <div className={`p-8 md:p-12 lg:p-16 bg-white flex flex-col justify-center ${mode === 'signup' ? 'md:order-1' : 'md:order-2'}`}>
-            <div className="mb-6 text-center md:text-left">
-              <h1 className="text-4xl font-black text-[#6347f9] mb-2 uppercase tracking-wide">
+          {/* Form Content */}
+          <div className={`p-8 md:p-10 lg:p-12 flex flex-col justify-center ${mode === 'signup' ? 'md:order-1' : 'md:order-2'}`}>
+            <div className="mb-8">
+              <h1 className="text-[42px] font-black text-[#6347f9] mb-2 uppercase tracking-tight leading-tight font-sans">
                 {mode === 'login' ? 'Đăng nhập' : 'ĐĂNG KÝ'}
               </h1>
-              <p className="text-slate-500 font-medium">
+              <p className="text-slate-500 font-medium text-lg">
                 Cùng Goouty lập kế hoạch chuyến đi
               </p>
             </div>
 
             <div className="space-y-6">
-              {/* Only show Google Login on Login Mode */}
+              {/* Google Login */}
               {mode === 'login' && (
                 <>
                   <Button
                     variant="outline"
-                    className="w-full h-12 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold gap-3 text-base"
+                    className="w-full h-[54px] rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold gap-3 text-base shadow-none transition-colors"
                     onClick={handleGoogleLogin}
                   >
-                    <GoogleIcon size={22} />
+                    <GoogleIcon size={24} />
                     Google
                   </Button>
 
-                  <div className="relative">
+                  <div className="relative py-2">
                     <div className="absolute inset-0 flex items-center">
                       <span className="w-full border-t border-slate-100" />
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
+                    <div className="relative flex justify-center text-sm">
                       <span className="bg-white px-4 text-slate-400 font-medium">Hoặc</span>
                     </div>
                   </div>
@@ -195,12 +190,12 @@ const AuthPage = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Name - Signup Only */}
                 {mode === 'signup' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="fullname" className="text-slate-600 font-medium">Họ và tên</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="fullname" className="text-slate-400 text-sm font-medium ml-1">Họ và tên</Label>
                     <Input
                       id="fullname"
                       type="text"
-                      className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white transition-all px-4"
+                      className="h-[52px] rounded-xl bg-white border-slate-200 focus:border-[#6347f9] focus:ring-0 transition-all px-4 text-base"
                       placeholder="Nhập họ và tên của bạn"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -208,26 +203,26 @@ const AuthPage = () => {
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-600 font-medium">Địa chỉ email</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-slate-400 text-sm font-medium ml-1">Địa chỉ email</Label>
                   <Input
                     id="email"
                     type="email"
-                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white transition-all px-4"
-                    placeholder={mode === 'login' ? "Nhập địa chỉ email của bạn" : "Nhập địa chỉ email của bạn"}
+                    className="h-[52px] rounded-xl bg-white border-slate-200 focus:border-[#6347f9] focus:ring-0 transition-all px-4 text-base"
+                    placeholder="Nhập địa chỉ email của bạn"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-slate-600 font-medium">Mật khẩu</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-slate-400 text-sm font-medium ml-1">Mật khẩu</Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white transition-all px-4 pr-12"
-                      placeholder="Nhập mật khẩu của bạn"
+                      className="h-[52px] rounded-xl bg-white border-slate-200 focus:border-[#6347f9] focus:ring-0 transition-all px-4 pr-12 text-base"
+                      placeholder="Nhập mật khẩu"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
@@ -242,50 +237,50 @@ const AuthPage = () => {
                 </div>
 
                 {mode === 'login' && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between pt-1">
                     <label className="flex items-center gap-2 cursor-pointer group">
                       <input
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 rounded border-slate-300 text-[#6347f9] focus:ring-[#6347f9] cursor-pointer accent-[#6347f9]"
+                        className="w-[18px] h-[18px] rounded border-slate-300 text-[#6347f9] focus:ring-[#6347f9] cursor-pointer accent-[#6347f9]"
                       />
-                      <span className="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">Ghi nhớ tài khoản</span>
+                      <span className="text-sm text-slate-600 font-medium group-hover:text-slate-800 transition-colors">Ghi nhớ tài khoản</span>
                     </label>
 
                     <button
                       type="button"
                       onClick={() => navigate('/forgot-password')}
-                      className="text-sm font-semibold text-[#6347f9] hover:text-[#5136db] transition-colors"
+                      className="text-sm font-bold text-[#6347f9] hover:text-[#5136db] transition-colors"
                     >
-                      Quên mật khẩu?
+                      Quên mật khẩu
                     </button>
                   </div>
                 )}
 
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="w-full h-[54px] rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-none transition-all duration-300 mt-4"
                 >
                   {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                 </Button>
               </form>
-
-              <div className="text-center pt-2">
-                <p className="text-slate-500 font-medium text-sm">
-                  {mode === 'login' ? 'Bạn không có tài khoản? ' : 'Bạn đã có tài khoản? '}
-                  <button
-                    onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                    className="text-[#6347f9] font-bold hover:underline"
-                  >
-                    {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
-                  </button>
-                </p>
-              </div>
             </div>
           </div>
-
         </Card>
+
+        {/* Footer Navigation */}
+        <div className="mt-8 text-center">
+          <p className="text-slate-600 font-medium text-base">
+            {mode === 'login' ? 'Bạn không có tài khoản? ' : 'Bạn đã có tài khoản? '}
+            <button
+              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+              className="text-[#6347f9] font-extrabold hover:underline"
+            >
+              {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
+            </button>
+          </p>
+        </div>
       </AnimatedTransition>
     </div>
   );
