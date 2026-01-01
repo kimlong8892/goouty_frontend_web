@@ -77,10 +77,25 @@ const AuthPage = () => {
     if (mode === 'login') {
       const { error } = await login(email, password);
       if (error) {
-        showToast(error.message || 'Đăng nhập thất bại', 'error');
-        if (error.message?.includes('not confirmed')) setShowResendConfirmation(true);
+        // Xử lý thông báo lỗi rõ ràng hơn
+        let errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
+        if (error.message) {
+          if (error.message.includes('Email hoặc mật khẩu không đúng') || error.message.includes('Invalid credentials')) {
+            errorMessage = 'Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.';
+          } else if (error.message.includes('sử dụng Google') || error.message.includes('social login')) {
+            errorMessage = 'Tài khoản này chỉ có thể đăng nhập bằng Google. Vui lòng sử dụng nút đăng nhập Google.';
+          } else if (error.message.includes('email hợp lệ') || error.message.includes('valid email')) {
+            errorMessage = 'Địa chỉ email không hợp lệ. Vui lòng kiểm tra lại.';
+          } else if (error.message.includes('not confirmed')) {
+            errorMessage = 'Tài khoản chưa được xác nhận. Vui lòng kiểm tra email để xác nhận tài khoản.';
+            setShowResendConfirmation(true);
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        showToast(errorMessage, 'error');
       } else {
-        showToast('Đăng nhập thành công', 'success');
+        showToast('Đăng nhập thành công! Đang chuyển hướng...', 'success');
         navigate('/my-trips');
       }
     } else {
@@ -89,9 +104,23 @@ const AuthPage = () => {
         return;
       }
       const { error } = await signup(email, password, fullName); // Pass fullName to signup
-      if (error) showToast(error.message || 'Đăng ký thất bại', 'error');
-      else {
-        showToast('Đăng ký thành công. Kiểm tra email để xác nhận.', 'success');
+      if (error) {
+        // Xử lý thông báo lỗi rõ ràng hơn
+        let errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
+        if (error.message) {
+          if (error.message.includes('Email đã tồn tại') || error.message.includes('already exists')) {
+            errorMessage = 'Email này đã được sử dụng. Vui lòng sử dụng email khác hoặc đăng nhập.';
+          } else if (error.message.includes('email hợp lệ') || error.message.includes('valid email')) {
+            errorMessage = 'Địa chỉ email không hợp lệ. Vui lòng kiểm tra lại.';
+          } else if (error.message.includes('mật khẩu') || error.message.includes('password')) {
+            errorMessage = error.message;
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        showToast(errorMessage, 'error');
+      } else {
+        showToast('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản trước khi đăng nhập.', 'success');
         setMode('login');
       }
     }
@@ -157,12 +186,12 @@ const AuthPage = () => {
                 {/* Name - Signup Only */}
                 {mode === 'signup' && (
                   <div className="space-y-2">
-                    <Label htmlFor="fullname" className="text-slate-600 font-medium">Name</Label>
+                    <Label htmlFor="fullname" className="text-slate-600 font-medium">Họ và tên</Label>
                     <Input
                       id="fullname"
                       type="text"
                       className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4"
-                      placeholder="Shane Watson"
+                      placeholder="Nhập họ và tên của bạn"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                     />
@@ -170,25 +199,25 @@ const AuthPage = () => {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-600 font-medium">{mode === 'login' ? 'Địa chỉ email' : 'Email Address'}</Label>
+                  <Label htmlFor="email" className="text-slate-600 font-medium">Địa chỉ email</Label>
                   <Input
                     id="email"
                     type="email"
                     className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4"
-                    placeholder={mode === 'login' ? "Nhập địa chỉ email của bạn" : "shane.watson@example.com"}
+                    placeholder={mode === 'login' ? "Nhập địa chỉ email của bạn" : "Nhập địa chỉ email của bạn"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-slate-600 font-medium">{mode === 'login' ? 'Mật khẩu' : 'Password'}</Label>
+                  <Label htmlFor="password" className="text-slate-600 font-medium">Mật khẩu</Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4 pr-12"
-                      placeholder={mode === 'login' ? "Nhập mật khẩu" : "........"}
+                      placeholder="Nhập mật khẩu của bạn"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
