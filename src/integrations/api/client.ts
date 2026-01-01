@@ -118,6 +118,15 @@ export const api = {
     removeFromTrip: async (tripId: string, memberId: string) => {
       return await api.delete(`/trips/${tripId}/members/${memberId}`);
     },
+    getInvitationByToken: async (token: string) => {
+      return await api.get<any>(`/trips/invites/${token}`);
+    },
+    acceptInvite: async (token: string) => {
+      return await api.post<any>('/trips/invites/accept', { token });
+    },
+    acceptInviteByMemberId: async (tripId: string, memberId: string) => {
+      return await api.post<any>(`/trips/${tripId}/members/${memberId}/accept`);
+    },
   },
 
   // Day-specific API methods

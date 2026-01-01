@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label.tsx';
 import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
 import { useAnimateIn } from '@/lib/animations.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useGlobalToast } from '../utils/globalToast';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -48,6 +48,9 @@ const AuthPage = () => {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const inviteToken = (location.state as any)?.inviteToken;
+  const fromPath = (location.state as any)?.from;
 
   useEffect(() => {
     document.title = mode === 'login' ? 'Đăng nhập - Goouty' : 'Đăng ký - Goouty';
@@ -55,9 +58,16 @@ const AuthPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/my-trips');
+      // If there's an invite token, redirect to accept invitation
+      if (inviteToken) {
+        navigate(`/invite?token=${inviteToken}`);
+      } else if (fromPath) {
+        navigate(fromPath);
+      } else {
+        navigate('/my-trips');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, inviteToken, fromPath]);
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -96,7 +106,7 @@ const AuthPage = () => {
         showToast(errorMessage, 'error');
       } else {
         showToast('Đăng nhập thành công! Đang chuyển hướng...', 'success');
-        navigate('/my-trips');
+        // Navigation will be handled by useEffect when isAuthenticated changes
       }
     } else {
       if (!fullName) {
