@@ -321,7 +321,7 @@ const App = () => (
       <AuthProvider>
         <NotificationCountProvider>
           <PWANotificationProvider>
-            <TooltipProvider>
+            <TooltipProvider delayDuration={100}>
               <Toaster />
               <Sonner />
               <AppContent />

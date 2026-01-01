@@ -355,8 +355,7 @@ const MyTripsPage = () => {
                       <div className="absolute bottom-0 left-0 right-0 z-10 bg-white h-[180px] rounded-[32px] p-5 flex flex-col justify-between shadow-[0_-5px_20px_rgba(0,0,0,0.05)] border border-white/50">
                         <div>
                           {/* Title */}
-                          <h3 className="font-bold text-lg text-slate-900 line-clamp-1 mb-1">{trip.title}</h3>
-
+                          <h3 className="font-bold text-base text-slate-900 mb-1 leading-snug">{trip.title}</h3>
                           {/* Location */}
                           <div className="flex items-center text-slate-500 text-xs mb-1">
                             <MapPin size={14} className="mr-1 flex-shrink-0" />

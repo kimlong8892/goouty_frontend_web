@@ -432,7 +432,7 @@ const PWATripListPage = () => {
                   </div>
 
                   <CardContent className="p-4">
-                    <h3 className="font-bold text-lg text-gray-900 mb-3 line-clamp-1 group-hover:text-primary transition-colors duration-200">
+                    <h3 className="font-bold text-base text-gray-900 mb-1 leading-snug group-hover:text-primary transition-colors duration-200">
                       {trip.title}
                     </h3>
 

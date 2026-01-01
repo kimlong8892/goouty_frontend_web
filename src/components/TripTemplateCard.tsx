@@ -53,7 +53,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
   // Dummy data for design match since API might not return these yet
   const rating = 5.0;
   const reviewCount = "6k";
-  const price = "$1200";
+  const price = "1.200.000 VNĐ";
 
   return (
     <div className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[420px] w-full max-w-sm mx-auto flex flex-col">
@@ -90,12 +90,12 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
         <div>
           {/* Header: Title & Price */}
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-extrabold text-xl text-slate-900 line-clamp-1 pr-2 flex-1" title={template.title}>
+            <h3 className="font-bold text-base text-slate-900 pr-2 flex-1 leading-snug" title={template.title}>
               {template.title}
             </h3>
             <div className="flex flex-col items-end">
               <span className="text-[#6347f9] font-black text-lg">{price}</span>
-              <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">/person</span>
+              <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">/ người</span>
             </div>
           </div>
 
