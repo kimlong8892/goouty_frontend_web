@@ -251,15 +251,15 @@ const Profile = () => {
             <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
 
             {/* Stats Card - Mobile */}
-            <div className="mt-6 bg-slate-50 rounded-xl px-6 py-4 flex items-center gap-4">
+            <div className="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-3 flex items-center gap-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{profile.tripsCount ?? 0}</div>
-                <div className="text-xs text-gray-500 mt-1">CHUYẾN ĐI</div>
+                <div className="text-lg font-bold text-gray-900">{profile.tripsCount ?? 0}</div>
+                <div className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">CHUYẾN ĐI</div>
               </div>
-              <div className="w-px h-10 bg-gray-200"></div>
+              <div className="w-px h-6 bg-gray-100"></div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{profile.placesCount ?? 0}</div>
-                <div className="text-xs text-gray-500 mt-1">ĐỊA ĐIỂM</div>
+                <div className="text-lg font-bold text-gray-900">{profile.placesCount ?? 0}</div>
+                <div className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">ĐỊA ĐIỂM</div>
               </div>
             </div>
 
@@ -412,9 +412,9 @@ const Profile = () => {
               />
             </div>
 
-            <div className="px-6 md:px-10 pb-8 flex flex-col md:flex-row items-end md:items-center justify-between relative mt-[-60px] md:mt-[-40px]">
+            <div className="px-6 md:px-10 pb-8 flex flex-col md:flex-row items-end md:items-center justify-between relative mt-[-60px] md:mt-0">
               <div className="flex flex-col md:flex-row items-center gap-6 z-10 w-full md:w-auto">
-                <div className="relative">
+                <div className="relative md:-mt-16">
                   <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-[6px] border-white shadow-xl bg-white overflow-hidden relative">
                     {profile.profilePicture ? (
                       <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
@@ -430,7 +430,7 @@ const Profile = () => {
                   </label>
                 </div>
 
-                <div className="text-center md:text-left pt-2 md:pt-12">
+                <div className="text-center md:text-left pt-2 md:pt-4">
                   <h1 className="text-3xl font-bold text-slate-900">{profile.fullName}</h1>
                   <div className="flex items-center justify-center md:justify-start gap-2 text-slate-500 font-medium mt-1">
                     <span>Việt Nam</span>
@@ -439,15 +439,15 @@ const Profile = () => {
               </div>
 
               {/* Stats Card - Right */}
-              <div className="bg-slate-50 rounded-xl px-6 py-4 flex items-center gap-4 z-10">
+              <div className="bg-white rounded-2xl shadow-xl border border-slate-50 px-6 py-3 flex items-center gap-5 z-10 md:mt-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-slate-900">{profile.tripsCount ?? 0}</div>
-                  <div className="text-sm text-slate-500 mt-1">CHUYẾN ĐI</div>
+                  <div className="text-xl font-black text-slate-900">{profile.tripsCount ?? 0}</div>
+                  <div className="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">CHUYẾN ĐI</div>
                 </div>
-                <div className="w-px h-12 bg-slate-200"></div>
+                <div className="w-px h-8 bg-slate-100"></div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-slate-900">{profile.placesCount ?? 0}</div>
-                  <div className="text-sm text-slate-500 mt-1">ĐỊA ĐIỂM</div>
+                  <div className="text-xl font-black text-slate-900">{profile.placesCount ?? 0}</div>
+                  <div className="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">ĐỊA ĐIỂM</div>
                 </div>
               </div>
             </div>
