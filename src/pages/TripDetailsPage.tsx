@@ -80,7 +80,6 @@ type TripDetails = {
   name: string;
   description: string;
   startDate: string;
-  endDate: string;
   provinceId?: string;
   province?: {
     id: string;
@@ -309,7 +308,6 @@ const TripDetailsPage = () => {
         name: tripData.title,
         description: tripData.description,
         startDate: tripData.startDate,
-        endDate: tripData.endDate,
         provinceId: tripData.provinceId,
         province: tripData.province,
         isPublic: tripData.isPublic || false,
@@ -419,14 +417,13 @@ const TripDetailsPage = () => {
     return `${d.getDate()} Tháng ${d.getMonth() + 1}, ${d.getFullYear()}`;
   };
 
-  const getStatus = (startDate: string | null, endDate: string | null) => {
+  const getStatus = (startDate: string | null) => {
     if (!startDate) return 'planning';
     const today = new Date();
     const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : start;
 
-    if (end < today) return 'completed';
-    if (start <= today && today <= end) return 'ongoing';
+    if (start < today) return 'completed';
+    if (start.toDateString() === today.toDateString()) return 'ongoing';
     return 'upcoming';
   };
 
@@ -454,7 +451,7 @@ const TripDetailsPage = () => {
 
   if (!trip) return null;
 
-  const status = getStatus(trip.startDate, trip.endDate);
+  const status = getStatus(trip.startDate);
 
   return (
     <div className={cn(
@@ -552,7 +549,7 @@ const TripDetailsPage = () => {
             )}>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#6c5dd3]" />
-                <span>{formatDate(trip.startDate)} - {formatDate(trip.endDate)}</span>
+                <span>{formatDate(trip.startDate)}</span>
               </div>
               {trip.province && (
                 <div className="flex items-center gap-2">
@@ -932,7 +929,6 @@ const TripDetailsPage = () => {
                     provinceId: trip.provinceId || '',
                     province: trip.province,
                     startDate: trip.startDate,
-                    endDate: trip.endDate,
                     description: trip.description,
                     userId: trip.userId,
                     shareToken: trip.shareToken,

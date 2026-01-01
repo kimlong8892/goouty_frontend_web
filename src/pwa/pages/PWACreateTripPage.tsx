@@ -5,7 +5,6 @@ import { usePWA } from '@/pwa/hooks/usePWA';
 import { api } from '@/lib/api.ts';
 import { useGlobalToast } from '@/utils/globalToast';
 import { CreateTripRequest, Trip } from '@/lib/types.ts';
-import { DateRange } from 'react-day-picker';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
 import { Calendar } from '@/components/ui/calendar.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
@@ -26,7 +25,7 @@ const PWACreateTripPage = () => {
   const [tripName, setTripName] = useState('');
   const [destination, setDestination] = useState('');
   const [description, setDescription] = useState('');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [startDate, setStartDate] = useState<Date | undefined>();
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,9 +61,6 @@ const PWACreateTripPage = () => {
       newErrors.destination = 'Vui lòng nhập điểm đến';
     }
 
-    if (dateRange?.from && dateRange?.to && dateRange.from > dateRange.to) {
-      newErrors.dateRange = 'Ngày bắt đầu phải trước ngày kết thúc';
-    }
 
     // If there are errors, set them and focus on first error
     if (Object.keys(newErrors).length > 0) {
@@ -87,8 +83,7 @@ const PWACreateTripPage = () => {
         title: tripName.trim(),
         provinceId: destination.trim() || undefined,
         description: description.trim() || undefined,
-        ...(dateRange?.from && { startDate: dateRange.from.toISOString() }),
-        ...(dateRange?.to && { endDate: dateRange.to.toISOString() })
+        ...(startDate && { startDate: startDate.toISOString() })
       };
 
       const trip = await api.post<Trip>('/trips', tripData);
@@ -248,29 +243,22 @@ const PWACreateTripPage = () => {
             )}
           </div>
 
-          {/* Date Range Section */}
+          {/* Start Date Section */}
           <div className="space-y-2">
             <Label className="text-sm font-semibold text-gray-700">
-              Thời gian chuyến đi
+              Ngày đi
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-full justify-start text-left font-normal h-12 text-base transition-all duration-200 ${errors.dateRange ? 'border-red-500 focus:border-red-500' : 'border-gray-200 hover:border-primary/50 focus:border-primary'}`}
+                  className="w-full justify-start text-left font-normal h-12 text-base transition-all duration-200 border-gray-200 hover:border-primary/50 focus:border-primary"
                 >
                   <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>
-                        {format(dateRange.from, "dd/MM/yyyy", { locale: vi })} -{" "}
-                        {format(dateRange.to, "dd/MM/yyyy", { locale: vi })}
-                      </>
-                    ) : (
-                      format(dateRange.from, "dd/MM/yyyy", { locale: vi })
-                    )
+                  {startDate ? (
+                    format(startDate, "dd/MM/yyyy", { locale: vi })
                   ) : (
-                    <span className="text-gray-500">Chọn thời gian chuyến đi</span>
+                    <span className="text-gray-500">Chọn ngày đi</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -284,24 +272,17 @@ const PWACreateTripPage = () => {
               >
                 <Calendar
                   initialFocus
-                  mode="range"
-                  defaultMonth={dateRange?.from}
-                  selected={dateRange}
-                  onSelect={(range) => {
-                    setDateRange(range);
-                    if (errors.dateRange) {
-                      setErrors(prev => ({ ...prev, dateRange: '' }));
-                    }
+                  mode="single"
+                  defaultMonth={startDate}
+                  selected={startDate}
+                  onSelect={(date) => {
+                    setStartDate(date);
                   }}
-                  numberOfMonths={1}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                   className="rounded-md"
                 />
               </PopoverContent>
             </Popover>
-            {errors.dateRange && (
-              <p className="text-sm text-red-500 animate-fade-in">{errors.dateRange}</p>
-            )}
           </div>
 
           {/* Description Section */}

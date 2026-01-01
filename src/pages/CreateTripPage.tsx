@@ -16,7 +16,6 @@ import { useNavigate } from 'react-router-dom';
 import { useGlobalToast } from '../utils/globalToast';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { CreateTripRequest, Trip } from '@/lib/types.ts';
-import { DateRange } from 'react-day-picker';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
 
 const CreateTripPage = () => {
@@ -25,7 +24,7 @@ const CreateTripPage = () => {
   const [tripName, setTripName] = useState('');
   const [provinceId, setProvinceId] = useState('');
   const [description, setDescription] = useState('');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [startDate, setStartDate] = useState<Date | undefined>();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
@@ -56,9 +55,6 @@ const CreateTripPage = () => {
     if (!provinceId.trim()) {
       newErrors.provinceId = 'Vui lòng chọn tỉnh thành';
     }
-    if (dateRange?.from && dateRange?.to && dateRange.from > dateRange.to) {
-      newErrors.dateRange = 'Ngày bắt đầu phải trước ngày kết thúc';
-    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -75,8 +71,7 @@ const CreateTripPage = () => {
         title: tripName.trim(),
         provinceId: provinceId.trim(),
         description: description.trim() || undefined,
-        ...(dateRange?.from && { startDate: dateRange.from.toISOString() }),
-        ...(dateRange?.to && { endDate: dateRange.to.toISOString() })
+        ...(startDate && { startDate: startDate.toISOString() })
       };
       const trip = await api.post<Trip>('/trips', tripData);
       showToast('Tạo chuyến đi thành công!', 'success');
@@ -163,48 +158,38 @@ const CreateTripPage = () => {
                   {errors.provinceId && <p className="text-sm text-red-500">{errors.provinceId}</p>}
                 </div>
 
-                {/* Date Range */}
+                {/* Start Date */}
                 <div className="space-y-2">
                   <Label className="text-slate-600 font-medium text-sm">
-                    Thời gian chuyến đi
+                    Ngày đi
                   </Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        className={`w-full justify-start text-left font-normal h-11 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 ${!dateRange ? 'text-muted-foreground' : ''} ${errors.dateRange ? 'border-red-500' : ''}`}
+                        className={`w-full justify-start text-left font-normal h-11 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 ${!startDate ? 'text-muted-foreground' : ''}`}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4 text-slate-400" />
-                        {dateRange?.from ? (
-                          dateRange.to ? (
-                            <>
-                              {format(dateRange.from, "dd/MM/yyyy", { locale: vi })} -{" "}
-                              {format(dateRange.to, "dd/MM/yyyy", { locale: vi })}
-                            </>
-                          ) : (
-                            format(dateRange.from, "dd/MM/yyyy", { locale: vi })
-                          )
+                        {startDate ? (
+                          format(startDate, "dd/MM/yyyy", { locale: vi })
                         ) : (
-                          <span>Chọn thời gian chuyến đi</span>
+                          <span>Chọn ngày đi</span>
                         )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         initialFocus
-                        mode="range"
-                        defaultMonth={dateRange?.from}
-                        selected={dateRange}
-                        onSelect={(range) => {
-                          setDateRange(range);
-                          if (errors.dateRange) setErrors(prev => ({ ...prev, dateRange: '' }));
+                        mode="single"
+                        defaultMonth={startDate}
+                        selected={startDate}
+                        onSelect={(date) => {
+                          setStartDate(date);
                         }}
-                        numberOfMonths={2}
                         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                       />
                     </PopoverContent>
                   </Popover>
-                  {errors.dateRange && <p className="text-sm text-red-500">{errors.dateRange}</p>}
                 </div>
 
                 {/* Description */}

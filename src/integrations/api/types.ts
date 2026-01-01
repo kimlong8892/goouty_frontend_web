@@ -14,7 +14,6 @@ export namespace DATABASE_TYPES {
       phoneCode: number;
     };
     startDate?: string;
-    endDate?: string;
     description?: string;
     userId: string;
     isPublic?: boolean;

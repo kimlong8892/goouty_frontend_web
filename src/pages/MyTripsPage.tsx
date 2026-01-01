@@ -152,7 +152,6 @@ const MyTripsPage = () => {
           // Map API fields to component expected fields
           name: trip.title,
           start_date: trip.startDate,
-          end_date: trip.endDate,
           is_public: !!trip.shareToken,
           slug: trip.id.toString(),
           // Ensure user object is preserved with profilePicture

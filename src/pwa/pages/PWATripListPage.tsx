@@ -41,7 +41,6 @@ type TripWithMember = {
     phoneCode: number;
   };
   startDate: string;
-  endDate: string;
   description?: string;
   avatar?: string;
   userId: string;
@@ -176,7 +175,6 @@ const PWATripListPage = () => {
           isPublic: !!trip.shareToken,
           name: trip.title,
           start_date: trip.startDate,
-          end_date: trip.endDate,
           is_public: !!trip.shareToken,
           slug: trip.id.toString(),
           user: trip.user ? {
@@ -214,14 +212,13 @@ const PWATripListPage = () => {
     });
   };
 
-  const getTripStatus = (startDate: string | undefined, endDate: string | undefined) => {
+  const getTripStatus = (startDate: string | undefined) => {
     if (!startDate) return 'planning';
     const today = new Date();
     const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : start;
 
-    if (end < today) return 'completed';
-    if (start <= today && today <= end) return 'ongoing';
+    if (start < today) return 'completed';
+    if (start.toDateString() === today.toDateString()) return 'ongoing';
     return 'upcoming';
   };
 
@@ -364,7 +361,7 @@ const PWATripListPage = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             {trips.map((trip) => {
-              const status = getTripStatus(trip.startDate, trip.endDate);
+              const status = getTripStatus(trip.startDate);
               const statusColor = getStatusColor(status);
               const statusLabel = getStatusLabel(status);
 
@@ -451,7 +448,7 @@ const PWATripListPage = () => {
                     <div className="space-y-2.5 mb-4">
                       <div className="flex items-center text-sm text-gray-600">
                         <Calendar className="w-4 h-4 mr-2" />
-                        <span>{formatDate(trip.startDate)} - {formatDate(trip.endDate)}</span>
+                        <span>{formatDate(trip.startDate)}</span>
                       </div>
 
                       <div className="flex items-center text-sm text-gray-600">

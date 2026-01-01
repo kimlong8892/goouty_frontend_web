@@ -22,7 +22,6 @@ import { api } from '@/lib/api';
 import { Trip } from '@/lib/types';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
 import { useAuth } from '@/contexts/AuthContext';
-import { DateRange } from 'react-day-picker';
 
 interface EditTripDialogProps {
   trip: Trip;
@@ -41,10 +40,8 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
   const [tripName, setTripName] = useState(trip.title);
   const [provinceId, setProvinceId] = useState(trip.provinceId || '');
   const [description, setDescription] = useState(trip.description || '');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
-    const from = trip.startDate ? new Date(trip.startDate) : undefined;
-    const to = trip.endDate ? new Date(trip.endDate) : undefined;
-    return from || to ? { from, to } : undefined;
+  const [startDate, setStartDate] = useState<Date | undefined>(() => {
+    return trip.startDate ? new Date(trip.startDate) : undefined;
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [currentAvatar, setCurrentAvatar] = useState(trip.avatar || '');
@@ -70,9 +67,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
       setCurrentAvatar(trip.avatar || '');
       setSelectedAvatarFile(null);
       setAvatarPreview(null);
-      const from = trip.startDate ? new Date(trip.startDate) : undefined;
-      const to = trip.endDate ? new Date(trip.endDate) : undefined;
-      setDateRange(from || to ? { from, to } : undefined);
+      setStartDate(trip.startDate ? new Date(trip.startDate) : undefined);
       setErrors({});
     }
   }, [open, trip]);
@@ -148,9 +143,6 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
       newErrors.provinceId = 'Vui lòng chọn tỉnh thành';
     }
 
-    if (dateRange?.from && dateRange?.to && dateRange.from > dateRange.to) {
-      newErrors.dateRange = 'Ngày bắt đầu phải trước ngày kết thúc';
-    }
 
     // If there are errors, set them and focus on first error
     if (Object.keys(newErrors).length > 0) {
@@ -183,8 +175,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
         title: tripName.trim(),
         provinceId: provinceId.trim(),
         description: description.trim() || undefined,
-        ...(dateRange?.from && { startDate: dateRange.from.toISOString() }),
-        ...(dateRange?.to && { endDate: dateRange.to.toISOString() })
+        ...(startDate && { startDate: startDate.toISOString() })
       };
 
       updateTripMutation.mutate(updateData);
@@ -314,52 +305,38 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
             )}
           </div>
 
-          {/* Date Range Picker */}
+          {/* Start Date Picker */}
           <div className="space-y-2">
             <Label>
-              Thời gian chuyến đi
+              Ngày đi
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-full justify-start text-left font-normal ${errors.dateRange ? 'border-red-500' : ''}`}
+                  className="w-full justify-start text-left font-normal"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>
-                        {format(dateRange.from, "dd/MM/yyyy", { locale: vi })} -{" "}
-                        {format(dateRange.to, "dd/MM/yyyy", { locale: vi })}
-                      </>
-                    ) : (
-                      format(dateRange.from, "dd/MM/yyyy", { locale: vi })
-                    )
+                  {startDate ? (
+                    format(startDate, "dd/MM/yyyy", { locale: vi })
                   ) : (
-                    <span>Chọn thời gian chuyến đi</span>
+                    <span>Chọn ngày đi</span>
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   initialFocus
-                  mode="range"
-                  defaultMonth={dateRange?.from}
-                  selected={dateRange}
-                  onSelect={(range) => {
-                    setDateRange(range);
-                    if (errors.dateRange) {
-                      setErrors(prev => ({ ...prev, dateRange: '' }));
-                    }
+                  mode="single"
+                  defaultMonth={startDate}
+                  selected={startDate}
+                  onSelect={(date) => {
+                    setStartDate(date);
                   }}
-                  numberOfMonths={2}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                 />
               </PopoverContent>
             </Popover>
-            {errors.dateRange && (
-              <p className="text-sm text-red-500">{errors.dateRange}</p>
-            )}
           </div>
 
           <div className="space-y-2">
