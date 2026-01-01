@@ -1,0 +1,69 @@
+name: Deploy Frontend Prod
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: PROD
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install cloudflared, sshpass and jq
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+          sudo apt-get update && sudo apt-get install -y sshpass jq
+
+      - name: Generate .env.prod
+        id: gen_env
+        run: |
+          # Load public variables from repository JSON
+          jq -r 'to_entries | .[] | "\(.key)=\(.value)"' .github/env-config/prod/env.json > .env.prod
+          
+          # Handle optional bulk secret
+          if [ ! -z "${{ secrets.FE_ENV_SECRET }}" ]; then
+            echo "${{ secrets.FE_ENV_SECRET }}" >> .env.prod
+          fi
+
+      - name: Run Deploy Script
+        run: |
+          # Use Environment-level secrets
+          SSH_PASS="${{ secrets.FE_SSH_PASSWORD }}"
+          SSH_USER="${{ secrets.FE_SSH_USER }}"
+          SSH_HOST="${{ secrets.FE_SSH_HOST }}"
+          DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH }}"
+          
+          # Fallback to legacy names
+          [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.FE_SSH_PASSWORD_PROD }}"
+          [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.FE_SSH_USER_PROD }}"
+          [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.FE_SSH_HOST_PROD }}"
+          [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH_PROD }}"
+
+          sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o "ProxyCommand=cloudflared access ssh --hostname %h" $SSH_USER@$SSH_HOST "
+            cd $DEPLOY_PATH
+            # Fix permissions (Docker containers might have created files as root)
+            echo '$SSH_PASS' | sudo -S chown -R $SSH_USER:$SSH_USER .
+            git fetch origin prod
+            git reset --hard origin/prod
+          "
+          
+          # Upload using pipe (more reliable than scp in proxy environments)
+          cat .env.prod | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o "ProxyCommand=cloudflared access ssh --hostname %h" $SSH_USER@$SSH_HOST "cat > $DEPLOY_PATH/.env.prod"
+          
+          # Run the deploy script
+          sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o "ProxyCommand=cloudflared access ssh --hostname %h" $SSH_USER@$SSH_HOST "
+            cd $DEPLOY_PATH
+            echo 'Deploying Frontend Prod...'
+            chmod +x deploy_cicd_prod.sh
+            ./deploy_cicd_prod.sh
+            
+            echo 'Waiting for containers to start...'
+            sleep 5
+            echo '--- Container Logs ---'
+            docker compose -p goouty-frontend-prod logs --tail=50
+          "

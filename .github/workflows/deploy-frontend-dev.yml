@@ -1,0 +1,68 @@
+name: Deploy Frontend Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: DEV
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install cloudflared, sshpass and jq
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+          sudo apt-get update && sudo apt-get install -y sshpass jq
+
+      - name: Generate .env.dev
+        id: gen_env
+        run: |
+          # Load public variables from repositoy JSON
+          jq -r 'to_entries | .[] | "\(.key)=\(.value)"' .github/env-config/dev/env.json > .env.dev
+          
+          # Handle optional bulk secret (ONLY if you still want a back-door for hidden vars)
+          if [ ! -z "${{ secrets.FE_ENV_SECRET }}" ]; then
+            echo "${{ secrets.FE_ENV_SECRET }}" >> .env.dev
+          fi
+
+      - name: Run Deploy Script
+        run: |
+          # Use Environment-level secrets
+          SSH_PASS="${{ secrets.FE_SSH_PASSWORD }}"
+          SSH_USER="${{ secrets.FE_SSH_USER }}"
+          SSH_HOST="${{ secrets.FE_SSH_HOST }}"
+          DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH }}"
+          
+          # Fallback to legacy names
+          [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.FE_SSH_PASSWORD_DEV }}"
+          [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.FE_SSH_USER_DEV }}"
+          [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.FE_SSH_HOST_DEV }}"
+          [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH_DEV }}"
+
+          sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o "ProxyCommand=cloudflared access ssh --hostname %h" $SSH_USER@$SSH_HOST "
+            cd $DEPLOY_PATH
+            # Fix permissions (Docker containers might have created files as root)
+            echo '$SSH_PASS' | sudo -S chown -R $SSH_USER:$SSH_USER .
+            git fetch origin dev
+            git reset --hard origin/dev
+          "
+          
+          # Upload using pipe (more reliable than scp in proxy environments)
+          cat .env.dev | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o "ProxyCommand=cloudflared access ssh --hostname %h" $SSH_USER@$SSH_HOST "cat > $DEPLOY_PATH/.env.dev"
+          
+          sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o "ProxyCommand=cloudflared access ssh --hostname %h" $SSH_USER@$SSH_HOST "
+            cd $DEPLOY_PATH
+            echo 'Deploying Frontend Dev...'
+            chmod +x deploy_cicd_dev.sh
+            ./deploy_cicd_dev.sh
+            
+            echo 'Waiting for containers to start...'
+            sleep 5
+            echo '--- Container Logs ---'
+            docker compose -p goouty-frontend-dev logs --tail=50
+          "

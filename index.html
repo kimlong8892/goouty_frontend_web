@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Goouty - Lên kế hoạch chuyến đi, chia tiền nhóm, không rắc rối</title>
+  <meta name="description"
+    content="Goouty - Ứng dụng lập kế hoạch chuyến đi và quản lý chi phí nhóm. Plan trips, split expenses, no hassle." />
+  <meta name="author" content="Goouty Team" />
+  <meta name="keywords"
+    content="chuyến đi, du lịch, chia tiền, chi phí, nhóm, travel, trip planning, expense splitting" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+
+  <!-- Icons -->
+  <link rel="icon" href="/goouty-logo.svg" type="image/svg+xml" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/logo.png" />
+
+  <!-- PWA Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Goouty" />
+
+  <!-- Open Graph -->
+  <meta property="og:image" content="/og-image.png" />
+  <meta property="og:title" content="Goouty - Lên kế hoạch chuyến đi" />
+  <meta property="og:description" content="Ứng dụng lập kế hoạch chuyến đi và quản lý chi phí nhóm" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="/" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Goouty - Lên kế hoạch chuyến đi" />
+  <meta name="twitter:description" content="Ứng dụng lập kế hoạch chuyến đi và quản lý chi phí nhóm" />
+  <meta name="twitter:image" content="/og-image.png" />
+  <script>
+    // Apply theme before React renders to avoid flash
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var shouldUseDark = stored ? stored === 'dark' : prefersDark;
+        if (shouldUseDark) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      } catch (_) { }
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+  <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
