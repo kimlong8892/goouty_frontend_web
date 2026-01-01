@@ -31,6 +31,24 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Add response interceptor to handle errors properly
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Extract error message from backend response
+    if (error.response?.data?.message) {
+      // Create a new error with the backend message
+      const backendError = new Error(error.response.data.message);
+      // Preserve validation errors if present
+      if (error.response.data.errors) {
+        (backendError as any).errors = error.response.data.errors;
+      }
+      return Promise.reject(backendError);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const api = {
   async get<T>(endpoint: string, params?: QueryParams): Promise<T> {
     const response = await apiClient.get<T>(endpoint, { params });

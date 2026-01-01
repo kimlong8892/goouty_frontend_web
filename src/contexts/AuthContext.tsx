@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'accessToken' && e.newValue && e.newValue !== accessToken) {
         setAccessToken(e.newValue);
-        
+
         // Fetch user data with new token
         const fetchUserData = async () => {
           try {
@@ -85,10 +85,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const handleTokenUpdate = async (event: CustomEvent) => {
       const { token } = event.detail;
-      
+
       if (token && token !== accessToken) {
         setAccessToken(token);
-        
+
         // Fetch user data with new token
         try {
           const userData = await api.get<User>('/users/profile');
@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     window.addEventListener('tokenUpdated', handleTokenUpdate as EventListener);
-    
+
     return () => {
       window.removeEventListener('tokenUpdated', handleTokenUpdate as EventListener);
     };
@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: null };
     } catch (error) {
       console.error('Login error:', error);
-      return { error: error instanceof Error ? error.message : 'Login failed' };
+      return { error };
     }
   };
 
@@ -137,21 +137,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: null };
     } catch (error) {
       console.error('Registration error:', error);
-      return { error: error instanceof Error ? error.message : 'Registration failed' };
+      return { error };
     }
   };
 
   const loginWithGoogle = async () => {
     try {
       if (!googleAuthService.isAvailable()) {
-        return { error: 'Google OAuth not configured' };
+        return { error: new Error('Google OAuth not configured') };
       }
-      
+
       await googleAuthService.login();
       return { error: null };
     } catch (error) {
       console.error('Google login error:', error);
-      return { error: error instanceof Error ? error.message : 'Google login failed' };
+      return { error };
     }
   };
 
