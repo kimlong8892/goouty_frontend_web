@@ -256,6 +256,9 @@ export const api = {
     deleteAvatar: async () => {
       return await api.delete<any>('/users/avatar');
     },
+    changePassword: async (passwordData: any) => {
+      return await api.post<any>('/users/change-password', passwordData);
+    },
   },
 
   // Trip Template-specific API methods

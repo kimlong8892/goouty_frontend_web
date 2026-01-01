@@ -22,9 +22,18 @@ import {
   User,
   Pencil,
   Shield,
-  Bell
+  Bell,
+  Lock
 } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog.tsx";
 
 interface UserProfile {
   id: number;
@@ -34,6 +43,7 @@ interface UserProfile {
   profilePicture?: string;
   bankId?: string;
   bankNumber?: string;
+  hasPassword?: boolean; // True if user has password, false if registered via Google
   createdAt: string;
   updatedAt: string;
 }
@@ -46,6 +56,15 @@ const Profile = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Password change state
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
 
   const [pushEnabled, setPushEnabled] = useState(false);
 
@@ -156,6 +175,30 @@ const Profile = () => {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error('Mật khẩu mới và xác nhận mật khẩu không khớp');
+      return;
+    }
+
+    try {
+      setChangingPassword(true);
+      await api.users.changePassword(passwordForm);
+      toast.success('Đổi mật khẩu thành công');
+      setIsPasswordDialogOpen(false);
+      setPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Không thể đổi mật khẩu');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const handleLogout = async () => {
     await logout();
     navigate('/');
@@ -228,13 +271,25 @@ const Profile = () => {
             <div>
               <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Ứng dụng</h3>
               <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between p-4">
+                <div className="flex items-center justify-between p-4 border-b border-gray-50">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-yellow-50 rounded-xl text-yellow-600"><Bell className="w-5 h-5" /></div>
                     <span className="font-semibold text-gray-700">Thông báo đẩy</span>
                   </div>
                   <Switch checked={pushEnabled} onCheckedChange={handleTogglePush} className="data-[state=checked]:bg-[#6c5dd3]" />
                 </div>
+
+                {/* Mobile Change Password */}
+                <button
+                  onClick={() => setIsPasswordDialogOpen(true)}
+                  className="w-full p-4 flex items-center justify-between active:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-50 rounded-xl text-purple-600"><Lock className="w-5 h-5" /></div>
+                    <span className="font-semibold text-gray-700">Đổi mật khẩu</span>
+                  </div>
+                  <Settings className="w-4 h-4 text-gray-300 transform rotate-[-90deg]" />
+                </button>
               </div>
             </div>
 
@@ -251,6 +306,73 @@ const Profile = () => {
             </div>
           </div>
         </AnimatedTransition>
+
+        {/* Change Password Dialog */}
+        <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Đổi mật khẩu</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleChangePassword} className="space-y-4 pt-4">
+              {profile?.hasPassword && (
+                <div className="space-y-2">
+                  <Label>Mật khẩu hiện tại</Label>
+                  <Input
+                    type="password"
+                    required
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                  />
+                </div>
+              )}
+              {!profile?.hasPassword && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
+                  </p>
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label>Mật khẩu mới</Label>
+                <Input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={passwordForm.newPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Xác nhận mật khẩu mới</Label>
+                <Input
+                  type="password"
+                  required
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                />
+              </div>
+              <DialogFooter className="pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsPasswordDialogOpen(false)}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="bg-[#6c5dd3] hover:bg-[#5b4ec2]"
+                >
+                  {changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -413,6 +535,77 @@ const Profile = () => {
                     <Shield className="w-5 h-5 text-[#6c5dd3]" /> Bảo mật
                   </div>
                   <div className="space-y-2">
+                    <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start h-12 rounded-xl border-slate-100 hover:bg-slate-50 hover:text-[#6c5dd3] font-medium text-slate-600">
+                          <Lock className="w-4 h-4 mr-3" /> Đổi mật khẩu
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Đổi mật khẩu</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleChangePassword} className="space-y-4 pt-4">
+                          {profile?.hasPassword && (
+                            <div className="space-y-2">
+                              <Label>Mật khẩu hiện tại</Label>
+                              <Input
+                                type="password"
+                                required
+                                value={passwordForm.currentPassword}
+                                onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                              />
+                            </div>
+                          )}
+                          {!profile?.hasPassword && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                              <p className="text-sm text-blue-800">
+                                <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
+                              </p>
+                            </div>
+                          )}
+                          <div className="space-y-2">
+                            <Label>Mật khẩu mới</Label>
+                            <Input
+                              type="password"
+                              required
+                              minLength={6}
+                              value={passwordForm.newPassword}
+                              onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Xác nhận mật khẩu mới</Label>
+                            <Input
+                              type="password"
+                              required
+                              value={passwordForm.confirmPassword}
+                              onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                            />
+                          </div>
+                          <DialogFooter className="pt-4">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              onClick={() => setIsPasswordDialogOpen(false)}
+                            >
+                              Hủy
+                            </Button>
+                            <Button
+                              type="submit"
+                              disabled={changingPassword}
+                              className="bg-[#6c5dd3] hover:bg-[#5b4ec2]"
+                            >
+                              {changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+
                     <Button
                       variant="ghost"
                       onClick={handleLogout}
