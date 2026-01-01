@@ -65,11 +65,11 @@ export const HeroSection = ({
 
           {/* Right Column - Mascot Image */}
           <div className="flex justify-center items-center">
-            <div className="relative w-full max-w-lg">
+            <div className="relative w-full max-w-lg aspect-[4/5] overflow-hidden rounded-3xl">
               <img
-                src="/hero_octopus_figma.png"
+                src="/hero_mascot.png"
                 alt="Goouty Mascot"
-                className="w-full h-auto object-contain drop-shadow-xl"
+                className="w-full h-full object-cover scale-[1.15] transform origin-center transition-transform duration-700 hover:scale-[1.2]"
                 onError={(e) => {
                   // Fallback if image doesn't load
                   const target = e.currentTarget;
