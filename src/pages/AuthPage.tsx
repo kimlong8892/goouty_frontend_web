@@ -138,26 +138,28 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-12 pb-12 px-4 flex flex-col items-center justify-center bg-[#f8f9fa]">
+    <div className="min-h-screen pt-8 pb-12 px-4 flex flex-col items-center justify-center bg-[#f0f2f5]">
       <AnimatedTransition show={show} animation="slide-up" className="w-full max-w-[1000px]">
-        <Card className="w-full grid grid-cols-1 md:grid-cols-2 rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] border-none bg-white p-4">
+        <Card className="w-full grid grid-cols-1 md:grid-cols-2 rounded-[40px] overflow-hidden shadow-[0_12px_40px_rgb(0,0,0,0.06)] border-none bg-white p-6 md:p-8">
 
           {/* Mascot Image Section */}
-          <div className={`hidden md:block relative h-auto min-h-[500px] overflow-hidden rounded-[24px] ${mode === 'signup' ? 'md:order-2' : 'md:order-1'}`}>
-            <img
-              src="/create_trip_mascot.png"
-              alt="Goouty Mascot"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+          <div className={`hidden md:block ${mode === 'signup' ? 'md:order-2' : 'md:order-1'} self-center`}>
+            <div className="aspect-square w-full overflow-hidden rounded-[32px] bg-[#f8f9fa]">
+              <img
+                src="/auth_mascot.png"
+                alt="Goouty Mascot"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
 
           {/* Form Content */}
-          <div className={`p-8 md:p-10 lg:p-12 flex flex-col justify-center ${mode === 'signup' ? 'md:order-1' : 'md:order-2'}`}>
-            <div className="mb-8">
-              <h1 className="text-[42px] font-black text-[#6347f9] mb-2 uppercase tracking-tight leading-tight font-sans">
+          <div className={`p-6 md:p-8 lg:p-10 flex flex-col justify-center ${mode === 'signup' ? 'md:order-1' : 'md:order-2'}`}>
+            <div className={`mb-10 ${mode === 'login' ? 'md:text-left' : ''}`}>
+              <h1 className="text-[44px] font-black text-[#6347f9] mb-3 uppercase tracking-tight leading-tight font-sans">
                 {mode === 'login' ? 'Đăng nhập' : 'ĐĂNG KÝ'}
               </h1>
-              <p className="text-slate-500 font-medium text-lg">
+              <p className="text-slate-600 font-semibold text-lg">
                 Cùng Goouty lập kế hoạch chuyến đi
               </p>
             </div>
@@ -168,7 +170,7 @@ const AuthPage = () => {
                 <>
                   <Button
                     variant="outline"
-                    className="w-full h-[54px] rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold gap-3 text-base shadow-none transition-colors"
+                    className="w-full h-[56px] rounded-2xl border-slate-200 hover:bg-slate-50 text-slate-700 font-bold gap-3 text-base shadow-sm transition-all"
                     onClick={handleGoogleLogin}
                   >
                     <GoogleIcon size={24} />
@@ -180,7 +182,7 @@ const AuthPage = () => {
                       <span className="w-full border-t border-slate-100" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="bg-white px-4 text-slate-400 font-medium">Hoặc</span>
+                      <span className="bg-white px-4 text-slate-400 font-bold">Hoặc</span>
                     </div>
                   </div>
                 </>
@@ -191,12 +193,12 @@ const AuthPage = () => {
                 {/* Name - Signup Only */}
                 {mode === 'signup' && (
                   <div className="space-y-1.5">
-                    <Label htmlFor="fullname" className="text-slate-400 text-sm font-medium ml-1">Họ và tên</Label>
+                    <Label htmlFor="fullname" className="text-slate-400 text-sm font-bold ml-1">Name</Label>
                     <Input
                       id="fullname"
                       type="text"
-                      className="h-[52px] rounded-xl bg-white border-slate-200 focus:border-[#6347f9] focus:ring-0 transition-all px-4 text-base"
-                      placeholder="Nhập họ và tên của bạn"
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400"
+                      placeholder="Shane Watson"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                     />
@@ -204,25 +206,29 @@ const AuthPage = () => {
                 )}
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-slate-400 text-sm font-medium ml-1">Địa chỉ email</Label>
+                  <Label htmlFor="email" className="text-slate-400 text-sm font-bold ml-1">
+                    {mode === 'signup' ? 'Email Address' : 'Địa chỉ email'}
+                  </Label>
                   <Input
                     id="email"
                     type="email"
-                    className="h-[52px] rounded-xl bg-white border-slate-200 focus:border-[#6347f9] focus:ring-0 transition-all px-4 text-base"
-                    placeholder="Nhập địa chỉ email của bạn"
+                    className="h-[56px] rounded-2xl bg-[#f3f4f6] border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400"
+                    placeholder={mode === 'signup' ? "shane.watson@example.com" : "Nhập địa chỉ email của bạn"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-slate-400 text-sm font-medium ml-1">Mật khẩu</Label>
+                  <Label htmlFor="password" className="text-slate-400 text-sm font-bold ml-1">
+                    {mode === 'signup' ? 'Password' : 'Mật khẩu'}
+                  </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      className="h-[52px] rounded-xl bg-white border-slate-200 focus:border-[#6347f9] focus:ring-0 transition-all px-4 pr-12 text-base"
-                      placeholder="Nhập mật khẩu"
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 pr-12 text-base font-medium placeholder:text-slate-400"
+                      placeholder={mode === 'signup' ? "••••••••" : "Nhập mật khẩu"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
@@ -245,13 +251,13 @@ const AuthPage = () => {
                         onChange={(e) => setRememberMe(e.target.checked)}
                         className="w-[18px] h-[18px] rounded border-slate-300 text-[#6347f9] focus:ring-[#6347f9] cursor-pointer accent-[#6347f9]"
                       />
-                      <span className="text-sm text-slate-600 font-medium group-hover:text-slate-800 transition-colors">Ghi nhớ tài khoản</span>
+                      <span className="text-[14px] text-slate-600 font-bold group-hover:text-slate-800 transition-colors">Ghi nhớ tài khoản</span>
                     </label>
 
                     <button
                       type="button"
                       onClick={() => navigate('/forgot-password')}
-                      className="text-sm font-bold text-[#6347f9] hover:text-[#5136db] transition-colors"
+                      className="text-[14px] font-bold text-[#6347f9] hover:text-[#5136db] transition-colors"
                     >
                       Quên mật khẩu
                     </button>
@@ -260,27 +266,26 @@ const AuthPage = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-[54px] rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-none transition-all duration-300 mt-4"
+                  className="w-full h-[58px] rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-extrabold text-lg shadow-lg shadow-purple-200 transition-all duration-300 mt-4 active:scale-[0.98]"
                 >
                   {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                 </Button>
               </form>
+
+              <div className="pt-4 text-center">
+                <p className="text-slate-600 font-bold text-[15px]">
+                  {mode === 'login' ? 'Bạn không có tài khoản? ' : 'Bạn đã có tài khoản? '}
+                  <button
+                    onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                    className="text-[#6347f9] font-black hover:underline underline-offset-4"
+                  >
+                    {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
+                  </button>
+                </p>
+              </div>
             </div>
           </div>
         </Card>
-
-        {/* Footer Navigation */}
-        <div className="mt-8 text-center">
-          <p className="text-slate-600 font-medium text-base">
-            {mode === 'login' ? 'Bạn không có tài khoản? ' : 'Bạn đã có tài khoản? '}
-            <button
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-              className="text-[#6347f9] font-extrabold hover:underline"
-            >
-              {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
-            </button>
-          </p>
-        </div>
       </AnimatedTransition>
     </div>
   );
