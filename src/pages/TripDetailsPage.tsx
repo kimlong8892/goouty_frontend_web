@@ -564,12 +564,17 @@ const TripDetailsPage = () => {
             </div>
 
             {trip.description && (
-              <p className={cn(
-                "text-slate-600 max-w-3xl leading-relaxed bg-white/50 p-4 rounded-2xl border border-white/80 shadow-sm",
-                isMobileView ? "text-sm" : "text-base"
+              <div className={cn(
+                "bg-white shadow-sm border border-gray-100/50 mb-8 w-full",
+                isMobileView ? "rounded-full px-6 py-4" : "rounded-full px-8 py-5"
               )}>
-                {trip.description}
-              </p>
+                <p className={cn(
+                  "text-slate-700 leading-relaxed font-semibold",
+                  isMobileView ? "text-base" : "text-lg"
+                )}>
+                  {trip.description}
+                </p>
+              </div>
             )}
           </div>
 
