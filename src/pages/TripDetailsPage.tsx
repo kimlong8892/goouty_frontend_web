@@ -507,7 +507,9 @@ const TripDetailsPage = () => {
                 {statusLabels[status as keyof typeof statusLabels]}
               </Badge>
               <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0">
-                {trip.userRole === 'owner' ? 'Chủ chuyến đi' : 'Thành viên'}
+                {trip.userRole === 'owner' 
+                  ? `Chủ chuyến đi (${(trip.members?.length || 0) + 1})` 
+                  : `Thành viên (${(trip.members?.length || 0) + 1})`}
               </Badge>
             </div>
 
@@ -617,7 +619,7 @@ const TripDetailsPage = () => {
                   )}
                 >
                   <Users className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
-                  Thành viên
+                  Thành viên ({(trip.members?.length || 0) + 1})
                 </TabsTrigger>
                 {trip.userRole === 'owner' && (
                   <TabsTrigger
