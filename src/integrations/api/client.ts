@@ -241,17 +241,17 @@ export const api = {
   // Auth methods
   auth: {
     login: async (email: string, password: string) => {
-      const response = await api.post<{ user: any; token: string }>('/auth/login', { email, password });
-      localStorage.setItem('auth_token', response.token);
+      const response = await api.post<{ user: any; accessToken: string }>('/auth/login', { email, password });
+      localStorage.setItem('accessToken', response.accessToken);
       return response;
     },
     register: async (email: string, password: string) => {
-      const response = await api.post<{ user: any; token: string }>('/auth/register', { email, password });
-      localStorage.setItem('auth_token', response.token);
+      const response = await api.post<{ user: any; accessToken: string }>('/auth/register', { email, password });
+      localStorage.setItem('accessToken', response.accessToken);
       return response;
     },
     logout: async () => {
-      localStorage.removeItem('auth_token');
+      localStorage.removeItem('accessToken');
       return await api.post('/auth/logout');
     },
     getUser: async () => {

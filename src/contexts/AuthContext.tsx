@@ -133,7 +133,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signup = async (email: string, password: string, fullName: string) => {
     try {
-      await api.post('/auth/register', { email, password, fullName });
+      const data = await api.post<User & { accessToken: string }>('/auth/register', {
+        email,
+        password,
+        fullName
+      });
+
+      setUser({
+        id: data.id,
+        email: data.email,
+        fullName: data.fullName
+      });
+      setAccessToken(data.accessToken);
+      localStorage.setItem('accessToken', data.accessToken);
       return { error: null };
     } catch (error) {
       console.error('Registration error:', error);
