@@ -214,9 +214,9 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                 isMobileView && "p-3 gap-3"
               )}
             >
-              <Avatar className={cn("border-2 border-white shadow-sm", isMobileView ? "w-10 h-10" : "w-12 h-12")}>
+              <Avatar className={cn("border-2 border-white shadow-sm", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
                 <AvatarImage src={member.user.profilePicture} />
-                <AvatarFallback className="bg-slate-100 text-slate-500 font-bold text-xs">
+                <AvatarFallback className={cn("bg-slate-100 text-slate-500 font-bold", isMobileView ? "text-sm" : "text-base")}>
                   {getInitials(member.user.fullName, member.user.email)}
                 </AvatarFallback>
               </Avatar>
@@ -224,7 +224,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className={cn("font-bold text-slate-900 truncate", isMobileView ? "text-[15px]" : "text-base")}>
+                    <span className={cn("font-bold text-slate-900 truncate", isMobileView ? "text-base" : "text-lg")}>
                       {member.user.fullName || member.user.email.split('@')[0]}
                     </span>
                     {isCurrentUser && (

@@ -133,15 +133,15 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
                   {/* Flow Visualization */}
                   <div className="flex items-center justify-between gap-4 py-2">
                     <div className="flex flex-col items-center gap-2 flex-1">
-                      <Avatar className="w-12 h-12 border-2 border-white shadow-md">
+                      <Avatar className="w-14 h-14 border-2 border-white shadow-md">
                         {settlement.debtor.profilePicture && <AvatarImage src={settlement.debtor.profilePicture} />}
-                        <AvatarFallback className="bg-slate-100 text-slate-600 font-bold">
+                        <AvatarFallback className="bg-slate-100 text-slate-600 font-bold text-sm">
                           {(settlement.debtor.fullName || settlement.debtor.email).charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="text-center">
-                        <p className="text-xs font-bold text-slate-900 truncate max-w-[100px]">{debtorName}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase">Người gửi</p>
+                        <p className="text-sm font-bold text-slate-900 truncate max-w-[100px]">{debtorName}</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase">Người gửi</p>
                       </div>
                     </div>
 
@@ -154,15 +154,15 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
                     </div>
 
                     <div className="flex flex-col items-center gap-2 flex-1">
-                      <Avatar className="w-12 h-12 border-2 border-white shadow-md">
+                      <Avatar className="w-14 h-14 border-2 border-white shadow-md">
                         {settlement.creditor.profilePicture && <AvatarImage src={settlement.creditor.profilePicture} />}
-                        <AvatarFallback className="bg-slate-100 text-slate-600 font-bold">
+                        <AvatarFallback className="bg-slate-100 text-slate-600 font-bold text-sm">
                           {(settlement.creditor.fullName || settlement.creditor.email).charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="text-center">
-                        <p className="text-xs font-bold text-slate-900 truncate max-w-[100px]">{creditorName}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase">Người nhận</p>
+                        <p className="text-sm font-bold text-slate-900 truncate max-w-[100px]">{creditorName}</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase">Người nhận</p>
                       </div>
                     </div>
                   </div>

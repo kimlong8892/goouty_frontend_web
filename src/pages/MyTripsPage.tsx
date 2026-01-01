@@ -200,8 +200,8 @@ const MyTripsPage = () => {
     if (action === 'view') {
       navigate(`/trip/${trip.id}`);
     } else if (action === 'edit') {
-      // Handled by inline dialog or navigation
-      navigate(`/trip/${trip.id}`);
+      // Navigate to detail page with edit query param
+      navigate(`/trip/${trip.id}?edit=true`);
     } else if (action === 'delete') {
       openDeleteDialog(trip);
     }

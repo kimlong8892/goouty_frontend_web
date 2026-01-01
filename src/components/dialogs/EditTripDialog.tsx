@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -15,13 +15,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, MapPin, Edit, Loader2 } from 'lucide-react';
+import { CalendarIcon, MapPin, Edit, Loader2, Camera, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { api } from '@/lib/api';
 import { Trip } from '@/lib/types';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
-import { TripAvatarUpload } from '@/components/TripAvatarUpload.tsx';
 import { useAuth } from '@/contexts/AuthContext';
 import { DateRange } from 'react-day-picker';
 
@@ -29,11 +28,16 @@ interface EditTripDialogProps {
   trip: Trip;
   children: React.ReactNode;
   onSuccess?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProps) {
+export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen, onOpenChange: controlledOnOpenChange }: EditTripDialogProps) {
   const { user } = useAuth();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? (controlledOnOpenChange || (() => {})) : setInternalOpen;
   const [tripName, setTripName] = useState(trip.title);
   const [provinceId, setProvinceId] = useState(trip.provinceId || '');
   const [description, setDescription] = useState(trip.description || '');
@@ -44,6 +48,9 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [currentAvatar, setCurrentAvatar] = useState(trip.avatar || '');
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   // Check if current user is the trip owner
@@ -61,12 +68,55 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
       setProvinceId(trip.provinceId || '');
       setDescription(trip.description || '');
       setCurrentAvatar(trip.avatar || '');
+      setSelectedAvatarFile(null);
+      setAvatarPreview(null);
       const from = trip.startDate ? new Date(trip.startDate) : undefined;
       const to = trip.endDate ? new Date(trip.endDate) : undefined;
       setDateRange(from || to ? { from, to } : undefined);
       setErrors({});
     }
   }, [open, trip]);
+
+  const handleAvatarFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Vui lòng chọn file hình ảnh');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Kích thước file không được vượt quá 5MB');
+      return;
+    }
+
+    // Validate file format
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Chỉ hỗ trợ định dạng JPEG, PNG, WebP, GIF');
+      return;
+    }
+
+    setSelectedAvatarFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveAvatarFile = () => {
+    setSelectedAvatarFile(null);
+    setAvatarPreview(null);
+    if (avatarFileInputRef.current) {
+      avatarFileInputRef.current.value = '';
+    }
+  };
 
   const updateTripMutation = useMutation({
     mutationFn: (data: any) => api.put(`/trips/${trip.id}`, data),
@@ -117,15 +167,30 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
       return;
     }
 
-    const updateData = {
-      title: tripName.trim(),
-      provinceId: provinceId.trim(),
-      description: description.trim() || undefined,
-      ...(dateRange?.from && { startDate: dateRange.from.toISOString() }),
-      ...(dateRange?.to && { endDate: dateRange.to.toISOString() })
-    };
+    try {
+      // Upload avatar first if a new file is selected
+      if (selectedAvatarFile) {
+        try {
+          await api.trips.uploadAvatar(trip.id, selectedAvatarFile);
+        } catch (error: any) {
+          toast.error('Không thể tải lên ảnh đại diện: ' + (error.message || 'Lỗi không xác định'));
+          return;
+        }
+      }
 
-    updateTripMutation.mutate(updateData);
+      // Update trip information
+      const updateData = {
+        title: tripName.trim(),
+        provinceId: provinceId.trim(),
+        description: description.trim() || undefined,
+        ...(dateRange?.from && { startDate: dateRange.from.toISOString() }),
+        ...(dateRange?.to && { endDate: dateRange.to.toISOString() })
+      };
+
+      updateTripMutation.mutate(updateData);
+    } catch (error: any) {
+      toast.error('Có lỗi xảy ra khi cập nhật chuyến đi');
+    }
   };
 
   return (
@@ -149,17 +214,63 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
           <div className="space-y-2">
             <Label>Ảnh đại diện chuyến đi</Label>
             <div className="flex justify-center">
-              <TripAvatarUpload
-                tripId={trip.id}
-                currentAvatar={currentAvatar}
-                onAvatarChange={setCurrentAvatar}
-                onAvatarDelete={() => setCurrentAvatar('')}
-                tripTitle={trip.title}
-                size="lg"
-                showDeleteButton={true}
-                disabled={updateTripMutation.isPending}
-              />
+              <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200 group">
+                {(avatarPreview || currentAvatar) ? (
+                  <img
+                    src={avatarPreview || currentAvatar || ''}
+                    alt={trip.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
+                    <Camera className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+
+                {/* Overlay on hover */}
+                {!updateTripMutation.isPending && (
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => avatarFileInputRef.current?.click()}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Remove button */}
+                {(avatarPreview || (currentAvatar && !selectedAvatarFile)) && !updateTripMutation.isPending && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleRemoveAvatarFile}
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+
+                {/* Hidden file input */}
+                <input
+                  ref={avatarFileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleAvatarFileSelect}
+                  className="hidden"
+                  disabled={updateTripMutation.isPending}
+                />
+              </div>
             </div>
+            {selectedAvatarFile && (
+              <p className="text-xs text-center text-gray-500">
+                Ảnh mới sẽ được cập nhật khi bấm "Cập nhật"
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">

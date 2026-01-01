@@ -230,31 +230,31 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                   <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-50">
                     <div className="flex items-center gap-6">
                       <div className="flex flex-col gap-1">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Người chi</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Người chi</span>
                         <div className="flex items-center gap-2">
-                          <Avatar className="w-6 h-6 border border-white shadow-sm font-bold">
+                          <Avatar className="w-8 h-8 border border-white shadow-sm font-bold">
                             {payerInfo.profilePicture && <AvatarImage src={payerInfo.profilePicture} />}
-                            <AvatarFallback className="text-[10px] bg-slate-100 text-[#6c5dd3]">
+                            <AvatarFallback className="text-xs bg-slate-100 text-[#6c5dd3]">
                               {payerInfo.name.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="text-xs font-bold text-slate-700">{payerInfo.name}</span>
+                          <span className="text-sm font-bold text-slate-700">{payerInfo.name}</span>
                         </div>
                       </div>
 
                       <div className="flex flex-col gap-1 border-l border-slate-100 pl-6">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Chia sẻ cho</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Chia sẻ cho</span>
                         <div className="flex items-center -space-x-2">
                           {participants.slice(0, 4).map((p, i) => (
-                            <Avatar key={i} className="w-6 h-6 border-2 border-white shadow-sm font-bold">
+                            <Avatar key={i} className="w-8 h-8 border-2 border-white shadow-sm font-bold">
                               {p.profilePicture && <AvatarImage src={p.profilePicture} />}
-                              <AvatarFallback className="text-[10px] bg-slate-50 text-slate-400">
+                              <AvatarFallback className="text-xs bg-slate-50 text-slate-400">
                                 {p.name.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                           ))}
                           {participants.length > 4 && (
-                            <div className="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-400 z-10">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-400 z-10">
                               +{participants.length - 4}
                             </div>
                           )}

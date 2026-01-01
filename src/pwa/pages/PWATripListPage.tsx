@@ -271,7 +271,8 @@ const PWATripListPage = () => {
     if (!trip.id) return;
 
     if (action === 'edit') {
-      navigate(`/trip/${trip.id}`);
+      // Navigate to detail page with edit query param
+      navigate(`/trip/${trip.id}?edit=true`);
     } else if (action === 'delete') {
       setTripToDelete(trip);
       setDeleteDialogOpen(true);

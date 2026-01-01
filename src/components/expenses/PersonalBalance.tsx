@@ -72,22 +72,22 @@ export const PersonalBalance: React.FC<PersonalBalanceProps> = ({ userBalances }
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <Avatar className="w-10 h-10 border-2 border-white shadow-sm font-bold">
+                    <Avatar className={cn("border-2 border-white shadow-sm font-bold", isMobileView ? "w-12 h-12" : "w-14 h-14")}>
                       {userBalance.user.profilePicture && (
                         <AvatarImage src={userBalance.user.profilePicture} />
                       )}
-                      <AvatarFallback className="bg-slate-100 text-[#6c5dd3]">
+                      <AvatarFallback className={cn("bg-slate-100 text-[#6c5dd3]", isMobileView ? "text-sm" : "text-base")}>
                         {(userBalance.user.fullName || userBalance.user.email).charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     {isCurrentUser && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#6c5dd3] rounded-full border-2 border-white flex items-center justify-center">
-                        <UserIcon className="w-2 h-2 text-white" />
+                      <div className={cn("absolute -top-1 -right-1 bg-[#6c5dd3] rounded-full border-2 border-white flex items-center justify-center", isMobileView ? "w-4 h-4" : "w-5 h-5")}>
+                        <UserIcon className={cn("text-white", isMobileView ? "w-2 h-2" : "w-3 h-3")} />
                       </div>
                     )}
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900 text-sm">
+                    <p className={cn("font-bold text-slate-900", isMobileView ? "text-base" : "text-lg")}>
                       {userBalance.user.fullName || userBalance.user.email}
                       {isCurrentUser && ' (bạn)'}
                     </p>

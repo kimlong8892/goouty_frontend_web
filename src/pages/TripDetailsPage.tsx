@@ -181,6 +181,7 @@ const TripDetailsPage = () => {
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [selectedDayId, setSelectedDayId] = useState<string>('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editTripDialogOpen, setEditTripDialogOpen] = useState(false);
 
   const { id } = useParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -222,6 +223,18 @@ const TripDetailsPage = () => {
       setActiveTab('itinerary');
     }
   }, [trip?.userRole, activeTab]);
+
+  // Check for edit query param and open dialog
+  useEffect(() => {
+    const editParam = searchParams.get('edit');
+    if (editParam === 'true' && trip && trip.userRole === 'owner') {
+      setEditTripDialogOpen(true);
+      // Remove edit param from URL
+      const next = new URLSearchParams(searchParams);
+      next.delete('edit');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, trip, setSearchParams]);
 
   const fetchDaysAndActivities = async () => {
     if (!id || !apiData) return;
@@ -470,6 +483,8 @@ const TripDetailsPage = () => {
                   title: trip.name,
                 }}
                 onSuccess={fetchTripDetails}
+                open={editTripDialogOpen}
+                onOpenChange={setEditTripDialogOpen}
               >
                 <button className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200">
                   <Edit className="w-5 h-5 text-gray-600" />
@@ -519,6 +534,8 @@ const TripDetailsPage = () => {
                     title: trip.name,
                   }}
                   onSuccess={fetchTripDetails}
+                  open={editTripDialogOpen}
+                  onOpenChange={setEditTripDialogOpen}
                 >
                   <button className="text-slate-400 hover:text-[#6c5dd3] transition-colors p-1">
                     <Edit className="w-5 h-5" />
@@ -563,36 +580,56 @@ const TripDetailsPage = () => {
               !isMobileView && "relative top-0 mx-0 px-0 bg-transparent"
             )}>
               <TabsList className={cn(
-                "bg-transparent h-auto p-0 gap-3 flex w-full overflow-x-auto scrollbar-hide pb-2 justify-start",
-                !isMobileView && "justify-between"
+                "bg-transparent h-auto p-0 gap-3 flex w-full overflow-x-auto scrollbar-hide pb-2",
+                isPWA ? "justify-start" : "justify-between"
               )}>
                 <TabsTrigger
                   value="itinerary"
-                  className="whitespace-nowrap rounded-full px-6 py-2.5 h-auto text-sm font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95"
+                  className={cn(
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    isPWA 
+                      ? "whitespace-nowrap px-6 py-2.5 text-sm" 
+                      : "flex-1 px-8 py-3.5 text-base"
+                  )}
                 >
-                  <Clock className="w-4 h-4 mr-2" />
+                  <Clock className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
                   Lịch trình
                 </TabsTrigger>
                 <TabsTrigger
                   value="expenses"
-                  className="whitespace-nowrap rounded-full px-6 py-2.5 h-auto text-sm font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95"
+                  className={cn(
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    isPWA 
+                      ? "whitespace-nowrap px-6 py-2.5 text-sm" 
+                      : "flex-1 px-8 py-3.5 text-base"
+                  )}
                 >
-                  <DollarSign className="w-4 h-4 mr-2" />
+                  <DollarSign className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
                   Chi phí
                 </TabsTrigger>
                 <TabsTrigger
                   value="members"
-                  className="whitespace-nowrap rounded-full px-6 py-2.5 h-auto text-sm font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95"
+                  className={cn(
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    isPWA 
+                      ? "whitespace-nowrap px-6 py-2.5 text-sm" 
+                      : "flex-1 px-8 py-3.5 text-base"
+                  )}
                 >
-                  <Users className="w-4 h-4 mr-2" />
+                  <Users className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
                   Thành viên
                 </TabsTrigger>
                 {trip.userRole === 'owner' && (
                   <TabsTrigger
                     value="share"
-                    className="whitespace-nowrap rounded-full px-6 py-2.5 h-auto text-sm font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95"
+                    className={cn(
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                      isPWA 
+                        ? "whitespace-nowrap px-6 py-2.5 text-sm" 
+                        : "flex-1 px-8 py-3.5 text-base"
+                    )}
                   >
-                    <Share2 className="w-4 h-4 mr-2" />
+                    <Share2 className={cn("mr-2", isPWA ? "w-4 h-4" : "w-5 h-5")} />
                     Chia sẻ
                   </TabsTrigger>
                 )}

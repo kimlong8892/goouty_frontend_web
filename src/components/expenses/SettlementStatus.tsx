@@ -206,30 +206,30 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                   {/* Participant Flow */}
                   <div className="flex items-center gap-2 sm:gap-4">
                     <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-                      <Avatar className={cn("border-2 border-white shadow-sm font-bold", isMobileView ? "w-10 h-10" : "w-12 h-12")}>
+                      <Avatar className={cn("border-2 border-white shadow-sm font-bold", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
                         {settlement.debtor.profilePicture && <AvatarImage src={settlement.debtor.profilePicture} />}
-                        <AvatarFallback className="bg-orange-50 text-orange-600 uppercase">
+                        <AvatarFallback className={cn("bg-orange-50 text-orange-600 uppercase", isMobileView ? "text-sm" : "text-base")}>
                           {(settlement.debtor.fullName || settlement.debtor.email).charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="text-center w-full">
-                        <p className="text-[10px] font-bold text-slate-900 truncate">
+                        <p className={cn("font-bold text-slate-900 truncate", isMobileView ? "text-xs" : "text-sm")}>
                           {(settlement.debtor.fullName || settlement.debtor.email)}
                         </p>
                       </div>
                     </div>
 
-                    <ArrowRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                    <ArrowRight className={cn("text-slate-300 flex-shrink-0", isMobileView ? "w-4 h-4" : "w-5 h-5")} />
 
                     <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-                      <Avatar className={cn("border-2 border-white shadow-sm font-bold", isMobileView ? "w-10 h-10" : "w-12 h-12")}>
+                      <Avatar className={cn("border-2 border-white shadow-sm font-bold", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
                         {settlement.creditor.profilePicture && <AvatarImage src={settlement.creditor.profilePicture} />}
-                        <AvatarFallback className="bg-green-50 text-green-600 uppercase">
+                        <AvatarFallback className={cn("bg-green-50 text-green-600 uppercase", isMobileView ? "text-sm" : "text-base")}>
                           {(settlement.creditor.fullName || settlement.creditor.email).charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="text-center w-full">
-                        <p className="text-[10px] font-bold text-slate-900 truncate">
+                        <p className={cn("font-bold text-slate-900 truncate", isMobileView ? "text-xs" : "text-sm")}>
                           {(settlement.creditor.fullName || settlement.creditor.email)}
                         </p>
                       </div>
