@@ -159,7 +159,7 @@ const AuthPage = () => {
           {/* Form Content - Conditional Order */}
           <div className={`p-8 md:p-12 lg:p-16 bg-white flex flex-col justify-center ${mode === 'signup' ? 'md:order-1' : 'md:order-2'}`}>
             <div className="mb-6 text-center md:text-left">
-              <h1 className="text-4xl font-black text-[#6c5dd3] mb-2 uppercase tracking-wide">
+              <h1 className="text-4xl font-black text-[#6347f9] mb-2 uppercase tracking-wide">
                 {mode === 'login' ? 'Đăng nhập' : 'ĐĂNG KÝ'}
               </h1>
               <p className="text-slate-500 font-medium">
@@ -200,7 +200,7 @@ const AuthPage = () => {
                     <Input
                       id="fullname"
                       type="text"
-                      className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4"
+                      className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white transition-all px-4"
                       placeholder="Nhập họ và tên của bạn"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -213,7 +213,7 @@ const AuthPage = () => {
                   <Input
                     id="email"
                     type="email"
-                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4"
+                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white transition-all px-4"
                     placeholder={mode === 'login' ? "Nhập địa chỉ email của bạn" : "Nhập địa chỉ email của bạn"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -226,7 +226,7 @@ const AuthPage = () => {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4 pr-12"
+                      className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white transition-all px-4 pr-12"
                       placeholder="Nhập mật khẩu của bạn"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -234,7 +234,7 @@ const AuthPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#6c5dd3] transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#6347f9] transition-colors"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -248,7 +248,7 @@ const AuthPage = () => {
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 rounded border-slate-300 text-[#6c5dd3] focus:ring-[#6c5dd3] cursor-pointer accent-[#6c5dd3]"
+                        className="w-4 h-4 rounded border-slate-300 text-[#6347f9] focus:ring-[#6347f9] cursor-pointer accent-[#6347f9]"
                       />
                       <span className="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">Ghi nhớ tài khoản</span>
                     </label>
@@ -256,7 +256,7 @@ const AuthPage = () => {
                     <button
                       type="button"
                       onClick={() => navigate('/forgot-password')}
-                      className="text-sm font-semibold text-[#6c5dd3] hover:text-[#5b4ec2] transition-colors"
+                      className="text-sm font-semibold text-[#6347f9] hover:text-[#5136db] transition-colors"
                     >
                       Quên mật khẩu?
                     </button>
@@ -265,7 +265,7 @@ const AuthPage = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="w-full h-12 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                 </Button>
@@ -276,7 +276,7 @@ const AuthPage = () => {
                   {mode === 'login' ? 'Bạn không có tài khoản? ' : 'Bạn đã có tài khoản? '}
                   <button
                     onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                    className="text-[#6c5dd3] font-bold hover:underline"
+                    className="text-[#6347f9] font-bold hover:underline"
                   >
                     {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
                   </button>

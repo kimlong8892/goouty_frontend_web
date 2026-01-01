@@ -128,7 +128,7 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
         <div>
           <h2 className={cn("font-bold text-gray-900 flex items-center gap-2", isMobileView ? "text-lg" : "text-2xl")}>
             <div className={cn("rounded-xl relative overflow-hidden group", isMobileView ? "p-1.5" : "p-2 bg-indigo-50")}>
-              <Share2 className={cn("text-[#6c5dd3] relative z-10", isMobileView ? "w-5 h-5" : "w-6 h-6")} />
+              <Share2 className={cn("text-[#6347f9] relative z-10", isMobileView ? "w-5 h-5" : "w-6 h-6")} />
             </div>
             Chia sẻ
           </h2>
@@ -177,18 +177,18 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
                   <div className="flex flex-col gap-3">
                     <div className="relative group/input">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Link2 className="h-4 w-4 text-gray-400 group-hover/input:text-[#6c5dd3] transition-colors" />
+                        <Link2 className="h-4 w-4 text-gray-400 group-hover/input:text-[#6347f9] transition-colors" />
                       </div>
                       <Input
                         value={currentShareLink}
                         readOnly
-                        className="pl-10 h-11 bg-white border-gray-200 focus:border-[#6c5dd3] focus:ring-[#6c5dd3]/20 rounded-xl font-medium text-gray-600 transition-all text-[13px]"
+                        className="pl-10 h-11 bg-white border-gray-200 focus:border-[#6347f9] focus:ring-[#6347f9]/20 rounded-xl font-medium text-gray-600 transition-all text-[13px]"
                       />
                     </div>
                     <div className="flex gap-2">
                       <Button
                         size="default"
-                        className="flex-1 h-11 bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white rounded-xl shadow-md transition-all font-semibold active:scale-95"
+                        className="flex-1 h-11 bg-[#6347f9] hover:bg-[#5136db] text-white rounded-xl shadow-md transition-all font-semibold active:scale-95"
                         onClick={() => copyToClipboard(currentShareLink)}
                       >
                         <Copy className="h-4 w-4 mr-2" />
@@ -234,7 +234,7 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
               size="lg"
               onClick={handleGenerateShareLink}
               disabled={generateShareLinkMutation.isPending}
-              className="h-12 px-8 bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white rounded-xl shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-0.5 transition-all duration-300 font-semibold"
+              className="h-12 px-8 bg-[#6347f9] hover:bg-[#5136db] text-white rounded-xl shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-0.5 transition-all duration-300 font-semibold"
             >
               {generateShareLinkMutation.isPending ? (
                 <>
@@ -257,7 +257,7 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
         )}>
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
             <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2 text-sm">
-              <Users className="w-4 h-4 text-[#6c5dd3]" />
+              <Users className="w-4 h-4 text-[#6347f9]" />
               Tham gia
             </h4>
             <ul className="space-y-2">

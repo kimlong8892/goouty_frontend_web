@@ -196,8 +196,8 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
         <DialogHeader className="p-8 pb-2 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#6c5dd3]/10 flex items-center justify-center">
-                <Edit3 className="w-5 h-5 text-[#6c5dd3]" />
+              <div className="w-10 h-10 rounded-xl bg-[#6347f9]/10 flex items-center justify-center">
+                <Edit3 className="w-5 h-5 text-[#6347f9]" />
               </div>
               <DialogTitle className="text-xl font-bold text-slate-900">
                 Chỉnh sửa chi phí
@@ -215,7 +215,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
               </Label>
               <Input
                 id="title"
-                className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6c5dd3] focus:border-[#6c5dd3] transition-all font-bold text-slate-900"
+                className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6347f9] focus:border-[#6347f9] transition-all font-bold text-slate-900"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="VD: Khách sạn, Tiền xăng..."
@@ -229,7 +229,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
               </Label>
               <Input
                 id="description"
-                className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6c5dd3] focus:border-[#6c5dd3] transition-all font-medium text-slate-700"
+                className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6347f9] focus:border-[#6347f9] transition-all font-medium text-slate-700"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Nhập ghi chú thêm..."
@@ -244,7 +244,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                 </Label>
                 <Input
                   id="amount"
-                  className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6c5dd3] focus:border-[#6c5dd3] transition-all pl-4 font-black text-slate-900"
+                  className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6347f9] focus:border-[#6347f9] transition-all pl-4 font-black text-slate-900"
                   value={formatCurrencyInput(formData.amount)}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value.replace(/[^0-9]/g, '') })}
                   placeholder="0"
@@ -258,7 +258,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                   <Input
                     id="date"
                     type="date"
-                    className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6c5dd3] focus:border-[#6c5dd3] transition-all font-bold text-slate-700"
+                    className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6347f9] focus:border-[#6347f9] transition-all font-bold text-slate-700"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   />
@@ -270,7 +270,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             <div className="space-y-1.5">
               <Label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Người trả <span className="text-red-500">*</span></Label>
               <Select value={formData.payerId} onValueChange={(v) => setFormData({ ...formData, payerId: v })}>
-                <SelectTrigger className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6c5dd3] font-bold text-slate-700">
+                <SelectTrigger className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6347f9] font-bold text-slate-700">
                   <SelectValue placeholder="Chọn người trả" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-slate-100 shadow-xl">
@@ -293,7 +293,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between ml-1">
                 <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Người tham gia</Label>
-                <span className="text-[10px] font-black text-[#6c5dd3] bg-[#6c5dd3]/5 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                <span className="text-[10px] font-black text-[#6347f9] bg-[#6347f9]/5 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                   {formData.participantIds.length} người
                 </span>
               </div>
@@ -303,14 +303,14 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                     <div className="flex items-center gap-3">
                       <Avatar className="w-8 h-8 font-bold border-2 border-white shadow-sm ring-1 ring-slate-100">
                         <AvatarImage src={m.user.profilePicture} />
-                        <AvatarFallback className="bg-slate-100 text-[#6c5dd3]">{(m.user.fullName || m.user.email).charAt(0).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback className="bg-slate-100 text-[#6347f9]">{(m.user.fullName || m.user.email).charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{m.user.fullName || m.user.email} {user?.id === m.user.id && '(bạn)'}</span>
                     </div>
                     <Checkbox
                       checked={formData.participantIds.includes(m.user.id.toString())}
                       onCheckedChange={() => toggleParticipant(m.user.id.toString())}
-                      className="rounded-full border-slate-200 data-[state=checked]:bg-[#6c5dd3] data-[state=checked]:border-[#6c5dd3]"
+                      className="rounded-full border-slate-200 data-[state=checked]:bg-[#6347f9] data-[state=checked]:border-[#6347f9]"
                     />
                   </label>
                 ))}
@@ -338,7 +338,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                           <input
                             type="text"
                             inputMode="numeric"
-                            className="w-28 h-8 text-right pr-2 text-xs font-black text-[#6c5dd3] border-none focus:ring-1 focus:ring-purple-200 rounded-lg bg-slate-50/50"
+                            className="w-28 h-8 text-right pr-2 text-xs font-black text-[#6347f9] border-none focus:ring-1 focus:ring-purple-200 rounded-lg bg-slate-50/50"
                             value={(amountByUserId[pid] ?? '').toString()}
                             onChange={(e) => {
                               const digits = e.target.value.replace(/[^0-9]/g, '');
@@ -372,7 +372,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             </Button>
             <Button
               onClick={handleSubmit}
-              className="flex-[2] h-12 rounded-2xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-purple-200 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="flex-[2] h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-purple-200 transition-all active:scale-[0.98] disabled:opacity-50"
               disabled={loading || membersLoading}
             >
               {loading ? (

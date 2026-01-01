@@ -273,7 +273,7 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
 
                       <div className={cn("flex gap-2", isMobileView ? "flex-col" : "col-span-2")}>
                         <Button
-                          className="flex-1 h-11 rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white font-bold shadow-lg shadow-purple-200"
+                          className="flex-1 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200"
                           disabled={isUpdating}
                           onClick={() => handleCreateTransaction(settlement)}
                         >
@@ -322,8 +322,8 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
           isMobileView ? "h-full w-full max-w-none rounded-none p-4" : "rounded-[32px] p-8 max-w-sm"
         )}>
           <DialogHeader className={cn(isMobileView ? "mb-4 pt-10" : "mb-6")}>
-            <div className="w-12 h-12 rounded-2xl bg-[#6c5dd3]/10 flex items-center justify-center mx-auto mb-4">
-              <QrCode className="w-6 h-6 text-[#6c5dd3]" />
+            <div className="w-12 h-12 rounded-2xl bg-[#6347f9]/10 flex items-center justify-center mx-auto mb-4">
+              <QrCode className="w-6 h-6 text-[#6347f9]" />
             </div>
             <DialogTitle className="text-center text-xl font-black text-slate-900">
               Quét QR Chuyển Khoản
@@ -348,7 +348,7 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                 </div>
                 <div className="text-right">
                   <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Số tiền</p>
-                  <p className="text-sm font-black text-[#6c5dd3]">
+                  <p className="text-sm font-black text-[#6347f9]">
                     {formatCurrency(Number(amountInputs[qrSettlementId] || settlements.find(s => s.id === qrSettlementId)?.amount || 0))}
                   </p>
                 </div>
@@ -364,7 +364,7 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                 </Button>
                 <Button
                   onClick={() => handleDownloadQr(settlements.find((s) => s.id === qrSettlementId)!)}
-                  className="h-12 rounded-2xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white font-bold shadow-lg shadow-purple-200"
+                  className="h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200"
                 >
                   Tải QR
                 </Button>

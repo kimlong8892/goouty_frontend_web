@@ -167,7 +167,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6c5dd3]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6347f9]"></div>
       </div>
     );
   }
@@ -197,7 +197,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
             <DialogTrigger asChild>
               <Button
                 size={isMobileView ? "sm" : "default"}
-                className="bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white rounded-xl shadow-md transition-all hover:shadow-lg h-10 px-4"
+                className="bg-[#6347f9] hover:bg-[#5136db] text-white rounded-xl shadow-md transition-all hover:shadow-lg h-10 px-4"
               >
                 {isMobileView ? <UserPlus className="h-5 w-5" /> : <Plus className="h-5 w-5 mr-2" />}
                 {!isMobileView && "Thêm thành viên"}
@@ -205,7 +205,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
             </DialogTrigger>
             <DialogContent className={cn("max-w-md", isMobileView ? "w-[95%] rounded-3xl" : "rounded-2xl")}>
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold text-[#6c5dd3]">Mời thành viên mới</DialogTitle>
+                <DialogTitle className="text-xl font-bold text-[#6347f9]">Mời thành viên mới</DialogTitle>
                 <DialogDescription>
                   Nhập email của người bạn muốn mời. Họ sẽ nhận được thông báo và cần chấp nhận lời mời trước khi tham gia.
                 </DialogDescription>
@@ -219,7 +219,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                     placeholder="user@example.com"
                     value={memberEmail}
                     onChange={(e) => setMemberEmail(e.target.value)}
-                    className="rounded-xl border-slate-200 focus-visible:ring-[#6c5dd3]"
+                    className="rounded-xl border-slate-200 focus-visible:ring-[#6347f9]"
                   />
                 </div>
               </div>
@@ -228,14 +228,14 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                   variant="outline"
                   onClick={() => setIsAddMemberOpen(false)}
                   disabled={addMemberMutation.isPending}
-                  className="rounded-xl border-slate-200 hover:text-[#6c5dd3] hover:border-[#6c5dd3]"
+                  className="rounded-xl border-slate-200 hover:text-[#6347f9] hover:border-[#6347f9]"
                 >
                   Hủy
                 </Button>
                 <Button
                   onClick={handleAddMember}
                   disabled={addMemberMutation.isPending}
-                  className="rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white"
+                  className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white"
                 >
                   {addMemberMutation.isPending ? 'Đang gửi...' : 'Gửi lời mời'}
                 </Button>
@@ -373,7 +373,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                   <div
                     key={member.id}
                     className={cn(
-                      "flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-white hover:border-[#6c5dd3]/30 hover:shadow-md transition-all duration-300",
+                      "flex items-center gap-3 p-4 rounded-2xl border border-slate-100 bg-white hover:border-[#6347f9]/30 hover:shadow-md transition-all duration-300",
                       isMobileView && "p-3 gap-3"
                     )}
                   >

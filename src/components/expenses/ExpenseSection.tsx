@@ -92,7 +92,7 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6c5dd3]"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9]"></div>
         <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Đang chuẩn bị dữ liệu chi phí...</p>
       </div>
     );

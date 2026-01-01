@@ -156,7 +156,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-5xl font-black mb-4 bg-gradient-to-r from-[#6c5dd3] to-[#8673f8] bg-clip-text text-transparent uppercase tracking-tight">
+          <h2 className="text-3xl md:text-5xl font-black mb-4 bg-gradient-to-r from-[#6347f9] to-[#8673f8] bg-clip-text text-transparent uppercase tracking-tight">
             KHÁM PHÁ TEMPLATES
           </h2>
           <p className="text-lg text-slate-500 font-medium max-w-lg mx-auto leading-relaxed">
@@ -170,12 +170,12 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
             {/* Search */}
             <div className="flex-[2]">
               <div className="relative group">
-                <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 transition-colors group-focus-within:text-[#6c5dd3]" />
+                <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 transition-colors group-focus-within:text-[#6347f9]" />
                 <Input
                   placeholder="Tìm kiếm theo tiêu đề..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-14 h-14 bg-white border-slate-200 rounded-[20px] focus-visible:ring-[#6c5dd3]/20 shadow-sm focus:shadow-md transition-all text-base"
+                  className="pl-14 h-14 bg-white border-slate-200 rounded-[20px] focus-visible:ring-[#6347f9]/20 shadow-sm focus:shadow-md transition-all text-base"
                 />
               </div>
             </div>
@@ -183,7 +183,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
             {/* Province Filter */}
             <div className="flex-1 min-w-[200px]">
               <Select value={selectedProvince} onValueChange={setSelectedProvince}>
-                <SelectTrigger className="h-14 bg-white border-slate-200 rounded-[20px] focus:ring-[#6c5dd3]/20 shadow-sm text-base">
+                <SelectTrigger className="h-14 bg-white border-slate-200 rounded-[20px] focus:ring-[#6347f9]/20 shadow-sm text-base">
                   <div className="flex items-center">
                     <MapPin className="w-5 h-5 mr-3 text-slate-400" />
                     <SelectValue placeholder="Tất cả tỉnh thành" />
@@ -215,7 +215,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
             <p className="text-sm font-semibold text-slate-500 tracking-wide uppercase">
               Hiển thị {templates.length} template{templates.length !== 1 ? 's' : ''}
               {pagination.total > templates.length && (
-                <span className="ml-1 text-[#6c5dd3]">/ {pagination.total}</span>
+                <span className="ml-1 text-[#6347f9]">/ {pagination.total}</span>
               )}
             </p>
             <div className="h-px w-8 bg-slate-200" />
@@ -241,7 +241,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
               <div ref={observerTarget} className="flex justify-center py-8">
                 {loadingMore && (
                   <div className="flex items-center space-x-2">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#6c5dd3]" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#6347f9]" />
                     <span className="text-sm text-slate-500 font-medium">Đang tải thêm...</span>
                   </div>
                 )}

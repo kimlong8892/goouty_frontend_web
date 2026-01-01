@@ -105,7 +105,7 @@ const CreateTripPage = () => {
                   className="w-full h-full object-contain drop-shadow-xl transform hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-3 text-[#6c5dd3] uppercase tracking-wide">
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-3 text-[#6347f9] uppercase tracking-wide">
                 TẠO CHUYẾN ĐI MỚI
               </h1>
               <p className="text-slate-600 font-medium">
@@ -216,7 +216,7 @@ const CreateTripPage = () => {
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
                   <Button
                     variant="outline"
-                    className="flex-1 h-12 rounded-xl border-purple-200 text-[#6c5dd3] hover:bg-purple-50 hover:text-[#5b4ec2]"
+                    className="flex-1 h-12 rounded-xl border-purple-200 text-[#6347f9] hover:bg-purple-50 hover:text-[#5136db]"
                     onClick={() => navigate('/templates')}
                   >
                     <Copy className="mr-2 h-4 w-4" />
@@ -224,7 +224,7 @@ const CreateTripPage = () => {
                   </Button>
                   <Button
                     onClick={handleCreateTrip}
-                    className="flex-1 h-12 rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white shadow-lg hover:shadow-xl transition-all"
+                    className="flex-1 h-12 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-xl transition-all"
                     disabled={loading}
                   >
                     {loading ? (

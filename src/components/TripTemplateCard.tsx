@@ -94,7 +94,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
               {template.title}
             </h3>
             <div className="flex flex-col items-end">
-              <span className="text-[#6c5dd3] font-black text-lg">{price}</span>
+              <span className="text-[#6347f9] font-black text-lg">{price}</span>
               <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">/person</span>
             </div>
           </div>
@@ -102,7 +102,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
           {/* Location & Rating row */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center text-slate-500 font-medium text-sm">
-              <MapPin size={16} className="mr-1.5 text-[#6c5dd3]" />
+              <MapPin size={16} className="mr-1.5 text-[#6347f9]" />
               <span className="truncate max-w-[120px]">{template.province?.name || "Vietnam"}</span>
             </div>
 
@@ -125,7 +125,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
           </Button>
           <Button
             size="lg"
-            className="w-full rounded-2xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
+            className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
             onClick={handleUseTemplate}
             disabled={isLoading || usingTemplate}
           >

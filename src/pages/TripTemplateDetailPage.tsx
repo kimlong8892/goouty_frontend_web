@@ -95,7 +95,7 @@ const TripTemplateDetailPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6c5dd3]"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9]"></div>
           <p className="text-slate-500 font-medium">Đang tải template...</p>
         </div>
       </div>
@@ -135,7 +135,7 @@ const TripTemplateDetailPage = () => {
             <div className="max-w-7xl mx-auto">
               <div className="flex flex-wrap gap-3 mb-4">
                 {template.province && (
-                  <Badge className="bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white border-none px-3 py-1 text-sm">
+                  <Badge className="bg-[#6347f9] hover:bg-[#5136db] text-white border-none px-3 py-1 text-sm">
                     <MapPin className="w-3 h-3 mr-1" /> {template.province.name}
                   </Badge>
                 )}
@@ -168,7 +168,7 @@ const TripTemplateDetailPage = () => {
             {/* Description Card */}
             <Card className="rounded-[32px] border-none shadow-xl bg-white overflow-hidden">
               <CardContent className="p-8">
-                <h2 className="text-2xl font-bold text-[#6c5dd3] mb-4 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-[#6347f9] mb-4 flex items-center gap-2">
                   Giới thiệu chuyến đi
                 </h2>
                 <p className="text-slate-600 text-lg leading-relaxed whitespace-pre-line">
@@ -190,7 +190,7 @@ const TripTemplateDetailPage = () => {
                 <Card key={day.id} className="rounded-[24px] overflow-hidden border-none shadow-md group hover:shadow-lg transition-shadow bg-white">
                   {/* Day Header */}
                   <div className="bg-gradient-to-r from-purple-50 to-white p-5 border-b border-purple-100 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#6c5dd3] text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-purple-200">
+                    <div className="w-12 h-12 rounded-2xl bg-[#6347f9] text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-purple-200">
                       {idx + 1}
                     </div>
                     <div className="flex-1">
@@ -204,7 +204,7 @@ const TripTemplateDetailPage = () => {
                     {day.activities?.length > 0 ? (
                       day.activities.map((act) => (
                         <div key={act.id} className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors">
-                          <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-indigo-50 text-[#6c5dd3] flex items-center justify-center">
+                          <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-indigo-50 text-[#6347f9] flex items-center justify-center">
                             {getActivityIcon(act.title)}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -219,7 +219,7 @@ const TripTemplateDetailPage = () => {
 
                             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-slate-500">
                               {act.location && (
-                                <span className="flex items-center gap-1 hover:text-[#6c5dd3] transition-colors">
+                                <span className="flex items-center gap-1 hover:text-[#6347f9] transition-colors">
                                   <MapPin className="w-3 h-3" /> {act.location}
                                 </span>
                               )}
@@ -255,7 +255,7 @@ const TripTemplateDetailPage = () => {
 
               {/* Action Card */}
               <Card className="rounded-[32px] border-none shadow-2xl overflow-hidden relative">
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#6c5dd3] to-purple-400" />
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#6347f9] to-purple-400" />
                 <CardContent className="p-8 pt-10 text-center">
                   <h3 className="text-2xl font-black text-slate-900 mb-2">Sẵn sàng đi chưa?</h3>
                   <p className="text-slate-500 mb-8">
@@ -265,7 +265,7 @@ const TripTemplateDetailPage = () => {
                   <Button
                     onClick={handleUseTemplate}
                     disabled={usingTemplate}
-                    className="w-full h-14 rounded-2xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white font-bold text-lg shadow-xl hover:shadow-purple-300 transition-all duration-300 transform hover:-translate-y-1"
+                    className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-xl hover:shadow-purple-300 transition-all duration-300 transform hover:-translate-y-1"
                   >
                     {usingTemplate ? (
                       <>

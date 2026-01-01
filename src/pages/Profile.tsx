@@ -216,7 +216,7 @@ const Profile = () => {
   if (loading) {
     return (
       <div className="min-h-screen pt-20 flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6c5dd3]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6347f9]"></div>
       </div>
     );
   }
@@ -236,12 +236,12 @@ const Profile = () => {
                 {profile.profilePicture ? (
                   <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#6c5dd3] to-[#8c7df0] flex items-center justify-center text-3xl font-bold text-white uppercase">
+                  <div className="w-full h-full bg-gradient-to-br from-[#6347f9] to-[#8c7df0] flex items-center justify-center text-3xl font-bold text-white uppercase">
                     {profile.fullName.charAt(0)}
                   </div>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 bg-[#6c5dd3] text-white p-2 rounded-full cursor-pointer shadow-lg transform translate-x-1/4 translate-y-1/4 active:scale-95 transition-transform">
+              <label className="absolute bottom-0 right-0 bg-[#6347f9] text-white p-2 rounded-full cursor-pointer shadow-lg transform translate-x-1/4 translate-y-1/4 active:scale-95 transition-transform">
                 <Camera className="w-4 h-4" />
                 <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
               </label>
@@ -343,7 +343,7 @@ const Profile = () => {
                     required
                     value={passwordForm.currentPassword}
                     onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                   />
                 </div>
               )}
@@ -362,7 +362,7 @@ const Profile = () => {
                   minLength={6}
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                 />
               </div>
               <div className="space-y-2">
@@ -372,7 +372,7 @@ const Profile = () => {
                   required
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                 />
               </div>
               <DialogFooter className="pt-4">
@@ -386,7 +386,7 @@ const Profile = () => {
                 <Button
                   type="submit"
                   disabled={changingPassword}
-                  className="bg-[#6c5dd3] hover:bg-[#5b4ec2]"
+                  className="bg-[#6347f9] hover:bg-[#5136db]"
                 >
                   {changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
                 </Button>
@@ -419,12 +419,12 @@ const Profile = () => {
                     {profile.profilePicture ? (
                       <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-4xl font-bold text-[#6c5dd3]">
+                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-4xl font-bold text-[#6347f9]">
                         {profile.fullName.charAt(0)}
                       </div>
                     )}
                   </div>
-                  <label className="absolute bottom-1 right-1 bg-[#6c5dd3] text-white p-2 rounded-full cursor-pointer hover:bg-[#5b4ec2] shadow-md transition-all">
+                  <label className="absolute bottom-1 right-1 bg-[#6347f9] text-white p-2 rounded-full cursor-pointer hover:bg-[#5136db] shadow-md transition-all">
                     <Camera className="w-4 h-4" />
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
                   </label>
@@ -473,7 +473,7 @@ const Profile = () => {
                         <Input
                           value={formData.fullName}
                           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                         />
                       </div>
                       <div className="space-y-2">
@@ -494,7 +494,7 @@ const Profile = () => {
                           placeholder="+84 909 123 456"
                           value={formData.phoneNumber}
                           onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                         />
                       </div>
                     </div>
@@ -517,7 +517,7 @@ const Profile = () => {
                           <Input
                             value={formData.bankNumber}
                             onChange={(e) => setFormData({ ...formData, bankNumber: e.target.value })}
-                            className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                            className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                             placeholder="0000 0000 0000"
                           />
                         </div>
@@ -536,7 +536,7 @@ const Profile = () => {
                     <Button
                       onClick={handleSaveProfile}
                       disabled={saving}
-                      className="px-8 h-11 rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white shadow-lg shadow-purple-200"
+                      className="px-8 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg shadow-purple-200"
                     >
                       {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
                     </Button>
@@ -552,12 +552,12 @@ const Profile = () => {
               <Card className="rounded-[24px] border-none shadow-lg overflow-hidden bg-white">
                 <CardContent className="p-6">
                   <div className="font-bold text-slate-900 flex items-center gap-2 mb-6">
-                    <Shield className="w-5 h-5 text-[#6c5dd3]" /> Bảo mật
+                    <Shield className="w-5 h-5 text-[#6347f9]" /> Bảo mật
                   </div>
                   <div className="space-y-2">
                     <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start h-12 rounded-xl border-slate-100 hover:bg-slate-50 hover:text-[#6c5dd3] font-medium text-slate-600">
+                        <Button variant="outline" className="w-full justify-start h-12 rounded-xl border-slate-100 hover:bg-slate-50 hover:text-[#6347f9] font-medium text-slate-600">
                           <Lock className="w-4 h-4 mr-3" /> Đổi mật khẩu
                         </Button>
                       </DialogTrigger>
@@ -574,7 +574,7 @@ const Profile = () => {
                                 required
                                 value={passwordForm.currentPassword}
                                 onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                                className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                               />
                             </div>
                           )}
@@ -593,7 +593,7 @@ const Profile = () => {
                               minLength={6}
                               value={passwordForm.newPassword}
                               onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                             />
                           </div>
                           <div className="space-y-2">
@@ -603,7 +603,7 @@ const Profile = () => {
                               required
                               value={passwordForm.confirmPassword}
                               onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6c5dd3]"
+                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                             />
                           </div>
                           <DialogFooter className="pt-4">
@@ -617,7 +617,7 @@ const Profile = () => {
                             <Button
                               type="submit"
                               disabled={changingPassword}
-                              className="bg-[#6c5dd3] hover:bg-[#5b4ec2]"
+                              className="bg-[#6347f9] hover:bg-[#5136db]"
                             >
                               {changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
                             </Button>

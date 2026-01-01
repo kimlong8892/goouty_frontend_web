@@ -133,7 +133,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
       <div className="space-y-6">
         <h2 className="text-xl font-bold text-slate-900">Chi tiết chi phí</h2>
         <div className="text-center py-20 bg-slate-50/50 rounded-[32px] border-2 border-dashed border-slate-100">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6c5dd3] mx-auto"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9] mx-auto"></div>
           <p className="mt-4 text-slate-500 font-medium tracking-wide font-bold uppercase text-[10px]">Đang tải dữ liệu...</p>
         </div>
       </div>
@@ -162,7 +162,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
             {(isOwner || isMember) && (
               <Button
                 onClick={() => setShowAddDialog(true)}
-                className="rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white"
+                className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white"
               >
                 <Handshake className="w-4 h-4 mr-2" />
                 Ghi chú chi phí ngay
@@ -179,14 +179,14 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
             return (
               <div
                 key={expense.id}
-                className={`group rounded-[24px] border transition-all duration-300 relative overflow-hidden ${expense.isLocked ? 'bg-slate-50/80 border-slate-100 opacity-90' : 'bg-white border-slate-100 hover:border-[#6c5dd3]/30 hover:shadow-xl hover:shadow-purple-500/5'
+                className={`group rounded-[24px] border transition-all duration-300 relative overflow-hidden ${expense.isLocked ? 'bg-slate-50/80 border-slate-100 opacity-90' : 'bg-white border-slate-100 hover:border-[#6347f9]/30 hover:shadow-xl hover:shadow-purple-500/5'
                   }`}
               >
                 <div className="p-5 md:p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <h3 className={`text-lg font-bold ${expense.isLocked ? 'text-slate-500' : 'text-slate-900 group-hover:text-[#6c5dd3] transition-colors'}`}>
+                        <h3 className={`text-lg font-bold ${expense.isLocked ? 'text-slate-500' : 'text-slate-900 group-hover:text-[#6347f9] transition-colors'}`}>
                           {expense.title}
                         </h3>
                         {expense.isLocked && <Lock className="w-3 h-3 text-slate-400" />}
@@ -206,7 +206,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditExpense(expense)}
-                              className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-400 hover:text-[#6c5dd3]"
+                              className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-400 hover:text-[#6347f9]"
                             >
                               <Edit className="w-3.5 h-3.5" />
                             </Button>
@@ -234,7 +234,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                         <div className="flex items-center gap-2">
                           <Avatar className="w-8 h-8 border border-white shadow-sm font-bold">
                             {payerInfo.profilePicture && <AvatarImage src={payerInfo.profilePicture} />}
-                            <AvatarFallback className="text-xs bg-slate-100 text-[#6c5dd3]">
+                            <AvatarFallback className="text-xs bg-slate-100 text-[#6347f9]">
                               {payerInfo.name.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
@@ -264,8 +264,8 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
 
                     <div className="flex items-center gap-2">
                       <div className="bg-indigo-50 px-3 py-1 rounded-full flex items-center gap-1.5">
-                        <Users className="w-3 h-3 text-[#6c5dd3]" />
-                        <span className="text-[10px] font-bold text-[#6c5dd3]">{expense.participants.length} người</span>
+                        <Users className="w-3 h-3 text-[#6347f9]" />
+                        <span className="text-[10px] font-bold text-[#6347f9]">{expense.participants.length} người</span>
                       </div>
                     </div>
                   </div>

@@ -27,7 +27,7 @@ export const HeroSection = ({
           {/* Left Column - Text Content */}
           <div className="text-left space-y-6">
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-[#5744e4]">
+            <h1 style={{ color: '#6347f9' }} className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-[#6347f9]">
               VI VU THẢ GA,
               <br />
               KHÔNG LO RẮC RỐI.
@@ -56,7 +56,7 @@ export const HeroSection = ({
             <div className="pt-6">
               <Button
                 onClick={handleGetStarted}
-                className="bg-[#5744e4] hover:bg-[#4636b6] text-white font-semibold pl-6 pr-4 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+                className="bg-[#6347f9] hover:bg-[#5136db] text-white font-semibold pl-6 pr-4 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
               >
                 Bắt đầu hành trình <ChevronRight size={18} />
               </Button>

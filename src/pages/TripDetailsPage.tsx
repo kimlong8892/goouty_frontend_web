@@ -444,7 +444,7 @@ const TripDetailsPage = () => {
   if (loading || authLoading) {
     return (
       <div className="min-h-screen pt-20 px-4 flex items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6c5dd3]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6347f9]"></div>
       </div>
     );
   }
@@ -536,7 +536,7 @@ const TripDetailsPage = () => {
                   open={editTripDialogOpen}
                   onOpenChange={setEditTripDialogOpen}
                 >
-                  <button className="text-slate-400 hover:text-[#6c5dd3] transition-colors p-1">
+                  <button className="text-slate-400 hover:text-[#6347f9] transition-colors p-1">
                     <Edit className="w-5 h-5" />
                   </button>
                 </EditTripDialog>
@@ -548,7 +548,7 @@ const TripDetailsPage = () => {
               isMobileView && "gap-x-4"
             )}>
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#6c5dd3]" />
+                <Calendar className="w-4 h-4 text-[#6347f9]" />
                 <span>{formatDate(trip.startDate)}</span>
               </div>
               {trip.province && (
@@ -585,7 +585,7 @@ const TripDetailsPage = () => {
                 <TabsTrigger
                   value="itinerary"
                   className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
                     isMobileView
                       ? "whitespace-nowrap px-6 py-3.5 text-base"
                       : "flex-1 px-8 py-4 text-base"
@@ -597,7 +597,7 @@ const TripDetailsPage = () => {
                 <TabsTrigger
                   value="expenses"
                   className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
                     isMobileView
                       ? "whitespace-nowrap px-6 py-3.5 text-base"
                       : "flex-1 px-8 py-4 text-base"
@@ -609,7 +609,7 @@ const TripDetailsPage = () => {
                 <TabsTrigger
                   value="members"
                   className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
                     isMobileView
                       ? "whitespace-nowrap px-6 py-3.5 text-base"
                       : "flex-1 px-8 py-4 text-base"
@@ -622,7 +622,7 @@ const TripDetailsPage = () => {
                   <TabsTrigger
                     value="share"
                     className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
                       isMobileView
                         ? "whitespace-nowrap px-6 py-3.5 text-base"
                         : "flex-1 px-8 py-4 text-base"
@@ -654,7 +654,7 @@ const TripDetailsPage = () => {
                   <Button
                     onClick={() => setShowAddDay(true)}
                     size={isMobileView ? "sm" : "default"}
-                    className="rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white shadow-lg"
+                    className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg"
                   >
                     <Plus className="w-4 h-4 mr-1.5" />
                     Thêm ngày
@@ -674,7 +674,7 @@ const TripDetailsPage = () => {
                       </div>
                       <h3 className="text-lg font-semibold text-slate-800 mb-2">Chưa có lịch trình</h3>
                       <p className="text-slate-500 mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
-                      <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2]">
+                      <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-[#6347f9] hover:bg-[#5136db]">
                         <Plus className="w-4 h-4 mr-2" />
                         Thêm ngày đầu tiên
                       </Button>
@@ -694,7 +694,7 @@ const TripDetailsPage = () => {
                               <div className={cn(
                                 "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
                                 isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
-                                isExpanded ? "bg-[#6c5dd3] text-white" : "bg-slate-200 text-slate-500"
+                                isExpanded ? "bg-[#6347f9] text-white" : "bg-slate-200 text-slate-500"
                               )}>
                                 {index + 1}
                               </div>
@@ -802,14 +802,14 @@ const TripDetailsPage = () => {
 
                                           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-slate-500">
                                             {activity.pinned && (
-                                              <Badge className="bg-[#6c5dd3] text-white hover:bg-[#5b4ec2] rounded-md px-2 py-0.5 border-0">
+                                              <Badge className="bg-[#6347f9] text-white hover:bg-[#5136db] rounded-md px-2 py-0.5 border-0">
                                                 Quan trọng
                                               </Badge>
                                             )}
 
                                             {activity.timeStart && (
                                               <div className="flex items-center text-slate-700 bg-slate-50 px-2 py-1 rounded-md">
-                                                <Clock className="w-3 h-3 mr-1 text-[#6c5dd3]" />
+                                                <Clock className="w-3 h-3 mr-1 text-[#6347f9]" />
                                                 {formatTime(activity.timeStart)}
                                                 {activity.durationMin && <span className="text-slate-400 mx-1">|</span>}
                                                 {activity.durationMin && <span>{activity.durationMin}p</span>}

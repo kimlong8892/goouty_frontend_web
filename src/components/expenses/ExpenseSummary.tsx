@@ -42,7 +42,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
           <Button
             onClick={onAddExpense}
             size={isMobileView ? "sm" : "default"}
-            className="rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white shadow-lg shadow-purple-100 flex-shrink-0"
+            className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg shadow-purple-100 flex-shrink-0"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             {isMobileView ? "Thêm" : "Thêm chi phí"}
@@ -51,7 +51,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-        <Card className="rounded-[24px] border-none shadow-sm bg-gradient-to-br from-[#6c5dd3] to-[#8673f5] text-white overflow-hidden relative">
+        <Card className="rounded-[24px] border-none shadow-sm bg-gradient-to-br from-[#6347f9] to-[#8673f5] text-white overflow-hidden relative">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <DollarSign className={cn(isMobileView ? "w-16 h-16" : "w-24 h-24", "rotate-12")} />
           </div>
@@ -73,7 +73,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
                 <p className={cn("font-black text-slate-900", isMobileView ? "text-2xl" : "text-3xl")}>{calculation.transactionCount}</p>
               </div>
               <div className={cn("rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-slate-100 transition-colors", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
-                <ReceiptText className={cn("text-slate-300 group-hover:text-[#6c5dd3] transition-colors", isMobileView ? "w-6 h-6" : "w-8 h-8")} />
+                <ReceiptText className={cn("text-slate-300 group-hover:text-[#6347f9] transition-colors", isMobileView ? "w-6 h-6" : "w-8 h-8")} />
               </div>
             </div>
           </CardContent>

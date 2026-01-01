@@ -235,7 +235,7 @@ const MyTripsPage = () => {
       {isLoading ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6c5dd3]" />
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6347f9]" />
             <p className="text-muted-foreground">Đang kiểm tra đăng nhập...</p>
           </div>
         </div>
@@ -251,7 +251,7 @@ const MyTripsPage = () => {
                   className="w-full h-full object-contain drop-shadow-xl transform hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h1 className="text-3xl md:text-5xl font-black mb-3 text-[#6c5dd3] uppercase tracking-wide">
+              <h1 className="text-3xl md:text-5xl font-black mb-3 text-[#6347f9] uppercase tracking-wide">
                 CHUYẾN ĐI CỦA TÔI
               </h1>
               <p className="text-slate-600 font-medium text-lg mb-6">
@@ -260,7 +260,7 @@ const MyTripsPage = () => {
 
               <Button
                 onClick={() => navigate('/create-trip')}
-                className="h-12 px-8 rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white shadow-lg hover:shadow-xl transition-all font-semibold"
+                className="h-12 px-8 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-xl transition-all font-semibold"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Tạo chuyến đi
@@ -303,12 +303,12 @@ const MyTripsPage = () => {
             {/* Trips Grid */}
             {loading ? (
               <div className="text-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6c5dd3]" />
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6347f9]" />
                 <p className="text-muted-foreground">Đang tải...</p>
               </div>
             ) : searchLoading ? (
               <div className="text-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6c5dd3]" />
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6347f9]" />
                 <p className="text-muted-foreground">Đang tìm kiếm...</p>
               </div>
             ) : (
@@ -325,8 +325,8 @@ const MyTripsPage = () => {
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#6c5dd3]/10 via-[#6c5dd3]/5 to-white flex items-center justify-center">
-                            <Plane className="w-16 h-16 text-[#6c5dd3]/20 animate-pulse-slow" />
+                          <div className="w-full h-full bg-gradient-to-br from-[#6347f9]/10 via-[#6347f9]/5 to-white flex items-center justify-center">
+                            <Plane className="w-16 h-16 text-[#6347f9]/20 animate-pulse-slow" />
                           </div>
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -389,7 +389,7 @@ const MyTripsPage = () => {
                         <div className="mt-1">
                           <Button
                             size="sm"
-                            className="w-full rounded-2xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white text-xs font-semibold h-10 shadow-md hover:shadow-lg transition-all"
+                            className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-xs font-semibold h-10 shadow-md hover:shadow-lg transition-all"
                             onClick={() => handleTripAction('view', trip)}
                           >
                             Xem chi tiết <Eye className="w-3 h-3 ml-1" />
@@ -407,7 +407,7 @@ const MyTripsPage = () => {
                       variant="outline"
                       onClick={handleLoadMore}
                       disabled={loadingMore}
-                      className="px-8 h-12 rounded-xl border-purple-200 text-[#6c5dd3] hover:bg-purple-50 font-medium"
+                      className="px-8 h-12 rounded-xl border-purple-200 text-[#6347f9] hover:bg-purple-50 font-medium"
                     >
                       {loadingMore ? (
                         <>
@@ -450,7 +450,7 @@ const MyTripsPage = () => {
                   }
                 </p>
                 {!searchQuery && (
-                  <Button onClick={() => navigate('/create-trip')} className="h-12 px-8 rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white font-semibold">
+                  <Button onClick={() => navigate('/create-trip')} className="h-12 px-8 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-semibold">
                     <Plus className="w-5 h-5 mr-2" />
                     Tạo chuyến đi đầu tiên
                   </Button>
