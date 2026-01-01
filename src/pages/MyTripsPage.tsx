@@ -14,7 +14,6 @@ import {
   Filter,
   MoreVertical,
   Share2,
-  Edit,
   Trash2,
   ChevronDown,
   Loader2,
@@ -32,7 +31,7 @@ import { api } from '@/lib/api.ts';
 import { envUtils } from '@/lib/env';
 import { usePWA } from '@/pwa/hooks/usePWA';
 import { Trip, ShareLink } from '@/lib/types.ts';
-import { EditTripDialog } from '@/components/dialogs/EditTripDialog.tsx';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Using Trip from types.ts, extending it for local needs
@@ -198,9 +197,7 @@ const MyTripsPage = () => {
 
     if (action === 'view') {
       navigate(`/trip/${trip.id}`);
-    } else if (action === 'edit') {
-      // Navigate to detail page with edit query param
-      navigate(`/trip/${trip.id}?edit=true`);
+
     } else if (action === 'delete') {
       openDeleteDialog(trip);
     }
@@ -389,16 +386,7 @@ const MyTripsPage = () => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="grid grid-cols-2 gap-3 mt-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full rounded-2xl border-purple-100 text-[#6c5dd3] hover:bg-purple-50 hover:text-[#5b4ec2] text-xs font-semibold h-10"
-                            onClick={() => handleTripAction('edit', trip)}
-                          >
-                            {/* Using Edit icon or label */}
-                            Chỉnh sửa <Edit className="w-3 h-3 ml-1" />
-                          </Button>
+                        <div className="mt-1">
                           <Button
                             size="sm"
                             className="w-full rounded-2xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white text-xs font-semibold h-10 shadow-md hover:shadow-lg transition-all"

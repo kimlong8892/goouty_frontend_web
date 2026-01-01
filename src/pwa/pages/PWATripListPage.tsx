@@ -18,7 +18,6 @@ import {
   Camera,
   Car,
   MoreVertical,
-  Edit,
   Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
@@ -267,10 +266,7 @@ const PWATripListPage = () => {
   const handleTripAction = async (action: string, trip: TripWithMember) => {
     if (!trip.id) return;
 
-    if (action === 'edit') {
-      // Navigate to detail page with edit query param
-      navigate(`/trip/${trip.id}?edit=true`);
-    } else if (action === 'delete') {
+    if (action === 'delete') {
       setTripToDelete(trip);
       setDeleteDialogOpen(true);
     }
@@ -408,10 +404,6 @@ const PWATripListPage = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleTripAction('edit', trip)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Chỉnh sửa
-                            </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleTripAction('delete', trip)}
                               className="text-red-600 focus:text-red-600"
