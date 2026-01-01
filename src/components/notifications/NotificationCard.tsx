@@ -16,9 +16,14 @@ import {
   Banknote,
   Plane,
   CreditCard,
-  Bell
+  Bell,
+  Info,
+  AlertTriangle,
+  XCircle,
+  RefreshCcw,
+  UserPlus
 } from 'lucide-react';
-import { cn } from '@/lib/utils.ts';
+import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import {
@@ -100,23 +105,75 @@ export function NotificationCard({
 
   const isInvitation = notification.type === NotificationType.TRIP_CREATED || notification.body.toLowerCase().includes('mời');
 
-  // Map icons based on type
-  const getIcon = () => {
+  // Map icons and colors based on type
+  const getNotificationStyle = () => {
     switch (notification.type) {
       case NotificationType.TRIP_CREATED:
+        return {
+          icon: <Plane size={12} className="text-white fill-current" />,
+          bgColor: "bg-blue-500"
+        };
       case NotificationType.TRIP_UPDATED:
-        return <Plane size={12} className="text-white fill-current" />;
+        return {
+          icon: <RefreshCcw size={12} className="text-white" />,
+          bgColor: "bg-indigo-500"
+        };
       case NotificationType.EXPENSE_ADDED:
+        return {
+          icon: <Banknote size={12} className="text-white" />,
+          bgColor: "bg-emerald-500"
+        };
       case NotificationType.EXPENSE_UPDATED:
-        return <Banknote size={12} className="text-white" />;
+        return {
+          icon: <RefreshCcw size={12} className="text-white" />,
+          bgColor: "bg-teal-500"
+        };
       case NotificationType.SETTLEMENT_CREATED:
-        return <CreditCard size={12} className="text-white" />;
+        return {
+          icon: <CreditCard size={12} className="text-white" />,
+          bgColor: "bg-purple-500"
+        };
       case NotificationType.SYSTEM_ANNOUNCEMENT:
-        return <Bell size={12} className="text-white fill-current" />;
+        return {
+          icon: <Bell size={12} className="text-white fill-current" />,
+          bgColor: "bg-orange-500"
+        };
+      case NotificationType.SUCCESS:
+        return {
+          icon: <Check size={12} className="text-white" />,
+          bgColor: "bg-green-500"
+        };
+      case NotificationType.WARNING:
+        return {
+          icon: <AlertTriangle size={12} className="text-white" />,
+          bgColor: "bg-amber-500"
+        };
+      case NotificationType.ERROR:
+        return {
+          icon: <XCircle size={12} className="text-white" />,
+          bgColor: "bg-red-500"
+        };
+      case NotificationType.INFO:
+        return {
+          icon: <Info size={12} className="text-white" />,
+          bgColor: "bg-sky-500"
+        };
       default:
-        return <Check size={12} className="text-white" />;
+        // Check for invitation in body if it's not a specific type
+        if (isInvitation) {
+          return {
+            icon: <UserPlus size={12} className="text-white" />,
+            bgColor: "bg-pink-500"
+          };
+        }
+        return {
+          icon: <Bell size={12} className="text-white" />,
+          bgColor: "bg-gray-400"
+        };
     }
   };
+
+  const style = getNotificationStyle();
 
   return (
     <div
@@ -142,9 +199,9 @@ export function NotificationCard({
         {/* Type Icon Overlay */}
         <div className={cn(
           "absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-[3px] border-white flex items-center justify-center shadow-sm",
-          isUnread ? "bg-[#22C348]" : "bg-gray-400"
+          style.bgColor
         )}>
-          {getIcon()}
+          {style.icon}
         </div>
       </div>
 
