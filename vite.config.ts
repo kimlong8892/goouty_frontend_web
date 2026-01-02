@@ -41,13 +41,13 @@ export default defineConfig(({ mode }) => {
           orientation: 'portrait-primary',
           icons: [
             {
-              src: '/footer_badge_mascot.png',
+              src: '/favicon_v2.png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any maskable'
             },
             {
-              src: '/footer_badge_mascot.png',
+              src: '/favicon_v2.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any maskable'
