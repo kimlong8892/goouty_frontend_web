@@ -29,8 +29,13 @@ export default defineConfig(({ mode }) => {
         name: 'basic-auth',
         configureServer(server) {
           server.middlewares.use((req, res, next) => {
-            const authUser = process.env.VITE_BASIC_AUTH_USER || env.VITE_BASIC_AUTH_USER || 'goouty';
-            const authPass = process.env.VITE_BASIC_AUTH_PASS || env.VITE_BASIC_AUTH_PASS || 'goouty';
+            const authUser = process.env.VITE_BASIC_AUTH_USER || env.VITE_BASIC_AUTH_USER;
+            const authPass = process.env.VITE_BASIC_AUTH_PASS || env.VITE_BASIC_AUTH_PASS;
+
+            if (!authUser || !authPass) {
+              next();
+              return;
+            }
 
             // Apply only to main document request if possible, or all.
             // Construct expected Basic Auth header value (Base64)
