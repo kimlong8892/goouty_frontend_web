@@ -156,7 +156,7 @@ const PWACreateTripPage = () => {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 flex flex-col"
+      className="min-h-screen flex flex-col"
       style={{
         minHeight: '100dvh', // Dynamic viewport height for mobile
         overflowY: 'auto',

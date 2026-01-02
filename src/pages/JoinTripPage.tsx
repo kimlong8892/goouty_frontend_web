@@ -11,10 +11,10 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  MapPin, 
-  Calendar, 
-  Users, 
+import {
+  MapPin,
+  Calendar,
+  Users,
   Plane,
   CheckCircle,
   AlertCircle,
@@ -51,14 +51,14 @@ export function JoinTripPage() {
   useEffect(() => {
     // Wait for auth loading to complete before checking authentication
     if (isLoading) return;
-    
+
     // Redirect to login if not authenticated
     if (!isAuthenticated) {
-      navigate('/auth', { 
-        state: { 
+      navigate('/auth', {
+        state: {
           from: `/trip/${id}/${shareToken}`,
           message: 'Vui lòng đăng nhập để tham gia chuyến đi'
-        } 
+        }
       });
       return;
     }
@@ -133,7 +133,7 @@ export function JoinTripPage() {
           <CardContent className="space-y-6">
             <div className="bg-white p-4 rounded-lg border">
               <div className="flex items-center space-x-3 mb-3">
-                <img src="/goouty-logo.svg" alt="Goouty Logo" className="h-5 w-5 object-contain" />
+                <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="h-5 w-5 object-contain" />
                 <h3 className="font-semibold">{joinedTrip.trip?.title || 'Chuyến đi'}</h3>
               </div>
               <div className="space-y-2 text-sm text-muted-foreground">
@@ -179,7 +179,7 @@ export function JoinTripPage() {
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <div className="p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden">
-            <img src="/goouty-logo.svg" alt="Goouty Logo" className="w-full h-full object-contain" />
+            <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="w-full h-full object-contain" />
           </div>
           <CardTitle className="text-2xl">
             Tham gia chuyến đi
@@ -196,8 +196,8 @@ export function JoinTripPage() {
                 <div>
                   <h4 className="font-medium text-red-900">Có lỗi xảy ra</h4>
                   <p className="text-sm text-red-700 mt-1">
-                    {(joinTripMutation.error as any)?.response?.data?.message || 
-                     'Không thể tham gia chuyến đi. Vui lòng thử lại.'}
+                    {(joinTripMutation.error as any)?.response?.data?.message ||
+                      'Không thể tham gia chuyến đi. Vui lòng thử lại.'}
                   </p>
                 </div>
               </div>
@@ -228,10 +228,10 @@ export function JoinTripPage() {
               <span>Đăng nhập với tài khoản:</span>
               <Badge variant="secondary">{user?.email}</Badge>
             </div>
-            
+
             <div className="flex space-x-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleGoBack}
                 disabled={joinTripMutation.isPending}
                 className="flex-1"
@@ -239,7 +239,7 @@ export function JoinTripPage() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Hủy bỏ
               </Button>
-              <Button 
+              <Button
                 onClick={handleJoinTrip}
                 disabled={joinTripMutation.isPending}
                 className="flex-1"

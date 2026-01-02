@@ -85,7 +85,7 @@ const CreateTripPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-4 pb-12 px-4 bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
+    <div className="min-h-screen pt-4 pb-12 px-4">
       {isLoading ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
