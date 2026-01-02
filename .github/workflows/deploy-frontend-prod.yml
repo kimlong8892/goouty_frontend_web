@@ -1,143 +1,143 @@
-name: Deploy Frontend Prod
+# name: Deploy Frontend Prod
 
-on:
-  push:
-    branches:
-      - prod
+# on:
+#   push:
+#     branches:
+#       - prod
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment: PROD
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     environment: PROD
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Install dependencies (sshpass, jq)
-        run: |
-          echo "Updating and installing core tools (sshpass, jq)..."
-          sudo apt-get update -y && sudo apt-get install -y sshpass jq
+#       - name: Install dependencies (sshpass, jq)
+#         run: |
+#           echo "Updating and installing core tools (sshpass, jq)..."
+#           sudo apt-get update -y && sudo apt-get install -y sshpass jq
           
-          # Detect Cloudflare flag using grep
-          USE_CLOUDFLARE_SSH=$(grep USE_CLOUDFLARE_SSH .github/env-config/prod/env.json | awk -F'"' '{print $4}')
+#           # Detect Cloudflare flag using grep
+#           USE_CLOUDFLARE_SSH=$(grep USE_CLOUDFLARE_SSH .github/env-config/prod/env.json | awk -F'"' '{print $4}')
           
-          if [ "$USE_CLOUDFLARE_SSH" = "true" ]; then
-            echo "Cloudflare SSH enabled. Installing cloudflared..."
-            curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-            sudo dpkg -i cloudflared.deb
-            rm cloudflared.deb
-          else
-            echo "Cloudflare SSH disabled. Skipping cloudflared install."
-          fi
+#           if [ "$USE_CLOUDFLARE_SSH" = "true" ]; then
+#             echo "Cloudflare SSH enabled. Installing cloudflared..."
+#             curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+#             sudo dpkg -i cloudflared.deb
+#             rm cloudflared.deb
+#           else
+#             echo "Cloudflare SSH disabled. Skipping cloudflared install."
+#           fi
 
-      - name: Generate .env.prod
-        id: gen_env
-        run: |
-          # Load public variables from repository JSON
-          echo "Generating .env.prod from public config..."
-          jq -r 'to_entries | .[] | "\(.key)=\(.value)"' .github/env-config/prod/env.json > .env.prod
+#       - name: Generate .env.prod
+#         id: gen_env
+#         run: |
+#           # Load public variables from repository JSON
+#           echo "Generating .env.prod from public config..."
+#           jq -r 'to_entries | .[] | "\(.key)=\(.value)"' .github/env-config/prod/env.json > .env.prod
           
-          # Handle optional bulk secret (FE_ENV_SECRET)
-          if [ ! -z "${{ secrets.FE_ENV_SECRET }}" ]; then
-            echo "Appending FE_ENV_SECRET..."
-            echo "${{ secrets.FE_ENV_SECRET }}" >> .env.prod
-          fi
+#           # Handle optional bulk secret (FE_ENV_SECRET)
+#           if [ ! -z "${{ secrets.FE_ENV_SECRET }}" ]; then
+#             echo "Appending FE_ENV_SECRET..."
+#             echo "${{ secrets.FE_ENV_SECRET }}" >> .env.prod
+#           fi
 
-      - name: Run Deploy Script
-        run: |
-          # Use Environment-level secrets (prioritize FE specific, then generic backend specific, then fallback)
-          SSH_PASS="${{ secrets.FE_SSH_PASSWORD_PROD }}"
-          [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.SSH_PASSWORD_PROD }}"
-          [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.FE_SSH_PASSWORD }}"
-          [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.SSH_PASSWORD }}"
+#       - name: Run Deploy Script
+#         run: |
+#           # Use Environment-level secrets (prioritize FE specific, then generic backend specific, then fallback)
+#           SSH_PASS="${{ secrets.FE_SSH_PASSWORD_PROD }}"
+#           [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.SSH_PASSWORD_PROD }}"
+#           [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.FE_SSH_PASSWORD }}"
+#           [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.SSH_PASSWORD }}"
           
-          SSH_USER="${{ secrets.FE_SSH_USER_PROD }}"
-          [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.SSH_USER_PROD }}"
-          [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.FE_SSH_USER }}"
-          [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.SSH_USER }}"
+#           SSH_USER="${{ secrets.FE_SSH_USER_PROD }}"
+#           [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.SSH_USER_PROD }}"
+#           [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.FE_SSH_USER }}"
+#           [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.SSH_USER }}"
           
-          SSH_HOST="${{ secrets.FE_SSH_HOST_PROD }}"
-          [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.SSH_HOST_PROD }}"
-          [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.FE_SSH_HOST }}"
-          [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.SSH_HOST }}"
+#           SSH_HOST="${{ secrets.FE_SSH_HOST_PROD }}"
+#           [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.SSH_HOST_PROD }}"
+#           [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.FE_SSH_HOST }}"
+#           [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.SSH_HOST }}"
           
-          DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH_PROD }}"
-          [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.DEPLOY_PATH_PROD }}"
-          [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH }}"
-          [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+#           DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH_PROD }}"
+#           [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.DEPLOY_PATH_PROD }}"
+#           [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH }}"
+#           [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
 
-          if [ -z "$SSH_HOST" ] || [ -z "$SSH_USER" ] || [ -z "$SSH_PASS" ]; then
-            echo "Error: SSH credentials (HOST, USER, or PASS) are missing. Please check your GitHub Secrets."
-            exit 1
-          fi
+#           if [ -z "$SSH_HOST" ] || [ -z "$SSH_USER" ] || [ -z "$SSH_PASS" ]; then
+#             echo "Error: SSH credentials (HOST, USER, or PASS) are missing. Please check your GitHub Secrets."
+#             exit 1
+#           fi
 
-          USE_CLOUDFLARE_SSH=$(grep USE_CLOUDFLARE_SSH .github/env-config/prod/env.json | awk -F'"' '{print $4}')
+#           USE_CLOUDFLARE_SSH=$(grep USE_CLOUDFLARE_SSH .github/env-config/prod/env.json | awk -F'"' '{print $4}')
           
-          if [ "$USE_CLOUDFLARE_SSH" = "true" ]; then
-             SSH_OPTS="-o StrictHostKeyChecking=no -o ProxyCommand='cloudflared access ssh --hostname %h'"
-          else
-             SSH_OPTS="-o StrictHostKeyChecking=no"
-          fi
+#           if [ "$USE_CLOUDFLARE_SSH" = "true" ]; then
+#              SSH_OPTS="-o StrictHostKeyChecking=no -o ProxyCommand='cloudflared access ssh --hostname %h'"
+#           else
+#              SSH_OPTS="-o StrictHostKeyChecking=no"
+#           fi
 
-          echo "Connecting to $SSH_HOST as $SSH_USER..."
+#           echo "Connecting to $SSH_HOST as $SSH_USER..."
           
-          sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST "
-            # Robust Docker & Docker Compose Installation/Check
-            if ! command -v docker &> /dev/null; then
-              echo 'Docker not found. Installing...'
-              # Clean up potentially malformed sources
-              sudo rm -f /etc/apt/sources.list.d/docker.list
-              sudo apt-get update -y
-              sudo apt-get install -y ca-certificates curl gnupg
+#           sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST "
+#             # Robust Docker & Docker Compose Installation/Check
+#             if ! command -v docker &> /dev/null; then
+#               echo 'Docker not found. Installing...'
+#               # Clean up potentially malformed sources
+#               sudo rm -f /etc/apt/sources.list.d/docker.list
+#               sudo apt-get update -y
+#               sudo apt-get install -y ca-certificates curl gnupg
               
-              # Fallback to get.docker.com for maximum reliability
-              curl -fsSL https://get.docker.com -o get-docker.sh
-              echo '$SSH_PASS' | sudo -S sh get-docker.sh
-              echo '$SSH_PASS' | sudo -S usermod -aG docker $SSH_USER
-              rm get-docker.sh
-              echo 'Docker installed successfully.'
-            fi
+#               # Fallback to get.docker.com for maximum reliability
+#               curl -fsSL https://get.docker.com -o get-docker.sh
+#               echo '$SSH_PASS' | sudo -S sh get-docker.sh
+#               echo '$SSH_PASS' | sudo -S usermod -aG docker $SSH_USER
+#               rm get-docker.sh
+#               echo 'Docker installed successfully.'
+#             fi
 
-            # Ensure Docker Compose plugin is installed
-            if ! docker compose version &> /dev/null; then
-              echo 'Docker Compose plugin not found. Installing...'
-              sudo apt-get update -y
-              sudo apt-get install -y docker-compose-plugin
-            fi
+#             # Ensure Docker Compose plugin is installed
+#             if ! docker compose version &> /dev/null; then
+#               echo 'Docker Compose plugin not found. Installing...'
+#               sudo apt-get update -y
+#               sudo apt-get install -y docker-compose-plugin
+#             fi
 
-            # Ensure deployment directory exists
-            if [ ! -d \"$DEPLOY_PATH/.git\" ]; then
-              echo \"Repository not found at $DEPLOY_PATH. cloning...\"
-              echo '$SSH_PASS' | sudo -S mkdir -p $DEPLOY_PATH
-              echo '$SSH_PASS' | sudo -S chown -R $SSH_USER:$SSH_USER $DEPLOY_PATH
-              git clone -b prod https://github.com/kimlong8892/goouty_frontend_web.git $DEPLOY_PATH
-            fi
+#             # Ensure deployment directory exists
+#             if [ ! -d \"$DEPLOY_PATH/.git\" ]; then
+#               echo \"Repository not found at $DEPLOY_PATH. cloning...\"
+#               echo '$SSH_PASS' | sudo -S mkdir -p $DEPLOY_PATH
+#               echo '$SSH_PASS' | sudo -S chown -R $SSH_USER:$SSH_USER $DEPLOY_PATH
+#               git clone -b prod https://github.com/kimlong8892/goouty_frontend_web.git $DEPLOY_PATH
+#             fi
 
-            cd $DEPLOY_PATH
+#             cd $DEPLOY_PATH
             
-            # Fix permissions (Docker containers might have created files as root)
-            echo '$SSH_PASS' | sudo -S chown -R $SSH_USER:$SSH_USER .
+#             # Fix permissions (Docker containers might have created files as root)
+#             echo '$SSH_PASS' | sudo -S chown -R $SSH_USER:$SSH_USER .
             
-            echo \"Fetching latest changes from prod...\"
-            git fetch origin prod
-            git reset --hard origin/prod
-          "
+#             echo \"Fetching latest changes from prod...\"
+#             git fetch origin prod
+#             git reset --hard origin/prod
+#           "
           
-          # Upload .env.prod
-          echo "Uploading .env.prod..."
-          sshpass -p "$SSH_PASS" scp $SSH_OPTS .env.prod $SSH_USER@$SSH_HOST:$DEPLOY_PATH/.env.prod
+#           # Upload .env.prod
+#           echo "Uploading .env.prod..."
+#           sshpass -p "$SSH_PASS" scp $SSH_OPTS .env.prod $SSH_USER@$SSH_HOST:$DEPLOY_PATH/.env.prod
           
-          # Run the deploy script
-          sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST "
-            cd $DEPLOY_PATH
-            echo 'Deploying Frontend Prod...'
-            chmod +x deploy_cicd_prod.sh
-            ./deploy_cicd_prod.sh
+#           # Run the deploy script
+#           sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST "
+#             cd $DEPLOY_PATH
+#             echo 'Deploying Frontend Prod...'
+#             chmod +x deploy_cicd_prod.sh
+#             ./deploy_cicd_prod.sh
             
-            echo 'Waiting for containers to start...'
-            sleep 5
+#             echo 'Waiting for containers to start...'
+#             sleep 5
             
-            echo '--- Container Logs ---'
-            docker compose -p goouty-frontend-prod logs --tail=50
-          "
+#             echo '--- Container Logs ---'
+#             docker compose -p goouty-frontend-prod logs --tail=50
+#           "
 

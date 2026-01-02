@@ -1,22 +1,29 @@
-FROM node:18-slim
+# ---------- BUILD STAGE ----------
+FROM node:18-slim AS builder
 
-# Đặt thư mục làm việc
 WORKDIR /usr/src/app
 
-# Copy package.json và package-lock.json
+# Cài dependency
 COPY package*.json ./
+RUN apt-get update && apt-get install -y openssl \
+  && npm ci
 
-# Cài dependencies (cả dev để chạy build)
-RUN apt-get update && apt-get install -y curl && npm install
-
-# Copy toàn bộ source code
+# Copy source
 COPY . .
 
-# Build app cho production
+# Build Vite App
 RUN npm run build
 
-# Expose port (Vite mặc định 5173)
+# ---------- RUNTIME STAGE ----------
+FROM nginx:alpine
+
+# Copy built assets từ builder stage
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+
+# Copy custom nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 8080 (phải khớp với nginx.conf)
 EXPOSE 8080
 
-# Command mặc định: chạy dev server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["nginx", "-g", "daemon off;"]
