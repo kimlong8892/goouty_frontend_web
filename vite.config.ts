@@ -25,6 +25,29 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
+      {
+        name: 'basic-auth',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            const authUser = process.env.VITE_BASIC_AUTH_USER || env.VITE_BASIC_AUTH_USER || 'goouty';
+            const authPass = process.env.VITE_BASIC_AUTH_PASS || env.VITE_BASIC_AUTH_PASS || 'goouty';
+
+            // Apply only to main document request if possible, or all.
+            // Construct expected Basic Auth header value (Base64)
+            const expectedAuth = Buffer.from(`${authUser}:${authPass}`).toString('base64');
+            const authHeader = req.headers.authorization || '';
+            const b64auth = authHeader.split(' ')[1] || '';
+
+            if (b64auth !== expectedAuth) {
+              res.statusCode = 401;
+              res.setHeader('WWW-Authenticate', 'Basic realm="Goouty Dev"');
+              res.end('Access denied');
+              return;
+            }
+            next();
+          });
+        }
+      },
       react(),
       VitePWA({
         registerType: 'autoUpdate',
