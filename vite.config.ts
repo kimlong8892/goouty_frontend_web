@@ -1,11 +1,26 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import fs from "fs";
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), 'VITE_');
+
+  // Load custom env from .github/env-config
+  const envMap: Record<string, string> = { development: 'dev', production: 'prod' };
+  const envFolder = envMap[mode] || mode;
+  const envJsonPath = path.resolve(process.cwd(), `.github/env-config/${envFolder}/env.json`);
+
+  if (fs.existsSync(envJsonPath)) {
+    try {
+      const extraEnv = JSON.parse(fs.readFileSync(envJsonPath, 'utf-8'));
+      Object.assign(env, extraEnv);
+    } catch (e) {
+      console.warn(`Could not parse env file: ${envJsonPath}`, e);
+    }
+  }
 
   return {
     server: {
