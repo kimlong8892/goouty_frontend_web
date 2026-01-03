@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Plane, LogIn, Search, Upload, User, Settings, LogOut, Map, Plus, List, Users, MapPin, Home, Bell } from 'lucide-react';
+import { Plane, LogIn, Search, Upload, User, Settings, LogOut, Map, Plus, List, Users, MapPin, Home, Bell, CloudOff } from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations.ts';
 import { cn } from '@/lib/utils.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/navigation-menu.tsx";
 import { TooltipProvider } from '@/components/ui/tooltip.tsx';
 import { useIsMobile } from '@/hooks/use-mobile.tsx';
+import { PWAInstallButton } from '@/pwa/components/PWAInstallButton';
 
 interface NavItemProps {
   to: string;
@@ -385,8 +386,8 @@ export const Navbar = () => {
           {/* Top header for Mobile/PWA - removed for cleaner UI */}
 
           {/* Top banner for offline status on mobile */}
-          {!isAuthenticated && !isOnline && (
-            <div className="fixed top-0 left-0 right-0 z-50 bg-red-500 text-white text-[10px] py-0.5 text-center font-medium">
+          {!isOnline && (
+            <div className="fixed top-0 left-0 right-0 z-[60] bg-destructive text-destructive-foreground text-[10px] py-1 text-center font-bold shadow-md animate-in fade-in slide-in-from-top duration-300">
               Bạn đang ngoại tuyến
             </div>
           )}
@@ -396,7 +397,7 @@ export const Navbar = () => {
             <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#edeeff]/90 backdrop-blur-lg px-4 py-2 pb-8 border-t border-gray-200/50">
               <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
                 <div className="pointer-events-auto">
-                  <SyncStatus />
+                  {/* Removed SyncStatus icon from PWA nav as requested */}
                 </div>
               </div>
               <div className="flex items-center justify-around max-w-6xl mx-auto">
@@ -462,6 +463,12 @@ export const Navbar = () => {
 
               {/* Right side - User actions */}
               <div className="flex items-center gap-3">
+                {/* PWA Install Button */}
+                <PWAInstallButton
+                  variant="outline"
+                  className="hidden md:flex rounded-full border-primary/20 hover:bg-primary/5 text-primary"
+                />
+
                 {/* Profile item with user info */}
                 {isAuthenticated && user && (
                   <div
@@ -492,8 +499,8 @@ export const Navbar = () => {
                   </div>
                 )}
 
-                {/* Sync Status */}
-                {isAuthenticated && <SyncStatus />}
+                {/* Sync Status - Removed as requested to use the offline banner instead */}
+                {/* {isAuthenticated && <SyncStatus />} */}
 
                 {/* Notification Bell */}
                 {isAuthenticated && (
@@ -536,6 +543,14 @@ export const Navbar = () => {
                 )}
               </div>
             </nav>
+
+            {/* Offline Banner for Web View */}
+            {!isOnline && (
+              <div className="mt-4 mx-auto max-w-fit px-6 py-1.5 rounded-full bg-destructive/90 backdrop-blur-sm text-destructive-foreground text-xs font-bold shadow-lg animate-in slide-in-from-top duration-300 flex items-center gap-2">
+                <CloudOff size={14} />
+                Bạn đang ngoại tuyến. Các thay đổi sẽ được đồng bộ khi có mạng.
+              </div>
+            )}
           </div>
         </header>
       </TooltipProvider>

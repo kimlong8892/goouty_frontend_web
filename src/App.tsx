@@ -14,6 +14,7 @@ import { usePWA } from "@/pwa/hooks/usePWA";
 import { PWANotificationToast } from "@/pwa/components/PWANotificationToast.tsx";
 import { PWAAlertNotification } from "@/pwa/components/PWAAlertNotification.tsx";
 import { PWANotificationProvider, usePWANotificationContext } from "@/pwa/contexts/PWANotificationContext.tsx";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt.tsx";
 import Index from "./pages/Index.tsx";
 import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
@@ -336,6 +337,7 @@ const App = () => (
               <Toaster />
               <Sonner />
               <AppContent />
+              <PWAInstallPrompt />
             </TooltipProvider>
           </PWANotificationProvider>
         </NotificationCountProvider>

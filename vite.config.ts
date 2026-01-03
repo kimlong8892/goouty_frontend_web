@@ -71,7 +71,8 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'logo.png', 'goouty-logo.svg', '*.png'],
+        injectRegister: 'auto',
+        includeAssets: ['favicon.ico', 'logo.png', 'goouty-logo.svg', 'favicon_v2.png', '*.png'],
         manifest: {
           name: 'Goouty',
           short_name: 'Goouty',
@@ -87,13 +88,25 @@ export default defineConfig(({ mode }) => {
               src: '/favicon_v2.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
             },
             {
               src: '/favicon_v2.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: '/favicon_v2.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'maskable'
+            },
+            {
+              src: '/favicon_v2.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ],
           shortcuts: [
@@ -115,6 +128,7 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

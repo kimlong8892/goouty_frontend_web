@@ -2,6 +2,7 @@ import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { PWAInstallButton } from '@/pwa/components/PWAInstallButton';
 
 interface HeroSectionProps {
   showTitle: boolean;
@@ -52,14 +53,19 @@ export const HeroSection = ({
               </ul>
             </div>
 
-            {/* CTA Button */}
-            <div className="pt-6">
+            {/* CTA Buttons */}
+            <div className="pt-6 flex flex-wrap gap-4">
               <Button
                 onClick={handleGetStarted}
                 className="bg-[#6347f9] hover:bg-[#5136db] text-white font-semibold pl-6 pr-4 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
               >
                 Bắt đầu hành trình <ChevronRight size={18} />
               </Button>
+
+              <PWAInstallButton
+                variant="outline"
+                className="border-[#6347f9]/20 hover:bg-[#6347f9]/5 text-[#6347f9] font-semibold px-6 py-6 text-base rounded-xl"
+              />
             </div>
           </div>
 

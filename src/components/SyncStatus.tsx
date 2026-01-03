@@ -8,18 +8,7 @@ export const SyncStatus: React.FC = () => {
     const { isOnline, pendingCount } = useOfflineStatus();
 
     if (isOnline && pendingCount === 0) {
-        return (
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600 transition-all duration-300">
-                        <Wifi size={16} />
-                    </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                    <p>Đang trực tuyến</p>
-                </TooltipContent>
-            </Tooltip>
-        );
+        return null;
     }
 
     return (

@@ -8,6 +8,7 @@ import { Loader2, Search, MapPin, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface PWATripTemplatesListProps {
   onUseTemplate?: (template: DATABASE_TYPES.tripTemplates) => void;
@@ -177,9 +178,15 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-center mb-2">{t('template.templates')}</h1>
-        <p className="text-muted-foreground text-center">
+        <p className="text-muted-foreground text-center mb-4">
           {t('template.description')}
         </p>
+        <div className="flex justify-center">
+          <PWAInstallButton
+            variant="outline"
+            className="rounded-full border-primary/20 hover:bg-primary/5 text-primary"
+          />
+        </div>
       </div>
 
       {/* Search and Filter - Sticky */}
