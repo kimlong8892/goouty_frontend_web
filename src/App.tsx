@@ -39,7 +39,7 @@ import InviteAcceptPage from "./pages/InviteAcceptPage.tsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 
-const queryClient = new QueryClient();
+import { queryClient } from "@/lib/queryClient";
 
 // Page transition wrapper
 const PageTransition = ({ children }: { children: React.ReactNode }) => {

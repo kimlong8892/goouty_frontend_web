@@ -9,6 +9,8 @@ import AuthModal from '@/components/AuthModal.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { SyncStatus } from '@/components/SyncStatus.tsx';
+import { useOfflineStatus } from '@/lib/offline/OfflineManager';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -260,6 +262,7 @@ export const Navbar = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout, user, isLoading } = useAuth();
+  const { isOnline, pendingCount } = useOfflineStatus();
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
   const isMobileView = isPWA || isMobile;
@@ -381,9 +384,21 @@ export const Navbar = () => {
         <TooltipProvider>
           {/* Top header for Mobile/PWA - removed for cleaner UI */}
 
+          {/* Top banner for offline status on mobile */}
+          {!isAuthenticated && !isOnline && (
+            <div className="fixed top-0 left-0 right-0 z-50 bg-red-500 text-white text-[10px] py-0.5 text-center font-medium">
+              Bạn đang ngoại tuyến
+            </div>
+          )}
+
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (
             <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#edeeff]/90 backdrop-blur-lg px-4 py-2 pb-8 border-t border-gray-200/50">
+              <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
+                <div className="pointer-events-auto">
+                  <SyncStatus />
+                </div>
+              </div>
               <div className="flex items-center justify-around max-w-6xl mx-auto">
                 {pwaNavItems.map((item) => (
                   <PWANavItem
@@ -476,6 +491,9 @@ export const Navbar = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Sync Status */}
+                {isAuthenticated && <SyncStatus />}
 
                 {/* Notification Bell */}
                 {isAuthenticated && (
