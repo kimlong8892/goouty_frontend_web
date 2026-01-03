@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Switch } from '@/components/ui/switch.tsx';
 import { Card, CardContent } from '@/components/ui/card.tsx';
-import { BankSearch } from '@/components/BankSearch.tsx';
+import { BankSearch, BANKS } from '@/components/BankSearch.tsx';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { api } from '@/integrations/api/client.ts';
 import { toast } from 'sonner';
@@ -50,6 +50,8 @@ interface UserProfile {
   createdAt: string;
   updatedAt: string;
 }
+
+const VIETQR_TEMPLATE = 'compact';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -493,10 +495,62 @@ const Profile = () => {
                           className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
                         />
                       </div>
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2 text-slate-600 font-medium">
+                          <CreditCard className="w-4 h-4" /> Ngân hàng
+                        </Label>
+                        <BankSearch
+                          value={formData.bankId}
+                          onChange={(value) => setFormData({ ...formData, bankId: value })}
+                          placeholder="Chọn ngân hàng"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2 text-slate-600 font-medium">
+                          <CreditCard className="w-4 h-4" /> Số tài khoản
+                        </Label>
+                        <Input
+                          placeholder="Số tài khoản ngân hàng"
+                          value={formData.bankNumber}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setFormData({ ...formData, bankNumber: value })
+                          }}
+                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                        />
+                      </div>
                     </div>
 
 
                   </div>
+
+                  {formData.bankId && formData.bankNumber && (
+                    <div className="mt-8 bg-slate-50 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-8 border border-slate-100">
+                      <div className="p-2 bg-white rounded-xl shadow-sm">
+                        <img
+                          src={`https://img.vietqr.io/image/${formData.bankId}-${formData.bankNumber}-${VIETQR_TEMPLATE}.png`}
+                          alt="QR Chuyển khoản"
+                          className="w-40 h-auto"
+                        />
+                      </div>
+                      <div className="text-center md:text-left flex-1">
+                        <h3 className="text-lg font-bold text-slate-900 mb-1">QR Chuyển khoản</h3>
+                        <p className="text-slate-500 text-sm mb-3">
+                          Quét mã để chuyển khoản nhanh cho <strong>{formData.fullName}</strong>
+                        </p>
+                        <div className="flex flex-col gap-1">
+                          <div className="bg-white px-3 py-2 rounded-lg border border-slate-100 inline-block w-fit">
+                            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider mr-2">NGÂN HÀNG</span>
+                            <span className="text-slate-700 font-semibold">{BANKS.find(b => b.code === formData.bankId)?.name || formData.bankId}</span>
+                          </div>
+                          <div className="bg-white px-3 py-2 rounded-lg border border-slate-100 inline-block w-fit">
+                            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider mr-2">SỐ TÀI KHOẢN</span>
+                            <span className="text-slate-700 font-semibold">{formData.bankNumber}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex justify-end gap-3 mt-10 pt-6 border-t border-slate-100">
                     <Button
@@ -612,8 +666,8 @@ const Profile = () => {
             </div>
           </div>
         </div>
-      </AnimatedTransition>
-    </div>
+      </AnimatedTransition >
+    </div >
   );
 };
 
