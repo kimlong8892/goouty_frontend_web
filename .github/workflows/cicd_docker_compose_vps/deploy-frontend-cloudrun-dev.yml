@@ -1,21 +1,21 @@
-name: Deploy Frontend Prod Cloud Run
+name: Deploy Frontend Dev Cloud Run
 
 on:
   push:
-    branches: [ "prod" ]
+    branches: [ "abc" ]
   workflow_dispatch:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: asia-southeast1
   REPO_NAME: goouty-repo
-  SERVICE_NAME: goouty-frontend-prod
+  SERVICE_NAME: goouty-frontend-dev
   WORKDIR: .
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: PROD
+    environment: DEV
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -41,8 +41,8 @@ jobs:
       - name: Build and Push Docker Image
         working-directory: ${{ env.WORKDIR }}
         run: |
-          # Build Docker image cho production
-          docker build -f Dockerfile.prod -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+          # Build Docker image cho dev
+          docker build -f Dockerfile.dev -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
           # Push image lên Artifact Registry
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
 
@@ -54,24 +54,33 @@ jobs:
         run: |
           echo "Generating environment variables..."
           
+          echo "--- DEBUG INFO ---"
+          echo "Available Secret Keys (Values masked):"
+          echo "$ALL_SECRETS" | jq keys
+          echo "Available Variable Keys:"
+          echo "$ALL_VARS" | jq keys
+          echo "Secrets Mapping Config:"
+          [ -f .github/env-config/dev/secrets.json ] && cat .github/env-config/dev/secrets.json || echo "No secrets.json found"
+          echo "--- END DEBUG INFO ---"
+          
           # Initialize .env.temp
           touch .env.temp
 
           # 1. Load public variables from env.json
-          if [ -f .github/env-config/prod/env.json ]; then
-            # Extract PORT for Cloud Run flag
-            PORT_VAL=$(jq -r '.PORT // "8080"' .github/env-config/prod/env.json)
+          if [ -f .github/env-config/dev/env.json ]; then
+            # Extract PORT for Cloud Run flag (avoiding env var conflict)
+            PORT_VAL=$(jq -r '.PORT // "8080"' .github/env-config/dev/env.json)
             echo "PORT=$PORT_VAL" >> $GITHUB_OUTPUT
             
             # Extract other vars, excluding PORT
-            jq -r 'to_entries | .[] | select(.key != "PORT") | "\(.key)=\(.value)"' .github/env-config/prod/env.json >> .env.temp
+            jq -r 'to_entries | .[] | select(.key != "PORT") | "\(.key)=\(.value)"' .github/env-config/dev/env.json >> .env.temp
           else
             echo "PORT=8080" >> $GITHUB_OUTPUT
           fi
           
           # 2. Load secrets based on secrets.json mapping
-          if [ -f .github/env-config/prod/secrets.json ]; then
-            jq -n --argjson secrets "$ALL_SECRETS" --argjson vars "$ALL_VARS" --argjson mapping "$(cat .github/env-config/prod/secrets.json)" '
+          if [ -f .github/env-config/dev/secrets.json ]; then
+            jq -n --argjson secrets "$ALL_SECRETS" --argjson vars "$ALL_VARS" --argjson mapping "$(cat .github/env-config/dev/secrets.json)" '
               $mapping | to_entries | .[] | 
               .key as $k | .value as $v |
               ($secrets[$v] // $vars[$v]) as $val |
