@@ -52,6 +52,17 @@ export default defineConfig(({ mode }) => {
               return;
             }
 
+            // Skip auth for PWA manifest, service worker and assets
+            const isPWAFile = req.url?.includes('manifest') ||
+              req.url?.includes('sw.js') ||
+              req.url?.includes('registerSW.js') ||
+              req.url?.match(/\.(png|svg|ico|webmanifest)$/);
+
+            if (isPWAFile) {
+              next();
+              return;
+            }
+
             // Apply only to main document request if possible, or all.
             // Construct expected Basic Auth header value (Base64)
             const expectedAuth = Buffer.from(`${authUser}:${authPass}`).toString('base64');
@@ -82,31 +93,26 @@ export default defineConfig(({ mode }) => {
           display: 'standalone',
           scope: '/',
           start_url: '/',
+          lang: 'vi',
           orientation: 'portrait-primary',
           icons: [
             {
-              src: '/favicon_v2.png',
-              sizes: '192x192',
-              type: 'image/png',
+              src: '/goouty-logo.svg',
+              sizes: 'any',
+              type: 'image/svg+xml',
               purpose: 'any'
             },
             {
-              src: '/favicon_v2.png',
-              sizes: '512x512',
+              src: '/goouty-logo.svg',
+              sizes: 'any',
+              type: 'image/svg+xml',
+              purpose: 'maskable'
+            },
+            {
+              src: '/auth_mascot.png',
+              sizes: '192x192 512x512',
               type: 'image/png',
               purpose: 'any'
-            },
-            {
-              src: '/favicon_v2.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'maskable'
-            },
-            {
-              src: '/favicon_v2.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable'
             }
           ],
           shortcuts: [
@@ -115,14 +121,14 @@ export default defineConfig(({ mode }) => {
               short_name: 'Tạo chuyến đi',
               description: 'Tạo một chuyến đi mới nhanh chóng',
               url: '/create-trip',
-              icons: [{ src: '/create_trip_mascot.png', sizes: '192x192' }]
+              icons: [{ src: '/goouty-logo.svg', sizes: 'any', type: 'image/svg+xml' }]
             },
             {
               name: 'Chuyến đi của tôi',
               short_name: 'Chuyến đi',
               description: 'Xem danh sách chuyến đi của bạn',
               url: '/trips',
-              icons: [{ src: '/my_trips_mascot.png', sizes: '192x192' }]
+              icons: [{ src: '/goouty-logo.svg', sizes: 'any', type: 'image/svg+xml' }]
             }
           ]
         },
