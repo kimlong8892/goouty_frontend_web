@@ -156,7 +156,7 @@ const PWACreateTripPage = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-gray-50"
+      className="min-h-screen flex flex-col"
       style={{
         minHeight: '100dvh',
         paddingTop: 'env(safe-area-inset-top)'
@@ -173,6 +173,8 @@ const PWACreateTripPage = () => {
           >
             Hủy
           </button>
+
+          <h2 className="text-lg font-bold text-gray-900">Tạo chuyến đi</h2>
 
           <button
             onClick={handleCreateTrip}

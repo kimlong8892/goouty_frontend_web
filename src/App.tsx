@@ -17,6 +17,7 @@ import { PWANotificationProvider, usePWANotificationContext } from "@/pwa/contex
 import Index from "./pages/Index.tsx";
 import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
+import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
 import TemplatesPage from "./pages/TemplatesPage.tsx";
 import TripTemplateDetailPage from "./pages/TripTemplateDetailPage.tsx";
 import MyTripsPage from "./pages/MyTripsPage.tsx";
@@ -108,6 +109,16 @@ const AppRoutes = () => {
           <AuthGuard>
             <PageTransition>
               <PWACreateTripPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-edit-trip/:id"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAEditTripPage />
             </PageTransition>
           </AuthGuard>
         }

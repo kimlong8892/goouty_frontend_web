@@ -15,6 +15,7 @@ export namespace DATABASE_TYPES {
     };
     startDate?: string;
     description?: string;
+    avatar?: string;
     userId: string;
     isPublic?: boolean;
     shareToken?: string;

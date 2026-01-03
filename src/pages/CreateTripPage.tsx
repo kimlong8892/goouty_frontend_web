@@ -17,6 +17,7 @@ import { useGlobalToast } from '../utils/globalToast';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { CreateTripRequest, Trip } from '@/lib/types.ts';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
+import { X, Image as ImageIcon, Camera } from 'lucide-react';
 
 const CreateTripPage = () => {
   const { showToast } = useGlobalToast();
@@ -26,6 +27,8 @@ const CreateTripPage = () => {
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [loading, setLoading] = useState(false);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -74,6 +77,17 @@ const CreateTripPage = () => {
         ...(startDate && { startDate: startDate.toISOString() })
       };
       const trip = await api.post<Trip>('/trips', tripData);
+
+      // Upload image if provided
+      if (coverImage) {
+        try {
+          await api.trips.uploadAvatar(trip.id, coverImage);
+        } catch (error: any) {
+          console.error('Upload avatar error:', error);
+          showToast('Tạo chuyến đi thành công nhưng không thể tải lên ảnh đại diện', 'warning');
+        }
+      }
+
       showToast('Tạo chuyến đi thành công!', 'success');
       navigate(`/trip/${trip.id}`);
     } catch (error: any) {
@@ -82,6 +96,31 @@ const CreateTripPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Kích thước ảnh không được vượt quá 5MB', 'error');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        showToast('Vui lòng chọn file ảnh hợp lệ', 'error');
+        return;
+      }
+      setCoverImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setCoverImage(null);
+    setImagePreview(null);
   };
 
   return (
@@ -210,6 +249,62 @@ const CreateTripPage = () => {
                   <div className="text-right text-xs text-slate-400">
                     {description.length}/100
                   </div>
+                </div>
+
+                {/* Trip Avatar */}
+                <div className="space-y-2">
+                  <Label className="text-slate-600 font-medium text-sm">
+                    Ảnh đại diện chuyến đi
+                  </Label>
+                  {imagePreview ? (
+                    <div className="relative group w-full h-48 rounded-xl overflow-hidden border border-slate-200">
+                      <img
+                        src={imagePreview}
+                        alt="Trip cover preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="rounded-full"
+                          onClick={() => document.getElementById('trip-avatar-upload')?.click()}
+                        >
+                          <Camera className="w-4 h-4 mr-2" />
+                          Thay đổi
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="rounded-full"
+                          onClick={removeImage}
+                        >
+                          <X className="w-4 h-4 mr-2" />
+                          Xóa
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="w-full h-48 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-[#6347f9]/30 transition-all cursor-pointer group"
+                      onClick={() => document.getElementById('trip-avatar-upload')?.click()}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-[#6347f9] transition-colors mb-2">
+                        <ImageIcon className="w-6 h-6" />
+                      </div>
+                      <p className="text-sm font-medium text-slate-500">Tải lên ảnh chuyến đi</p>
+                      <p className="text-xs text-slate-400 mt-1">PNG, JPG tối đa 5MB</p>
+                    </div>
+                  )}
+                  <input
+                    id="trip-avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
                 </div>
 
                 {/* Action Buttons */}
