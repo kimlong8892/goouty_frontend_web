@@ -130,8 +130,9 @@ const MyTripsPage = () => {
         const isOwner = trip.userId === user.id;
         const userRole = isOwner ? 'owner' : 'member';
 
-        // Tính số lượng thành viên
-        const memberCount = trip.members?.length ?? 1;
+        // Tính số lượng thành viên (luôn bao gồm chủ chuyến đi + các thành viên đã accepted khác)
+        const otherAcceptedCount = trip.members?.filter((m: any) => m && m.userId !== trip.userId && (m.status === 'accepted' || !m.status)).length || 0;
+        const memberCount = otherAcceptedCount + 1;
 
         return {
           ...trip,

@@ -103,7 +103,9 @@ type TripDetails = {
       profilePicture?: string;
     };
     role: string;
+    status?: string;
   }[];
+  memberCount?: number;
 };
 
 type Day = {
@@ -315,7 +317,8 @@ const TripDetailsPage = () => {
         userId: tripData.userId,
         slug: tripData.id,
         shareToken: tripData.shareToken,
-        members: membersData
+        members: membersData,
+        memberCount: (membersData?.filter(m => m && m.user?.id !== tripData.userId && (m.status === 'accepted' || !m.status)).length || 0) + 1
       };
 
       setTrip(transformedTrip);
@@ -505,8 +508,8 @@ const TripDetailsPage = () => {
               </Badge>
               <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0">
                 {trip.userRole === 'owner'
-                  ? `Chủ chuyến đi (${(trip.members?.length || 0) + 1})`
-                  : `Thành viên (${(trip.members?.length || 0) + 1})`}
+                  ? `Chủ chuyến đi (${trip.memberCount || 1})`
+                  : `Thành viên (${trip.memberCount || 1})`}
               </Badge>
             </div>
 
@@ -559,7 +562,7 @@ const TripDetailsPage = () => {
               )}
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-slate-400" />
-                <span>{trip.members?.length || 1} người</span>
+                <span>{trip.memberCount || 1} người</span>
               </div>
             </div>
 
@@ -621,7 +624,7 @@ const TripDetailsPage = () => {
                   )}
                 >
                   <Users className="mr-2 w-5 h-5" />
-                  Thành viên ({(trip.members?.length || 0) + 1})
+                  Thành viên ({trip.memberCount || 1})
                 </TabsTrigger>
                 {trip.userRole === 'owner' && (
                   <TabsTrigger
@@ -916,7 +919,7 @@ const TripDetailsPage = () => {
                   <TripMembers
                     tripId={id || ''}
                     tripOwnerId={trip.userId}
-                    onCountChange={(count) => setTrip((prev) => prev ? { ...prev, members: new Array(count).fill(null) as any } : prev)}
+                    onCountChange={(count) => setTrip((prev) => prev ? { ...prev, memberCount: count } : prev)}
                   />
                 </CardContent>
               </Card>

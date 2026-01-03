@@ -160,7 +160,8 @@ const PWATripListPage = () => {
       const tripsWithMembers: TripWithMember[] = response.trips.map((trip: any) => {
         const isOwner = trip.userId === user.id;
         const userRole = isOwner ? 'owner' : 'member';
-        const memberCount = trip.members?.length ?? 1;
+        const otherAcceptedCount = trip.members?.filter((m: any) => m && m.userId !== trip.userId && (m.status === 'accepted' || !m.status)).length || 0;
+        const memberCount = otherAcceptedCount + 1;
 
         return {
           ...trip,

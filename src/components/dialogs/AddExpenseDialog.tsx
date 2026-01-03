@@ -61,7 +61,8 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
     try {
       setMembersLoading(true);
       const data = await api.members.getByTrip(tripId);
-      setMembers(data);
+      // Chỉ lấy những thành viên đã accepted để đưa vào chi phí
+      setMembers(data.filter((m: any) => m && (m.status === 'accepted' || !m.status)));
     } catch (error: any) {
       toast.error('Không thể tải danh sách thành viên');
     } finally {

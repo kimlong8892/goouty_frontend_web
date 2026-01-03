@@ -53,7 +53,8 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
   // Notify parent when member list changes
   React.useEffect(() => {
     if (members && onCountChange) {
-      onCountChange(members.length);
+      const otherAcceptedCount = members.filter(m => m && m.user?.id !== tripOwnerId && (m.status === 'accepted' || !m.status)).length;
+      onCountChange(otherAcceptedCount + 1);
     }
   }, [members, onCountChange]);
 
@@ -189,7 +190,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
             Thành viên
           </h3>
           <p className="text-slate-500 text-sm">
-            {members?.length || 0} người
+            {(members?.filter(m => m && m.user?.id !== tripOwnerId && (m.status === 'accepted' || !m.status)).length || 0) + 1} người
           </p>
         </div>
         {isOwner && (
@@ -248,14 +249,14 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
       {/* Member List */}
       <div className="grid gap-4">
         {/* Pending Invitations Section */}
-        {members?.some(m => m.status === 'pending') && (
+        {members?.some(m => m && m.status === 'pending') && (
           <div className="space-y-3">
             <h4 className="text-sm font-semibold text-slate-600 flex items-center gap-2">
               <Clock className="w-4 h-4" />
               Lời mời đang chờ
             </h4>
             {members
-              .filter(m => m.status === 'pending')
+              .filter(m => m && m.status === 'pending')
               .map((member) => {
                 const isCurrentUser = member.user.id === user?.id;
 
@@ -358,13 +359,13 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
         )}
 
         {/* Accepted Members Section */}
-        {members?.some(m => m.status === 'accepted' || !m.status) && (
+        {members?.some(m => m && (m.status === 'accepted' || !m.status)) && (
           <div className="space-y-3">
-            {members?.some(m => m.status === 'pending') && (
+            {members?.some(m => m && m.status === 'pending') && (
               <h4 className="text-sm font-semibold text-slate-600">Thành viên</h4>
             )}
             {members
-              .filter(m => m.status === 'accepted' || !m.status)
+              .filter(m => m && (m.status === 'accepted' || !m.status))
               .map((member) => {
                 const isCurrentUser = member.user.id === user?.id;
                 const isTripOwner = member.user.id === tripOwnerId;

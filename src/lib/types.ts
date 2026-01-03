@@ -124,7 +124,7 @@ export interface TripMember {
   id: string;
   userId: string;
   tripId: string;
-  role?: never;
+  role?: string;
   status?: 'pending' | 'accepted';
   joinedAt: string;
   user: {
