@@ -88,8 +88,8 @@ export default defineConfig(({ mode }) => {
           name: 'Goouty',
           short_name: 'Goouty',
           description: 'Lên kế hoạch chuyến đi, chia tiền nhóm, không rắc rối',
-          theme_color: '#6347f9',
-          background_color: '#ffffff',
+          theme_color: '#edeeff',
+          background_color: '#edeeff',
           display: 'standalone',
           scope: '/',
           start_url: '/',
@@ -97,22 +97,16 @@ export default defineConfig(({ mode }) => {
           orientation: 'portrait-primary',
           icons: [
             {
-              src: '/goouty-logo.svg',
-              sizes: 'any',
-              type: 'image/svg+xml',
-              purpose: 'any'
-            },
-            {
-              src: '/goouty-logo.svg',
-              sizes: 'any',
-              type: 'image/svg+xml',
-              purpose: 'maskable'
-            },
-            {
-              src: '/auth_mascot.png',
+              src: '/favicon_v2.png',
               sizes: '192x192 512x512',
               type: 'image/png',
               purpose: 'any'
+            },
+            {
+              src: '/favicon_v2.png',
+              sizes: '192x192 512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ],
           shortcuts: [
@@ -128,7 +122,7 @@ export default defineConfig(({ mode }) => {
               short_name: 'Chuyến đi',
               description: 'Xem danh sách chuyến đi của bạn',
               url: '/trips',
-              icons: [{ src: '/goouty-logo.svg', sizes: 'any', type: 'image/svg+xml' }]
+              icons: [{ src: '/favicon_v2.png', sizes: 'any', type: 'image/png' }]
             }
           ]
         },

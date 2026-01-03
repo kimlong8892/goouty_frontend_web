@@ -79,7 +79,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
             className={cn(
               "relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300",
               "bg-primary hover:bg-primary/90",
-              "text-white font-medium shadow-md hover:shadow-lg",
+              "text-primary-foreground font-medium shadow-md hover:shadow-lg",
               "overflow-hidden flex-shrink-0"
             )}
             onClick={(e) => {
@@ -487,7 +487,7 @@ export const Navbar = () => {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span className="text-sm font-semibold text-white">
+                          <span className="text-sm font-semibold text-primary-foreground">
                             {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                           </span>
                         )}
