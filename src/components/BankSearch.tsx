@@ -17,7 +17,7 @@ interface BankSearchProps {
   disabled?: boolean;
 }
 
-const BANKS: Bank[] = [
+export const BANKS: Bank[] = [
   { code: 'ICB', name: 'VietinBank' },
   { code: 'VCB', name: 'Vietcombank' },
   { code: 'MB', name: 'MBBank' },
@@ -101,7 +101,7 @@ export const BankSearch: React.FC<BankSearchProps> = ({
     const term = e.target.value;
     setSearchTerm(term);
     setIsOpen(true);
-    
+
     // If user clears the input, clear selection
     if (!term) {
       setSelectedBank(null);
@@ -173,7 +173,7 @@ export const BankSearch: React.FC<BankSearchProps> = ({
               <X className="h-4 w-4" />
             </button>
           ) : (
-            <ChevronDown 
+            <ChevronDown
               className={cn(
                 "absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground transition-transform",
                 isOpen && "rotate-180"
@@ -181,7 +181,7 @@ export const BankSearch: React.FC<BankSearchProps> = ({
             />
           )}
         </div>
-        
+
         {isOpen && (
           <div
             ref={dropdownRef}

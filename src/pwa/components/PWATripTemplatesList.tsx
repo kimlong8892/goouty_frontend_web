@@ -30,8 +30,28 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   });
   const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
+  const hasMoreTemplates = pagination.page < pagination.totalPages;
+  const hasActiveFilters = searchTerm || (selectedProvince && selectedProvince !== 'all');
 
   // Ref for infinite scroll
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreTemplates && !loadingMore) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMoreTemplates, loadingMore]); // eslint-disable-next-line react-hooks/exhaustive-deps
 
   // Load initial data
   useEffect(() => {
@@ -139,8 +159,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
     loadInitialData();
   };
 
-  const hasMoreTemplates = pagination.page < pagination.totalPages;
-  const hasActiveFilters = searchTerm || (selectedProvince && selectedProvince !== 'all');
+
 
   if (loading && templates.length === 0) {
     return (
@@ -234,27 +253,15 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
             ))}
           </div>
 
-          {/* Load More Button */}
+          {/* Infinite Scroll Sentinel */}
           {hasMoreTemplates && (
-            <div className="flex justify-center py-6">
-              <Button
-                variant="outline"
-                onClick={loadMore}
-                disabled={loadingMore}
-                className="w-full max-w-xs h-12 rounded-xl border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-semibold"
-              >
-                {loadingMore ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    {t('common.loadingMore')}
-                  </>
-                ) : (
-                  <>
-                    {t('common.loadMore')}
-                    <ChevronDown className="ml-2 w-5 h-5" />
-                  </>
-                )}
-              </Button>
+            <div ref={loadMoreRef} className="flex justify-center py-6 min-h-[60px]">
+              {loadingMore && (
+                <div className="flex items-center gap-2 text-primary">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span>{t('common.loadingMore')}</span>
+                </div>
+              )}
             </div>
           )}
 

@@ -276,7 +276,7 @@ export const Navbar = () => {
       case '/notifications':
         return 'Thông báo';
       case '/profile':
-        return '';
+        return 'Trang cá nhân';
       case '/profile/edit':
         return '';
       case '/settings':
@@ -380,43 +380,27 @@ export const Navbar = () => {
       <>
         <TooltipProvider>
           {/* Top header for Mobile/PWA - minimal with logo and actions */}
-          <header className="sticky top-0 z-50 w-full px-4 py-2 bg-transparent border-b border-gray-200/50 mb-2">
-            <nav className="flex items-center justify-between max-w-6xl mx-auto h-12">
-              <div className="flex items-center gap-2">
-                <Link to="/" className="flex items-center gap-2">
-                  <img src="/footer_badge_mascot.png" alt="Goouty" className="w-10 h-10 object-contain" />
+          {location.pathname !== '/profile/edit' && (
+            <header className="sticky top-0 z-50 w-full px-4 py-2 bg-transparent border-b border-gray-200/50 mb-2">
+              <nav className="flex items-center justify-between max-w-6xl mx-auto h-12">
+                <div className="flex items-center gap-2">
                   {pageTitle && !isHomePage && (
                     <h1 className="text-lg font-bold text-gray-900 truncate max-w-[180px]">
                       {pageTitle}
                     </h1>
                   )}
-                </Link>
-              </div>
+                </div>
 
-              <div className="flex items-center gap-2">
-                {isAuthenticated ? (
-                  <>
-                    <button
-                      onClick={() => navigate('/profile')}
-                      className="w-8 h-8 rounded-full overflow-hidden border border-gray-200"
-                    >
-                      {user?.profilePicture ? (
-                        <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
-                          {user?.fullName?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                      )}
-                    </button>
-                  </>
-                ) : (
-                  <Button variant="ghost" size="sm" onClick={handleGoToAuth} className="text-primary font-semibold">
-                    Đăng nhập
-                  </Button>
-                )}
-              </div>
-            </nav>
-          </header>
+                <div className="flex items-center gap-2">
+                  {!isAuthenticated && (
+                    <Button variant="ghost" size="sm" onClick={handleGoToAuth} className="text-primary font-semibold">
+                      Đăng nhập
+                    </Button>
+                  )}
+                </div>
+              </nav>
+            </header>
+          )}
 
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (

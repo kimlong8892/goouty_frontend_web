@@ -264,7 +264,7 @@ const Profile = () => {
             </div>
 
             <Button
-              onClick={() => navigate('/profile/edit')}
+              onClick={() => navigate('/profile/edit', { state: { mode: 'edit' } })}
               variant="outline"
               className="mt-6 rounded-full px-8 h-10 border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 bg-white shadow-sm"
             >
@@ -282,11 +282,7 @@ const Profile = () => {
                   label="Thông tin cá nhân"
                   onClick={() => navigate('/profile/edit')}
                 />
-                <MenuRow
-                  icon={<CreditCard className="text-green-500 w-5 h-5" />}
-                  label="Thông tin thanh toán"
-                  onClick={() => navigate('/profile/edit')}
-                />
+
               </div>
             </div>
 
@@ -499,30 +495,7 @@ const Profile = () => {
                       </div>
                     </div>
 
-                    <div className="pt-8 border-t border-slate-100">
-                      <div className="flex items-center gap-2 mb-4 text-slate-900 font-bold">
-                        <CreditCard className="w-5 h-5 text-slate-400" /> Thông tin thanh toán
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Ngân hàng</Label>
-                          <BankSearch
-                            value={formData.bankId}
-                            onChange={(value) => setFormData({ ...formData, bankId: value })}
-                            placeholder="Chọn ngân hàng"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Số tài khoản</Label>
-                          <Input
-                            value={formData.bankNumber}
-                            onChange={(e) => setFormData({ ...formData, bankNumber: e.target.value })}
-                            className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
-                            placeholder="0000 0000 0000"
-                          />
-                        </div>
-                      </div>
-                    </div>
+
                   </div>
 
                   <div className="flex justify-end gap-3 mt-10 pt-6 border-t border-slate-100">
