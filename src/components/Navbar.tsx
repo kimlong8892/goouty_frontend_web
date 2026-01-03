@@ -147,7 +147,7 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
             "relative flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-300",
             "hover:bg-primary/10 hover:text-primary",
             "overflow-hidden flex-shrink-0 min-w-0",
-            active ? "bg-primary/10 text-primary" : "text-foreground/80",
+            active ? "bg-primary text-primary-foreground" : "text-foreground/80",
             isHighlighted && "bg-primary text-primary-foreground shadow-lg scale-105",
             disabled && "opacity-50 cursor-not-allowed"
           )}
@@ -155,7 +155,7 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
         >
           <span className={cn(
             "transition-all duration-300 text-xl flex items-center justify-center",
-            active ? "text-primary" : "text-foreground/60",
+            active ? "text-primary-foreground" : "text-foreground/60",
             isHighlighted && "text-primary-foreground"
           )}>
             {icon}
@@ -203,7 +203,10 @@ const ProfileNavItem = ({ user, active, onClick, isPWAMode }: { user: any, activ
             )}
             onClick={onClick}
           >
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+            <div className={cn(
+              "w-6 h-6 rounded-full flex items-center justify-center overflow-hidden",
+              active ? "bg-white/20" : "bg-primary/10"
+            )}>
               {user?.profilePicture ? (
                 <img
                   src={user.profilePicture}
@@ -211,7 +214,10 @@ const ProfileNavItem = ({ user, active, onClick, isPWAMode }: { user: any, activ
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-xs font-medium text-primary">
+                <span className={cn(
+                  "text-xs font-medium",
+                  active ? "text-white" : "text-primary"
+                )}>
                   {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                 </span>
               )}
@@ -236,7 +242,10 @@ const ProfileNavItem = ({ user, active, onClick, isPWAMode }: { user: any, activ
       onClick={onClick}
     >
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+        <div className={cn(
+          "w-6 h-6 rounded-full flex items-center justify-center overflow-hidden",
+          active ? "bg-white/20" : "bg-primary/10"
+        )}>
           {user?.profilePicture ? (
             <img
               src={user.profilePicture}
@@ -244,7 +253,10 @@ const ProfileNavItem = ({ user, active, onClick, isPWAMode }: { user: any, activ
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-xs font-medium text-primary">
+            <span className={cn(
+              "text-xs font-medium",
+              active ? "text-white" : "text-primary"
+            )}>
               {user?.fullName?.charAt(0).toUpperCase() || 'U'}
             </span>
           )}

@@ -17,9 +17,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Primary: #edeeff */
-    --primary: 237 100% 96.5%;
-    --primary-foreground: 222.2 84% 4.9%;
+    /* Primary Purple: #6347f9 */
+    --primary: 249 94% 63%;
+    --primary-foreground: 0 0% 100%;
 
     /* Secondary: Light Purple Gray */
     --secondary: 249 30% 96%;
@@ -38,8 +38,8 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    /* Ring matches Primary */
-    --ring: 237 100% 96.5%;
+    /* Ring matches Primary Purple */
+    --ring: 249 94% 63%;
 
     --radius: 0.75rem;
     /* Larger radius (12px) for softer look */
