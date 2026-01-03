@@ -56,7 +56,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
   const price = "1.200.000 VNĐ";
 
   return (
-    <div className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[420px] w-full max-w-sm mx-auto flex flex-col">
+    <div className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[420px] w-full flex flex-col">
       {/* Background Image - Full Cover */}
       <div className="relative h-1/2 overflow-hidden">
         <img

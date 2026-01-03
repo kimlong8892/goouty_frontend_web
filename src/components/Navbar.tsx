@@ -148,7 +148,7 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
             "hover:bg-primary/10 hover:text-primary",
             "overflow-hidden flex-shrink-0 min-w-0",
             active ? "bg-primary text-primary-foreground" : "text-foreground/80",
-            isHighlighted && "bg-primary text-primary-foreground shadow-lg scale-105",
+            isHighlighted && "shadow-lg scale-105",
             disabled && "opacity-50 cursor-not-allowed"
           )}
           onClick={handleClick}
@@ -156,7 +156,7 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
           <span className={cn(
             "transition-all duration-300 text-xl flex items-center justify-center",
             active ? "text-primary-foreground" : "text-foreground/60",
-            isHighlighted && "text-primary-foreground"
+            isHighlighted && active && "text-primary-foreground"
           )}>
             {icon}
           </span>
@@ -333,7 +333,7 @@ export const Navbar = () => {
       setActive('profile');
     } else if (path === '/settings') {
       setActive('settings');
-    } else if (path === '/create-trip') {
+    } else if (path === '/create-trip' || path === '/pwa-create-trip') {
       setActive('create-trip');
     } else if (path === '/templates') {
       setActive('templates');

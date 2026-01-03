@@ -58,7 +58,18 @@ export default defineConfig(({ mode }) => {
               req.url?.includes('registerSW.js') ||
               req.url?.match(/\.(png|svg|ico|webmanifest)$/);
 
-            if (isPWAFile) {
+            // Skip auth for PWA mode (standalone)
+            const isPWAMode = req.url?.includes('source=pwa');
+            const hasPWACookie = req.headers.cookie?.includes('pwa_auth=true');
+
+            if (isPWAMode) {
+              // Set a cookie to remember PWA mode for subsequent requests during the session
+              res.setHeader('Set-Cookie', 'pwa_auth=true; Path=/; SameSite=Lax');
+              next();
+              return;
+            }
+
+            if (hasPWACookie || isPWAFile) {
               next();
               return;
             }
@@ -92,7 +103,7 @@ export default defineConfig(({ mode }) => {
           background_color: '#edeeff',
           display: 'standalone',
           scope: '/',
-          start_url: '/',
+          start_url: '/?source=pwa',
           lang: 'vi',
           orientation: 'portrait-primary',
           icons: [

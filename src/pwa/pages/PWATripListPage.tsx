@@ -308,35 +308,29 @@ const PWATripListPage = () => {
   return (
     <div className="min-h-screen pb-20 px-4">
 
-      {/* Search and Filter - Fixed */}
-      <div className="fixed top-[48px] left-0 right-0 z-30 bg-white border-b border-gray-200/50 py-4 px-4 shadow-sm">
+      {/* Search - Fixed at top */}
+      <div className="fixed top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200/50 py-3 px-4 shadow-sm pt-[max(env(safe-area-inset-top),12px)]">
         <div className="max-w-6xl mx-auto">
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Tìm kiếm chuyến đi..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white border-gray-200 focus:border-primary focus:ring-primary/20 shadow-sm"
-                disabled={searchLoading}
-              />
-              {searchLoading && (
-                <div className="absolute right-3 top-3">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                </div>
-              )}
-            </div>
-            <Button variant="outline" className="bg-white border-gray-200 hover:bg-primary/5 hover:border-primary/50 shadow-sm transition-all duration-200">
-              <Filter className="w-4 h-4 mr-2" />
-              Lọc
-            </Button>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Tìm kiếm chuyến đi..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary/20 shadow-sm rounded-xl"
+              disabled={searchLoading}
+            />
+            {searchLoading && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Spacer to account for fixed search bar */}
-      <div className="h-20"></div>
+      <div className="h-28"></div>
 
 
       {/* Trips Grid */}

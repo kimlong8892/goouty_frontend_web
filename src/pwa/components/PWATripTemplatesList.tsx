@@ -9,6 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PWAInstallButton } from './PWAInstallButton';
+import { cn } from '@/lib/utils.ts';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Check } from 'lucide-react';
 
 interface PWATripTemplatesListProps {
   onUseTemplate?: (template: DATABASE_TYPES.tripTemplates) => void;
@@ -30,6 +40,8 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
     totalPages: 0
   });
   const [hasSearched, setHasSearched] = useState(false);
+  const [isProvinceDrawerOpen, setIsProvinceDrawerOpen] = useState(false);
+  const [provinceSearchQuery, setProvinceSearchQuery] = useState('');
   const { toast } = useToast();
   const hasMoreTemplates = pagination.page < pagination.totalPages;
   const hasActiveFilters = searchTerm || (selectedProvince && selectedProvince !== 'all');
@@ -151,7 +163,15 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   const handleProvinceChange = (value: string) => {
     setSelectedProvince(value);
     setHasSearched(true);
+    setIsProvinceDrawerOpen(false);
+    setProvinceSearchQuery('');
   };
+
+  const selectedProvinceName = provinces.find(p => p.id === selectedProvince)?.name || t('template.allProvinces');
+
+  const filteredProvincesList = provinces.filter(p =>
+    p.name.toLowerCase().includes(provinceSearchQuery.toLowerCase())
+  );
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -174,9 +194,96 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+
+      {/* Search and Filter - Sticky at top */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100/50 pt-[max(env(safe-area-inset-top),12px)] pb-2 px-4 shadow-sm">
+        <div className="max-w-6xl mx-auto space-y-3">
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder={t('template.searchTemplates')}
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-10 h-11 bg-gray-50 border-gray-100 focus:border-primary focus:ring-primary/20 shadow-sm rounded-xl text-base"
+            />
+          </div>
+
+          {/* Province Filter - Searchable Drawer */}
+          <Drawer open={isProvinceDrawerOpen} onOpenChange={setIsProvinceDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-between h-10 rounded-xl border-gray-200 text-gray-600 font-medium px-4 transition-all",
+                  selectedProvince !== 'all' && "border-primary/50 bg-primary/5 text-primary"
+                )}
+              >
+                <div className="flex items-center">
+                  <MapPin className={cn("w-4 h-4 mr-2", selectedProvince !== 'all' ? "text-primary" : "text-gray-400")} />
+                  <span className="truncate">{selectedProvinceName}</span>
+                </div>
+                <ChevronDown className="w-4 h-4 opacity-50" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="max-h-[85vh]">
+              <DrawerHeader className="border-b pb-4">
+                <DrawerTitle className="text-center">Chọn tỉnh thành</DrawerTitle>
+                <div className="relative mt-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    placeholder="Tìm nhanh tỉnh thành..."
+                    value={provinceSearchQuery}
+                    onChange={(e) => setProvinceSearchQuery(e.target.value)}
+                    className="pl-10 h-11 bg-gray-50 border-none rounded-xl"
+                  />
+                </div>
+              </DrawerHeader>
+              <div className="overflow-y-auto py-2 px-2 flex-1">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-between h-12 rounded-xl px-4",
+                    selectedProvince === 'all' && "bg-primary/5 text-primary font-bold"
+                  )}
+                  onClick={() => handleProvinceChange('all')}
+                >
+                  <span>{t('template.allProvinces')}</span>
+                  {selectedProvince === 'all' && <Check className="w-4 h-4" />}
+                </Button>
+                <div className="h-px bg-gray-100 my-1 mx-4" />
+                {filteredProvincesList.map((province) => (
+                  <Button
+                    key={province.id}
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-between h-12 rounded-xl px-4 font-normal",
+                      selectedProvince === province.id && "bg-primary/5 text-primary font-bold"
+                    )}
+                    onClick={() => handleProvinceChange(province.id)}
+                  >
+                    <span>{province.name}</span>
+                    {selectedProvince === province.id && <Check className="w-4 h-4" />}
+                  </Button>
+                ))}
+                {filteredProvincesList.length === 0 && (
+                  <div className="py-8 text-center text-gray-500">
+                    Không tìm thấy tỉnh thành nào
+                  </div>
+                )}
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      </div>
+
+      {/* Spacer for fixed header */}
+      <div className="h-[max(calc(env(safe-area-inset-top)+110px),125px)]"></div>
+
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-8 mt-4 animate-fade-in px-2">
         <h1 className="text-2xl font-bold text-center mb-2">{t('template.templates')}</h1>
         <p className="text-muted-foreground text-center mb-4">
           {t('template.description')}
@@ -189,46 +296,22 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
         </div>
       </div>
 
-      {/* Search and Filter - Sticky */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40 mb-6 pb-4 pt-2">
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder={t('template.searchTemplates')}
-                value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={selectedProvince} onValueChange={handleProvinceChange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('template.allProvinces')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('template.allProvinces')}</SelectItem>
-                {provinces.map((province) => (
-                  <SelectItem key={province.id} value={province.id}>
-                    {province.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {hasActiveFilters && (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                {t('template.templatesFound', { count: templates.length })}
-              </p>
-              <Button variant="outline" size="sm" onClick={clearFilters}>
-                {t('common.clearFilters')}
-              </Button>
-            </div>
-          )}
+      {/* Results summary if filtering */}
+      {hasActiveFilters && templates.length > 0 && (
+        <div className="flex items-center justify-between mb-4 px-2">
+          <p className="text-sm font-medium text-gray-500">
+            {t('template.templatesFound', { count: templates.length })}
+          </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="text-primary hover:bg-primary/5 h-8 font-semibold"
+          >
+            {t('common.clearFilters')}
+          </Button>
         </div>
-      </div>
+      )}
 
       {/* Templates Grid */}
       {templates.length === 0 ? (
@@ -249,7 +332,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 gap-6 mb-8 px-2">
             {templates.map((template) => (
               <TripTemplateCard
                 key={template.id}
