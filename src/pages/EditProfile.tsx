@@ -177,45 +177,8 @@ const EditProfile = () => {
     return (
       <div className="min-h-screen bg-white">
         <AnimatedTransition show={showContent} animation="slide-up">
-          {/* Header */}
-          <div className="fixed top-0 left-0 right-0 z-10 bg-white">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-              <button
-                onClick={handleBack}
-                className="text-gray-600 font-medium hover:text-gray-800 transition-colors flex items-center"
-              >
-                {isEditing ? (
-                  "Hủy"
-                ) : (
-                  <>
-                    <ChevronLeft className="w-5 h-5 mr-1" /> Quay lại
-                  </>
-                )}
-              </button>
-              <h1 className="text-lg font-semibold text-black">
-                {isEditing ? 'Chỉnh sửa thông tin' : 'Thông tin cá nhân'}
-              </h1>
-              {isEditing ? (
-                <button
-                  onClick={handleSaveProfile}
-                  disabled={saving || !formData.fullName.trim()}
-                  className="text-blue-600 font-medium hover:text-blue-800 transition-colors disabled:opacity-50"
-                >
-                  {saving ? 'Lưu...' : 'Xong'}
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="text-blue-600 font-medium hover:text-blue-800 transition-colors"
-                >
-                  Sửa
-                </button>
-              )}
-            </div>
-          </div>
-
           {/* Content */}
-          <div className="px-4 py-6 pt-20 pb-24">
+          <div className="px-4 py-6 pb-24">
             {isEditing ? (
               // EDIT MODE
               <>
@@ -290,6 +253,24 @@ const EditProfile = () => {
                       placeholder="Nhập số tài khoản"
                     />
                   </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={handleBack}
+                      className="flex-1 h-12"
+                    >
+                      Hủy
+                    </Button>
+                    <Button
+                      onClick={handleSaveProfile}
+                      disabled={saving || !formData.fullName.trim()}
+                      className="flex-1 h-12 bg-primary hover:bg-primary/90"
+                    >
+                      {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                    </Button>
+                  </div>
                 </div>
               </>
             ) : (
@@ -307,6 +288,14 @@ const EditProfile = () => {
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">{profile.fullName}</h2>
 
+                  {/* Edit Button below Name */}
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    className="mt-4 w-full max-w-xs h-11 bg-primary hover:bg-primary/90 flex items-center justify-center gap-2"
+                  >
+                    <Pencil className="w-4 h-4" />
+                    Chỉnh sửa thông tin
+                  </Button>
                 </div>
 
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-sm">
@@ -314,6 +303,7 @@ const EditProfile = () => {
                     <span className="text-gray-500 font-medium">Email</span>
                     <span className="text-gray-900 font-medium max-w-[200px] truncate" title={profile.email}>{profile.email}</span>
                   </div>
+
                   <div className="p-4 border-b border-gray-50 last:border-0 flex justify-between items-center">
                     <span className="text-gray-500 font-medium">Số điện thoại</span>
                     <span className="text-gray-900 font-medium">{profile.phoneNumber || '---'}</span>
@@ -482,9 +472,6 @@ const EditProfile = () => {
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 text-center">{profile.fullName}</h2>
                   <p className="text-gray-500 text-center mt-1">{profile.email}</p>
-                  <div className="mt-4 flex flex-col gap-1 items-center">
-                    <span className="px-3 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600">ID: #{profile.id}</span>
-                  </div>
                 </div>
 
                 <div className="col-span-1 lg:col-span-2 space-y-8">

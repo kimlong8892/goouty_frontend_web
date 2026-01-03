@@ -379,28 +379,7 @@ export const Navbar = () => {
     return (
       <>
         <TooltipProvider>
-          {/* Top header for Mobile/PWA - minimal with logo and actions */}
-          {location.pathname !== '/profile/edit' && (
-            <header className="sticky top-0 z-50 w-full px-4 py-2 bg-transparent border-b border-gray-200/50 mb-2">
-              <nav className="flex items-center justify-between max-w-6xl mx-auto h-12">
-                <div className="flex items-center gap-2">
-                  {pageTitle && !isHomePage && (
-                    <h1 className="text-lg font-bold text-gray-900 truncate max-w-[180px]">
-                      {pageTitle}
-                    </h1>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {!isAuthenticated && (
-                    <Button variant="ghost" size="sm" onClick={handleGoToAuth} className="text-primary font-semibold">
-                      Đăng nhập
-                    </Button>
-                  )}
-                </div>
-              </nav>
-            </header>
-          )}
+          {/* Top header for Mobile/PWA - removed for cleaner UI */}
 
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (

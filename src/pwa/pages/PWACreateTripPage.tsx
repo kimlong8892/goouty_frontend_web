@@ -156,37 +156,29 @@ const PWACreateTripPage = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
+      className="min-h-screen flex flex-col bg-gray-50"
       style={{
-        minHeight: '100dvh', // Dynamic viewport height for mobile
-        overflowY: 'auto',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100%',
-        paddingTop: 'env(safe-area-inset-top)' // Account for status bar
+        minHeight: '100dvh',
+        paddingTop: 'env(safe-area-inset-top)'
       }}
     >
       {/* Header */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-200/50 px-4 py-4 shadow-sm">
+      <div className="sticky top-0 z-50 flex-shrink-0 bg-white border-b border-gray-200/50 px-4 py-4 shadow-sm">
         <div className="flex items-center justify-between">
           <button
             onClick={handleCancel}
-            className="flex items-center text-muted-foreground hover:text-gray-900 transition-colors text-lg font-medium"
+            disabled={loading}
+            className="flex items-center text-muted-foreground hover:text-gray-900 disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             Hủy
           </button>
 
-          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Tạo chuyến đi
-          </h1>
-
           <button
             onClick={handleCreateTrip}
             disabled={loading}
-            className="flex items-center text-primary hover:text-primary/80 disabled:text-gray-400 transition-colors font-bold text-lg"
+            className="flex items-center text-primary hover:text-primary/80 disabled:text-gray-400 transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             {loading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
@@ -197,7 +189,7 @@ const PWACreateTripPage = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 py-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4">
         {/* Form Section */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-gray-200/50 space-y-4">
           {/* Trip Name Section */}
