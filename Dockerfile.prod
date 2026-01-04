@@ -1,18 +1,18 @@
 # ---------- BUILD STAGE ----------
-FROM node:18-slim AS builder
+FROM oven/bun:1 AS builder
 
 WORKDIR /usr/src/app
 
 # Cài dependency
-COPY package*.json ./
-RUN apt-get update && apt-get install -y openssl \
-  && npm ci
+COPY package.json bun.lockb* package-lock.json* ./
+# Frozen lockfile guarantee
+RUN bun install --frozen-lockfile
 
 # Copy source
 COPY . .
 
 # Build Vite App
-RUN npm run build
+RUN bun run build
 
 # ---------- RUNTIME STAGE ----------
 FROM nginx:alpine

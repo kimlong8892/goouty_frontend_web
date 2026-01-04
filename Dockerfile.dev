@@ -1,13 +1,17 @@
-FROM node:18-slim
+FROM oven/bun:1
 
 # Đặt thư mục làm việc
 WORKDIR /usr/src/app
 
-# Copy package.json và package-lock.json
-COPY package*.json ./
+# Copy package.json và bun.lockb (hoặc package-lock.json để fallback)
+COPY package.json bun.lockb* package-lock.json* ./
 
-# Cài dependencies
-RUN apt-get update && apt-get install -y curl && npm install
+# Cài dependencies bằng Bun
+# --no-save để không update lockfile
+RUN bun install --no-save
+
+# Cài curl cho healthcheck (nếu base image chưa có)
+RUN apt-get update && apt-get install -y curl
 
 # Copy toàn bộ source code
 COPY . .
@@ -16,4 +20,4 @@ COPY . .
 EXPOSE 8080
 
 # Command mặc định: chạy dev server với host 0.0.0.0 và port 8080
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["bun", "run", "dev", "--host", "0.0.0.0", "--port", "8080"]
