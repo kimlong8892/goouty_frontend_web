@@ -372,7 +372,7 @@ export const Navbar = () => {
       label: 'Trang chủ',
       id: 'home',
     },
-    { to: '/create-trip', icon: <Plus size={18} />, label: 'Tạo chuyến đi', id: 'create-trip' },
+    ...(isAuthenticated ? [{ to: '/create-trip', icon: <Plus size={18} />, label: 'Tạo chuyến đi', id: 'create-trip' }] : []),
   ];
 
   const authNavItems = [
