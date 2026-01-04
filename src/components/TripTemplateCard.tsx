@@ -36,8 +36,8 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
         title: "Trip created successfully!",
         description: "Your trip has been created from the template.",
       });
-      // Navigate to the new trip's detail page
-      navigate(`/trip/${newTrip.id}`);
+      // Navigate to home page
+      navigate('/');
     } catch (error) {
       console.error('Error creating trip from template:', error);
       toast({
@@ -114,15 +114,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-full rounded-2xl border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 text-sm font-bold h-12 transition-all"
-            onClick={handleViewDetails}
-          >
-            Xem chi tiết
-          </Button>
+        <div className="pt-2">
           <Button
             size="lg"
             className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"

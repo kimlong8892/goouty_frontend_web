@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -35,6 +36,34 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
   }, []);
 
 
+
+  // Handle scroll from navigation state
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check if we need to scroll to templates section
+    // Only try to scroll if we are not loading, because the element might not exist yet
+    if (!loading && location.state && (location.state as any)?.scrollTo === 'templates') {
+      const element = document.getElementById('templates-section');
+      if (element) {
+        // Add a small delay to ensure DOM is ready and layout is stable
+        setTimeout(() => {
+          const headerOffset = 100; // Adjust this value based on your actual header height
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+
+          // Optional: clear state to prevent scrolling again on re-render
+          // We use reset state so we don't clear it immediately if re-renders happen quickly
+          window.history.replaceState({}, document.title);
+        }, 100);
+      }
+    }
+  }, [location, loading]);
 
   // Search and filter when they change
   useEffect(() => {

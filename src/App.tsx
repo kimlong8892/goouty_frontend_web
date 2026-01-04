@@ -19,8 +19,8 @@ import Index from "./pages/Index.tsx";
 import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
 import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
-import TemplatesPage from "./pages/TemplatesPage.tsx";
-import TripTemplateDetailPage from "./pages/TripTemplateDetailPage.tsx";
+
+
 import MyTripsPage from "./pages/MyTripsPage.tsx";
 import PWATripListPage from "@/pwa/pages/PWATripListPage.tsx";
 import TripDetailsPage from "./pages/TripDetailsPage.tsx";
@@ -124,26 +124,8 @@ const AppRoutes = () => {
           </AuthGuard>
         }
       />
-      <Route
-        path="/templates"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <TemplatesPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/template/:id"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <TripTemplateDetailPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
+
+
       <Route
         path="/my-trips"
         element={

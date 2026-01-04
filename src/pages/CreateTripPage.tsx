@@ -307,18 +307,18 @@ const CreateTripPage = () => {
                   />
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
                   <Button
                     variant="outline"
                     className="flex-1 h-12 rounded-xl border-purple-200 text-[#6347f9] hover:bg-purple-50 hover:text-[#5136db]"
-                    onClick={() => navigate('/templates')}
+                    onClick={() => navigate('/', { state: { scrollTo: 'templates' } })}
                   >
                     <Copy className="mr-2 h-4 w-4" />
                     Sử dụng mẫu
                   </Button>
                   <Button
                     onClick={handleCreateTrip}
+
                     className="flex-1 h-12 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-xl transition-all"
                     disabled={loading}
                   >

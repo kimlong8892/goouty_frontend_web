@@ -297,8 +297,7 @@ export const Navbar = () => {
         return '';
       case '/settings':
         return 'Cài đặt';
-      case '/templates':
-        return 'Mẫu chuyến đi';
+
       default:
         return '';
     }
@@ -335,8 +334,7 @@ export const Navbar = () => {
       setActive('settings');
     } else if (path === '/create-trip' || path === '/pwa-create-trip') {
       setActive('create-trip');
-    } else if (path === '/templates') {
-      setActive('templates');
+
     } else if (path === '/auth') {
       setActive('login');
     }
