@@ -9,9 +9,6 @@ services:
     working_dir: /usr/src/app
     ports:
       - "8081:8080"
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     env_file:
       - .env.dev
     environment:

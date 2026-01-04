@@ -26,6 +26,11 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "::",
       port: parseInt(env.VITE_DEV_PORT) || 8080,
+      allowedHosts: [
+        'localhost',
+        'local.goouty.com',
+        env.VITE_FRONTEND_URL ? new URL(env.VITE_FRONTEND_URL).hostname : undefined
+      ].filter(Boolean) as string[],
       // Enable SPA fallback for client-side routing
       historyApiFallback: true,
       proxy: {
