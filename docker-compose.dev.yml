@@ -17,7 +17,6 @@ services:
     environment:
       - VITE_BASIC_AUTH_USER=goouty
       - VITE_BASIC_AUTH_PASS=minh_long_hoang
-    command: bun run dev --host 0.0.0.0
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
