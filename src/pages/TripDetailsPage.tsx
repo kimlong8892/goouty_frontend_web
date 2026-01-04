@@ -253,6 +253,7 @@ const TripDetailsPage = () => {
       }));
 
       setDays(transformedDays);
+      setExpandedDayIds(transformedDays.map(day => day.id));
 
       const activitiesByDayMap: Record<string, Activity[]> = {};
       tripData.days.forEach(day => {
@@ -333,6 +334,7 @@ const TripDetailsPage = () => {
         }));
 
         setDays(transformedDays);
+        setExpandedDayIds(transformedDays.map(day => day.id));
 
         const activitiesByDayMap: Record<string, Activity[]> = {};
         tripData.days.forEach(day => {
