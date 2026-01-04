@@ -390,6 +390,8 @@ const TripDetailsPage = () => {
     if (!confirm('Bạn có chắc muốn xóa hoạt động này?')) return;
 
     try {
+      await api.activities.delete(activityId);
+
       setActivitiesByDay(prev => {
         const newActivitiesByDay = { ...prev };
         for (const dayId in newActivitiesByDay) {
