@@ -19,6 +19,8 @@ import Index from "./pages/Index.tsx";
 import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
 import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
+import TemplateDetailsPage from "./pages/TemplateDetailsPage.tsx";
+import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
 
 
 import MyTripsPage from "./pages/MyTripsPage.tsx";
@@ -250,6 +252,26 @@ const AppRoutes = () => {
           <PageTransition>
             <ChromePWATestPage />
           </PageTransition>
+        }
+      />
+      <Route
+        path="/template/:id"
+        element={
+          <AuthGuard forceWebAuth>
+            <PageTransition>
+              <TemplateDetailsPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-template-details/:id"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWATemplateDetailsPage />
+            </PageTransition>
+          </AuthGuard>
         }
       />
       <Route

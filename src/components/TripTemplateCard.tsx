@@ -4,6 +4,7 @@ import { DATABASE_TYPES } from '@/integrations/api/types';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { usePWA } from '@/pwa/hooks/usePWA';
 import { api } from '@/integrations/api/client';
 
 interface TripTemplateCardProps {
@@ -17,9 +18,14 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isPWA } = usePWA();
 
   const handleViewDetails = () => {
-    navigate(`/template/${template.id}`);
+    if (isPWA) {
+      navigate(`/pwa-template-details/${template.id}`);
+    } else {
+      navigate(`/template/${template.id}`);
+    }
   };
 
   const handleUseTemplate = async (e: React.MouseEvent) => {
@@ -56,7 +62,10 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
   const price = "1.200.000 VNĐ";
 
   return (
-    <div className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[420px] w-full flex flex-col">
+    <div
+      className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[420px] w-full flex flex-col cursor-pointer"
+      onClick={handleViewDetails}
+    >
       {/* Background Image - Full Cover */}
       <div className="relative h-1/2 overflow-hidden">
         <img
