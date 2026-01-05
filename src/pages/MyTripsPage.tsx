@@ -33,6 +33,7 @@ import { usePWA } from '@/pwa/hooks/usePWA';
 import { Trip, ShareLink } from '@/lib/types.ts';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Using Trip from types.ts, extending it for local needs
 type LocalTrip = Trip & {
@@ -353,10 +354,19 @@ const MyTripsPage = () => {
                       </div>
 
                       {/* Content Card (Floating layer) */}
-                      <div className="absolute bottom-0 left-0 right-0 z-10 bg-white h-[180px] rounded-[32px] p-5 flex flex-col justify-between shadow-[0_-5px_20px_rgba(0,0,0,0.05)] border border-white/50">
+                      <div className="absolute bottom-0 left-0 right-0 z-10 bg-white h-[200px] rounded-[32px] p-5 flex flex-col justify-between shadow-[0_-5px_20px_rgba(0,0,0,0.05)] border border-white/50">
                         <div>
                           {/* Title */}
-                          <h3 className="font-bold text-base text-slate-900 mb-1 leading-snug">{trip.title}</h3>
+                          <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <h3 className="font-bold text-base text-slate-900 mb-1 leading-snug line-clamp-2 min-h-[44px] cursor-help text-left">{trip.title}</h3>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-[300px] break-words">{trip.title}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                           {/* Location */}
                           <div className="flex items-center text-slate-500 text-xs mb-1">
                             <MapPin size={14} className="mr-1 flex-shrink-0" />
