@@ -589,8 +589,8 @@ const TripDetailsPage = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className={cn(
-              "sticky top-[60px] z-50 mb-8 w-full -mx-4 px-4 py-2 bg-white",
-              !isMobileView && "relative top-0 mx-0 px-0 bg-transparent"
+              "sticky top-[60px] z-30 mb-8 w-full -mx-4 px-4 py-2 bg-white",
+              !isMobileView && "relative top-0 mx-0 px-0 bg-transparent z-0"
             )}>
               <TabsList className={cn(
                 "bg-transparent h-auto p-0 gap-3 flex w-full overflow-x-auto scrollbar-hide pb-2",
