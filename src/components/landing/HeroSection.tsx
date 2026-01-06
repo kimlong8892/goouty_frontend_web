@@ -29,9 +29,9 @@ export const HeroSection = ({
           <div className="text-left space-y-6">
             {/* Main Headline */}
             <h1 style={{ color: '#6347f9' }} className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-[#6347f9]">
-              VI VU THẢ GA,
-              <br />
-              KHÔNG LO RẮC RỐI.
+              <span className="block mb-3">VI VU THẢ GA,</span>
+              <span className="block mb-3">KHÔNG LO RẮC</span>
+              <span className="block">RỐI.</span>
             </h1>
 
             {/* Subheading */}
