@@ -482,10 +482,10 @@ const MyTripsPage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">Hủy</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl hover:bg-purple-50 hover:text-[#6347f9] border-slate-200">Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteTrip}
-              className="bg-red-600 hover:bg-red-700 rounded-xl"
+              className="bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white"
             >
               Xóa chuyến đi
             </AlertDialogAction>
