@@ -23,7 +23,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu.tsx';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog.tsx';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalToast } from '../utils/globalToast';
@@ -472,26 +472,32 @@ const MyTripsPage = () => {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận xóa chuyến đi</AlertDialogTitle>
-            <AlertDialogDescription>
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa chuyến đi</DialogTitle>
+            <DialogDescription>
               Bạn có chắc chắn muốn xóa chuyến đi "{tripToDelete?.title}"?
               Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl hover:bg-purple-50 hover:text-[#6347f9] border-slate-200">Hủy</AlertDialogCancel>
-            <AlertDialogAction
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              className="rounded-xl hover:bg-purple-50 hover:text-[#6347f9] border-slate-200"
+            >
+              Hủy
+            </Button>
+            <Button
               onClick={handleDeleteTrip}
               className="bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white"
             >
               Xóa chuyến đi
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
