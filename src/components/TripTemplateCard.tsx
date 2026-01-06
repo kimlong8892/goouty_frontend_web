@@ -123,10 +123,22 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
         </div>
 
         {/* Action Buttons */}
-        <div className="pt-2">
+        <div className="pt-2 flex gap-3">
+          <Button
+            variant="outline"
+            size="lg"
+            className="flex-1 rounded-2xl border-slate-200 text-slate-600 hover:border-[#6347f9] hover:text-[#6347f9] hover:bg-slate-50 text-sm font-bold h-12 transition-all active:scale-[0.98]"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewDetails();
+            }}
+          >
+            Xem chi tiết
+          </Button>
+
           <Button
             size="lg"
-            className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
+            className="flex-1 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
             onClick={handleUseTemplate}
             disabled={isLoading || usingTemplate}
           >
