@@ -183,6 +183,8 @@ const TripDetailsPage = () => {
   const [selectedDayId, setSelectedDayId] = useState<string>('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editTripDialogOpen, setEditTripDialogOpen] = useState(false);
+  const [deleteActivityDialogOpen, setDeleteActivityDialogOpen] = useState(false);
+  const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
 
   const { id } = useParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -388,23 +390,30 @@ const TripDetailsPage = () => {
     }
   };
 
-  const handleDeleteActivity = async (activityId: string) => {
-    if (!confirm('Bạn có chắc muốn xóa hoạt động này?')) return;
+  const openDeleteActivityDialog = (activity: Activity) => {
+    setActivityToDelete(activity);
+    setDeleteActivityDialogOpen(true);
+  };
+
+  const handleConfirmDeleteActivity = async () => {
+    if (!activityToDelete) return;
 
     try {
-      await api.activities.delete(activityId);
+      await api.activities.delete(activityToDelete.id);
 
       setActivitiesByDay(prev => {
         const newActivitiesByDay = { ...prev };
         for (const dayId in newActivitiesByDay) {
           newActivitiesByDay[dayId] = newActivitiesByDay[dayId].filter(
-            activity => activity.id !== activityId
+            activity => activity.id !== activityToDelete.id
           );
         }
         return newActivitiesByDay;
       });
 
       showToast('Đã xóa hoạt động', 'success');
+      setDeleteActivityDialogOpen(false);
+      setActivityToDelete(null);
     } catch (error: unknown) {
       showToast('Không thể xóa hoạt động', 'error');
     }
@@ -797,7 +806,7 @@ const TripDetailsPage = () => {
                                                   variant="ghost"
                                                   size="icon"
                                                   className="h-8 w-8 text-slate-400 hover:text-red-500 active:bg-red-50 rounded-full"
-                                                  onClick={() => handleDeleteActivity(activity.id)}
+                                                  onClick={() => openDeleteActivityDialog(activity)}
                                                 >
                                                   <Trash2 className="w-4 h-4" />
                                                 </Button>
@@ -863,7 +872,7 @@ const TripDetailsPage = () => {
                                               variant="ghost"
                                               size="sm"
                                               className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full"
-                                              onClick={() => handleDeleteActivity(activity.id)}
+                                              onClick={() => openDeleteActivityDialog(activity)}
                                             >
                                               <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -947,6 +956,27 @@ const TripDetailsPage = () => {
 
         </div>
       </AnimatedTransition>
+
+      {/* Delete Activity Dialog */}
+      <AlertDialog open={deleteActivityDialogOpen} onOpenChange={setDeleteActivityDialogOpen}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa hoạt động</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa hoạt động "{activityToDelete?.title}"? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl hover:bg-purple-50 hover:text-[#6347f9] border-slate-200">Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDeleteActivity}
+              className="bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white"
+            >
+              Xóa hoạt động
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AddDayDialog
         open={showAddDay}
