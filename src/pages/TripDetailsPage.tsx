@@ -41,7 +41,7 @@ import { AddExpenseDialog } from '@/components/dialogs/AddExpenseDialog.tsx';
 import { TripMembers } from '@/components/TripMembers.tsx';
 import { ShareLinkManager } from '@/components/ShareLinkManager.tsx';
 import { ExpenseSection } from '@/components/expenses/ExpenseSection.tsx';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog.tsx';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { EditTripDialog } from '@/components/dialogs/EditTripDialog.tsx';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -958,25 +958,31 @@ const TripDetailsPage = () => {
       </AnimatedTransition>
 
       {/* Delete Activity Dialog */}
-      <AlertDialog open={deleteActivityDialogOpen} onOpenChange={setDeleteActivityDialogOpen}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận xóa hoạt động</AlertDialogTitle>
-            <AlertDialogDescription>
+      <Dialog open={deleteActivityDialogOpen} onOpenChange={setDeleteActivityDialogOpen}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa hoạt động</DialogTitle>
+            <DialogDescription>
               Bạn có chắc chắn muốn xóa hoạt động "{activityToDelete?.title}"? Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl hover:bg-purple-50 hover:text-[#6347f9] border-slate-200">Hủy</AlertDialogCancel>
-            <AlertDialogAction
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteActivityDialogOpen(false)}
+              className="rounded-xl hover:bg-purple-50 hover:text-[#6347f9] border-slate-200"
+            >
+              Hủy
+            </Button>
+            <Button
               onClick={handleConfirmDeleteActivity}
               className="bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white"
             >
               Xóa hoạt động
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AddDayDialog
         open={showAddDay}
