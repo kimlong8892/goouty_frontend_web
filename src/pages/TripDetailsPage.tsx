@@ -831,9 +831,9 @@ const TripDetailsPage = () => {
                                             )}
 
                                             {activity.location && (
-                                              <div className="flex items-center truncate max-w-[200px]">
-                                                <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C]" />
-                                                <span className="truncate">{activity.location}</span>
+                                              <div className="flex items-start">
+                                                <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C] mt-0.5 flex-shrink-0" />
+                                                <span>{activity.location}</span>
                                               </div>
                                             )}
                                           </div>
