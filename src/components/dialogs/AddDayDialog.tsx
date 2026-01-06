@@ -50,7 +50,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Inline validate + focus
     const newErrors: { title?: string; date?: string } = {};
     let focused = false;
@@ -120,7 +120,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="VD: Ngày 1 - Khám phá thành phố"
               aria-invalid={!!errors.title}
-              className={errors.title ? 'border-destructive focus-visible:ring-destructive' : undefined}
+              className={errors.title ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:ring-0 focus-visible:ring-offset-0'}
             />
             {errors.title && (
               <p className="mt-1 text-xs text-destructive">{errors.title}</p>
@@ -134,6 +134,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Mô tả chi tiết về ngày này..."
               rows={2}
+              className="focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
           <div>
@@ -145,7 +146,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
               aria-invalid={!!errors.date}
-              className={errors.date ? 'border-destructive focus-visible:ring-destructive' : undefined}
+              className={errors.date ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:ring-0 focus-visible:ring-offset-0'}
             />
             {errors.date && (
               <p className="mt-1 text-xs text-destructive">{errors.date}</p>

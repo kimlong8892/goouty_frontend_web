@@ -171,7 +171,7 @@ const CreateTripPage = () => {
                       setTripName(e.target.value);
                       if (errors.tripName) setErrors(prev => ({ ...prev, tripName: '' }));
                     }}
-                    className={`bg-slate-50 border-slate-200 h-11 rounded-xl focus-visible:ring-purple-500/20 ${errors.tripName ? 'border-red-500' : ''}`}
+                    className={`bg-slate-50 border-slate-200 h-11 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0 ${errors.tripName ? 'border-red-500' : ''}`}
                   />
                   {errors.tripName && <p className="text-sm text-red-500">{errors.tripName}</p>}
                 </div>
@@ -191,8 +191,7 @@ const CreateTripPage = () => {
                     }}
                     placeholder="Chọn tỉnh thành"
                     error={!!errors.provinceId}
-                  // Passing style props heavily relies on implementation of ProvinceSelector
-                  // If it uses Select component from basics, we can try targeting it via context or wrapper
+                    className="bg-slate-50 border-slate-200 h-11 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                   {errors.provinceId && <p className="text-sm text-red-500">{errors.provinceId}</p>}
                 </div>
@@ -244,7 +243,7 @@ const CreateTripPage = () => {
                       if (e.target.value.length <= 100) setDescription(e.target.value);
                     }}
                     rows={4}
-                    className="bg-slate-50 border-slate-200 rounded-xl resize-none focus-visible:ring-purple-500/20"
+                    className="bg-slate-50 border-slate-200 rounded-xl resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                   <div className="text-right text-xs text-slate-400">
                     {description.length}/100
