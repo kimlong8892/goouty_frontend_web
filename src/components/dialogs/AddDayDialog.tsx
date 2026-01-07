@@ -4,7 +4,11 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
-import { Calendar } from 'lucide-react';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar.tsx';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils.ts';
 import { api } from '@/lib/api.ts';
 import { toast } from 'sonner';
 import { CreateDayRequest, Day } from '@/lib/types.ts';
@@ -35,7 +39,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
 
   // Refs để focus input đầu tiên bị lỗi
   const titleRef = useRef<HTMLInputElement | null>(null);
-  const dateRef = useRef<HTMLInputElement | null>(null);
+  // const dateRef = useRef<HTMLInputElement | null>(null); // Removed dateRef as it's not applicable to Popover trigger directly
 
   const resetForm = () => {
     setFormData({ title: '', description: '', date: '' });
@@ -62,14 +66,13 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
 
     if (!formData.date) {
       newErrors.date = 'Vui lòng chọn ngày';
-      if (!focused) { dateRef.current?.focus(); focused = true; }
     } else {
       const selectedDate = new Date(formData.date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (selectedDate < today) {
         newErrors.date = 'Không thể chọn ngày trong quá khứ';
-        if (!focused) { dateRef.current?.focus(); focused = true; }
+        newErrors.date = 'Không thể chọn ngày trong quá khứ';
       }
     }
 
@@ -106,7 +109,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
+            <CalendarIcon className="w-5 h-5" />
             Thêm ngày mới
           </DialogTitle>
         </DialogHeader>
@@ -139,15 +142,34 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
           </div>
           <div>
             <Label htmlFor="date">Ngày <span className="text-destructive">*</span></Label>
-            <Input
-              id="date"
-              type="date"
-              ref={dateRef}
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              aria-invalid={!!errors.date}
-              className={errors.date ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:ring-0 focus-visible:ring-offset-0'}
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="date"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal h-10 hover:bg-white hover:text-slate-900",
+                    !formData.date && "text-muted-foreground",
+                    errors.date && "border-destructive hover:border-destructive/80"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formData.date ? (
+                    format(new Date(formData.date), "dd/MM/yyyy")
+                  ) : (
+                    <span>dd/mm/yyyy</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={formData.date ? new Date(formData.date) : undefined}
+                  onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             {errors.date && (
               <p className="mt-1 text-xs text-destructive">{errors.date}</p>
             )}

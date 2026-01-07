@@ -525,10 +525,10 @@ export const Navbar = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="w-9 h-9 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="w-9 h-9 rounded-lg hover:bg-primary hover:text-primary-foreground group transition-colors"
                         onClick={logout}
                       >
-                        <LogOut size={18} className="text-gray-600" />
+                        <LogOut size={18} className="text-gray-600 group-hover:text-primary-foreground" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>

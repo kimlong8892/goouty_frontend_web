@@ -213,7 +213,7 @@ export function NotificationBell() {
       <Button
         variant="ghost"
         size="sm"
-        className="relative h-9 w-9 p-0"
+        className="relative h-9 w-9 p-0 hover:bg-primary hover:text-primary-foreground"
         onClick={handleMobileClick}
       >
         <Bell className="w-5 h-5" />
@@ -233,7 +233,7 @@ export function NotificationBell() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative h-9 w-9 p-0">
+        <Button variant="ghost" size="sm" className="relative h-9 w-9 p-0 hover:bg-primary hover:text-primary-foreground">
           <Bell className="w-5 h-5" />
           {unreadCount > 0 && (
             <Badge
@@ -259,8 +259,8 @@ export function NotificationBell() {
                 handleMarkAllAsRead();
               }}
               className={`text-sm font-medium transition-colors ${unreadCount > 0
-                  ? 'text-blue-600 hover:text-blue-700'
-                  : 'text-gray-400 cursor-not-allowed'
+                ? 'text-blue-600 hover:text-blue-700'
+                : 'text-gray-400 cursor-not-allowed'
                 }`}
               disabled={unreadCount === 0}
             >
