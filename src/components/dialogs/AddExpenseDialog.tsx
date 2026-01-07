@@ -198,7 +198,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
         "max-w-md bg-white rounded-[32px] border-none shadow-2xl p-0 overflow-hidden flex flex-col z-[100]",
-        isMobileView ? "h-full w-full max-w-none rounded-none [&>button]:hidden" : "max-h-[90vh]"
+        isMobileView ? "h-full w-full max-w-none rounded-none [&>button]:hidden bg-[#eeedfe]" : "max-h-[90vh]"
       )}>
         {isMobileView ? (
           <div className="px-4 py-4 border-b border-gray-200/50 flex-shrink-0 bg-white flex items-center justify-between">
@@ -238,8 +238,8 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
           </DialogHeader>
         )}
 
-        <form onSubmit={handleSubmit} className={cn("flex-1 overflow-y-auto py-4 space-y-6 custom-scrollbar", isMobileView ? "px-4" : "px-8")}>
-          <div className="space-y-4">
+        <form onSubmit={handleSubmit} className={cn("flex-1 overflow-y-auto py-4 custom-scrollbar", isMobileView ? "px-4" : "px-8 space-y-6")}>
+          <div className={cn("space-y-4", isMobileView && "bg-white rounded-2xl p-5 shadow-sm border border-gray-100")}>
             {/* Title */}
             <div className="space-y-1.5">
               <Label htmlFor="title" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Tên chi phí</Label>
