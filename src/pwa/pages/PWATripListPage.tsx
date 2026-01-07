@@ -73,6 +73,7 @@ const PWATripListPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [tripToDelete, setTripToDelete] = useState<TripWithMember | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Debounce search query
   useEffect(() => {
@@ -82,6 +83,16 @@ const PWATripListPage = () => {
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // Handle scroll for header style
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Set page title
   useEffect(() => {
@@ -310,7 +321,10 @@ const PWATripListPage = () => {
     <div className="min-h-screen pb-20 px-4">
 
       {/* Search - Fixed at top */}
-      <div className="fixed top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200/50 py-3 px-4 shadow-sm pt-[max(env(safe-area-inset-top),12px)]">
+      <div className={`fixed top-0 left-0 right-0 z-30 transition-all duration-200 py-3 px-4 pt-[max(env(safe-area-inset-top),12px)] ${isScrolled
+          ? 'bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm'
+          : 'bg-transparent'
+        }`}>
         <div className="max-w-6xl mx-auto">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
