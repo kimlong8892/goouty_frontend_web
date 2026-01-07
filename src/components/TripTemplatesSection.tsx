@@ -3,12 +3,26 @@ import { useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Button } from '@/components/ui/button';
-import { Search, Loader2, MapPin, ChevronDown } from 'lucide-react';
+import { Search, Loader2, MapPin, ChevronDown, Check } from 'lucide-react';
 import { TripTemplateCard } from './TripTemplateCard';
 import { api } from '@/integrations/api/client';
 import { DATABASE_TYPES } from '@/integrations/api/types';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface TripTemplatesSectionProps {
   onUseTemplate?: (template: DATABASE_TYPES.tripTemplates) => void;
@@ -22,6 +36,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
+  const [open, setOpen] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 12,
@@ -194,28 +209,71 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
 
             {/* Province Filter */}
             <div className="flex-1 min-w-[200px]">
-              <Select value={selectedProvince} onValueChange={setSelectedProvince}>
-                <SelectTrigger className="h-14 bg-white border-slate-200 rounded-[20px] focus:ring-[#6347f9]/20 shadow-sm text-base">
-                  <div className="flex items-center">
-                    <MapPin className="w-5 h-5 mr-3 text-slate-400" />
-                    <SelectValue placeholder="Tất cả tỉnh thành" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl border-slate-200 shadow-xl max-h-[300px]">
-                  <SelectItem value="all" className="font-medium">Tất cả tỉnh thành</SelectItem>
-                  {Array.isArray(provinces) && provinces.length > 0 ? (
-                    provinces.map((province) => (
-                      <SelectItem key={province.id} value={province.id}>
-                        {province.name}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="loading" disabled>
-                      Đang tải...
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full h-14 bg-white border-slate-200 rounded-[20px] focus:ring-[#6347f9]/20 shadow-sm text-base justify-between font-normal hover:bg-white text-slate-500 hover:text-slate-500"
+                  >
+                    <div className="flex items-center truncate">
+                      <MapPin className="w-5 h-5 mr-3 text-slate-400 shrink-0" />
+                      <span className={cn(selectedProvince === 'all' ? "" : "text-black")}>
+                        {selectedProvince === 'all'
+                          ? "Tất cả tỉnh thành"
+                          : provinces.find((province) => province.id === selectedProvince)?.name || "Chọn tỉnh thành"}
+                      </span>
+                    </div>
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0 rounded-2xl border-slate-200 shadow-xl" align="end">
+                  <Command>
+                    <CommandInput placeholder="Tìm nhanh tỉnh thành..." />
+                    <CommandList>
+                      <CommandEmpty>Không tìm thấy tỉnh thành.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="all"
+                          className="data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
+                          onSelect={() => {
+                            setSelectedProvince('all');
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedProvince === 'all' ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          Tất cả tỉnh thành
+                        </CommandItem>
+                        {Array.isArray(provinces) && provinces.map((province) => (
+                          <CommandItem
+                            key={province.id}
+                            value={province.name}
+                            className="data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
+                            onSelect={() => {
+                              setSelectedProvince(province.id);
+                              setOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedProvince === province.id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {province.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
