@@ -106,81 +106,98 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5" />
-            Thêm ngày mới
-          </DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          <div>
-            <Label htmlFor="title">Tiêu đề ngày <span className="text-destructive">*</span></Label>
-            <Input
-              id="title"
-              ref={titleRef}
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="VD: Ngày 1 - Khám phá thành phố"
-              aria-invalid={!!errors.title}
-              className={errors.title ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:ring-0 focus-visible:ring-offset-0'}
-            />
-            {errors.title && (
-              <p className="mt-1 text-xs text-destructive">{errors.title}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="description">Mô tả ngày</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Mô tả chi tiết về ngày này..."
-              rows={2}
-              className="focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-          </div>
-          <div>
-            <Label htmlFor="date">Ngày <span className="text-destructive">*</span></Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="date"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal h-10 hover:bg-white hover:text-slate-900",
-                    !formData.date && "text-muted-foreground",
-                    errors.date && "border-destructive hover:border-destructive/80"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formData.date ? (
-                    format(new Date(formData.date), "dd/MM/yyyy")
-                  ) : (
-                    <span>dd/mm/yyyy</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={formData.date ? new Date(formData.date) : undefined}
-                  onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            {errors.date && (
-              <p className="mt-1 text-xs text-destructive">{errors.date}</p>
-            )}
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+      <DialogContent className="[&>button]:hidden p-0 gap-0 sm:max-w-md w-full rounded-2xl overflow-hidden">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col h-full">
+          <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-gray-100 space-y-0">
+            <Button
+              type="button"
+              variant="ghost"
+              className="p-0 h-auto font-medium text-muted-foreground hover:text-gray-900 hover:bg-transparent text-base"
+              onClick={() => handleOpenChange(false)}
+            >
               Hủy
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Đang thêm...' : 'Thêm ngày'}
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold">
+              <CalendarIcon className="w-5 h-5" />
+              Thêm ngày mới
+            </DialogTitle>
+            <Button
+              type="submit"
+              variant="ghost"
+              disabled={loading}
+              className="p-0 h-auto font-bold text-primary hover:text-primary/80 hover:bg-transparent disabled:text-gray-400 text-base"
+            >
+              {loading && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
+              )}
+              Xong
             </Button>
+          </DialogHeader>
+
+          <div className="p-4 sm:p-6 space-y-4">
+            <div>
+              <Label htmlFor="title">Tiêu đề ngày <span className="text-destructive">*</span></Label>
+              <Input
+                id="title"
+                ref={titleRef}
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="VD: Ngày 1 - Khám phá thành phố"
+                aria-invalid={!!errors.title}
+                className={cn(
+                  "rounded-xl",
+                  errors.title ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:ring-0 focus-visible:ring-offset-0'
+                )}
+              />
+              {errors.title && (
+                <p className="mt-1 text-xs text-destructive">{errors.title}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="description">Mô tả ngày</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Mô tả chi tiết về ngày này..."
+                rows={2}
+                className="focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl"
+              />
+            </div>
+            <div>
+              <Label htmlFor="date">Ngày <span className="text-destructive">*</span></Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="date"
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal h-10 hover:bg-white hover:text-slate-900 rounded-xl",
+                      !formData.date && "text-muted-foreground",
+                      errors.date && "border-destructive hover:border-destructive/80"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.date ? (
+                      format(new Date(formData.date), "dd/MM/yyyy")
+                    ) : (
+                      <span>dd/mm/yyyy</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formData.date ? new Date(formData.date) : undefined}
+                    onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.date && (
+                <p className="mt-1 text-xs text-destructive">{errors.date}</p>
+              )}
+            </div>
           </div>
         </form>
       </DialogContent>

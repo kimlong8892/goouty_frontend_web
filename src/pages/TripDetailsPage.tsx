@@ -161,6 +161,30 @@ const TripDetailsPage = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [apiData, setApiData] = useState<ApiTrip | null>(null);
 
+  // Scroll direction logic for hiding/showing tabs
+  const [isTabsVisible, setIsTabsVisible] = useState(true);
+  const lastScrollY = React.useRef(0);
+
+  useEffect(() => {
+    if (!isMobileView) return;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      // Scroll down -> hide
+      if (currentScrollY > lastScrollY.current + 5 && currentScrollY > 60) {
+        setIsTabsVisible(false);
+      }
+      // Scroll up -> show
+      else if (currentScrollY < lastScrollY.current - 5) {
+        setIsTabsVisible(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMobileView]);
+
   // State for collapsible days (default empty = all collapsed)
   const [expandedDayIds, setExpandedDayIds] = useState<string[]>([]);
   const [showAddDay, setShowAddDay] = useState(false);
@@ -589,8 +613,10 @@ const TripDetailsPage = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className={cn(
-              "sticky top-[60px] z-30 mb-8 w-full -mx-4 px-4 py-2 bg-white",
-              !isMobileView && "relative top-0 mx-0 px-0 bg-transparent z-0"
+              "z-30 mb-8 w-full -mx-4 px-4 py-2 transition-[top] duration-300",
+              isMobileView
+                ? cn("sticky", isTabsVisible ? "top-[60px]" : "top-[-100px]")
+                : "relative top-0 mx-0 px-0 bg-transparent z-0"
             )}>
               <TabsList className={cn(
                 "bg-transparent h-auto p-0 gap-3 flex w-full overflow-x-auto scrollbar-hide pb-2",
