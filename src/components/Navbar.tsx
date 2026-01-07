@@ -361,6 +361,9 @@ export const Navbar = () => {
 
   const handleNavItemClick = (id: string) => {
     setActive(id);
+    if (id === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const GooutySubmenu = [
