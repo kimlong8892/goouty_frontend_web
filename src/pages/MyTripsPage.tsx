@@ -317,92 +317,113 @@ const MyTripsPage = () => {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {trips.map((trip) => (
-                    <div key={trip.id} className="group relative rounded-[32px] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white h-[400px] w-full mx-auto">
-                      {/* Background Image / Placeholder */}
-                      <div className="absolute inset-0 z-0 h-3/5">
+                    <div
+                      key={trip.id}
+                      className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[450px] w-full flex flex-col cursor-pointer"
+                      onClick={() => handleTripAction('view', trip)}
+                    >
+                      {/* Background Image - Full Cover */}
+                      <div className="relative h-1/2 overflow-hidden bg-gray-100">
                         {trip.avatar ? (
                           <img
                             src={trip.avatar}
                             alt={trip.title}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#6347f9]/10 via-[#6347f9]/5 to-white flex items-center justify-center">
-                            <Plane className="w-16 h-16 text-[#6347f9]/20 animate-pulse-slow" />
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                            <Plane className="w-16 h-16 text-gray-300" />
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-60" />
+
+                        {/* Action Menu (Three Dots) - Top Right */}
+                        <div className="absolute top-4 right-4 z-10 flex gap-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md hover:bg-white/40 transition-all border border-white/20 active:scale-95 text-white"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreVertical size={20} />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="rounded-xl">
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTripAction('delete', trip);
+                                }}
+                                className="text-red-600 focus:text-red-600 focus:bg-red-50 rounded-lg"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Xóa chuyến đi
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
 
-                      {/* Favorite/Menu Button (Top Right) - Keeping it simple or menu */}
-                      <div className="absolute top-4 right-4 z-10 flex gap-2">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button className="w-9 h-9 flex items-center justify-center rounded-full bg-white/30 backdrop-blur-md hover:bg-white/50 transition-colors border border-white/20 text-white">
-                              <MoreVertical size={18} />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-xl">
-                            <DropdownMenuItem onClick={() => handleTripAction('delete', trip)} className="text-red-600">
-                              <Trash2 className="w-4 h-4 mr-2" /> Xóa chuyến đi
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                        <button className="w-9 h-9 flex items-center justify-center rounded-full bg-white/30 backdrop-blur-md hover:bg-white/50 transition-colors border border-white/20 text-white">
-                          <Heart size={18} />
-                        </button>
-                      </div>
-
-                      {/* Content Card (Floating layer) */}
-                      <div className="absolute bottom-0 left-0 right-0 z-10 bg-white h-[200px] rounded-[32px] p-5 flex flex-col justify-between shadow-[0_-5px_20px_rgba(0,0,0,0.05)] border border-white/50">
-                        <div>
+                      {/* Content Card */}
+                      <div className="flex-1 bg-white p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
+                        <div className="space-y-4">
                           {/* Title */}
                           <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <h3 className="font-bold text-base text-slate-900 mb-1 leading-snug line-clamp-2 min-h-[44px] cursor-help text-left">{trip.title}</h3>
+                                <h3 className="font-bold text-lg text-slate-900 leading-snug line-clamp-2 cursor-help text-left" title={trip.title}>
+                                  {trip.title}
+                                </h3>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="max-w-[300px] break-words">{trip.title}</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
-                          {/* Location */}
-                          <div className="flex items-center text-slate-500 text-xs mb-1">
-                            <MapPin size={14} className="mr-1 flex-shrink-0" />
-                            <span className="truncate">{trip.province?.name || "Địa điểm chưa xác định"}</span>
-                          </div>
 
-                          {/* Member Count */}
-                          <div className="flex items-center text-slate-500 text-xs mb-2">
-                            <Users size={14} className="mr-1 flex-shrink-0" />
-                            <span>{trip.member_count} thành viên</span>
-                          </div>
-
-                          {/* Owner Info */}
-                          <div className="flex items-center text-xs">
-                            <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden mr-2 ring-1 ring-slate-100">
-                              {(trip as any).user?.profilePicture ? (
-                                <img src={(trip as any).user.profilePicture} alt="Owner" className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-[10px] font-bold text-slate-500">{(trip as any).user?.fullName?.[0]?.toUpperCase() || 'U'}</span>
-                              )}
+                          {/* Details */}
+                          <div className="space-y-2">
+                            {/* Location */}
+                            <div className="flex items-center text-slate-500 font-medium text-sm">
+                              <MapPin size={16} className="mr-2 text-[#6347f9]" />
+                              <span className="truncate">{trip.province?.name || 'Chưa xác định'}</span>
                             </div>
-                            <span className="text-slate-400">Chủ chuyến đi: </span>
-                            <span className="font-semibold text-slate-700 ml-1 truncate max-w-[120px]">
-                              {(trip as any).user?.fullName || 'Unknown'}
-                            </span>
+
+                            {/* Members */}
+                            <div className="flex items-center text-slate-500 font-medium text-sm">
+                              <Users size={16} className="mr-2 text-red-500" />
+                              <span>{trip.member_count || 1} thành viên</span>
+                            </div>
+
+                            {/* Owner */}
+                            <div className="flex items-center text-slate-500 font-medium text-sm pt-1">
+                              <div className="w-5 h-5 rounded-full bg-[#00A58E] flex items-center justify-center text-white text-[10px] font-bold mr-2 overflow-hidden flex-shrink-0">
+                                {(trip as any).user?.profilePicture ? (
+                                  <img src={(trip as any).user.profilePicture} alt="Owner" className="w-full h-full object-cover" />
+                                ) : (
+                                  <span>{(trip.user?.fullName || 'A').charAt(0).toUpperCase()}</span>
+                                )}
+                              </div>
+                              <span className="truncate">Chủ chuyến đi: <span className="text-slate-900 font-medium">{(trip as any).user?.fullName || 'Tôi'}</span></span>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="mt-1">
+                        {/* Action Button */}
+                        <div className="pt-2">
                           <Button
-                            size="sm"
-                            className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-xs font-semibold h-10 shadow-md hover:shadow-lg transition-all"
-                            onClick={() => handleTripAction('view', trip)}
+                            className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-11 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTripAction('view', trip);
+                            }}
                           >
-                            Xem chi tiết <Eye className="w-3 h-3 ml-1" />
+                            Xem chi tiết
+                            <Eye className="ml-2 w-4 h-4" />
                           </Button>
                         </div>
                       </div>
