@@ -119,138 +119,146 @@ const PWATemplateDetailsPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-[160px]">
-            {/* Mobile Sticky Header */}
-            <div className="sticky top-0 z-[60] bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between shadow-sm">
-                <div className="flex items-center gap-3 overflow-hidden">
+        <div className="min-h-screen bg-[#f8f9fc] pb-[100px]">
+            {/* HERO SECTION */}
+            <div className="relative w-full h-[45vh] min-h-[360px]">
+                {template.avatar ? (
+                    <img
+                        src={template.avatar}
+                        alt={template.title}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-slate-200 flex items-center justify-center">
+                        <Camera className="w-12 h-12 text-slate-300" />
+                    </div>
+                )}
+
+                {/* Gradient Overlays */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/20 to-transparent opacity-90" />
+
+                {/* Back Button */}
+                <div className="absolute top-4 left-4 z-50">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                        className="w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full text-white transition-all border border-white/10 active:scale-95"
                     >
-                        <ArrowLeft className="w-6 h-6 text-gray-800" />
+                        <ArrowLeft className="w-5 h-5" />
                     </button>
-                    <h1 className="text-lg font-bold text-slate-900 truncate">
+                </div>
+
+                {/* Content Overlay */}
+                <div className="absolute bottom-12 left-0 w-full px-5">
+                    {/* Badges */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {template.province && (
+                            <Badge className="bg-[#6347f9] text-white border-none px-2.5 py-1 text-xs rounded-lg shadow-lg shadow-indigo-900/10">
+                                <MapPin className="w-3 h-3 mr-1" /> {template.province.name}
+                            </Badge>
+                        )}
+                        <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-2.5 py-1 text-xs rounded-lg">
+                            {getTotalDays()} Days
+                        </Badge>
+                        <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-2.5 py-1 text-xs rounded-lg">
+                            {getTotalActivities()} Activities
+                        </Badge>
+                    </div>
+
+                    <h1 className="text-3xl font-black text-white mb-2.5 leading-[1.2] drop-shadow-sm">
                         {template.title}
                     </h1>
+
+                    <div className="flex items-center gap-2 text-white/90 text-sm font-medium">
+                        <div className="w-6 h-6 rounded-full bg-indigo-500/30 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                            <Users className="w-3 h-3 text-white" />
+                        </div>
+                        Created by <span className="text-white font-bold">{template.user?.fullName || "Goouty"}</span>
+                    </div>
                 </div>
             </div>
 
             <AnimatedTransition show={showContent} animation="fade">
-                <div className="px-4 py-6">
-                    {/* Header Info */}
-                    <div className="mb-6">
-                        <div className="flex gap-2 mb-3 flex-wrap">
-                            {template.province && (
-                                <Badge className="bg-[#6347f9] text-white border-none px-2.5 py-0.5 text-xs rounded-md">
-                                    <MapPin className="w-3 h-3 mr-1" /> {template.province.name}
-                                </Badge>
-                            )}
-                            <Badge variant="secondary" className="bg-white text-slate-600 border border-slate-200 px-2.5 py-0.5 text-xs rounded-md">
-                                {getTotalDays()} Ngày
-                            </Badge>
-                            <Badge variant="secondary" className="bg-white text-slate-600 border border-slate-200 px-2.5 py-0.5 text-xs rounded-md">
-                                {getTotalActivities()} Hoạt động
-                            </Badge>
-                        </div>
-
-                        <h1 className="text-2xl font-black text-slate-900 mb-2 leading-tight">
-                            {template.title}
-                        </h1>
-
-                        <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-                            <Users className="w-4 h-4" />
-                            <span>Tạo bởi <span className="font-semibold text-slate-700">{template.user?.fullName || "Goouty Official"}</span></span>
-                        </div>
-
-                        <Card className="rounded-2xl border-none shadow-sm bg-white overflow-hidden">
-                            <CardContent className="p-4">
-                                <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
-                                    {template.description || "Chưa có mô tả chi tiết cho mẫu chuyến đi này."}
-                                </p>
-                            </CardContent>
-                        </Card>
+                <div className="px-4 -mt-6 relative z-10">
+                    {/* Description Card */}
+                    <div className="bg-white rounded-[1.5rem] p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 mb-6">
+                        <h2 className="text-[#6347f9] text-lg font-bold mb-3 flex items-center gap-2">
+                            Giới thiệu chuyến đi
+                        </h2>
+                        <p className="text-slate-600 text-[15px] leading-relaxed whitespace-pre-line font-medium">
+                            {template.description || "Chưa có mô tả chi tiết cho mẫu chuyến đi này."}
+                        </p>
                     </div>
 
-                    {/* Tabs & Itinerary */}
-                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                        <TabsList className="w-full justify-start bg-transparent p-0 mb-4 border-b border-gray-200 pb-px gap-4 overflow-x-auto">
-                            <TabsTrigger
-                                value="itinerary"
-                                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#6347f9] data-[state=active]:text-[#6347f9] bg-transparent px-0 pb-2 font-bold text-slate-500 data-[state=active]:shadow-none transition-none"
-                            >
-                                Lịch trình
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="info"
-                                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#6347f9] data-[state=active]:text-[#6347f9] bg-transparent px-0 pb-2 font-bold text-slate-500 data-[state=active]:shadow-none transition-none"
-                            >
-                                Thông tin
-                            </TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="itinerary" className="mt-0 space-y-4">
+                    {/* Itinerary Section */}
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-4 px-1">Lịch trình chi tiết</h3>
+                        <div className="space-y-4">
                             {(template.days || []).map((day, index) => {
                                 const isExpanded = expandedDayIds.includes(day.id.toString());
                                 return (
                                     <div key={day.id} className="relative">
                                         <div
-                                            className="flex items-start gap-3 mb-3 cursor-pointer select-none active:bg-slate-100 rounded-lg p-2 -mx-2 transition-colors"
+                                            className="flex items-start gap-4 mb-3 cursor-pointer select-none active:scale-[0.99] transition-transform bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
                                             onClick={() => toggleDay(day.id.toString())}
                                         >
                                             <div className={cn(
-                                                "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all w-8 h-8 text-sm",
-                                                isExpanded ? "bg-[#6347f9] text-white" : "bg-slate-200 text-slate-500"
+                                                "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all w-9 h-9 text-sm",
+                                                isExpanded ? "bg-[#6347f9] text-white shadow-indigo-200" : "bg-slate-100 text-slate-500"
                                             )}>
                                                 {index + 1}
                                             </div>
                                             <div className="flex-1 pt-0.5">
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center justify-between gap-2">
                                                     <h3 className={cn(
-                                                        "font-bold leading-tight text-base transition-colors",
+                                                        "font-bold leading-tight text-[17px] transition-colors",
                                                         isExpanded ? "text-slate-900" : "text-slate-600"
                                                     )}>
                                                         {day.title}
                                                     </h3>
-                                                    {isExpanded ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+                                                    {isExpanded ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
                                                 </div>
                                                 {day.description && (
-                                                    <p className="text-slate-500 mt-0.5 text-xs line-clamp-1">{day.description}</p>
+                                                    <p className="text-slate-500 mt-1 text-xs line-clamp-2 leading-relaxed">{day.description}</p>
                                                 )}
                                             </div>
                                         </div>
 
                                         {isExpanded && (
-                                            <div className="pl-4 ml-4 border-l-2 border-slate-100 space-y-3 pb-2">
+                                            <div className="pl-4 ml-4 border-l-2 border-dashed border-slate-200 space-y-3 pb-2 pt-1">
                                                 {day.activities?.length > 0 ? (
                                                     day.activities.map((act) => (
-                                                        <div key={act.id} className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm">
+                                                        <div key={act.id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm relative group">
+                                                            {/* Connector dot */}
+                                                            <div className="absolute -left-[21px] top-6 w-2.5 h-2.5 rounded-full bg-white border-2 border-indigo-300" />
+
                                                             <div className="flex items-start gap-3">
-                                                                <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-indigo-50 text-[#6347f9] flex items-center justify-center">
+                                                                <div className="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-indigo-50 text-[#6347f9] flex items-center justify-center">
                                                                     {getActivityIcon(act.title)}
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
-                                                                    <div className="flex items-start justify-between gap-2 mb-1">
-                                                                        <h4 className="font-semibold text-slate-900 text-[15px] leading-tight">{act.title}</h4>
+                                                                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                                                                        <h4 className="font-bold text-slate-900 text-[15px] leading-tight">{act.title}</h4>
                                                                         {act.startTime && (
-                                                                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded flex-shrink-0">
+                                                                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md flex-shrink-0">
                                                                                 {act.startTime}
                                                                             </span>
                                                                         )}
                                                                     </div>
-                                                                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                                                                    <div className="flex flex-wrap gap-3 text-xs text-slate-500 mb-2">
                                                                         {act.location && (
-                                                                            <span className="flex items-center gap-1 truncate">
-                                                                                <MapPin className="w-3 h-3 flex-shrink-0" /> <span className="truncate">{act.location}</span>
+                                                                            <span className="flex items-center gap-1">
+                                                                                <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" /> <span className="truncate max-w-[150px]">{act.location}</span>
                                                                             </span>
                                                                         )}
                                                                         {act.durationMin && (
                                                                             <span className="flex items-center gap-1 flex-shrink-0">
-                                                                                <Clock className="w-3 h-3" /> {act.durationMin}p
+                                                                                <Clock className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" /> {act.durationMin}p
                                                                             </span>
                                                                         )}
                                                                     </div>
                                                                     {act.notes && (
-                                                                        <p className="mt-2 text-xs text-slate-400 italic bg-slate-50 p-2 rounded border border-slate-50">
+                                                                        <p className="text-xs text-slate-500 italic bg-slate-50 p-2.5 rounded-xl border border-dashed border-slate-200">
                                                                             "{act.notes}"
                                                                         </p>
                                                                     )}
@@ -259,29 +267,23 @@ const PWATemplateDetailsPage = () => {
                                                         </div>
                                                     ))
                                                 ) : (
-                                                    <div className="text-xs text-slate-400 italic pl-2">Không có hoạt động.</div>
+                                                    <div className="text-xs text-slate-400 italic pl-2 py-2">Không có hoạt động.</div>
                                                 )}
                                             </div>
                                         )}
                                     </div>
                                 );
                             })}
-                        </TabsContent>
-
-                        <TabsContent value="info">
-                            <div className="text-center py-8 text-slate-400 text-sm italic">
-                                Thông tin bổ sung sẽ hiển thị ở đây.
-                            </div>
-                        </TabsContent>
-                    </Tabs>
+                        </div>
+                    </div>
 
                 </div>
 
                 {/* Fixed Bottom Action for PWA */}
-                <div className="fixed bottom-[80px] left-0 right-0 px-4 py-2 z-[40]">
+                <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 z-50 safe-area-bottom pb-8 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
                     <Button
                         size="lg"
-                        className="w-full h-12 text-base font-bold bg-[#6347f9] hover:bg-[#5136db] shadow-xl shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"
+                        className="w-full h-12 text-base font-bold bg-[#6347f9] hover:bg-[#5136db] shadow-lg shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"
                         onClick={handleUseTemplate}
                         disabled={usingTemplate}
                     >
