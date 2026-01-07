@@ -389,13 +389,13 @@ const MyTripsPage = () => {
                           <div className="space-y-2">
                             {/* Location */}
                             <div className="flex items-center text-slate-500 font-medium text-sm">
-                              <MapPin size={16} className="mr-2 text-[#6347f9]" />
+                              <MapPin size={16} className="mr-2 text-red-500" />
                               <span className="truncate">{trip.province?.name || 'Chưa xác định'}</span>
                             </div>
 
                             {/* Members */}
                             <div className="flex items-center text-slate-500 font-medium text-sm">
-                              <Users size={16} className="mr-2 text-red-500" />
+                              <Users size={16} className="mr-2 text-[#6347f9]" />
                               <span>{trip.member_count || 1} thành viên</span>
                             </div>
 

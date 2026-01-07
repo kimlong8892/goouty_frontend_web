@@ -111,7 +111,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
           {/* Location & Rating row */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center text-slate-500 font-medium text-sm">
-              <MapPin size={16} className="mr-1.5 text-[#6347f9]" />
+              <MapPin size={16} className="mr-1.5 text-red-500" />
               <span className="truncate max-w-[120px]">{template.province?.name || "Vietnam"}</span>
             </div>
 
