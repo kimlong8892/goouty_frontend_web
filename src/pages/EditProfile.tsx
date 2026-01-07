@@ -178,104 +178,116 @@ const EditProfile = () => {
       <div className="min-h-screen bg-white">
         <AnimatedTransition show={showContent} animation="slide-up">
           {/* Content */}
-          <div className="px-4 py-6 pb-24">
+          <div>
             {isEditing ? (
               // EDIT MODE
               <>
-                <div className="text-center mb-8">
-                  <ProfilePictureUpload
-                    currentImage={profile.profilePicture}
-                    onImageChange={handleProfilePictureChange}
-                    onImageDelete={handleDeleteAvatar}
-                    userName={profile.fullName}
-                    size="lg"
-                  />
-                </div>
-
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName" className="text-black font-semibold">Tên</Label>
-                    <Input
-                      id="fullName"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
-                      placeholder="Nhập tên của bạn"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-black font-semibold">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      disabled
-                      className="bg-gray-100 border-gray-300 rounded-lg h-12 text-gray-500"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phoneNumber" className="text-black font-semibold">Số điện thoại</Label>
-                    <Input
-                      id="phoneNumber"
-                      type="tel"
-                      value={formData.phoneNumber}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/[^0-9]/g, '');
-                        setFormData({ ...formData, phoneNumber: value });
-                      }}
-                      className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
-                      placeholder="Nhập số điện thoại"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-black font-semibold">Ngân hàng</Label>
-                    <BankSearch
-                      value={formData.bankId}
-                      onChange={(value) => setFormData({ ...formData, bankId: value })}
-                      placeholder="Tìm kiếm ngân hàng..."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="bankNumber" className="text-black font-semibold">Số tài khoản</Label>
-                    <Input
-                      id="bankNumber"
-                      type="tel"
-                      value={formData.bankNumber}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/[^0-9]/g, '');
-                        setFormData({ ...formData, bankNumber: value });
-                      }}
-                      className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
-                      placeholder="Nhập số tài khoản"
-                    />
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      variant="outline"
+                <div className="sticky top-0 z-50 flex-shrink-0 bg-white border-b border-gray-200/50 px-4 py-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <button
                       onClick={handleBack}
-                      className="flex-1 h-12"
+                      disabled={saving}
+                      className="flex items-center text-muted-foreground hover:text-gray-900 disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                       Hủy
-                    </Button>
-                    <Button
+                    </button>
+
+                    <h2 className="text-lg font-bold text-gray-900">Chỉnh sửa thông tin</h2>
+
+                    <button
                       onClick={handleSaveProfile}
                       disabled={saving || !formData.fullName.trim()}
-                      className="flex-1 h-12 bg-primary hover:bg-primary/90"
+                      className="flex items-center text-primary hover:text-primary/80 disabled:text-gray-400 transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
-                      {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-                    </Button>
+                      {saving ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                      ) : null}
+                      Xong
+                    </button>
+                  </div>
+                </div>
+
+                <div className="px-4 py-6 pb-24">
+                  <div className="text-center mb-8">
+                    <ProfilePictureUpload
+                      currentImage={profile.profilePicture}
+                      onImageChange={handleProfilePictureChange}
+                      onImageDelete={handleDeleteAvatar}
+                      userName={profile.fullName}
+                      size="lg"
+                    />
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName" className="text-black font-semibold">Tên</Label>
+                      <Input
+                        id="fullName"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
+                        placeholder="Nhập tên của bạn"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-black font-semibold">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        disabled
+                        className="bg-gray-100 border-gray-300 rounded-lg h-12 text-gray-500"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phoneNumber" className="text-black font-semibold">Số điện thoại</Label>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        value={formData.phoneNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          setFormData({ ...formData, phoneNumber: value });
+                        }}
+                        className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
+                        placeholder="Nhập số điện thoại"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-black font-semibold">Ngân hàng</Label>
+                      <BankSearch
+                        value={formData.bankId}
+                        onChange={(value) => setFormData({ ...formData, bankId: value })}
+                        placeholder="Tìm kiếm ngân hàng..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bankNumber" className="text-black font-semibold">Số tài khoản</Label>
+                      <Input
+                        id="bankNumber"
+                        type="tel"
+                        value={formData.bankNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          setFormData({ ...formData, bankNumber: value });
+                        }}
+                        className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
+                        placeholder="Nhập số tài khoản"
+                      />
+                    </div>
+
                   </div>
                 </div>
               </>
             ) : (
               // VIEW MODE
-              <div className="space-y-4">
+              <div className="space-y-4 px-4 py-6 pb-24">
                 <div className="flex flex-col items-center mb-6">
                   <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-slate-100 shadow-sm">
                     {profile.profilePicture ? (
