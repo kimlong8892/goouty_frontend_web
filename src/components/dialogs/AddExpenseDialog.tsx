@@ -5,7 +5,11 @@ import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
-import { Plus, X, Calendar, User, Users, Wallet, DollarSign } from 'lucide-react';
+import { Plus, X, Calendar as CalendarIcon, User, Users, Wallet, DollarSign } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar.tsx';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
 import { api } from '@/integrations/api/client.ts';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext.tsx';
@@ -250,13 +254,32 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
               </div>
               <div className="space-y-1.5 text-center sm:text-left">
                 <Label htmlFor="date" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 block sm:inline">Ngày</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6347f9] font-bold text-slate-700 px-2 sm:px-3"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full h-12 justify-start text-left font-bold rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6347f9] hover:bg-transparent hover:text-slate-900 px-3",
+                        !formData.date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 text-slate-500" />
+                      {formData.date ? (
+                        format(new Date(formData.date + 'T00:00:00'), "dd/MM/yyyy")
+                      ) : (
+                        <span>Chọn ngày</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.date ? new Date(formData.date + 'T00:00:00') : undefined}
+                      onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
