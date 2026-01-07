@@ -227,7 +227,7 @@ const EditProfile = () => {
                         id="fullName"
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
+                        className="bg-slate-50 border-gray-200 rounded-xl h-12 text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
                         placeholder="Nhập tên của bạn"
                       />
                     </div>
@@ -239,7 +239,7 @@ const EditProfile = () => {
                         type="email"
                         value={formData.email}
                         disabled
-                        className="bg-gray-100 border-gray-300 rounded-lg h-12 text-gray-500"
+                        className="bg-slate-50 border-gray-200 rounded-xl h-12 text-gray-500 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
                       />
                     </div>
 
@@ -253,7 +253,7 @@ const EditProfile = () => {
                           const value = e.target.value.replace(/[^0-9]/g, '');
                           setFormData({ ...formData, phoneNumber: value });
                         }}
-                        className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
+                        className="bg-slate-50 border-gray-200 rounded-xl h-12 text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
                         placeholder="Nhập số điện thoại"
                       />
                     </div>
@@ -277,7 +277,7 @@ const EditProfile = () => {
                           const value = e.target.value.replace(/[^0-9]/g, '');
                           setFormData({ ...formData, bankNumber: value });
                         }}
-                        className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
+                        className="bg-slate-50 border-gray-200 rounded-xl h-12 text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
                         placeholder="Nhập số tài khoản"
                       />
                     </div>
@@ -396,7 +396,7 @@ const EditProfile = () => {
                         id="fullName"
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="h-12"
+                        className="h-12 bg-slate-50 border-gray-200 rounded-xl text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
                         placeholder="Nhập tên của bạn"
                       />
                     </div>
@@ -407,7 +407,7 @@ const EditProfile = () => {
                         type="email"
                         value={formData.email}
                         disabled
-                        className="h-12 bg-gray-50"
+                        className="h-12 bg-slate-50 border-gray-200 rounded-xl text-gray-500 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
                       />
                     </div>
                     <div className="space-y-2">
@@ -420,7 +420,7 @@ const EditProfile = () => {
                           const value = e.target.value.replace(/[^0-9]/g, '');
                           setFormData({ ...formData, phoneNumber: value });
                         }}
-                        className="h-12"
+                        className="h-12 bg-slate-50 border-gray-200 rounded-xl text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
                         placeholder="Nhập số điện thoại"
                       />
                     </div>
@@ -445,7 +445,7 @@ const EditProfile = () => {
                           const value = e.target.value.replace(/[^0-9]/g, '');
                           setFormData({ ...formData, bankNumber: value });
                         }}
-                        className="h-12"
+                        className="h-12 bg-slate-50 border-gray-200 rounded-xl text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
                         placeholder="Nhập số tài khoản"
                       />
                     </div>
