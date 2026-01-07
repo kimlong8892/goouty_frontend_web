@@ -209,7 +209,7 @@ const PWAEditTripPage = () => {
                                 setTripName(e.target.value);
                                 if (errors.tripName) setErrors(prev => ({ ...prev, tripName: '' }));
                             }}
-                            className={`w-full text-base border-gray-200 focus:border-primary focus:ring-primary/20 ${errors.tripName ? 'border-red-500' : ''}`}
+                            className={`w-full text-base border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 ${errors.tripName ? 'border-red-500' : ''}`}
                         />
                         {errors.tripName && <p className="text-sm text-red-500 animate-fade-in">{errors.tripName}</p>}
                     </div>
@@ -238,7 +238,7 @@ const PWAEditTripPage = () => {
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start text-left font-normal h-12 text-base border-gray-200 hover:border-primary/50 focus:border-primary hover:bg-white"
+                                    className="w-full justify-start text-left font-normal h-12 text-base border-gray-200 hover:border-primary/50 focus:border-[#d2cdfe] hover:bg-white"
                                 >
                                     <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
                                     {startDate ? (
@@ -271,7 +271,7 @@ const PWAEditTripPage = () => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             rows={3}
-                            className="w-full text-base border-gray-200 focus:border-primary focus:ring-primary/20 resize-none"
+                            className="w-full text-base border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
                         />
                     </div>
 

@@ -322,8 +322,8 @@ const PWATripListPage = () => {
 
       {/* Search - Fixed at top */}
       <div className={`fixed top-0 left-0 right-0 z-30 transition-all duration-200 py-3 px-4 pt-[max(env(safe-area-inset-top),12px)] ${isScrolled
-          ? 'bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm'
-          : 'bg-transparent'
+        ? 'bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm'
+        : 'bg-transparent'
         }`}>
         <div className="max-w-6xl mx-auto">
           <div className="relative">
@@ -332,7 +332,7 @@ const PWATripListPage = () => {
               placeholder="Tìm kiếm chuyến đi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary/20 shadow-sm rounded-xl"
+              className="pl-10 h-11 bg-gray-50 border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 shadow-sm rounded-xl"
               disabled={searchLoading}
             />
             {searchLoading && (

@@ -15,9 +15,9 @@ interface ProvinceSelectorProps {
   error?: boolean;
 }
 
-export function ProvinceSelector({ 
-  value, 
-  onChange, 
+export function ProvinceSelector({
+  value,
+  onChange,
   placeholder = "Chọn tỉnh thành",
   className,
   error = false
@@ -35,7 +35,7 @@ export function ProvinceSelector({
     const loadProvinces = async () => {
       setLoading(true);
       try {
-        const response = await api.get<{data: Province[]}>('/provinces?limit=100');
+        const response = await api.get<{ data: Province[] }>('/provinces?limit=100');
         setProvinces(response.data);
       } catch (error) {
         console.error('Error loading provinces:', error);
@@ -88,7 +88,7 @@ export function ProvinceSelector({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setSearchQuery(newValue);
-    
+
     // Always show dropdown when typing
     if (newValue.trim()) {
       setIsOpen(true);
@@ -118,7 +118,7 @@ export function ProvinceSelector({
           onFocus={handleInputFocus}
           placeholder={placeholder}
           className={cn(
-            "pl-10 pr-10",
+            "pl-10 pr-10 border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200",
             error ? 'border-red-500 focus:border-red-500' : '',
             className
           )}
@@ -174,14 +174,14 @@ export function ProvinceSelector({
                       Danh sách tỉnh thành ({provinces.length})
                     </div>
                   )}
-                  
+
                   {/* Show filtered results when searching */}
                   {searchQuery && (
                     <div className="px-3 py-2 text-xs font-medium text-muted-foreground bg-blue-50 border-b">
                       Kết quả tìm kiếm cho "{searchQuery}" ({filteredProvinces.length})
                     </div>
                   )}
-                  
+
                   {filteredProvinces.map((province) => (
                     <button
                       key={province.id}
