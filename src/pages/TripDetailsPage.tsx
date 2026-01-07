@@ -454,7 +454,9 @@ const TripDetailsPage = () => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '—';
     const d = new Date(dateString);
-    return `${d.getDate()} Tháng ${d.getMonth() + 1}, ${d.getFullYear()}`;
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    return `${day}/${month}/${d.getFullYear()}`;
   };
 
   const getStatus = (startDate: string | null) => {
@@ -767,7 +769,7 @@ const TripDetailsPage = () => {
                                     </div>
                                   </div>
 
-                                  <Badge variant="outline" className="text-slate-500 font-normal bg-slate-50 border-slate-200 ml-auto md:ml-0">
+                                  <Badge variant="outline" className="text-[#6347f9] font-normal bg-slate-50 border-slate-200 ml-auto md:ml-0">
                                     {formatDate(day.date)}
                                   </Badge>
                                 </div>
