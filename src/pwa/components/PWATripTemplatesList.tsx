@@ -257,7 +257,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full justify-between h-12 rounded-xl px-4",
+                      "w-full justify-between h-12 rounded-xl px-4 hover:bg-primary hover:text-primary-foreground",
                       selectedProvince === 'all' && "bg-primary/5 text-primary font-bold"
                     )}
                     onClick={() => handleProvinceChange('all')}
@@ -271,7 +271,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
                       key={province.id}
                       variant="ghost"
                       className={cn(
-                        "w-full justify-between h-12 rounded-xl px-4 font-normal",
+                        "w-full justify-between h-12 rounded-xl px-4 font-normal hover:bg-primary hover:text-primary-foreground",
                         selectedProvince === province.id && "bg-primary/5 text-primary font-bold"
                       )}
                       onClick={() => handleProvinceChange(province.id)}
