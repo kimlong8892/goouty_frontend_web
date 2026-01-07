@@ -44,6 +44,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
     totalPages: 0
   });
   const { toast } = useToast();
+  const [restoreScrollY, setRestoreScrollY] = useState<number | null>(null);
 
   // Load initial data
   useEffect(() => {
@@ -89,6 +90,39 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
   }, [searchTerm, selectedProvince]);
 
 
+  // Save state on unmount
+  useEffect(() => {
+    return () => {
+      const scrollY = window.scrollY;
+      sessionStorage.setItem('web_templates_scroll_y', scrollY.toString());
+      sessionStorage.setItem('web_templates_pagination', JSON.stringify(pagination));
+    };
+  }, [pagination]);
+
+  // Handle scroll restoration
+  useEffect(() => {
+    if (restoreScrollY !== null && templates.length > 0) {
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: restoreScrollY,
+          behavior: 'auto'
+        });
+
+        setTimeout(() => {
+          if (Math.abs(window.scrollY - restoreScrollY) > 50) {
+            window.scrollTo({
+              top: restoreScrollY,
+              behavior: 'auto'
+            });
+          }
+          setRestoreScrollY(null);
+          sessionStorage.removeItem('web_templates_scroll_y');
+          sessionStorage.removeItem('web_templates_pagination');
+        }, 100);
+      });
+    }
+  }, [templates, restoreScrollY]);
+
   const loadInitialData = async () => {
     try {
       setLoading(true);
@@ -97,13 +131,38 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
       const provincesResponse = await api.provinces.getAll();
       setProvinces(Array.isArray(provincesResponse) ? provincesResponse : []);
 
+      // Check for saved state
+      const savedPaginationStr = sessionStorage.getItem('web_templates_pagination');
+      const savedScrollYStr = sessionStorage.getItem('web_templates_scroll_y');
+
+      let initialLimit = pagination.limit;
+      let initialPage = 1;
+
+      if (savedPaginationStr) {
+        const savedPagination = JSON.parse(savedPaginationStr);
+        if (savedPagination.page > 1) {
+          initialPage = savedPagination.page;
+          initialLimit = savedPagination.page * savedPagination.limit;
+        }
+      }
+
       // Load templates
       const templatesResponse = await api.tripTemplates.getPublic({
         page: 1,
-        limit: pagination.limit
+        limit: initialLimit
       });
       setTemplates(Array.isArray(templatesResponse.templates) ? templatesResponse.templates : []);
-      setPagination(templatesResponse.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 });
+
+      setPagination({
+        ...templatesResponse.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 },
+        page: initialPage,
+        limit: pagination.limit
+      });
+
+      // Restore Scroll
+      if (savedScrollYStr) {
+        setRestoreScrollY(parseInt(savedScrollYStr));
+      }
 
     } catch (error) {
       console.error('Error loading initial data:', error);

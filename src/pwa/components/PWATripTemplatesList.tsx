@@ -45,6 +45,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   const { toast } = useToast();
   const hasMoreTemplates = pagination.page < pagination.totalPages;
   const hasActiveFilters = searchTerm || (selectedProvince && selectedProvince !== 'all');
+  const [restoreScrollY, setRestoreScrollY] = useState<number | null>(null);
 
   // Ref for infinite scroll
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -89,6 +90,41 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   }, [searchTerm, selectedProvince, hasSearched]);
 
 
+  // Save state on unmount
+  useEffect(() => {
+    return () => {
+      const scrollY = window.scrollY;
+      sessionStorage.setItem('pwa_templates_scroll_y', scrollY.toString());
+      sessionStorage.setItem('pwa_templates_pagination', JSON.stringify(pagination));
+    };
+  }, [pagination]);
+
+  // Handle scroll restoration
+  useEffect(() => {
+    if (restoreScrollY !== null && templates.length > 0) {
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: restoreScrollY,
+          behavior: 'auto'
+        });
+
+        setTimeout(() => {
+          // Retry if execution context wasn't ready
+          if (Math.abs(window.scrollY - restoreScrollY) > 50) {
+            window.scrollTo({
+              top: restoreScrollY,
+              behavior: 'auto'
+            });
+          }
+          setRestoreScrollY(null);
+          sessionStorage.removeItem('pwa_templates_scroll_y');
+          sessionStorage.removeItem('pwa_templates_pagination');
+        }, 100);
+      });
+    }
+  }, [templates, restoreScrollY]);
+
+  // Load initial data with potential restoration
   const loadInitialData = async () => {
     try {
       setLoading(true);
@@ -97,14 +133,39 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       const provincesResponse = await api.provinces.getAll();
       setProvinces(Array.isArray(provincesResponse) ? provincesResponse : []);
 
+      // Check for saved state
+      const savedPaginationStr = sessionStorage.getItem('pwa_templates_pagination');
+      const savedScrollYStr = sessionStorage.getItem('pwa_templates_scroll_y');
+
+      let initialLimit = pagination.limit;
+      let initialPage = 1;
+
+      if (savedPaginationStr) {
+        const savedPagination = JSON.parse(savedPaginationStr);
+        if (savedPagination.page > 1) {
+          initialPage = savedPagination.page;
+          initialLimit = savedPagination.page * savedPagination.limit;
+        }
+      }
 
       // Load templates
       const templatesResponse = await api.tripTemplates.getPublic({
         page: 1,
+        limit: initialLimit
+      });
+
+      setTemplates(Array.isArray(templatesResponse.templates) ? templatesResponse.templates : []);
+
+      setPagination({
+        ...templatesResponse.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 },
+        page: initialPage,
         limit: pagination.limit
       });
-      setTemplates(Array.isArray(templatesResponse.templates) ? templatesResponse.templates : []);
-      setPagination(templatesResponse.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 });
+
+      // Restore Scroll
+      if (savedScrollYStr) {
+        setRestoreScrollY(parseInt(savedScrollYStr));
+      }
 
     } catch (error) {
       console.error('Error loading initial data:', error);
