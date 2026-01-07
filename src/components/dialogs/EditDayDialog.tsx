@@ -102,30 +102,30 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
           <div>
             <Label htmlFor="title">Tiêu đề ngày <span className="text-destructive">*</span></Label>
             <Input id="title" ref={titleRef} value={formData.title}
-                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                   aria-invalid={!!errors.title}
-                   className={errors.title ? 'border-destructive focus-visible:ring-destructive' : undefined}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              aria-invalid={!!errors.title}
+              className={errors.title ? 'border-destructive focus-visible:ring-destructive' : undefined}
             />
             {errors.title && <p className="mt-1 text-xs text-destructive">{errors.title}</p>}
           </div>
           <div>
             <Label htmlFor="description">Mô tả ngày</Label>
             <Textarea id="description" value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      rows={2}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={2}
             />
           </div>
           <div>
             <Label htmlFor="date">Ngày <span className="text-destructive">*</span></Label>
             <Input id="date" type="date" ref={dateRef} value={formData.date}
-                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                   aria-invalid={!!errors.date}
-                   className={errors.date ? 'border-destructive focus-visible:ring-destructive' : undefined}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              aria-invalid={!!errors.date}
+              className={errors.date ? 'border-destructive focus-visible:ring-destructive' : undefined}
             />
             {errors.date && <p className="mt-1 text-xs text-destructive">{errors.date}</p>}
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Hủy</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="hover:bg-transparent hover:text-primary hover:border-primary">Hủy</Button>
             <Button type="submit" disabled={loading}>{loading ? 'Đang lưu...' : 'Lưu'}</Button>
           </div>
         </form>

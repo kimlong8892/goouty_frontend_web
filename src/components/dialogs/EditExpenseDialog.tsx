@@ -365,7 +365,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             <Button
               type="button"
               variant="ghost"
-              className="flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
+              className="flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 hover:text-[#6347f9] hover:bg-transparent border border-transparent hover:border-[#6347f9] transition-all"
               onClick={() => onOpenChange(false)}
             >
               Hủy

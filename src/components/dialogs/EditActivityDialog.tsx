@@ -76,7 +76,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
     if (!formData.title.trim()) {
       toast.error('Vui lòng nhập tên hoạt động');
@@ -101,7 +101,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
       };
 
       // Remove undefined values
-      Object.keys(updateData).forEach(key => 
+      Object.keys(updateData).forEach(key =>
         updateData[key as keyof UpdateActivityRequest] === undefined && delete updateData[key as keyof UpdateActivityRequest]
       );
 
@@ -188,7 +188,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
             <Label htmlFor="important">Đánh dấu là hoạt động quan trọng</Label>
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} className="hover:bg-transparent hover:text-primary hover:border-primary">
               Hủy
             </Button>
             <Button type="submit" disabled={loading}>
