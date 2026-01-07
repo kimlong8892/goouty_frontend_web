@@ -274,7 +274,7 @@ const TripTemplateDetailPage = () => {
                                                                         <div className="flex items-start justify-between">
                                                                             <h4 className="font-semibold text-slate-900">{act.title}</h4>
                                                                             {act.startTime && (
-                                                                                <span className="text-xs font-bold text-slate-500 bg-white px-2 py-1 rounded shadow-sm border border-slate-100">
+                                                                                <span className="text-xs font-bold text-[#6347f9] bg-white px-2 py-1 rounded shadow-sm border border-slate-100">
                                                                                     {act.startTime}
                                                                                 </span>
                                                                             )}
@@ -282,12 +282,12 @@ const TripTemplateDetailPage = () => {
                                                                         <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-500">
                                                                             {act.location && (
                                                                                 <span className="flex items-center gap-1.5">
-                                                                                    <MapPin className="w-3.5 h-3.5" /> {act.location}
+                                                                                    <MapPin className="w-3.5 h-3.5 text-red-500" /> {act.location}
                                                                                 </span>
                                                                             )}
                                                                             {act.durationMin && (
                                                                                 <span className="flex items-center gap-1.5">
-                                                                                    <Clock className="w-3.5 h-3.5" /> {act.durationMin} phút
+                                                                                    <Clock className="w-3.5 h-3.5 text-yellow-500" /> {act.durationMin} phút
                                                                                 </span>
                                                                             )}
                                                                         </div>

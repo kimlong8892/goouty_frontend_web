@@ -240,7 +240,7 @@ const PWATemplateDetailsPage = () => {
                                                                     <div className="flex items-start justify-between gap-2 mb-1.5">
                                                                         <h4 className="font-bold text-slate-900 text-[15px] leading-tight">{act.title}</h4>
                                                                         {act.startTime && (
-                                                                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md flex-shrink-0">
+                                                                            <span className="text-[10px] font-bold text-[#6347f9] bg-slate-100 px-2 py-1 rounded-md flex-shrink-0">
                                                                                 {act.startTime}
                                                                             </span>
                                                                         )}
@@ -248,12 +248,12 @@ const PWATemplateDetailsPage = () => {
                                                                     <div className="flex flex-wrap gap-3 text-xs text-slate-500 mb-2">
                                                                         {act.location && (
                                                                             <span className="flex items-center gap-1">
-                                                                                <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" /> <span className="truncate max-w-[150px]">{act.location}</span>
+                                                                                <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-red-500" /> <span className="truncate max-w-[150px]">{act.location}</span>
                                                                             </span>
                                                                         )}
                                                                         {act.durationMin && (
                                                                             <span className="flex items-center gap-1 flex-shrink-0">
-                                                                                <Clock className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" /> {act.durationMin}p
+                                                                                <Clock className="w-3.5 h-3.5 flex-shrink-0 text-yellow-500" /> {act.durationMin}p
                                                                             </span>
                                                                         )}
                                                                     </div>
