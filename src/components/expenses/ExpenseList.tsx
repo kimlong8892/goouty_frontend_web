@@ -83,7 +83,9 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
 
   const formatDate = (dateString: string) => {
     const d = new Date(dateString);
-    return `${d.getDate()} Tháng ${d.getMonth() + 1}, ${d.getFullYear()}`;
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    return `${day}/${month}/${d.getFullYear()}`;
   };
 
   const getPayerInfo = (payerId: string) => {
