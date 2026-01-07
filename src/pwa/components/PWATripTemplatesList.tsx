@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { DATABASE_TYPES } from '@/integrations/api/types';
 import { api } from '@/integrations/api/client';
 import { TripTemplateCard } from '@/components/TripTemplateCard';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, MapPin } from 'lucide-react';
+import { Loader2, Search, MapPin, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PWAInstallButton } from './PWAInstallButton';
@@ -24,6 +25,7 @@ interface PWATripTemplatesListProps {
 }
 
 export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTemplatesListProps) => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [templates, setTemplates] = useState<DATABASE_TYPES.tripTemplates[]>([]);
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
@@ -358,18 +360,40 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       {/* Spacer for fixed header */}
       <div className="h-[max(calc(env(safe-area-inset-top)+60px),70px)]"></div>
 
-      {/* Header */}
-      <div className="mb-8 mt-4 animate-fade-in px-2">
-        <h1 className="text-2xl font-bold text-center mb-2">{t('template.templates')}</h1>
-        <p className="text-muted-foreground text-center mb-4">
-          {t('template.description')}
-        </p>
-        <div className="flex justify-center">
-          <PWAInstallButton
-            variant="outline"
-            className="rounded-full border-primary/20 hover:bg-primary/5 text-primary"
-          />
+      {/* Hero Section - Custom UI */}
+      <div className="flex flex-col items-center justify-center pt-2 pb-6 text-center px-4 animate-fade-in">
+        <h1 className="text-2xl font-black text-[#6347f9] uppercase tracking-wide mb-3 leading-tight drop-shadow-sm w-full">
+          VI VU THẢ GA,<br />KHÔNG LO RẮC RỐI.
+        </h1>
+
+        <div className="space-y-1 mb-4">
+          <p className="text-gray-500 font-bold text-sm">
+            Nền tảng 2 trong 1
+          </p>
+          <ul className="text-gray-500 font-bold text-sm list-none space-y-1">
+            <li>• Quản lý lịch trình và Chi phí nhóm.</li>
+            <li>• Chia sẻ dễ dàng qua một đường link duy nhất.</li>
+          </ul>
         </div>
+
+        <Button
+          onClick={() => navigate('/create-trip')}
+          className="mb-6 rounded-full bg-[#6347f9] hover:bg-[#5136db] text-white font-bold h-10 px-6 shadow-[0_4px_14px_0_rgba(99,71,249,0.39)] hover:shadow-[0_6px_20px_rgba(99,71,249,0.23)] hover:scale-[1.02] transition-all"
+        >
+          Bắt đầu hành trình <ChevronRight className="w-4 h-4 ml-1" />
+        </Button>
+
+
+      </div>
+
+      {/* Services Section - KHÁM PHÁ TEMPLATES */}
+      <div className="text-center px-4 mb-8 animate-fade-in delay-100">
+        <h2 className="text-2xl font-black text-[#6347f9] uppercase tracking-wide mb-3 drop-shadow-sm">
+          KHÁM PHÁ TEMPLATES
+        </h2>
+        <p className="text-gray-500 font-bold text-sm leading-relaxed max-w-xs mx-auto">
+          Duyệt qua và sử dụng các kế hoạch chuyến đi có sẵn để bắt đầu hành trình của bạn ngay lập tức
+        </p>
       </div>
 
       {/* Results summary if filtering */}

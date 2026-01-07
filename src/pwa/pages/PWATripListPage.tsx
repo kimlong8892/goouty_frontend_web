@@ -347,6 +347,23 @@ const PWATripListPage = () => {
       {/* Spacer to account for fixed search bar */}
       <div className="h-28"></div>
 
+      {/* Hero Section */}
+      <div className="flex flex-col items-center justify-center pt-2 pb-6 text-center px-4">
+        <img
+          src="/my_trips_mascot.png"
+          alt="My Trips Mascot"
+          className="w-32 h-32 object-contain mb-2 drop-shadow-sm"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+        <h1 className="text-2xl font-black text-[#6347f9] uppercase tracking-wide mb-2 drop-shadow-sm text-center w-full">
+          CHUYẾN ĐI CỦA TÔI
+        </h1>
+        <p className="text-gray-500 font-bold text-sm">
+          Quản lý và theo dõi tất cả chuyến đi
+        </p>
+      </div>
 
       {/* Trips Grid */}
       {loading ? (
