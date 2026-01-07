@@ -77,6 +77,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
   useEffect(() => {
     if (open) {
       fetchMembers();
+      setErrors({});
     }
   }, [open, tripId]);
 
@@ -186,27 +187,56 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
   };
 
   const formatCurrencyInput = (raw: string) => {
+    if (!raw) return '';
     const digits = raw.replace(/[^0-9]/g, '');
     const num = Number(digits || '0');
+    if (num === 0) return '';
     return num.toLocaleString('vi-VN');
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
-        "max-w-md bg-white rounded-[32px] border-none shadow-2xl p-0 overflow-hidden flex flex-col",
-        isMobileView ? "h-full w-full max-w-none rounded-none" : "max-h-[90vh]"
+        "max-w-md bg-white rounded-[32px] border-none shadow-2xl p-0 overflow-hidden flex flex-col z-[100]",
+        isMobileView ? "h-full w-full max-w-none rounded-none [&>button]:hidden" : "max-h-[90vh]"
       )}>
-        <DialogHeader className={cn("p-6 pb-2 flex-shrink-0", isMobileView && "px-4 pt-4")}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#6347f9]/10 flex items-center justify-center">
-              <Plus className="w-5 h-5 text-[#6347f9]" />
-            </div>
-            <DialogTitle className={cn("font-bold text-slate-900", isMobileView ? "text-lg" : "text-xl")}>
+        {isMobileView ? (
+          <div className="px-4 py-4 border-b border-gray-200/50 flex-shrink-0 bg-white flex items-center justify-between">
+            <button
+              onClick={() => onOpenChange(false)}
+              disabled={loading}
+              className="flex items-center text-muted-foreground hover:text-gray-900 disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+              type="button"
+            >
+              Hủy
+            </button>
+            <DialogTitle className="text-lg font-bold text-gray-900">
               Thêm chi phí
             </DialogTitle>
+            <button
+              onClick={handleSubmit}
+              disabled={loading || membersLoading}
+              className="flex items-center text-[#6347f9] hover:text-[#5136db] disabled:text-gray-400 transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+              type="button"
+            >
+              {loading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6347f9] mr-2"></div>
+              ) : null}
+              Xong
+            </button>
           </div>
-        </DialogHeader>
+        ) : (
+          <DialogHeader className={cn("p-6 pb-2 flex-shrink-0", isMobileView && "px-4 pt-4")}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#6347f9]/10 flex items-center justify-center">
+                <Plus className="w-5 h-5 text-[#6347f9]" />
+              </div>
+              <DialogTitle className={cn("font-bold text-slate-900", isMobileView ? "text-lg" : "text-xl")}>
+                Thêm chi phí
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+        )}
 
         <form onSubmit={handleSubmit} className={cn("flex-1 overflow-y-auto py-4 space-y-6 custom-scrollbar", isMobileView ? "px-4" : "px-8")}>
           <div className="space-y-4">
@@ -375,29 +405,32 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
         </form>
 
         {/* Footer */}
-        <div className={cn("p-6 pt-2 border-t border-slate-50 bg-white flex-shrink-0", isMobileView && "px-4 pb-4")}>
-          <div className="flex items-center gap-3">
-            <Button
-              type="button"
-              variant="ghost"
-              className="flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
-              onClick={() => onOpenChange(false)}
-            >
-              Hủy
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              className="flex-[2] h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-purple-200 transition-all active:scale-[0.98] disabled:opacity-50"
-              disabled={loading || membersLoading}
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                'Thêm chi phí'
-              )}
-            </Button>
+        {!isMobileView && (
+          <div className={cn("p-6 pt-2 border-t border-slate-50 bg-white flex-shrink-0", isMobileView && "px-4 pb-4")}>
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                className="flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
+                onClick={() => onOpenChange(false)}
+              >
+                Hủy
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                className="flex-[2] h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-purple-200 transition-all active:scale-[0.98] disabled:opacity-50"
+                disabled={loading || membersLoading}
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  'Thêm chi phí'
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
+
       </DialogContent>
     </Dialog>
   );

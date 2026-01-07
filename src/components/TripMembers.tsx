@@ -229,7 +229,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                   variant="outline"
                   onClick={() => setIsAddMemberOpen(false)}
                   disabled={addMemberMutation.isPending}
-                  className="rounded-xl border-slate-200 hover:text-[#6347f9] hover:border-[#6347f9]"
+                  className="rounded-xl border-slate-200 hover:bg-slate-100 hover:text-[#6347f9]"
                 >
                   Hủy
                 </Button>
