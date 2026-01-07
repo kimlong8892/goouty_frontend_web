@@ -161,7 +161,7 @@ export const BankSearch: React.FC<BankSearchProps> = ({
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled}
-            className="pl-10 pr-10"
+            className="pl-10 pr-10 bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200 h-12 rounded-xl"
           />
           {selectedBank ? (
             <button

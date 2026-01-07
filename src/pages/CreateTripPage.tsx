@@ -171,7 +171,7 @@ const CreateTripPage = () => {
                       setTripName(e.target.value);
                       if (errors.tripName) setErrors(prev => ({ ...prev, tripName: '' }));
                     }}
-                    className={`bg-slate-50 border-slate-200 h-11 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0 ${errors.tripName ? 'border-red-500' : ''}`}
+                    className={`h-12 rounded-xl bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 ${errors.tripName ? 'border-red-500' : ''}`}
                   />
                   {errors.tripName && <p className="text-sm text-red-500">{errors.tripName}</p>}
                 </div>
@@ -191,7 +191,7 @@ const CreateTripPage = () => {
                     }}
                     placeholder="Chọn tỉnh thành"
                     error={!!errors.provinceId}
-                    className="bg-slate-50 border-slate-200 h-11 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="h-12 rounded-xl bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                   {errors.provinceId && <p className="text-sm text-red-500">{errors.provinceId}</p>}
                 </div>
@@ -243,7 +243,7 @@ const CreateTripPage = () => {
                       if (e.target.value.length <= 100) setDescription(e.target.value);
                     }}
                     rows={4}
-                    className="bg-slate-50 border-slate-200 rounded-xl resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="h-12 rounded-xl bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                   <div className="text-right text-xs text-slate-400">
                     {description.length}/100

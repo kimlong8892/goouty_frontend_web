@@ -476,7 +476,7 @@ const Profile = () => {
                         <Input
                           value={formData.fullName}
                           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                          className="h-12 rounded-xl bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </div>
                       <div className="space-y-2">
@@ -486,7 +486,7 @@ const Profile = () => {
                         <Input
                           value={profile.email}
                           disabled
-                          className="h-12 rounded-xl bg-slate-50/50 border-transparent text-slate-500"
+                          className="h-12 rounded-xl bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </div>
                       <div className="space-y-2">
@@ -497,7 +497,7 @@ const Profile = () => {
                           placeholder="+84 909 123 456"
                           value={formData.phoneNumber}
                           onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                          className="h-12 rounded-xl bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </div>
                       <div className="space-y-2">
@@ -521,7 +521,7 @@ const Profile = () => {
                             const value = e.target.value.replace(/[^0-9]/g, '');
                             setFormData({ ...formData, bankNumber: value })
                           }}
-                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                          className="h-12 rounded-xl bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </div>
                     </div>
