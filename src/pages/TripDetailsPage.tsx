@@ -609,7 +609,7 @@ const TripDetailsPage = () => {
                   </div>
                 )}
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-white" />
+                  <Users className="w-5 h-5 text-[#6347f9]" />
                   <span>{trip.memberCount || 1} người</span>
                 </div>
               </div>
