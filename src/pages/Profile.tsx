@@ -328,67 +328,72 @@ const Profile = () => {
 
         {/* Change Password Dialog */}
         <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Đổi mật khẩu</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleChangePassword} className="space-y-4 pt-4">
-              {profile?.hasPassword && (
-                <div className="space-y-2">
-                  <Label>Mật khẩu hiện tại</Label>
-                  <Input
-                    type="password"
-                    required
-                    value={passwordForm.currentPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
-                  />
-                </div>
-              )}
-              {!profile?.hasPassword && (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-                  <p className="text-sm text-blue-800">
-                    <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
-                  </p>
-                </div>
-              )}
-              <div className="space-y-2">
-                <Label>Mật khẩu mới</Label>
-                <Input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={passwordForm.newPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Xác nhận mật khẩu mới</Label>
-                <Input
-                  type="password"
-                  required
-                  value={passwordForm.confirmPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
-                />
-              </div>
-              <DialogFooter className="pt-4">
+          <DialogContent className="w-screen h-screen max-w-full m-0 rounded-none border-none p-0 gap-0 [&>button]:hidden flex flex-col bg-[#F7F7FF]">
+            <form onSubmit={handleChangePassword} className="flex flex-col h-full">
+              <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 sticky top-0 z-10">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsPasswordDialogOpen(false)}
+                  className="text-gray-500 text-base font-normal h-auto p-0 hover:bg-transparent"
                 >
                   Hủy
                 </Button>
+                <DialogTitle className="text-lg font-bold">Đổi mật khẩu</DialogTitle>
                 <Button
                   type="submit"
                   disabled={changingPassword}
-                  className="bg-[#6347f9] hover:bg-[#5136db]"
+                  variant="ghost"
+                  className="text-[#6347f9] text-base font-bold h-auto p-0 hover:bg-transparent hover:text-[#5136db]"
                 >
-                  {changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
+                  {changingPassword ? '...' : 'Xong'}
                 </Button>
-              </DialogFooter>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="bg-white rounded-2xl p-4 shadow-sm space-y-4">
+                  {profile?.hasPassword && (
+                    <div className="space-y-2">
+                      <Label>Mật khẩu hiện tại</Label>
+                      <Input
+                        type="password"
+                        required
+                        value={passwordForm.currentPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                        className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                      />
+                    </div>
+                  )}
+                  {!profile?.hasPassword && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                      <p className="text-sm text-blue-800">
+                        <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
+                      </p>
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label>Mật khẩu mới</Label>
+                    <Input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Xác nhận mật khẩu mới</Label>
+                    <Input
+                      type="password"
+                      required
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                      className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                    />
+                  </div>
+                </div>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
@@ -601,7 +606,7 @@ const Profile = () => {
                                 required
                                 value={passwordForm.currentPassword}
                                 onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                                className="h-12 rounded-xl border border-gray-200 bg-white hover:border-[#d2cdfe] focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
                               />
                             </div>
                           )}
@@ -620,7 +625,7 @@ const Profile = () => {
                               minLength={6}
                               value={passwordForm.newPassword}
                               onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                              className="h-12 rounded-xl border border-gray-200 bg-white hover:border-[#d2cdfe] focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
                             />
                           </div>
                           <div className="space-y-2">
@@ -630,7 +635,7 @@ const Profile = () => {
                               required
                               value={passwordForm.confirmPassword}
                               onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                              className="h-12 rounded-xl border border-gray-200 bg-white hover:border-[#d2cdfe] focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
                             />
                           </div>
                           <DialogFooter className="pt-4">

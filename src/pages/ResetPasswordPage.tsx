@@ -64,7 +64,7 @@ const ResetPasswordPage = () => {
                                 <Input
                                     id="password"
                                     type={showPassword ? "text" : "password"}
-                                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white transition-all px-4 pr-12"
+                                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white outline-none transition-colors duration-200 px-4 pr-12"
                                     placeholder="Nhập mật khẩu mới"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}

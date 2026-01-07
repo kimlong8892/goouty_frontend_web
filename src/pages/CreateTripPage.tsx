@@ -287,7 +287,7 @@ const CreateTripPage = () => {
                     </div>
                   ) : (
                     <div
-                      className="w-full h-48 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-[#6347f9]/30 transition-all cursor-pointer group"
+                      className="w-full h-48 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-[#6347f9]/30 outline-none transition-colors duration-200 cursor-pointer group"
                       onClick={() => document.getElementById('trip-avatar-upload')?.click()}
                     >
                       <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-[#6347f9] transition-colors mb-2">
