@@ -356,7 +356,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={updateTripMutation.isPending}
-            className="hover:bg-white hover:text-primary"
+            className="hover:bg-transparent hover:text-primary hover:border-primary"
           >
             Hủy
           </Button>

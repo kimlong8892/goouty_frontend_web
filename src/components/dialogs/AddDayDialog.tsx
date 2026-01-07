@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
 import { format } from 'date-fns';
@@ -106,26 +106,29 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="[&>button]:hidden p-0 gap-0 sm:max-w-md w-full rounded-2xl overflow-hidden">
+      <DialogContent className="[&>button]:hidden sm:[&>button]:flex p-0 gap-0 sm:max-w-md w-full rounded-2xl overflow-hidden">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col h-full">
-          <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-gray-100 space-y-0">
+          <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-gray-100 space-y-0 text-center sm:text-left">
             <Button
               type="button"
               variant="ghost"
-              className="p-0 h-auto font-medium text-muted-foreground hover:text-gray-900 hover:bg-transparent text-base"
+              className="p-0 h-auto font-medium text-muted-foreground hover:text-gray-900 hover:bg-transparent text-base sm:hidden"
               onClick={() => handleOpenChange(false)}
             >
               Hủy
             </Button>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold">
-              <CalendarIcon className="w-5 h-5" />
-              Thêm ngày mới
+              {/* Icon only on mobile or both? Keep as is, maybe remove icon on desktop if needed, but keeping it is fine */}
+              <CalendarIcon className="w-5 h-5 sm:hidden" />
+              <Plus className="w-5 h-5 hidden sm:block" />
+              <span className="sm:hidden">Thêm ngày mới</span>
+              <span className="hidden sm:inline">Thêm ngày mới</span>
             </DialogTitle>
             <Button
               type="submit"
               variant="ghost"
               disabled={loading}
-              className="p-0 h-auto font-bold text-primary hover:text-primary/80 hover:bg-transparent disabled:text-gray-400 text-base"
+              className="p-0 h-auto font-bold text-primary hover:text-primary/80 hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
             >
               {loading && (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
@@ -199,6 +202,27 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
               )}
             </div>
           </div>
+
+          <DialogFooter className="hidden sm:flex px-6 py-4 border-t border-gray-100 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOpenChange(false)}
+              className="rounded-xl h-10 hover:bg-transparent hover:text-primary hover:border-primary"
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              className="rounded-xl h-10 bg-primary hover:bg-primary/90"
+              disabled={loading}
+            >
+              {loading && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+              )}
+              Thêm ngày
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

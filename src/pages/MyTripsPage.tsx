@@ -506,7 +506,7 @@ const MyTripsPage = () => {
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              className="rounded-xl hover:bg-purple-50 hover:text-[#6347f9] border-slate-200"
+              className="rounded-xl hover:bg-transparent hover:text-primary hover:border-primary border-slate-200"
             >
               Hủy
             </Button>
