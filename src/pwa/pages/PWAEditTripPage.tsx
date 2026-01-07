@@ -238,7 +238,7 @@ const PWAEditTripPage = () => {
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start text-left font-normal h-12 text-base border-gray-200 hover:border-primary/50 focus:border-primary"
+                                    className="w-full justify-start text-left font-normal h-12 text-base border-gray-200 hover:border-primary/50 focus:border-primary hover:bg-white"
                                 >
                                     <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
                                     {startDate ? (

@@ -36,14 +36,14 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
-  const setOpen = isControlled ? (controlledOnOpenChange || (() => {})) : setInternalOpen;
+  const setOpen = isControlled ? (controlledOnOpenChange || (() => { })) : setInternalOpen;
   const [tripName, setTripName] = useState(trip.title);
   const [provinceId, setProvinceId] = useState(trip.provinceId || '');
   const [description, setDescription] = useState(trip.description || '');
   const [startDate, setStartDate] = useState<Date | undefined>(() => {
     return trip.startDate ? new Date(trip.startDate) : undefined;
   });
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [currentAvatar, setCurrentAvatar] = useState(trip.avatar || '');
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -133,7 +133,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
     setErrors({});
 
     // Validation
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!tripName.trim()) {
       newErrors.tripName = 'Vui lòng nhập tên chuyến đi';
@@ -147,14 +147,14 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
     // If there are errors, set them and focus on first error
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      
+
       // Focus on first error field
       const firstErrorField = Object.keys(newErrors)[0];
       const element = document.getElementById(firstErrorField);
       if (element) {
         element.focus();
       }
-      
+
       toast.error('Vui lòng kiểm tra lại thông tin');
       return;
     }
@@ -314,7 +314,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  className="w-full justify-start text-left font-normal hover:bg-white"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? (
@@ -356,6 +356,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={updateTripMutation.isPending}
+            className="hover:bg-white hover:text-primary"
           >
             Hủy
           </Button>
