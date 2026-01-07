@@ -124,7 +124,7 @@ const TripTemplateDetailPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-[#f8f9fc]">
+        <div className="min-h-screen bg-[#edeeff]">
             {/* HERO SECTION */}
             <div className="relative w-full h-[40vh] min-h-[350px] lg:h-[450px] group">
                 {template.avatar ? (
