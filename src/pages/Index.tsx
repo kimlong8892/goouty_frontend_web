@@ -59,12 +59,17 @@ const Index = () => {
   }, [isMobileView]);
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
+    const hasVisited = sessionStorage.getItem('has_visited_index');
+    if (hasVisited) {
       setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    } else {
+      // Simulate loading only on first visit
+      const timer = setTimeout(() => {
+        setLoading(false);
+        sessionStorage.setItem('has_visited_index', 'true');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   if (loading) {
