@@ -15,6 +15,7 @@ import {
   Settings,
   Plus,
   Clock,
+  Camera,
   DollarSign,
   ArrowLeft,
   Pin,
@@ -106,6 +107,7 @@ type TripDetails = {
     status?: string;
   }[];
   memberCount?: number;
+  avatar?: string | null;
 };
 
 type Day = {
@@ -345,7 +347,8 @@ const TripDetailsPage = () => {
         slug: tripData.id,
         shareToken: tripData.shareToken,
         members: membersData,
-        memberCount: (membersData?.filter(m => m && m.user?.id !== tripData.userId && (m.status === 'accepted' || !m.status)).length || 0) + 1
+        memberCount: (membersData?.filter(m => m && m.user?.id !== tripData.userId && (m.status === 'accepted' || !m.status)).length || 0) + 1,
+        avatar: tripData.avatar,
       };
 
       setTrip(transformedTrip);
@@ -496,13 +499,10 @@ const TripDetailsPage = () => {
   const status = getStatus(trip.startDate);
 
   return (
-    <div className={cn(
-      "min-h-screen",
-      isMobileView ? "pt-0 pb-20" : "pt-4 pb-20 px-4"
-    )}>
+    <div className="min-h-screen bg-[#edeeff]">
       {/* Mobile Sticky Header */}
       {isMobileView && (
-        <div className="sticky top-0 z-[60] bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+        <div className="sticky top-0 z-[60] bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between support-backdrop-blur">
           <div className="flex items-center gap-3 overflow-hidden">
             <button
               onClick={() => navigate(-1)}
@@ -528,90 +528,107 @@ const TripDetailsPage = () => {
       )}
 
       <AnimatedTransition show={showContent} animation="slide-up">
-        <div className={cn("max-w-6xl mx-auto", isMobileView && "px-4 pt-6")}>
-          {/* Header Section */}
-          <div className={cn("mb-8", isMobileView && "mb-6")}>
-            <div className="flex gap-2 mb-4">
-              <Badge className={cn(
-                "rounded-md hover:bg-opacity-80 px-3 py-1 font-medium border-0",
-                statusColors[status as keyof typeof statusColors]
-              )}>
-                {statusLabels[status as keyof typeof statusLabels]}
-              </Badge>
-              <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0">
-                {trip.userRole === 'owner'
-                  ? `Chủ chuyến đi (${trip.memberCount || 1})`
-                  : `Thành viên (${trip.memberCount || 1})`}
-              </Badge>
+        {/* HERO SECTION */}
+        <div className="relative w-full h-[40vh] min-h-[350px] lg:h-[450px] group">
+          {trip.avatar ? (
+            <img
+              src={trip.avatar}
+              alt={trip.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full bg-slate-200 flex items-center justify-center">
+              <Camera className="w-16 h-16 text-slate-300" />
             </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/40 to-transparent opacity-90" />
 
-            <div className="flex items-center gap-3 mb-4 group">
-              {!isMobileView && (
-                <button
-                  onClick={() => navigate(-1)}
-                  className="p-2 -ml-12 rounded-full hover:bg-white/50 text-slate-400 hover:text-slate-600 transition-all active:scale-95"
-                  title="Quay lại"
-                >
-                  <ArrowLeft className="w-6 h-6" />
-                </button>
-              )}
-              <h1 className={cn(
-                "font-black text-slate-800 tracking-tight leading-tight",
-                isMobileView ? "text-2xl" : "text-3xl md:text-5xl"
-              )}>
-                {trip.name}
-              </h1>
-              {trip.userRole === 'owner' && !isMobileView && (
-                <EditTripDialog
-                  trip={{
-                    ...trip as any,
-                    title: trip.name,
-                  }}
-                  onSuccess={fetchTripDetails}
-                  open={editTripDialogOpen}
-                  onOpenChange={setEditTripDialogOpen}
-                >
-                  <button className="text-slate-400 hover:text-[#6347f9] transition-colors p-1">
-                    <Edit className="w-5 h-5" />
-                  </button>
-                </EditTripDialog>
-              )}
+          {/* Back Button (Desktop) */}
+          {!isMobileView && (
+            <div className="absolute top-6 left-6 z-20">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 pl-3 pr-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all border border-white/10 active:scale-95 text-sm font-medium"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Quay lại</span>
+              </button>
             </div>
+          )}
 
-            <div className={cn(
-              "flex flex-wrap items-center gap-y-3 gap-x-6 text-slate-500 font-medium text-sm mb-4",
-              isMobileView && "gap-x-4"
-            )}>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#6347f9]" />
-                <span>{formatDate(trip.startDate)}</span>
-              </div>
-              {trip.province && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#FF4D4C]" />
-                  <span>{trip.province.name}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-slate-400" />
-                <span>{trip.memberCount || 1} người</span>
-              </div>
-            </div>
-
-            {trip.description && (
-              <div className={cn(
-                "bg-white shadow-sm border border-gray-100/50 mb-8 w-full",
-                isMobileView ? "rounded-full px-6 py-4" : "rounded-full px-8 py-5"
-              )}>
-                <p className={cn(
-                  "text-slate-700 leading-relaxed font-semibold",
-                  isMobileView ? "text-base" : "text-lg"
+          {/* Content Overlay */}
+          <div className="absolute bottom-16 left-0 w-full px-4 lg:px-0">
+            <div className="max-w-6xl mx-auto">
+              {/* Badges */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                <Badge className={cn(
+                  "border-none px-3 py-1.5 text-sm rounded-lg shadow-lg",
+                  statusColors[status as keyof typeof statusColors]
                 )}>
-                  {trip.description}
-                </p>
+                  {statusLabels[status as keyof typeof statusLabels]}
+                </Badge>
+                <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-3 py-1.5 text-sm rounded-lg">
+                  {trip.userRole === 'owner'
+                    ? `Chủ chuyến đi (${trip.memberCount || 1})`
+                    : `Thành viên (${trip.memberCount || 1})`}
+                </Badge>
               </div>
-            )}
+
+              {/* Title */}
+              <div className="flex items-center gap-3 mb-4 group">
+                <h1 className="text-3xl md:text-5xl lg:text-[3.5rem] font-black text-white leading-tight tracking-tight drop-shadow-sm max-w-4xl">
+                  {trip.name}
+                </h1>
+                {trip.userRole === 'owner' && !isMobileView && (
+                  <EditTripDialog
+                    trip={{
+                      ...trip as any,
+                      title: trip.name,
+                    }}
+                    onSuccess={fetchTripDetails}
+                    open={editTripDialogOpen}
+                    onOpenChange={setEditTripDialogOpen}
+                  >
+                    <button className="text-white/70 hover:text-white transition-colors p-1 bg-white/10 rounded-full hover:bg-white/20 backdrop-blur-sm ml-2">
+                      <Edit className="w-6 h-6 p-1" />
+                    </button>
+                  </EditTripDialog>
+                )}
+              </div>
+
+              {/* Meta Info */}
+              <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-white/90 font-medium text-base">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-white" />
+                  <span>{formatDate(trip.startDate)}</span>
+                </div>
+                {trip.province && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-[#FF4D4C]" />
+                    <span>{trip.province.name}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-white" />
+                  <span>{trip.memberCount || 1} người</span>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* MAIN CONTENT CONTAINER */}
+        <div className="max-w-6xl mx-auto px-4 lg:px-0 -mt-8 relative z-10 pb-20">
+          {/* Description Card */}
+          <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 mb-8">
+            <h2 className="text-[#6347f9] text-xl font-bold mb-4 flex items-center gap-2">
+              Giới thiệu chuyến đi
+            </h2>
+            <p className="text-slate-600 leading-relaxed font-medium text-lg whitespace-pre-line">
+              {trip.description || "Chưa có mô tả chi tiết cho chuyến đi này."}
+            </p>
+          </div>
+
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className={cn(

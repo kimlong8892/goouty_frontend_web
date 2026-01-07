@@ -119,7 +119,7 @@ const PWATemplateDetailsPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-[#f8f9fc] pb-[100px]">
+        <div className="min-h-screen bg-[#edeeff] pb-[100px]">
             {/* HERO SECTION */}
             <div className="relative w-full h-[45vh] min-h-[360px]">
                 {template.avatar ? (
