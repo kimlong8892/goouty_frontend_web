@@ -220,7 +220,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
                 placeholder={t('template.searchTemplates')}
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 h-11 bg-white shadow-sm border-gray-100 focus:border-primary focus:ring-primary/20 rounded-xl text-base"
+                className="pl-10 h-11 bg-white shadow-sm border-gray-100 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl text-base"
               />
             </div>
 
@@ -231,7 +231,9 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
                   size="icon"
                   className={cn(
                     "h-11 w-11 rounded-xl shadow-sm shrink-0",
-                    selectedProvince !== 'all' ? "bg-primary text-white" : "bg-white text-gray-500 border border-gray-100"
+                    selectedProvince !== 'all'
+                      ? "bg-primary text-white hover:bg-primary/90"
+                      : "bg-white text-gray-500 border border-gray-100 hover:bg-primary/5 hover:text-primary"
                   )}
                 >
                   <Filter className="w-5 h-5" />
@@ -249,7 +251,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
                       placeholder="Tìm nhanh tỉnh thành..."
                       value={provinceSearchQuery}
                       onChange={(e) => setProvinceSearchQuery(e.target.value)}
-                      className="pl-10 h-11 bg-gray-50 border-none rounded-xl"
+                      className="pl-10 h-11 bg-gray-50 border border-transparent rounded-xl focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0"
                     />
                   </div>
                 </DrawerHeader>
