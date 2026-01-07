@@ -301,7 +301,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
                       )}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 z-[200]" align="start">
                     <Calendar
                       mode="single"
                       selected={formData.date ? new Date(formData.date + 'T00:00:00') : undefined}
@@ -323,7 +323,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
                 )}>
                   <SelectValue placeholder="Chọn người trả" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-slate-100 shadow-xl max-h-[250px]">
+                <SelectContent className="rounded-xl border-slate-100 shadow-xl max-h-[250px] z-[200]">
                   {members.map((m) => (
                     <SelectItem key={m.user.id} value={m.user.id.toString()} className="rounded-lg">
                       <div className="flex items-center gap-2">

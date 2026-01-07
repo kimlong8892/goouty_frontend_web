@@ -273,7 +273,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                 <SelectTrigger className="h-12 rounded-xl border-slate-200 focus:ring-2 focus:ring-[#6347f9] font-bold text-slate-700">
                   <SelectValue placeholder="Chọn người trả" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-slate-100 shadow-xl">
+                <SelectContent className="rounded-xl border-slate-100 shadow-xl z-[200]">
                   {members.map((m) => (
                     <SelectItem key={m.user.id} value={m.user.id.toString()} className="rounded-lg">
                       <div className="flex items-center gap-2">
