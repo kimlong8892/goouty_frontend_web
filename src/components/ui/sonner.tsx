@@ -7,7 +7,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme="light"
       className="toaster group"
-      position="top-center"
+      position="top-right"
       richColors
       closeButton
       expand={false}
