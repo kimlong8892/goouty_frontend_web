@@ -227,7 +227,7 @@ const AuthPage = () => {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      className="h-[56px] rounded-2xl bg-[#f3f4f6] border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 pr-12 text-base font-medium placeholder:text-slate-400"
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] border-none focus:ring-2 focus:ring-[#6347f9]/20 outline-none transition-colors duration-200 px-5 pr-12 text-base font-medium placeholder:text-slate-400"
                       placeholder={mode === 'signup' ? "••••••••" : "Nhập mật khẩu"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

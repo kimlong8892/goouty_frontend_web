@@ -118,7 +118,7 @@ export function ProvinceSelector({
           onFocus={handleInputFocus}
           placeholder={placeholder}
           className={cn(
-            "pl-10 pr-10 border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200",
+            "pl-10 pr-10 border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200",
             error ? 'border-red-500 focus:border-red-500' : '',
             className
           )}

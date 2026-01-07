@@ -305,7 +305,7 @@ const PWAEditTripPage = () => {
                             </div>
                         ) : (
                             <div
-                                className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 cursor-pointer"
+                                className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 outline-none transition-colors duration-200 cursor-pointer"
                                 onClick={() => document.getElementById('edit-cover-image-upload')?.click()}
                             >
                                 <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 text-gray-400">

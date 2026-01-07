@@ -54,7 +54,7 @@ const ForgotPasswordPage = () => {
                             <Input
                                 id="email"
                                 type="email"
-                                className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white transition-all px-4"
+                                className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white outline-none transition-colors duration-200 px-4"
                                 placeholder="Nhập email của bạn"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}

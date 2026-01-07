@@ -209,7 +209,7 @@ const PWACreateTripPage = () => {
                   setErrors(prev => ({ ...prev, tripName: '' }));
                 }
               }}
-              className={`w-full text-base transition-all duration-200 ${errors.tripName ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0'}`}
+              className={`w-full text-base outline-none transition-colors duration-200 ${errors.tripName ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0'}`}
             />
             {errors.tripName && (
               <p className="text-sm text-red-500 animate-fade-in">{errors.tripName}</p>
@@ -246,7 +246,7 @@ const PWACreateTripPage = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal h-12 text-base transition-all duration-200 border-gray-200 hover:border-primary/50 focus:border-[#d2cdfe] hover:bg-white hover:text-gray-900"
+                  className="w-full justify-start text-left font-normal h-12 text-base outline-none transition-colors duration-200 border-gray-200 hover:border-primary/50 focus:border-[#d2cdfe] hover:bg-white hover:text-gray-900"
                 >
                   <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
                   {startDate ? (
@@ -290,7 +290,7 @@ const PWACreateTripPage = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full text-base border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 resize-none transition-all duration-200"
+              className="w-full text-base border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 resize-none outline-none transition-colors duration-200"
             />
           </div>
 
@@ -309,13 +309,13 @@ const PWACreateTripPage = () => {
                 />
                 <button
                   onClick={removeImage}
-                  className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-200 shadow-lg hover:scale-110"
+                  className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 outline-none transition-colors duration-200 shadow-lg hover:scale-110"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 cursor-pointer">
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 outline-none transition-colors duration-200 cursor-pointer">
                 <input
                   type="file"
                   accept="image/*"
