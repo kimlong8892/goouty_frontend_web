@@ -28,7 +28,7 @@ export const HeroSection = ({
           {/* Left Column - Text Content */}
           <div className="text-left space-y-6">
             {/* Main Headline */}
-            <h1 style={{ color: '#6347f9' }} className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-[#6347f9]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-primary">
               <span className="block mb-3">VI VU THẢ GA,</span>
               <span className="block mb-3">KHÔNG LO RẮC</span>
               <span className="block">RỐI.</span>
@@ -36,18 +36,18 @@ export const HeroSection = ({
 
             {/* Subheading */}
             <div className="space-y-4">
-              <p className="text-lg font-medium text-gray-800">
+              <p className="text-lg font-medium text-foreground">
                 Nền tảng 2 trong 1
               </p>
 
               {/* Feature List */}
-              <ul className="space-y-2 text-base md:text-lg text-gray-700 font-medium">
+              <ul className="space-y-2 text-base md:text-lg text-muted-foreground font-medium">
                 <li className="flex items-center gap-3">
-                  <span className="text-2xl leading-none text-gray-900">•</span>
+                  <span className="text-2xl leading-none text-foreground">•</span>
                   <span>Quản lý lịch trình và chi phí nhóm.</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="text-2xl leading-none text-gray-900">•</span>
+                  <span className="text-2xl leading-none text-foreground">•</span>
                   <span>Chia sẻ dễ dàng qua một đường link duy nhất.</span>
                 </li>
               </ul>

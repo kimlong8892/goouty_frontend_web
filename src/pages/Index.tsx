@@ -77,7 +77,7 @@ const Index = () => {
   }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-background text-foreground">
       {isMobileView ? (
         // Mobile/PWA Mode: Show trip templates list
         <PWATripTemplatesList

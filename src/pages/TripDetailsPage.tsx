@@ -512,18 +512,18 @@ const TripDetailsPage = () => {
   const status = getStatus(trip.startDate);
 
   return (
-    <div className="min-h-screen bg-[#edeeff]">
+    <div className="min-h-screen bg-background">
       {/* Mobile Sticky Header */}
       {isMobileView && (
-        <div className="sticky top-0 z-[60] bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between support-backdrop-blur">
+        <div className="sticky top-0 z-[60] bg-background/80 backdrop-blur-md border-b border-border px-4 py-3 flex items-center justify-between support-backdrop-blur">
           <div className="flex items-center gap-3 overflow-hidden">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
+              className="p-2 -ml-2 rounded-full hover:bg-secondary active:bg-secondary transition-colors"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-800" />
+              <ArrowLeft className="w-6 h-6 text-foreground" />
             </button>
-            <h1 className="text-lg font-bold text-slate-900 truncate">
+            <h1 className="text-lg font-bold text-foreground truncate">
               {trip.name}
             </h1>
           </div>
@@ -531,9 +531,9 @@ const TripDetailsPage = () => {
             {trip.userRole === 'owner' && (
               <button
                 onClick={() => navigate(`/pwa-edit-trip/${id}`)}
-                className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200"
+                className="p-2 rounded-full hover:bg-secondary active:bg-secondary"
               >
-                <Edit className="w-5 h-5 text-gray-600" />
+                <Edit className="w-5 h-5 text-muted-foreground" />
               </button>
             )}
           </div>
@@ -550,8 +550,8 @@ const TripDetailsPage = () => {
               className="w-full h-full object-cover transition-transform duration-700"
             />
           ) : (
-            <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-              <Camera className="w-16 h-16 text-slate-300" />
+            <div className="w-full h-full bg-secondary flex items-center justify-center">
+              <Camera className="w-16 h-16 text-muted-foreground/50" />
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/40 to-transparent opacity-90" />
@@ -633,11 +633,11 @@ const TripDetailsPage = () => {
         {/* MAIN CONTENT CONTAINER */}
         <div className="max-w-6xl mx-auto px-4 lg:px-0 -mt-8 relative z-10 pb-20">
           {/* Description Card */}
-          <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 mb-8">
+          <div className="bg-card rounded-[2rem] p-8 shadow-sm border border-border mb-8">
             <h2 className="text-[#6347f9] text-xl font-bold mb-4 flex items-center gap-2">
               Giới thiệu chuyến đi
             </h2>
-            <p className="text-slate-600 leading-relaxed font-medium text-lg whitespace-pre-line">
+            <p className="text-muted-foreground leading-relaxed font-medium text-lg whitespace-pre-line">
               {trip.description || "Chưa có mô tả chi tiết cho chuyến đi này."}
             </p>
           </div>
@@ -657,7 +657,7 @@ const TripDetailsPage = () => {
                 <TabsTrigger
                   value="itinerary"
                   className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
                     isMobileView
                       ? "whitespace-nowrap px-6 py-3.5 text-base"
                       : "flex-1 px-8 py-4 text-base"
@@ -669,7 +669,7 @@ const TripDetailsPage = () => {
                 <TabsTrigger
                   value="expenses"
                   className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
                     isMobileView
                       ? "whitespace-nowrap px-6 py-3.5 text-base"
                       : "flex-1 px-8 py-4 text-base"
@@ -681,7 +681,7 @@ const TripDetailsPage = () => {
                 <TabsTrigger
                   value="members"
                   className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
                     isMobileView
                       ? "whitespace-nowrap px-6 py-3.5 text-base"
                       : "flex-1 px-8 py-4 text-base"
@@ -694,7 +694,7 @@ const TripDetailsPage = () => {
                   <TabsTrigger
                     value="share"
                     className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95",
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
                       isMobileView
                         ? "whitespace-nowrap px-6 py-3.5 text-base"
                         : "flex-1 px-8 py-4 text-base"
@@ -709,7 +709,7 @@ const TripDetailsPage = () => {
 
             <TabsContent value="itinerary" className="mt-0">
               <Card className={cn(
-                "border-none shadow-xl bg-white overflow-hidden",
+                "border-none shadow-xl bg-card overflow-hidden text-card-foreground",
                 isMobileView ? "rounded-3xl" : "rounded-[32px]"
               )}>
                 <CardHeader className={cn(
@@ -718,10 +718,10 @@ const TripDetailsPage = () => {
                 )}>
                   <div>
                     <h2 className={cn(
-                      "font-bold text-slate-900 mb-1",
+                      "font-bold text-foreground mb-1",
                       isMobileView ? "text-xl" : "text-2xl"
                     )}>Lịch trình</h2>
-                    {!isMobileView && <p className="text-slate-500 font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
+                    {!isMobileView && <p className="text-muted-foreground font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
                   </div>
                   <Button
                     onClick={() => setShowAddDay(true)}
@@ -738,14 +738,14 @@ const TripDetailsPage = () => {
                   isMobileView ? "px-5" : "px-8"
                 )}>
                   {days.length === 0 ? (
-                    <div className="text-center py-20 border-2 border-dashed border-slate-100 rounded-3xl bg-slate-50/50">
+                    <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl bg-secondary/50">
                       <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center">
-                          <Calendar className="w-8 h-8 text-indigo-300" />
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Calendar className="w-8 h-8 text-primary/40" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-800 mb-2">Chưa có lịch trình</h3>
-                      <p className="text-slate-500 mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">Chưa có lịch trình</h3>
+                      <p className="text-muted-foreground mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
                       <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-[#6347f9] hover:bg-[#5136db]">
                         <Plus className="w-4 h-4 mr-2" />
                         Thêm ngày đầu tiên
@@ -758,7 +758,7 @@ const TripDetailsPage = () => {
                         return (
                           <div key={day.id} className="relative">
                             <div className={cn(
-                              "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-slate-50/50 rounded-xl transition-colors",
+                              "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-secondary rounded-xl transition-colors",
                               isMobileView ? "p-1 -mx-1" : "p-2 -mx-2"
                             )}
                               onClick={() => toggleDay(day.id)}
@@ -766,7 +766,7 @@ const TripDetailsPage = () => {
                               <div className={cn(
                                 "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
                                 isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
-                                isExpanded ? "bg-[#6347f9] text-white" : "bg-slate-200 text-slate-500"
+                                isExpanded ? "bg-primary text-white" : "bg-secondary text-muted-foreground"
                               )}>
                                 {index + 1}
                               </div>
@@ -774,19 +774,19 @@ const TripDetailsPage = () => {
                                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                                   <h3 className={cn(
                                     "font-bold leading-tight transition-colors",
-                                    isExpanded ? "text-slate-900" : "text-slate-600",
+                                    isExpanded ? "text-foreground" : "text-muted-foreground",
                                     isMobileView ? "text-lg" : "text-xl"
                                   )}>
                                     {day.title}
                                   </h3>
 
                                   <div className="flex items-center gap-1">
-                                    {isExpanded ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+                                    {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
 
                                     <div onClick={(e) => e.stopPropagation()}>
                                       <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-400 opacity-0 group-hover/header:opacity-100 transition-opacity">
+                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-secondary text-muted-foreground/70 opacity-0 group-hover/header:opacity-100 transition-opacity">
                                             <MoreVertical className="w-4 h-4" />
                                           </Button>
                                         </DropdownMenuTrigger>
@@ -799,12 +799,12 @@ const TripDetailsPage = () => {
                                     </div>
                                   </div>
 
-                                  <Badge variant="outline" className="text-[#6347f9] font-normal bg-slate-50 border-slate-200 ml-auto md:ml-0">
+                                  <Badge variant="outline" className="text-primary font-normal bg-secondary border-border ml-auto md:ml-0">
                                     {formatDate(day.date)}
                                   </Badge>
                                 </div>
                                 {day.description && (
-                                  <p className="text-slate-500 mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>
+                                  <p className="text-muted-foreground mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>
                                 )}
                               </div>
                             </div>
@@ -823,9 +823,9 @@ const TripDetailsPage = () => {
                                     <div
                                       key={activity.id}
                                       className={cn(
-                                        "group bg-white border rounded-2xl transition-all duration-200",
+                                        "group bg-card border rounded-2xl transition-all duration-200",
                                         isMobileView ? "p-4" : "p-5",
-                                        activity.pinned ? "border-purple-200 shadow-sm ring-1 ring-purple-100" : "border-slate-200 hover:border-purple-200",
+                                        activity.pinned ? "border-primary/50 shadow-sm ring-1 ring-primary/20" : "border-border hover:border-primary/30",
                                         !isMobileView && "hover:shadow-md"
                                       )}
                                     >
@@ -833,7 +833,7 @@ const TripDetailsPage = () => {
                                         <div className="space-y-2 flex-1 min-w-0">
                                           <div className="flex items-start justify-between">
                                             <h4 className={cn(
-                                              "font-bold text-slate-800 break-words",
+                                              "font-bold text-foreground break-words",
                                               isMobileView ? "text-base" : "text-lg"
                                             )}>{activity.title}</h4>
 
@@ -880,10 +880,10 @@ const TripDetailsPage = () => {
                                             )}
 
                                             {activity.timeStart && (
-                                              <div className="flex items-center text-slate-700 bg-slate-50 px-2 py-1 rounded-md">
-                                                <Clock className="w-3 h-3 mr-1 text-[#6347f9]" />
+                                              <div className="flex items-center text-foreground bg-secondary px-2 py-1 rounded-md">
+                                                <Clock className="w-3 h-3 mr-1 text-primary" />
                                                 {formatTime(activity.timeStart)}
-                                                {activity.durationMin && <span className="text-slate-400 mx-1">|</span>}
+                                                {activity.durationMin && <span className="text-muted-foreground/50 mx-1">|</span>}
                                                 {activity.durationMin && <span>{activity.durationMin}p</span>}
                                               </div>
                                             )}
@@ -897,7 +897,7 @@ const TripDetailsPage = () => {
                                           </div>
 
                                           {activity.notes && (
-                                            <div className="pt-2 text-slate-600 text-[13px] leading-relaxed bg-slate-50/50 p-2.5 rounded-xl mt-2 border border-slate-100/50">
+                                            <div className="pt-2 text-muted-foreground text-[13px] leading-relaxed bg-secondary/50 p-2.5 rounded-xl mt-2 border border-border/50">
                                               {activity.notes}
                                             </div>
                                           )}
@@ -944,7 +944,7 @@ const TripDetailsPage = () => {
                                 <Button
                                   variant="outline"
                                   onClick={() => { setSelectedDayId(day.id); setShowAddActivity(true); }}
-                                  className="w-full border-2 border-dashed border-slate-200 hover:border-purple-300 text-slate-400 hover:text-purple-600 hover:bg-purple-50/50 h-12 rounded-2xl font-medium transition-all"
+                                  className="w-full border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-12 rounded-2xl font-medium transition-all"
                                 >
                                   <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
                                 </Button>
@@ -961,7 +961,7 @@ const TripDetailsPage = () => {
 
             <TabsContent value="expenses" className="mt-0">
               <Card className={cn(
-                "border-none shadow-xl bg-white overflow-hidden min-h-[500px]",
+                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
                 isMobileView ? "rounded-3xl" : "rounded-[32px]"
               )}>
                 <CardContent className={isMobileView ? "p-4" : "p-8"}>
@@ -976,7 +976,7 @@ const TripDetailsPage = () => {
 
             <TabsContent value="members" className="mt-0">
               <Card className={cn(
-                "border-none shadow-xl bg-white overflow-hidden min-h-[500px]",
+                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
                 isMobileView ? "rounded-3xl" : "rounded-[32px]"
               )}>
                 <CardContent className={isMobileView ? "p-4" : "p-8"}>
@@ -991,7 +991,7 @@ const TripDetailsPage = () => {
 
             <TabsContent value="share" className="mt-0">
               <Card className={cn(
-                "border-none shadow-xl bg-white overflow-hidden min-h-[500px]",
+                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
                 isMobileView ? "rounded-3xl" : "rounded-[32px]"
               )}>
                 <CardContent className={isMobileView ? "p-4" : "p-8"}>

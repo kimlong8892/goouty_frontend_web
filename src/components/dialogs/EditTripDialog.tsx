@@ -22,6 +22,7 @@ import { api } from '@/lib/api';
 import { Trip } from '@/lib/types';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
 import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 
 interface EditTripDialogProps {
   trip: Trip;
@@ -189,13 +190,13 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[#1c1e26] border-gray-800 text-white shadow-2xl rounded-[24px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <Edit className="h-5 w-5" />
+          <DialogTitle className="flex items-center space-x-2 text-white">
+            <Edit className="h-5 w-5 text-[#6347f9]" />
             <span>Chỉnh sửa chuyến đi</span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-slate-400">
             Cập nhật thông tin cho chuyến đi "{trip.title}"
           </DialogDescription>
         </DialogHeader>
@@ -203,9 +204,9 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
         <div className="space-y-6 py-4">
           {/* Trip Avatar Upload */}
           <div className="space-y-2">
-            <Label>Ảnh đại diện chuyến đi</Label>
+            <Label className="text-slate-300">Ảnh đại diện chuyến đi</Label>
             <div className="flex justify-center">
-              <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200 group">
+              <div className="relative w-32 h-32 rounded-2xl overflow-hidden bg-[#242731] border-2 border-gray-700 group shadow-inner">
                 {(avatarPreview || currentAvatar) ? (
                   <img
                     src={avatarPreview || currentAvatar || ''}
@@ -213,20 +214,20 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                    <Camera className="h-8 w-8 text-gray-400" />
+                  <div className="w-full h-full flex items-center justify-center bg-[#1c1e26]">
+                    <Camera className="h-8 w-8 text-slate-500" />
                   </div>
                 )}
 
                 {/* Overlay on hover */}
                 {!updateTripMutation.isPending && (
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
                     <Button
                       type="button"
                       variant="secondary"
                       size="sm"
                       onClick={() => avatarFileInputRef.current?.click()}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/20 hover:bg-white/30 text-white border-0"
                     >
                       <Camera className="h-4 w-4" />
                     </Button>
@@ -240,7 +241,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                     variant="destructive"
                     size="sm"
                     onClick={handleRemoveAvatarFile}
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full p-0 flex items-center justify-center shadow-lg border border-red-500/50"
                   >
                     <X className="h-3 w-3" />
                   </Button>
@@ -258,14 +259,14 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
               </div>
             </div>
             {selectedAvatarFile && (
-              <p className="text-xs text-center text-gray-500">
+              <p className="text-xs text-center text-slate-500">
                 Ảnh mới sẽ được cập nhật khi bấm "Cập nhật"
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tripName">
+            <Label htmlFor="tripName" className="text-slate-300">
               Tên chuyến đi <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -278,7 +279,10 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                   setErrors(prev => ({ ...prev, tripName: '' }));
                 }
               }}
-              className={errors.tripName ? 'border-red-500 focus:border-red-500' : ''}
+              className={cn(
+                "h-12 bg-[#242731] border-gray-700 text-white placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                errors.tripName ? 'border-red-500 focus:border-red-500' : ''
+              )}
             />
             {errors.tripName && (
               <p className="text-sm text-red-500">{errors.tripName}</p>
@@ -286,7 +290,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="provinceId">
+            <Label htmlFor="provinceId" className="text-slate-300">
               Tỉnh thành <span className="text-red-500">*</span>
             </Label>
             <ProvinceSelector
@@ -299,6 +303,8 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
               }}
               placeholder="Chọn tỉnh thành"
               error={!!errors.provinceId}
+              darkMode={true}
+              className="h-12"
             />
             {errors.provinceId && (
               <p className="text-sm text-red-500">{errors.provinceId}</p>
@@ -307,16 +313,19 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
 
           {/* Start Date Picker */}
           <div className="space-y-2">
-            <Label>
+            <Label className="text-slate-300">
               Ngày đi
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal hover:bg-white"
+                  className={cn(
+                    "w-full h-12 justify-start text-left font-normal bg-[#242731] border-gray-700 rounded-xl hover:bg-[#2d313d] hover:text-white transition-colors duration-200",
+                    !startDate ? "text-slate-500" : "text-white"
+                  )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 h-4 w-4 text-slate-400" />
                   {startDate ? (
                     format(startDate, "dd/MM/yyyy", { locale: vi })
                   ) : (
@@ -324,7 +333,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-[#1c1e26] border-gray-700" align="start">
                 <Calendar
                   initialFocus
                   mode="single"
@@ -334,35 +343,38 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                     setStartDate(date);
                   }}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  className="bg-[#1c1e26] text-white"
                 />
               </PopoverContent>
             </Popover>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả chuyến đi</Label>
+            <Label htmlFor="description" className="text-slate-300">Mô tả chuyến đi</Label>
             <Textarea
               id="description"
               placeholder="Chia sẻ về chuyến đi này - điều gì khiến bạn hứng thú?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
+              className="bg-[#242731] border-gray-700 text-white placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
             />
           </div>
         </div>
 
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-3 pt-2">
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={updateTripMutation.isPending}
-            className="hover:bg-transparent hover:text-primary hover:border-primary"
+            className="h-11 rounded-xl border-gray-700 bg-transparent text-slate-400 hover:bg-gray-800 hover:text-white transition-all px-6"
           >
             Hủy
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={updateTripMutation.isPending}
+            className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold px-6"
           >
             {updateTripMutation.isPending ? (
               <>

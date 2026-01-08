@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
 import { api } from '@/lib/api.ts';
 import { useGlobalToast } from '@/utils/globalToast';
+import { cn } from '@/lib/utils.ts';
 import {
   Search,
   Filter,
@@ -66,7 +67,7 @@ const PWATripListPage = () => {
   const [trips, setTrips] = useState<TripWithMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [searchTrigger, setSearchTrigger] = useState(0);
   const [searchLoading, setSearchLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,14 +76,10 @@ const PWATripListPage = () => {
   const [tripToDelete, setTripToDelete] = useState<TripWithMember | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  // Manual search trigger
+  const handleManualSearch = () => {
+    setSearchTrigger(prev => prev + 1);
+  };
 
   // Handle scroll for header style
   useEffect(() => {
@@ -116,7 +113,7 @@ const PWATripListPage = () => {
     setCurrentPage(1);
     setHasMore(true);
     fetchTrips(true); // true = isInitialLoad
-  }, [isAuthenticated, isLoading, user, debouncedSearchQuery]);
+  }, [isAuthenticated, isLoading, user, searchTrigger]);
 
   const handleLoadMore = useCallback(() => {
     if (hasMore && !loadingMore) {
@@ -153,18 +150,14 @@ const PWATripListPage = () => {
 
     // Show appropriate loading state
     if (isInitialLoad) {
-      if (debouncedSearchQuery !== searchQuery) {
-        setSearchLoading(true);
-      } else {
-        setLoading(true);
-      }
+      setLoading(true);
     } else {
       setLoadingMore(true);
     }
 
     try {
       const response = await api.trips.getAll({
-        search: debouncedSearchQuery || undefined,
+        search: searchQuery || undefined,
         page: currentPage,
         limit: 3
       });
@@ -318,21 +311,22 @@ const PWATripListPage = () => {
   }
 
   return (
-    <div className="min-h-screen pb-20 px-4">
+    <div className="min-h-screen pb-20 px-4 bg-background text-foreground">
 
       {/* Search - Fixed at top */}
-      <div className={`fixed top-0 left-0 right-0 z-30 transition-all duration-200 py-3 px-4 pt-[max(env(safe-area-inset-top),12px)] ${isScrolled
-        ? 'bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm'
-        : 'bg-transparent'
-        }`}>
+      <div className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-200 py-3 px-4 pt-[max(env(safe-area-inset-top),12px)]",
+        isScrolled ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm" : "bg-transparent"
+      )}>
         <div className="max-w-6xl mx-auto">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Tìm kiếm chuyến đi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 bg-gray-50 border-gray-200 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 shadow-sm rounded-xl"
+              onKeyDown={(e) => e.key === 'Enter' && handleManualSearch()}
+              className="pl-10 h-11 bg-card border-border focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-sm rounded-xl text-foreground placeholder:text-muted-foreground/60"
               disabled={searchLoading}
             />
             {searchLoading && (
@@ -357,10 +351,10 @@ const PWATripListPage = () => {
             e.currentTarget.style.display = 'none';
           }}
         />
-        <h1 className="text-2xl font-black text-[#6347f9] uppercase tracking-wide mb-2 drop-shadow-sm text-center w-full">
+        <h1 className="text-2xl font-black text-primary uppercase tracking-wide mb-2 drop-shadow-sm text-center w-full">
           CHUYẾN ĐI CỦA TÔI
         </h1>
-        <p className="text-gray-500 font-bold text-sm">
+        <p className="text-muted-foreground font-bold text-sm">
           Quản lý và theo dõi tất cả chuyến đi
         </p>
       </div>
@@ -391,7 +385,7 @@ const PWATripListPage = () => {
               return (
                 <div
                   key={trip.id}
-                  className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[450px] w-full flex flex-col cursor-pointer"
+                  className="group relative rounded-[32px] overflow-hidden border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-card h-[450px] w-full flex flex-col cursor-pointer"
                   onClick={() => handleTripClick(trip)}
                 >
                   {/* Background Image - Full Cover */}
@@ -441,37 +435,37 @@ const PWATripListPage = () => {
                   </div>
 
                   {/* Content Card */}
-                  <div className="flex-1 bg-white p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
+                  <div className="flex-1 bg-card p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
                     <div className="space-y-4">
                       {/* Title */}
-                      <h3 className="font-bold text-lg text-slate-900 leading-snug line-clamp-2" title={trip.title}>
+                      <h3 className="font-bold text-lg text-foreground leading-snug line-clamp-2" title={trip.title}>
                         {trip.title}
                       </h3>
 
                       {/* Details */}
                       <div className="space-y-2">
                         {/* Location */}
-                        <div className="flex items-center text-slate-500 font-medium text-sm">
-                          <MapPin size={16} className="mr-2 text-red-500" />
+                        <div className="flex items-center text-muted-foreground font-medium text-sm">
+                          <MapPin size={16} className="mr-2 text-destructive" />
                           <span className="truncate">{trip.province?.name || 'Chưa xác định'}</span>
                         </div>
 
                         {/* Members */}
-                        <div className="flex items-center text-slate-500 font-medium text-sm">
-                          <Users size={16} className="mr-2 text-[#6347f9]" />
+                        <div className="flex items-center text-muted-foreground font-medium text-sm">
+                          <Users size={16} className="mr-2 text-primary" />
                           <span>{trip.member_count || 1} thành viên</span>
                         </div>
 
                         {/* Owner */}
-                        <div className="flex items-center text-slate-500 font-medium text-sm pt-1">
-                          <div className="w-5 h-5 rounded-full bg-[#00A58E] flex items-center justify-center text-white text-[10px] font-bold mr-2 overflow-hidden flex-shrink-0">
+                        <div className="flex items-center text-muted-foreground font-medium text-sm pt-1">
+                          <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-accent-foreground text-[10px] font-bold mr-2 overflow-hidden flex-shrink-0">
                             {trip.user?.profilePicture ? (
                               <img src={trip.user.profilePicture} alt="Owner" className="w-full h-full object-cover" />
                             ) : (
                               <span>{(trip.user?.fullName || 'A').charAt(0).toUpperCase()}</span>
                             )}
                           </div>
-                          <span className="truncate">Chủ chuyến đi: <span className="text-slate-900 font-medium">{trip.user?.fullName || 'Tôi'}</span></span>
+                          <span className="truncate">Chủ chuyến đi: <span className="text-foreground font-medium">{trip.user?.fullName || 'Tôi'}</span></span>
                         </div>
                       </div>
                     </div>
@@ -479,7 +473,7 @@ const PWATripListPage = () => {
                     {/* Action Button */}
                     <div className="pt-2">
                       <Button
-                        className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-11 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
+                        className="w-full rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold h-11 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleTripClick(trip);
@@ -499,21 +493,21 @@ const PWATripListPage = () => {
           {loadingMore && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {Array.from({ length: 3 }).map((_, index) => (
-                <Card key={`skeleton-${index}`} className="bg-white overflow-hidden">
-                  <div className="h-40 bg-gray-200 animate-pulse"></div>
+                <Card key={`skeleton-${index}`} className="bg-card overflow-hidden border-border">
+                  <div className="h-40 bg-secondary animate-pulse"></div>
                   <CardContent className="p-4">
-                    <div className="h-6 bg-gray-200 rounded animate-pulse mb-3"></div>
+                    <div className="h-6 bg-secondary rounded animate-pulse mb-3"></div>
                     <div className="space-y-2 mb-4">
-                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                      <div className="h-4 bg-secondary rounded animate-pulse"></div>
+                      <div className="h-4 bg-secondary rounded animate-pulse w-3/4"></div>
+                      <div className="h-4 bg-secondary rounded animate-pulse w-1/2"></div>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse mr-2"></div>
-                        <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                        <div className="w-6 h-6 bg-secondary rounded-full animate-pulse mr-2"></div>
+                        <div className="h-4 bg-secondary rounded animate-pulse w-20"></div>
                       </div>
-                      <div className="h-8 bg-gray-200 rounded animate-pulse w-24"></div>
+                      <div className="h-8 bg-secondary rounded animate-pulse w-24"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -524,13 +518,13 @@ const PWATripListPage = () => {
           {/* Empty State */}
           {trips.length === 0 && (
             <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                <Plane className="w-8 h-8 text-gray-400" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-full mb-4">
+                <Plane className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-900">
+              <h3 className="text-lg font-semibold mb-2 text-foreground">
                 {searchQuery ? 'Không tìm thấy chuyến đi' : 'Chưa có chuyến đi nào'}
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-muted-foreground mb-4">
                 {searchQuery
                   ? 'Thử tìm kiếm với từ khóa khác'
                   : 'Bắt đầu tạo chuyến đi đầu tiên của bạn'

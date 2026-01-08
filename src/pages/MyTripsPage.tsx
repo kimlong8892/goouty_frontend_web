@@ -67,7 +67,7 @@ const MyTripsPage = () => {
   const showContent = useAnimateIn(false, 300);
   const { isPWA } = usePWA();
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [searchTrigger, setSearchTrigger] = useState(0);
   const [trips, setTrips] = useState<TripWithMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -85,31 +85,32 @@ const MyTripsPage = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 500); // 500ms delay
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  // Manual search trigger
+  const handleManualSearch = () => {
+    setSearchTrigger(prev => prev + 1);
+  };
 
   // Set page title
   useEffect(() => {
     document.title = 'Chuyến đi của tôi - Goouty';
   }, []);
 
-  // Fetch provinces
+  // Load provinces from our backend API
   useEffect(() => {
-    const fetchProvinces = async () => {
+    const loadProvinces = async () => {
+      setLoading(true);
       try {
-        const response = await api.get<{ data: Province[] }>('/provinces?limit=100');
-        setProvinces(response.data || []);
+        const provincesResponse = await api.provinces.getAll();
+        setProvinces(provincesResponse);
       } catch (error) {
-        console.error('Error fetching provinces:', error);
+        console.error('Error loading provinces:', error);
+        showToast('Không thể tải danh sách tỉnh thành', 'error');
+      } finally {
+        setLoading(false);
       }
     };
-    fetchProvinces();
+
+    loadProvinces();
   }, []);
 
   // Reset trips when search changes
@@ -126,7 +127,7 @@ const MyTripsPage = () => {
     setCurrentPage(1);
     setHasMore(true);
     fetchTrips(true); // true = isInitialLoad
-  }, [isAuthenticated, isLoading, navigate, user, debouncedSearchQuery, selectedProvince]);
+  }, [isAuthenticated, isLoading, navigate, user, searchTrigger, selectedProvince]);
 
   // Load more trips when page changes (for infinite scroll)
   useEffect(() => {
@@ -140,11 +141,7 @@ const MyTripsPage = () => {
 
     // Show appropriate loading state
     if (isInitialLoad) {
-      if (debouncedSearchQuery !== searchQuery) {
-        setSearchLoading(true);
-      } else {
-        setLoading(true);
-      }
+      setLoading(true);
     } else {
       setLoadingMore(true);
     }
@@ -157,7 +154,7 @@ const MyTripsPage = () => {
 
       // Lấy chuyến đi với tìm kiếm và phân trang
       const response = await api.trips.getAll({
-        search: debouncedSearchQuery || undefined,
+        search: searchQuery || undefined,
         page: isFilteringByProvince ? 1 : currentPage, // Always start from page 1 if filtering client-side
         limit: fetchLimit,
         provinceId: selectedProvince !== 'all' ? selectedProvince : undefined
@@ -287,7 +284,7 @@ const MyTripsPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-4 pb-12 px-4">
+    <div className="min-h-screen pt-4 pb-12 px-4 bg-background">
       {isLoading ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
@@ -307,10 +304,10 @@ const MyTripsPage = () => {
                   className="w-full h-full object-contain drop-shadow-xl transform hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h1 className="text-3xl md:text-5xl font-black mb-3 text-[#6347f9] uppercase tracking-wide">
+              <h1 className="text-3xl md:text-5xl font-black mb-3 text-primary uppercase tracking-wide">
                 CHUYẾN ĐI CỦA TÔI
               </h1>
-              <p className="text-slate-600 font-medium text-lg mb-6">
+              <p className="text-muted-foreground font-medium text-lg mb-6">
                 Quản lý và theo dõi tất cả chuyến đi
               </p>
 
@@ -327,12 +324,13 @@ const MyTripsPage = () => {
             {/* Search and Filters */}
             <div className="flex flex-col md:flex-row gap-4 mb-12 max-w-4xl mx-auto">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   placeholder="Tìm kiếm"
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="pl-14 pr-10 bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200 h-12 rounded-xl"
+                  onKeyDown={(e) => e.key === 'Enter' && handleManualSearch()}
+                  className="pl-14 pr-10 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 h-12 rounded-xl text-foreground placeholder:font-normal"
                   disabled={searchLoading}
                 />
                 {searchLoading && (
@@ -349,11 +347,11 @@ const MyTripsPage = () => {
                       variant="outline"
                       role="combobox"
                       aria-expanded={openProvinceFilter}
-                      className="w-full h-12 bg-white border-slate-200 rounded-2xl focus:ring-purple-500/20 shadow-none text-base justify-between font-normal hover:bg-white hover:border-[#d2cdfe] text-slate-500 hover:text-slate-500 transition-colors duration-200"
+                      className="w-full h-12 bg-secondary border-border rounded-xl focus:ring-2 focus:ring-primary/20 shadow-none text-base justify-between font-normal hover:bg-secondary hover:border-primary/50 text-muted-foreground hover:text-muted-foreground transition-all duration-200"
                     >
                       <div className="flex items-center truncate">
-                        <MapPin className="w-5 h-5 mr-3 text-slate-400 shrink-0" />
-                        <span className={cn(selectedProvince === 'all' ? "" : "text-black")}>
+                        <MapPin className="w-5 h-5 mr-3 text-muted-foreground shrink-0" />
+                        <span className={cn(selectedProvince === 'all' ? "" : "text-foreground font-normal")}>
                           {selectedProvince === 'all'
                             ? "Tất cả tỉnh thành"
                             : provinces.find((province) => province.id === selectedProvince)?.name || "Chọn tỉnh thành"}
@@ -362,7 +360,7 @@ const MyTripsPage = () => {
                       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[300px] p-0 rounded-2xl border-slate-200 shadow-xl" align="end">
+                  <PopoverContent className="w-[300px] p-0 rounded-2xl border-border shadow-xl bg-card" align="end">
                     <Command>
                       <CommandInput placeholder="Tìm nhanh tỉnh thành..." />
                       <CommandList>
@@ -428,7 +426,7 @@ const MyTripsPage = () => {
                   {trips.map((trip) => (
                     <div
                       key={trip.id}
-                      className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[450px] w-full flex flex-col cursor-pointer"
+                      className="group relative rounded-[32px] overflow-hidden border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-card h-[450px] w-full flex flex-col cursor-pointer"
                       onClick={() => handleTripAction('view', trip)}
                     >
                       {/* Background Image - Full Cover */}
@@ -478,13 +476,13 @@ const MyTripsPage = () => {
                       </div>
 
                       {/* Content Card */}
-                      <div className="flex-1 bg-white p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
+                      <div className="flex-1 bg-card p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
                         <div className="space-y-4">
                           {/* Title */}
                           <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <h3 className="font-bold text-lg text-slate-900 leading-snug line-clamp-2 text-left" title={trip.title}>
+                                <h3 className="font-bold text-lg text-foreground leading-snug line-clamp-2 text-left" title={trip.title}>
                                   {trip.title}
                                 </h3>
                               </TooltipTrigger>
@@ -497,19 +495,19 @@ const MyTripsPage = () => {
                           {/* Details */}
                           <div className="space-y-2">
                             {/* Location */}
-                            <div className="flex items-center text-slate-500 font-medium text-sm">
+                            <div className="flex items-center text-muted-foreground font-medium text-sm">
                               <MapPin size={16} className="mr-2 text-red-500" />
                               <span className="truncate">{trip.province?.name || 'Chưa xác định'}</span>
                             </div>
 
                             {/* Members */}
-                            <div className="flex items-center text-slate-500 font-medium text-sm">
-                              <Users size={16} className="mr-2 text-[#6347f9]" />
+                            <div className="flex items-center text-muted-foreground font-medium text-sm">
+                              <Users size={16} className="mr-2 text-primary" />
                               <span>{trip.member_count || 1} thành viên</span>
                             </div>
 
                             {/* Owner */}
-                            <div className="flex items-center text-slate-500 font-medium text-sm pt-1">
+                            <div className="flex items-center text-muted-foreground font-medium text-sm pt-1">
                               <div className="w-5 h-5 rounded-full bg-[#00A58E] flex items-center justify-center text-white text-[10px] font-bold mr-2 overflow-hidden flex-shrink-0">
                                 {(trip as any).user?.profilePicture ? (
                                   <img src={(trip as any).user.profilePicture} alt="Owner" className="w-full h-full object-cover" />
@@ -517,7 +515,7 @@ const MyTripsPage = () => {
                                   <span>{(trip.user?.fullName || 'A').charAt(0).toUpperCase()}</span>
                                 )}
                               </div>
-                              <span className="truncate">Chủ chuyến đi: <span className="text-slate-900 font-medium">{(trip as any).user?.fullName || 'Tôi'}</span></span>
+                              <span className="truncate">Chủ chuyến đi: <span className="text-foreground font-medium">{(trip as any).user?.fullName || 'Tôi'}</span></span>
                             </div>
                           </div>
                         </div>
@@ -615,7 +613,7 @@ const MyTripsPage = () => {
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              className="rounded-xl hover:bg-transparent hover:text-primary hover:border-primary border-slate-200"
+              className="rounded-xl hover:bg-transparent hover:text-primary hover:border-primary border-border bg-card text-foreground"
             >
               Hủy
             </Button>
