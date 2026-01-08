@@ -641,8 +641,9 @@ const Profile = () => {
                           <DialogFooter className="pt-4">
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="outline"
                               onClick={() => setIsPasswordDialogOpen(false)}
+                              className="hover:bg-transparent hover:text-primary hover:border-primary"
                             >
                               Hủy
                             </Button>
