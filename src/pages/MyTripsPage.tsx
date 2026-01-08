@@ -484,7 +484,7 @@ const MyTripsPage = () => {
                           <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <h3 className="font-bold text-lg text-slate-900 leading-snug line-clamp-2 cursor-help text-left" title={trip.title}>
+                                <h3 className="font-bold text-lg text-slate-900 leading-snug line-clamp-2 text-left" title={trip.title}>
                                   {trip.title}
                                 </h3>
                               </TooltipTrigger>
