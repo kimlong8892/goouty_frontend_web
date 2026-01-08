@@ -266,7 +266,7 @@ const AuthPage = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-[58px] rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-extrabold text-lg shadow-lg shadow-purple-200 transition-all duration-300 mt-4 active:scale-[0.98]"
+                  className="w-full h-[58px] rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-extrabold text-lg shadow-lg shadow-purple-200 dark:shadow-none transition-all duration-300 mt-4 active:scale-[0.98]"
                 >
                   {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                 </Button>
