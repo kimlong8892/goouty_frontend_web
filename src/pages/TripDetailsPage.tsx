@@ -904,11 +904,11 @@ const TripDetailsPage = () => {
                                         </div>
 
                                         {!isMobileView && (
-                                          <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <div className="flex items-center gap-1">
                                             <Button
                                               variant="ghost"
                                               size="sm"
-                                              className="h-8 w-8 p-0 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-full"
+                                              className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-full transition-colors"
                                               onClick={() => {
                                                 setEditingActivity({
                                                   id: activity.id,
@@ -929,7 +929,7 @@ const TripDetailsPage = () => {
                                             <Button
                                               variant="ghost"
                                               size="sm"
-                                              className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full"
+                                              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 rounded-full transition-colors"
                                               onClick={() => openDeleteActivityDialog(activity)}
                                             >
                                               <Trash2 className="w-4 h-4" />

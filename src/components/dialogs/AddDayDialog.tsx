@@ -106,9 +106,9 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="[&>button]:hidden sm:[&>button]:flex p-0 gap-0 sm:max-w-md w-full rounded-2xl overflow-hidden">
+      <DialogContent className="[&>button]:hidden sm:[&>button]:flex p-0 gap-0 sm:max-w-md w-full rounded-2xl sm:rounded-[32px] overflow-hidden border-border dark:bg-card dark:shadow-2xl">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col h-full">
-          <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-gray-100 space-y-0 text-center sm:text-left">
+          <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-border space-y-0 text-center sm:text-left dark:bg-card">
             <Button
               type="button"
               variant="ghost"
@@ -117,10 +117,10 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
             >
               Hủy
             </Button>
-            <DialogTitle className="flex items-center gap-2 text-lg font-bold">
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold dark:text-foreground">
               {/* Icon only on mobile or both? Keep as is, maybe remove icon on desktop if needed, but keeping it is fine */}
               <CalendarIcon className="w-5 h-5 sm:hidden" />
-              <Plus className="w-5 h-5 hidden sm:block" />
+              <Plus className="w-5 h-5 hidden sm:block text-[#6347f9]" />
               <span className="sm:hidden">Thêm ngày mới</span>
               <span className="hidden sm:inline">Thêm ngày mới</span>
             </DialogTitle>
@@ -137,9 +137,9 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
             </Button>
           </DialogHeader>
 
-          <div className="p-4 sm:p-6 space-y-4">
+          <div className="p-4 sm:p-6 space-y-4 dark:bg-card">
             <div>
-              <Label htmlFor="title">Tiêu đề ngày <span className="text-destructive">*</span></Label>
+              <Label htmlFor="title" className="dark:text-muted-foreground font-medium text-sm">Tiêu đề ngày <span className="text-destructive">*</span></Label>
               <Input
                 id="title"
                 ref={titleRef}
@@ -148,8 +148,8 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
                 placeholder="VD: Ngày 1 - Khám phá thành phố"
                 aria-invalid={!!errors.title}
                 className={cn(
-                  "rounded-xl",
-                  errors.title ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:ring-0 focus-visible:ring-offset-0'
+                  "h-12 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground dark:placeholder:text-muted-foreground/60 focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none",
+                  errors.title ? 'border-destructive focus-visible:ring-destructive' : ''
                 )}
               />
               {errors.title && (
@@ -157,30 +157,30 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
               )}
             </div>
             <div>
-              <Label htmlFor="description">Mô tả ngày</Label>
+              <Label htmlFor="description" className="dark:text-muted-foreground font-medium text-sm">Mô tả ngày</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Mô tả chi tiết về ngày này..."
                 rows={2}
-                className="focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl"
+                className="h-24 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground dark:placeholder:text-muted-foreground/60 focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none resize-none"
               />
             </div>
             <div>
-              <Label htmlFor="date">Ngày <span className="text-destructive">*</span></Label>
+              <Label htmlFor="date" className="dark:text-muted-foreground font-medium text-sm">Ngày <span className="text-destructive">*</span></Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     id="date"
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal h-10 hover:bg-white hover:text-slate-900 rounded-xl",
-                      !formData.date && "text-muted-foreground",
+                      "w-full justify-start text-left font-normal h-12 dark:bg-secondary dark:border-border rounded-xl hover:bg-white dark:hover:bg-secondary/80 dark:text-foreground transition-all duration-200",
+                      !formData.date && "text-muted-foreground dark:text-muted-foreground/60",
                       errors.date && "border-destructive hover:border-destructive/80"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-2 h-4 w-4 dark:text-muted-foreground" />
                     {formData.date ? (
                       format(new Date(formData.date), "dd/MM/yyyy")
                     ) : (
@@ -188,7 +188,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 dark:bg-card dark:border-border" align="start">
                   <Calendar
                     mode="single"
                     selected={formData.date ? new Date(formData.date) : undefined}
@@ -203,18 +203,18 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
             </div>
           </div>
 
-          <DialogFooter className="hidden sm:flex px-6 py-4 border-t border-gray-100 gap-2">
+          <DialogFooter className="hidden sm:flex px-6 py-4 border-t border-gray-100 dark:border-border gap-2 dark:bg-card">
             <Button
               type="button"
               variant="outline"
               onClick={() => handleOpenChange(false)}
-              className="rounded-xl h-10 hover:bg-transparent hover:text-primary hover:border-primary"
+              className="flex-1 rounded-xl h-12 dark:border-border dark:bg-transparent dark:text-muted-foreground dark:hover:bg-secondary dark:hover:text-foreground transition-all"
             >
               Hủy
             </Button>
             <Button
               type="submit"
-              className="rounded-xl h-10 bg-primary hover:bg-primary/90"
+              className="flex-1 rounded-xl h-12 bg-primary dark:bg-[#6347f9] dark:hover:bg-[#5136db] dark:text-white dark:shadow-lg dark:hover:shadow-[#6347f9]/20 transition-all font-bold"
               disabled={loading}
             >
               {loading && (
