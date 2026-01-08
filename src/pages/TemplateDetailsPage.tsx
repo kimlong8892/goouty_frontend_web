@@ -131,7 +131,7 @@ const TripTemplateDetailPage = () => {
                     <img
                         src={template.avatar}
                         alt={template.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-700"
                     />
                 ) : (
                     <div className="w-full h-full bg-slate-200 flex items-center justify-center">
