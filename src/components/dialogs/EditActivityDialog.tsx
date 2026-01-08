@@ -56,9 +56,17 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
       // Extract time from startTime if it exists
       let timeString = '';
       if (activity.startTime) {
-        const date = new Date(activity.startTime);
-        if (!isNaN(date.getTime())) {
-          timeString = date.toTimeString().slice(0, 5); // HH:MM format
+        if (activity.startTime.includes('T')) {
+          try {
+            timeString = activity.startTime.split('T')[1].substring(0, 5);
+          } catch (e) {
+            const date = new Date(activity.startTime);
+            if (!isNaN(date.getTime())) {
+              timeString = date.toTimeString().slice(0, 5);
+            }
+          }
+        } else {
+          timeString = activity.startTime;
         }
       }
 

@@ -448,10 +448,23 @@ const TripDetailsPage = () => {
 
   const formatTime = (timeString: string | null): string => {
     if (!timeString) return '';
-    const date = new Date(timeString);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+    // If it's a full ISO string like "2025-09-15T22:00:00.000Z"
+    // we want to extract the time part directly to avoid timezone conversion
+    if (timeString.includes('T')) {
+      try {
+        const timePart = timeString.split('T')[1];
+        return timePart.substring(0, 5); // HH:mm
+      } catch (e) {
+        // Fallback to standard behavior if parsing fails
+        const date = new Date(timeString);
+        if (isNaN(date.getTime())) return timeString;
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      }
+    }
+    // If it's already in "HH:mm" format or other format without 'T'
+    return timeString;
   };
 
   const formatDate = (dateString: string | null) => {

@@ -105,6 +105,23 @@ const PWATemplateDetailsPage = () => {
         return <Clock className="w-5 h-5" />;
     };
 
+    const formatTime = (timeString: string | null): string => {
+        if (!timeString) return '';
+        if (timeString.includes('T')) {
+            try {
+                const timePart = timeString.split('T')[1];
+                return timePart.substring(0, 5);
+            } catch (e) {
+                const date = new Date(timeString);
+                if (isNaN(date.getTime())) return timeString;
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+        }
+        return timeString;
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -241,7 +258,7 @@ const PWATemplateDetailsPage = () => {
                                                                         <h4 className="font-bold text-slate-900 text-[15px] leading-tight">{act.title}</h4>
                                                                         {act.startTime && (
                                                                             <span className="text-[10px] font-bold text-[#6347f9] bg-slate-100 px-2 py-1 rounded-md flex-shrink-0">
-                                                                                {act.startTime}
+                                                                                {formatTime(act.startTime)}
                                                                             </span>
                                                                         )}
                                                                     </div>
