@@ -41,14 +41,18 @@ export const Footer = () => {
                         <div className="space-y-3 w-full flex flex-col items-start">
                             <div className="text-sm font-semibold text-gray-900">Tải ứng dụng (Sắp ra mắt)</div>
                             <div className="flex gap-3">
-                                {/* App Store Placeholder */}
-                                <div className="h-10 px-4 rounded-lg bg-black text-white flex items-center gap-2 cursor-not-allowed opacity-60">
-                                    <span className="text-xs font-bold">App Store</span>
-                                </div>
-                                {/* Google Play Placeholder */}
-                                <div className="h-10 px-4 rounded-lg bg-black text-white flex items-center gap-2 cursor-not-allowed opacity-60">
-                                    <span className="text-xs font-bold">Google Play</span>
-                                </div>
+                                {/* App Store */}
+                                <img
+                                    src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+                                    alt="Download on the App Store"
+                                    className="h-9 w-auto cursor-not-allowed opacity-60 hover:opacity-100 transition-opacity"
+                                />
+                                {/* Google Play */}
+                                <img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                                    alt="Get it on Google Play"
+                                    className="h-9 w-auto cursor-not-allowed opacity-60 hover:opacity-100 transition-opacity"
+                                />
                             </div>
                         </div>
                     </div>

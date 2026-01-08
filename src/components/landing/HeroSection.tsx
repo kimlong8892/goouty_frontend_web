@@ -44,7 +44,7 @@ export const HeroSection = ({
               <ul className="space-y-2 text-base md:text-lg text-gray-700 font-medium">
                 <li className="flex items-center gap-3">
                   <span className="text-2xl leading-none text-gray-900">•</span>
-                  <span>Quản lý lịch trình và Chi phí nhóm.</span>
+                  <span>Quản lý lịch trình và chi phí nhóm.</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="text-2xl leading-none text-gray-900">•</span>
