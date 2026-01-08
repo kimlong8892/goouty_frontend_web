@@ -261,7 +261,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
                   placeholder="Tìm kiếm theo tiêu đề..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-14 h-14 bg-white border-slate-200 rounded-[20px] focus-visible:ring-[#6347f9]/20 shadow-sm focus:shadow-md transition-all text-base"
+                  className="pl-14 pr-10 bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200 h-12 rounded-xl"
                 />
               </div>
             </div>
@@ -274,7 +274,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full h-14 bg-white border-slate-200 rounded-[20px] focus:ring-[#6347f9]/20 shadow-sm text-base justify-between font-normal hover:bg-white text-slate-500 hover:text-slate-500"
+                    className="w-full h-12 bg-slate-50 border-gray-200 rounded-xl focus:ring-0 shadow-none text-base justify-between font-normal hover:bg-slate-50 hover:border-[#d2cdfe] text-slate-500 hover:text-slate-500 transition-colors duration-200"
                   >
                     <div className="flex items-center truncate">
                       <MapPin className="w-5 h-5 mr-3 text-slate-400 shrink-0" />
