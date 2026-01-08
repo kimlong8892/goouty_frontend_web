@@ -258,7 +258,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
               <div className="relative group">
                 <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 transition-colors group-focus-within:text-[#6347f9]" />
                 <Input
-                  className="pl-14 pr-4 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 h-14 rounded-2xl text-foreground transition-all duration-200"
+                  className="pl-14 pr-4 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 h-14 rounded-2xl text-foreground transition-all duration-200 placeholder:font-normal"
                   placeholder="Tìm kiếm mẫu chuyến đi..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -278,7 +278,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
                     className="h-14 px-6 rounded-2xl border-border bg-secondary hover:bg-secondary/80 hover:border-primary/50 text-foreground transition-all duration-200 active:scale-95 flex items-center gap-2"
                   >
                     <MapPin className="w-5 h-5 text-muted-foreground mr-1" />
-                    <span className="font-semibold">
+                    <span className="font-normal">
                       {selectedProvince === 'all'
                         ? "Tất cả địa điểm"
                         : provinces.find((p) => p.id === selectedProvince)?.name}

@@ -37,7 +37,7 @@ export const Footer = () => {
                         </p>
 
                         <div className="space-y-3 w-full flex flex-col items-start">
-                            <div className="text-sm font-semibold text-foreground">Tải ứng dụng (Sắp ra mắt)</div>
+                            <div className="text-sm font-semibold text-foreground dark:text-white">Tải ứng dụng (Sắp ra mắt)</div>
                             <div className="flex gap-3">
                                 {/* App Store */}
                                 <img
@@ -57,7 +57,7 @@ export const Footer = () => {
 
                     {/* 2. Goouty (Company) */}
                     <div className="flex flex-col space-y-4 items-start">
-                        <h3 className="font-bold text-gray-900 text-lg">Goouty</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-white text-lg">Goouty</h3>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
                                 <Link to="/about" className="flex items-center gap-2 hover:text-primary transition-colors">
@@ -94,7 +94,7 @@ export const Footer = () => {
 
                     {/* 3. Utilities */}
                     <div className="flex flex-col space-y-4 items-start">
-                        <h3 className="font-bold text-gray-900 text-lg">Tiện ích</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-white text-lg">Tiện ích</h3>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
                                 <Link to="/create-trip" className="flex items-center gap-2 hover:text-primary transition-colors">
@@ -119,10 +119,10 @@ export const Footer = () => {
 
                     {/* 4. Contact */}
                     <div className="flex flex-col space-y-4 items-start">
-                        <h3 className="font-bold text-gray-900 text-lg">Liên hệ</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-white text-lg">Liên hệ</h3>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li className="flex flex-col space-y-1 items-start">
-                                <span className="font-medium text-gray-900 flex items-center gap-2">
+                                <span className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
                                     <HelpCircle className="w-4 h-4" /> Trung tâm trợ giúp
                                 </span>
                                 <div className="flex flex-col gap-2 pl-6 mt-1">
@@ -155,7 +155,7 @@ export const Footer = () => {
 
                     {/* 5. Socials */}
                     <div className="flex flex-col space-y-4 items-start">
-                        <h3 className="font-bold text-gray-900 text-lg">Kết nối</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-white text-lg">Kết nối</h3>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
                                 <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">

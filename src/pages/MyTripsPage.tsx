@@ -330,7 +330,7 @@ const MyTripsPage = () => {
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onKeyDown={(e) => e.key === 'Enter' && handleManualSearch()}
-                  className="pl-14 pr-10 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 h-12 rounded-xl text-foreground"
+                  className="pl-14 pr-10 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 h-12 rounded-xl text-foreground placeholder:font-normal"
                   disabled={searchLoading}
                 />
                 {searchLoading && (
@@ -351,7 +351,7 @@ const MyTripsPage = () => {
                     >
                       <div className="flex items-center truncate">
                         <MapPin className="w-5 h-5 mr-3 text-muted-foreground shrink-0" />
-                        <span className={cn(selectedProvince === 'all' ? "" : "text-foreground font-semibold")}>
+                        <span className={cn(selectedProvince === 'all' ? "" : "text-foreground font-normal")}>
                           {selectedProvince === 'all'
                             ? "Tất cả tỉnh thành"
                             : provinces.find((province) => province.id === selectedProvince)?.name || "Chọn tỉnh thành"}
