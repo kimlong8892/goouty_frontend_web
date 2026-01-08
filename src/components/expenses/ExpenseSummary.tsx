@@ -63,7 +63,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
           </CardContent>
         </Card>
 
-        <Card className="rounded-[24px] border-none shadow-sm bg-white dark:bg-card border border-slate-100 dark:border-border overflow-hidden relative group hover:shadow-md transition-shadow">
+        <Card className="rounded-[24px] border-none shadow-sm bg-white dark:bg-card border border-slate-100 dark:border-border overflow-hidden relative">
           <CardContent className={cn(isMobileView ? "p-4" : "p-6")}>
             <div className="flex items-center justify-between">
               <div>
@@ -72,8 +72,8 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
                 </div>
                 <p className={cn("font-black text-slate-900 dark:text-foreground", isMobileView ? "text-2xl" : "text-3xl")}>{calculation.transactionCount}</p>
               </div>
-              <div className={cn("rounded-2xl bg-slate-50 dark:bg-secondary flex items-center justify-center group-hover:bg-slate-100 dark:group-hover:bg-secondary/80 transition-colors", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
-                <ReceiptText className={cn("text-slate-300 dark:text-muted-foreground/30 group-hover:text-[#6347f9] transition-colors", isMobileView ? "w-6 h-6" : "w-8 h-8")} />
+              <div className={cn("rounded-2xl bg-slate-50 dark:bg-secondary flex items-center justify-center", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
+                <ReceiptText className={cn("text-[#6347f9]", isMobileView ? "w-6 h-6" : "w-8 h-8")} />
               </div>
             </div>
           </CardContent>
