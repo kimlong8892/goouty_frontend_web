@@ -10,7 +10,8 @@ import {
     Shield,
     HelpCircle,
     MessageCircle, // For Feedback/Zalo
-    Cookie
+    Cookie,
+    Mail
 } from 'lucide-react';
 
 export const Footer = () => {
@@ -124,10 +125,24 @@ export const Footer = () => {
                                 <span className="font-medium text-gray-900 flex items-center gap-2">
                                     <HelpCircle className="w-4 h-4" /> Trung tâm trợ giúp
                                 </span>
-                                <span className="pl-6 text-gray-500">Zalo: 0949226378</span>
-                                <a href="mailto:Hi@goouty.com" className="pl-6 text-gray-500 hover:text-primary transition-colors">
-                                    Mail: Hi@goouty.com
-                                </a>
+                                <div className="flex flex-col gap-2 pl-6 mt-1">
+                                    <div className="flex items-center gap-2 text-gray-500">
+                                        <img
+                                            src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
+                                            alt="Zalo"
+                                            className="w-4 h-4 object-contain"
+                                        />
+                                        <span>0949226378</span>
+                                    </div>
+                                    <a href="mailto:Hi@goouty.com" className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors">
+                                        <img
+                                            src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg"
+                                            alt="Gmail"
+                                            className="w-4 h-4 object-contain"
+                                        />
+                                        <span>Hi@goouty.com</span>
+                                    </a>
+                                </div>
                             </li>
                             <li>
                                 <a href="https://forms.gle/placeholder" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
