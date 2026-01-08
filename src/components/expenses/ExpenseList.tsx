@@ -203,12 +203,12 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                       </p>
                       <div className="flex items-center gap-2">
                         {canEditOrDelete(expense) && !expense.isLocked && (
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-1">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditExpense(expense)}
-                              className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-400 hover:text-[#6347f9]"
+                              className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors"
                             >
                               <Edit className="w-3.5 h-3.5" />
                             </Button>
@@ -216,7 +216,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteExpense(expense.id)}
-                              className="h-8 w-8 p-0 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500"
+                              className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 transition-colors"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </Button>
