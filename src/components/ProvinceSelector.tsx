@@ -110,7 +110,7 @@ export function ProvinceSelector({
   return (
     <div className="relative" ref={dropdownRef}>
       <div className="relative">
-        <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           ref={inputRef}
           value={selectedProvince ? selectedProvince.name : searchQuery}
@@ -123,7 +123,7 @@ export function ProvinceSelector({
             className
           )}
         />
-        <div className="absolute right-1 top-1 flex items-center">
+        <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
           {selectedProvince && (
             <Button
               type="button"

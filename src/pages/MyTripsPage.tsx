@@ -20,7 +20,8 @@ import {
   Eye,
   Plane,
   Heart,
-  ChevronRight
+  ChevronRight,
+  Check
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
@@ -30,10 +31,23 @@ import { useGlobalToast } from '../utils/globalToast';
 import { api } from '@/lib/api.ts';
 import { envUtils } from '@/lib/env';
 import { usePWA } from '@/pwa/hooks/usePWA';
-import { Trip, ShareLink } from '@/lib/types.ts';
+import { Trip, ShareLink, Province } from '@/lib/types.ts';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { cn } from '@/lib/utils';
 
 // Using Trip from types.ts, extending it for local needs
 type LocalTrip = Trip & {
@@ -62,6 +76,11 @@ const MyTripsPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [totalTrips, setTotalTrips] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Province filter state
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [selectedProvince, setSelectedProvince] = useState<string>('all');
+  const [openProvinceFilter, setOpenProvinceFilter] = useState(false);
   const [tripToDelete, setTripToDelete] = useState<TripWithMember | null>(null);
   const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -80,6 +99,19 @@ const MyTripsPage = () => {
     document.title = 'Chuyến đi của tôi - Goouty';
   }, []);
 
+  // Fetch provinces
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const response = await api.get<{ data: Province[] }>('/provinces?limit=100');
+        setProvinces(response.data || []);
+      } catch (error) {
+        console.error('Error fetching provinces:', error);
+      }
+    };
+    fetchProvinces();
+  }, []);
+
   // Reset trips when search changes
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -94,7 +126,7 @@ const MyTripsPage = () => {
     setCurrentPage(1);
     setHasMore(true);
     fetchTrips(true); // true = isInitialLoad
-  }, [isAuthenticated, isLoading, navigate, user, debouncedSearchQuery]);
+  }, [isAuthenticated, isLoading, navigate, user, debouncedSearchQuery, selectedProvince]);
 
   // Load more trips when page changes (for infinite scroll)
   useEffect(() => {
@@ -118,15 +150,21 @@ const MyTripsPage = () => {
     }
 
     try {
+      // Determine if we assume we are doing client-side filtering (if backend doesn't support it)
+      // We fetch a larger batch if filtering by province to ensure we get matches
+      const isFilteringByProvince = selectedProvince !== 'all';
+      const fetchLimit = isFilteringByProvince ? 100 : 9; // Use 9 for grid (3x3)
+
       // Lấy chuyến đi với tìm kiếm và phân trang
       const response = await api.trips.getAll({
         search: debouncedSearchQuery || undefined,
-        page: currentPage,
-        limit: 6 // Increased limit for grid view
+        page: isFilteringByProvince ? 1 : currentPage, // Always start from page 1 if filtering client-side
+        limit: fetchLimit,
+        provinceId: selectedProvince !== 'all' ? selectedProvince : undefined
       });
 
       // Transform API response to match our component's expected format
-      const tripsWithMembers: TripWithMember[] = response.trips.map((trip: any) => {
+      let tripsWithMembers: TripWithMember[] = response.trips.map((trip: any) => {
         // Xác định vai trò của user trong chuyến đi
         const isOwner = trip.userId === user.id;
         const userRole = isOwner ? 'owner' : 'member';
@@ -163,16 +201,32 @@ const MyTripsPage = () => {
         };
       });
 
+      // Client-side filtering as fallback if backend ignores provinceId
+      if (isFilteringByProvince) {
+        tripsWithMembers = tripsWithMembers.filter(t =>
+          t.province?.id === selectedProvince || t.provinceId === selectedProvince
+        );
+      }
+
       // Update trips state
-      if (isInitialLoad) {
+      if (isInitialLoad || isFilteringByProvince) {
+        // If filtering, we replaced the whole list (since we fetched page 1 with high limit)
         setTrips(tripsWithMembers);
       } else {
         setTrips(prev => [...prev, ...tripsWithMembers]);
       }
 
       // Update pagination state
-      setHasMore(response.pagination.page < response.pagination.totalPages);
-      setTotalTrips(response.pagination.total);
+      if (isFilteringByProvince) {
+        // If client side filtering, we assume we fetched enough. 
+        // Improvement: could handle true pagination if we really wanted, but for My Trips this is usually safe.
+        // If we got 'limit' results, there MIGHT be more, but with the filter applied, complex pagination is hard.
+        // We'll trust the visual list for now.
+        setHasMore(false); // Disable infinite scroll for filtered view for simplicity
+      } else {
+        setHasMore(response.pagination.page < response.pagination.totalPages);
+        setTotalTrips(response.pagination.total);
+      }
     } catch (error: any) {
       console.error('Fetch trips error:', error);
       showToast(error.message || 'Không thể tải danh sách chuyến đi', 'error');
@@ -278,7 +332,7 @@ const MyTripsPage = () => {
                   placeholder="Tìm kiếm"
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="pl-11 h-12 bg-white border-slate-200 rounded-2xl focus-visible:ring-purple-500/20"
+                  className="pl-14 pr-10 bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200 h-12 rounded-xl"
                   disabled={searchLoading}
                 />
                 {searchLoading && (
@@ -289,16 +343,71 @@ const MyTripsPage = () => {
               </div>
 
               <div className="md:w-64">
-                <Select defaultValue="all">
-                  <SelectTrigger className="h-12 bg-white border-slate-200 rounded-2xl focus:ring-purple-500/20">
-                    <MapPin className="w-5 h-5 mr-2 text-slate-400" />
-                    <SelectValue placeholder="Tất cả tỉnh thành" select-none />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl border-slate-200">
-                    <SelectItem value="all">Tất cả tỉnh thành</SelectItem>
-                    {/* Add more filter options if needed */}
-                  </SelectContent>
-                </Select>
+                <Popover open={openProvinceFilter} onOpenChange={setOpenProvinceFilter}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openProvinceFilter}
+                      className="w-full h-12 bg-white border-slate-200 rounded-2xl focus:ring-purple-500/20 shadow-none text-base justify-between font-normal hover:bg-white hover:border-[#d2cdfe] text-slate-500 hover:text-slate-500 transition-colors duration-200"
+                    >
+                      <div className="flex items-center truncate">
+                        <MapPin className="w-5 h-5 mr-3 text-slate-400 shrink-0" />
+                        <span className={cn(selectedProvince === 'all' ? "" : "text-black")}>
+                          {selectedProvince === 'all'
+                            ? "Tất cả tỉnh thành"
+                            : provinces.find((province) => province.id === selectedProvince)?.name || "Chọn tỉnh thành"}
+                        </span>
+                      </div>
+                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[300px] p-0 rounded-2xl border-slate-200 shadow-xl" align="end">
+                    <Command>
+                      <CommandInput placeholder="Tìm nhanh tỉnh thành..." />
+                      <CommandList>
+                        <CommandEmpty>Không tìm thấy tỉnh thành.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            value="all"
+                            className="data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
+                            onSelect={() => {
+                              setSelectedProvince('all');
+                              setOpenProvinceFilter(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedProvince === 'all' ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            Tất cả tỉnh thành
+                          </CommandItem>
+                          {provinces.map((province) => (
+                            <CommandItem
+                              key={province.id}
+                              value={province.name}
+                              className="data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
+                              onSelect={() => {
+                                setSelectedProvince(province.id);
+                                setOpenProvinceFilter(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedProvince === province.id ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {province.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 

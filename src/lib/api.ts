@@ -41,7 +41,7 @@ export const api = {
       const apiError = new Error(error.message || `API error: ${response.statusText}`) as any;
       apiError.status = response.status;
       apiError.statusText = response.statusText;
-      
+
       throw apiError;
     }
 
@@ -98,12 +98,13 @@ export const api = {
 
   // Trip-specific API methods
   trips: {
-    getAll: async (params?: { search?: string; page?: number; limit?: number }) => {
+    getAll: async (params?: { search?: string; page?: number; limit?: number; provinceId?: string }) => {
       const queryParams = new URLSearchParams();
       if (params?.search) queryParams.append('search', params.search);
       if (params?.page) queryParams.append('page', params.page.toString());
       if (params?.limit) queryParams.append('limit', params.limit.toString());
-      
+      if (params?.provinceId) queryParams.append('provinceId', params.provinceId);
+
       const queryString = queryParams.toString();
       const endpoint = queryString ? `/trips?${queryString}` : '/trips';
       return await api.get<{ trips: DATABASE_TYPES.trips[]; pagination: any }>(endpoint);
@@ -126,7 +127,7 @@ export const api = {
     uploadAvatar: async (id: string, file: File) => {
       const formData = new FormData();
       formData.append('avatar', file);
-      
+
       return await api.request<{
         success: boolean;
         message: string;
