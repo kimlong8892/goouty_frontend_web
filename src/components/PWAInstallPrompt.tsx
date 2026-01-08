@@ -10,7 +10,8 @@ export const PWAInstallPrompt = () => {
     const [showPrompt, setShowPrompt] = useState(false);
 
     useEffect(() => {
-        if (isInstallable && !isPWA) {
+        const isDismissed = localStorage.getItem('goouty_pwa_install_prompt_dismissed') === 'true';
+        if (isInstallable && !isPWA && !isDismissed) {
             // Delay showing the prompt a bit for better UX
             const timer = setTimeout(() => {
                 setShowPrompt(true);
@@ -20,11 +21,13 @@ export const PWAInstallPrompt = () => {
     }, [isInstallable, isPWA]);
 
     const handleInstall = async () => {
+        localStorage.setItem('goouty_pwa_install_prompt_dismissed', 'true');
         await handleInstallClick();
         setShowPrompt(false);
     };
 
     const close = () => {
+        localStorage.setItem('goouty_pwa_install_prompt_dismissed', 'true');
         setShowPrompt(false);
     };
 
