@@ -22,6 +22,7 @@ import {
 import { TooltipProvider } from '@/components/ui/tooltip.tsx';
 import { useIsMobile } from '@/hooks/use-mobile.tsx';
 import { PWAInstallButton } from '@/pwa/components/PWAInstallButton';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface NavItemProps {
   to: string;
@@ -45,8 +46,8 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
           <NavigationMenuItem>
             <NavigationMenuTrigger
               className={cn(
-                "relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300",
-                "hover:bg-primary/10 hover:text-primary",
+                "relative flex items-center gap-3 px-5 py-3 rounded-lg transition-all duration-300",
+                "hover:bg-primary/10 hover:text-primary text-base",
                 active ? "bg-primary/10 text-primary" : "text-foreground/80"
               )}
             >
@@ -56,7 +57,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
               )}>
                 {icon}
               </span>
-              <span className="font-medium">{label}</span>
+              <span className="font-semibold">{label}</span>
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[200px] gap-1 p-2">
@@ -77,10 +78,10 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
           <Link
             to={to}
             className={cn(
-              "relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300",
-              "bg-primary hover:bg-primary/90",
-              "text-primary-foreground font-medium shadow-md hover:shadow-lg",
-              "overflow-hidden flex-shrink-0"
+              "relative flex items-center gap-2.5 px-6 py-2.5 rounded-full transition-all duration-300",
+              "bg-[#6347f9] hover:bg-[#5136db]",
+              "text-white font-bold shadow-md hover:shadow-lg",
+              "overflow-hidden flex-shrink-0 text-base"
             )}
             onClick={(e) => {
               handleRipple(e);
@@ -90,7 +91,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
             <span className="text-white">
               {icon}
             </span>
-            <span className="font-medium">{label}</span>
+            <span>{label}</span>
           </Link>
         </TooltipTrigger>
         <TooltipContent>
@@ -106,20 +107,20 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
         <Link
           to={to}
           className={cn(
-            "relative flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300",
-            "hover:bg-gray-100",
+            "relative flex items-center gap-2.5 px-5 py-2.5 rounded-lg transition-all duration-300 group",
+            "hover:bg-primary/10 dark:hover:bg-white/10",
             "overflow-hidden flex-shrink-0",
-            active ? "bg-gray-100" : "bg-transparent"
+            active ? "bg-primary/10 dark:bg-white/10" : "bg-transparent text-base"
           )}
           onClick={(e) => {
             handleRipple(e);
             onClick();
           }}
         >
-          <span className="transition-all duration-300 text-gray-600">
+          <span className="transition-all duration-300 text-gray-500 group-hover:text-primary dark:text-slate-400 dark:group-hover:text-white">
             {icon}
           </span>
-          <span className="font-medium text-gray-700 text-sm">{label}</span>
+          <span className="font-semibold text-gray-700 group-hover:text-primary dark:text-slate-300 dark:group-hover:text-white transition-colors">{label}</span>
         </Link>
       </TooltipTrigger>
       <TooltipContent>
@@ -405,9 +406,10 @@ export const Navbar = () => {
             </div>
           )}
 
+
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (
-            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#edeeff]/90 backdrop-blur-lg px-4 py-2 pb-8 border-t border-gray-200/50">
+            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg px-4 py-2 pb-8 border-t border-border/50">
               <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
                 <div className="pointer-events-auto">
                   {/* Removed SyncStatus icon from PWA nav as requested */}
@@ -443,7 +445,7 @@ export const Navbar = () => {
           <div className="max-w-7xl mx-auto px-4">
             <nav className={cn(
               "flex items-center justify-between px-6 py-3 rounded-full transition-all duration-300",
-              "bg-white/80 backdrop-blur-md shadow-lg border border-gray-100/50"
+              "bg-card/80 backdrop-blur-md shadow-lg border border-border/50"
             )}>
               {/* Left side - Logo and main nav */}
               <div className="flex items-center gap-3">
@@ -485,7 +487,7 @@ export const Navbar = () => {
                 {/* Profile item with user info */}
                 {isAuthenticated && user && (
                   <div
-                    className="flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#f3f4f6] hover:bg-gray-200 transition-colors cursor-pointer"
+                    className="flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-secondary hover:bg-secondary/80 transition-colors cursor-pointer"
                     onClick={() => {
                       handleNavItemClick('profile');
                       navigate('/profile');
@@ -505,7 +507,7 @@ export const Navbar = () => {
                           </span>
                         )}
                       </div>
-                      <span className="text-sm font-semibold text-gray-900 hidden md:inline">
+                      <span className="text-sm font-semibold text-foreground hidden md:inline">
                         {user?.fullName || 'User'}
                       </span>
                     </div>
@@ -521,6 +523,8 @@ export const Navbar = () => {
                     <NotificationBell />
                   </div>
                 )}
+
+                <ThemeToggle />
 
                 {isAuthenticated ? (
                   <Tooltip>

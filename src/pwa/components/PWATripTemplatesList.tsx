@@ -81,7 +81,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Search and filter when they change
+  // Filter when province changes (keep automatic for dropdowns)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (hasSearched) {
@@ -89,7 +89,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       }
     }, 300);
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, selectedProvince, hasSearched]);
+  }, [selectedProvince, hasSearched]);
 
 
   // Save state on unmount
@@ -131,9 +131,15 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
     try {
       setLoading(true);
 
-      // Load provinces
-      const provincesResponse = await api.provinces.getAll();
-      setProvinces(Array.isArray(provincesResponse) ? provincesResponse : []);
+      // Load provinces independently
+      try {
+        const provincesResponse = await api.provinces.getAll();
+        setProvinces(Array.isArray(provincesResponse) ? provincesResponse : []);
+      } catch (provinceError) {
+        console.error('Error loading provinces:', provinceError);
+        // Don't fail the whole initialization if only provinces fail, 
+        // but templates might still load.
+      }
 
       // Check for saved state
       const savedPaginationStr = sessionStorage.getItem('pwa_templates_pagination');
@@ -151,18 +157,23 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       }
 
       // Load templates
-      const templatesResponse = await api.tripTemplates.getPublic({
-        page: 1,
-        limit: initialLimit
-      });
+      try {
+        const templatesResponse = await api.tripTemplates.getPublic({
+          page: 1,
+          limit: initialLimit
+        });
 
-      setTemplates(Array.isArray(templatesResponse.templates) ? templatesResponse.templates : []);
+        setTemplates(Array.isArray(templatesResponse.templates) ? templatesResponse.templates : []);
 
-      setPagination({
-        ...templatesResponse.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 },
-        page: initialPage,
-        limit: pagination.limit
-      });
+        setPagination({
+          ...templatesResponse.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 },
+          page: initialPage,
+          limit: pagination.limit
+        });
+      } catch (templateError) {
+        console.error('Error loading templates:', templateError);
+        setTemplates([]);
+      }
 
       // Restore Scroll
       if (savedScrollYStr) {
@@ -170,9 +181,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       }
 
     } catch (error) {
-      console.error('Error loading initial data:', error);
-      setTemplates([]);
-      setProvinces([]);
+      console.error('General error in loadInitialData:', error);
     } finally {
       setLoading(false);
     }
@@ -265,25 +274,26 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-background text-foreground">
 
 
       {/* Search and Filter - Sticky at top */}
 
       <div className={cn(
         "fixed top-0 left-0 right-0 z-50 pt-[max(env(safe-area-inset-top),12px)] pb-2 px-4 transition-all duration-200",
-        isScrolled && "bg-white/95 backdrop-blur-md border-b border-gray-100/50 shadow-sm"
+        isScrolled ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm" : "bg-transparent"
       )}>
         <div className="max-w-6xl mx-auto space-y-3">
           <div className="flex gap-2">
             {/* Search Bar */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 placeholder={t('template.searchTemplates')}
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 h-11 bg-white shadow-sm border-gray-100 focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl text-base"
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="pl-10 h-11 bg-card shadow-sm border-border focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl text-base text-foreground placeholder:text-muted-foreground/60"
               />
             </div>
 
@@ -295,26 +305,26 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
                   className={cn(
                     "h-11 w-11 rounded-xl shadow-sm shrink-0",
                     selectedProvince !== 'all'
-                      ? "bg-primary text-white hover:bg-primary/90"
-                      : "bg-white text-gray-500 border border-gray-100 hover:bg-primary/5 hover:text-primary"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-card text-muted-foreground border border-border hover:bg-secondary hover:text-primary"
                   )}
                 >
                   <Filter className="w-5 h-5" />
                   {selectedProvince !== 'all' && (
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white ring-0" />
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full border-2 border-background ring-0" />
                   )}
                 </Button>
               </DrawerTrigger>
-              <DrawerContent className="max-h-[85vh]">
-                <DrawerHeader className="border-b pb-4">
-                  <DrawerTitle className="text-center">Chọn tỉnh thành</DrawerTitle>
+              <DrawerContent className="max-h-[85vh] bg-card border-t border-border">
+                <DrawerHeader className="border-b border-border pb-4">
+                  <DrawerTitle className="text-center text-foreground">Chọn tỉnh thành</DrawerTitle>
                   <div className="relative mt-4">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       placeholder="Tìm nhanh tỉnh thành..."
                       value={provinceSearchQuery}
                       onChange={(e) => setProvinceSearchQuery(e.target.value)}
-                      className="pl-10 h-11 bg-gray-50 border border-transparent rounded-xl focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="pl-10 pr-4 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 h-11 rounded-xl text-foreground transition-all duration-200"
                     />
                   </div>
                 </DrawerHeader>
@@ -322,22 +332,22 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full justify-between h-12 rounded-xl px-4 hover:bg-primary hover:text-primary-foreground",
-                      selectedProvince === 'all' && "bg-primary/5 text-primary font-bold"
+                      "w-full justify-between h-12 rounded-xl px-4 hover:bg-primary/10 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200",
+                      selectedProvince === 'all' && "bg-primary/10 text-primary font-bold"
                     )}
                     onClick={() => handleProvinceChange('all')}
                   >
                     <span>{t('template.allProvinces')}</span>
                     {selectedProvince === 'all' && <Check className="w-4 h-4" />}
                   </Button>
-                  <div className="h-px bg-gray-100 my-1 mx-4" />
+                  <div className="h-px bg-border my-1 mx-4" />
                   {filteredProvincesList.map((province) => (
                     <Button
                       key={province.id}
                       variant="ghost"
                       className={cn(
                         "w-full justify-between h-12 rounded-xl px-4 font-normal hover:bg-primary hover:text-primary-foreground",
-                        selectedProvince === province.id && "bg-primary/5 text-primary font-bold"
+                        selectedProvince === province.id && "bg-primary/10 text-primary font-bold"
                       )}
                       onClick={() => handleProvinceChange(province.id)}
                     >
@@ -367,10 +377,10 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
         </h1>
 
         <div className="space-y-1 mb-4">
-          <p className="text-gray-500 font-bold text-sm">
+          <p className="text-muted-foreground font-bold text-sm">
             Nền tảng 2 trong 1
           </p>
-          <ul className="text-gray-500 font-bold text-sm list-none space-y-1">
+          <ul className="text-muted-foreground font-bold text-sm list-none space-y-1">
             <li>• Quản lý lịch trình và Chi phí nhóm.</li>
             <li>• Chia sẻ dễ dàng qua một đường link duy nhất.</li>
           </ul>
@@ -391,7 +401,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
         <h2 className="text-2xl font-black text-[#6347f9] uppercase tracking-wide mb-3 drop-shadow-sm">
           KHÁM PHÁ TEMPLATES
         </h2>
-        <p className="text-gray-500 font-bold text-sm leading-relaxed max-w-xs mx-auto">
+        <p className="text-muted-foreground font-bold text-sm leading-relaxed max-w-xs mx-auto">
           Duyệt qua và sử dụng các kế hoạch chuyến đi có sẵn để bắt đầu hành trình của bạn ngay lập tức
         </p>
       </div>
@@ -399,14 +409,14 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       {/* Results summary if filtering */}
       {hasActiveFilters && templates.length > 0 && (
         <div className="flex items-center justify-between mb-4 px-2">
-          <p className="text-sm font-medium text-gray-500">
+          <p className="text-sm font-medium text-muted-foreground">
             {t('template.templatesFound', { count: templates.length })}
           </p>
           <Button
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="text-primary hover:bg-primary/5 h-8 font-semibold"
+            className="text-primary hover:bg-primary/10 h-8 font-semibold"
           >
             {t('common.clearFilters')}
           </Button>

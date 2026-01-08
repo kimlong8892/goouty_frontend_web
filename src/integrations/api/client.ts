@@ -349,8 +349,14 @@ export const api = {
   // Province-specific API methods
   provinces: {
     getAll: async () => {
-      const response = await api.get<{ data: DATABASE_TYPES.provinces[]; total: number }>('/provinces');
-      return response.data; // Extract the data array from the response
+      const response = await api.get<any>('/provinces', { limit: 100 });
+      // If the response is already an array, return it directly
+      if (Array.isArray(response)) return response;
+      // Handle the case where it's wrapped in a .data property 
+      if (response && Array.isArray(response.data)) return response.data;
+      // Handle the case where it's wrapped in a .provinces property
+      if (response && Array.isArray(response.provinces)) return response.provinces;
+      return [];
     },
     getById: async (id: string) => {
       return await api.get<DATABASE_TYPES.provinces>(`/provinces/${id}`);

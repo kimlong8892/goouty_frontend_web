@@ -317,7 +317,7 @@ const AppContentWithRouter = ({ isPWAMode }: { isPWAMode: boolean }) => {
 
   return (
     <div className={cn(
-      "min-h-screen flex flex-col animate-fade-in bg-[#edeeff]",
+      "min-h-screen flex flex-col animate-fade-in bg-background",
       isMobileView ? "pb-24 min-h-dvh" : "" // Add bottom padding and dynamic viewport height for Mobile/PWA
     )}>
       {/* PWA Alert Notification - positioned above navbar */}

@@ -81,13 +81,13 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
     }
   }, [location, loading]);
 
-  // Search and filter when they change
+  // Filter when province changes (keep automatic for dropdowns)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleSearch();
     }, 300);
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, selectedProvince]);
+  }, [selectedProvince]);
 
 
   // Save state on unmount
@@ -245,7 +245,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
           <h2 className="text-3xl md:text-5xl font-black mb-4 bg-gradient-to-r from-[#6347f9] to-[#8673f8] bg-clip-text text-transparent uppercase tracking-tight">
             KHÁM PHÁ TEMPLATES
           </h2>
-          <p className="text-lg text-slate-500 font-medium max-w-lg mx-auto leading-relaxed">
+          <p className="text-lg text-muted-foreground font-medium max-w-lg mx-auto leading-relaxed">
             Duyệt qua và sử dụng các kế hoạch chuyến đi có sẵn để bắt đầu hành trình của bạn ngay lập tức
           </p>
         </div>
@@ -258,10 +258,11 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
               <div className="relative group">
                 <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 transition-colors group-focus-within:text-[#6347f9]" />
                 <Input
-                  placeholder="Tìm kiếm theo tiêu đề..."
+                  className="pl-14 pr-4 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 h-14 rounded-2xl text-foreground transition-all duration-200"
+                  placeholder="Tìm kiếm mẫu chuyến đi..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-14 pr-10 bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200 h-12 rounded-xl"
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
             </div>
@@ -274,22 +275,23 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full h-12 bg-slate-50 border-gray-200 rounded-xl focus:ring-0 shadow-none text-base justify-between font-normal hover:bg-slate-50 hover:border-[#d2cdfe] text-slate-500 hover:text-slate-500 transition-colors duration-200"
+                    className="h-14 px-6 rounded-2xl border-border bg-secondary hover:bg-secondary/80 hover:border-primary/50 text-foreground transition-all duration-200 active:scale-95 flex items-center gap-2"
                   >
-                    <div className="flex items-center truncate">
-                      <MapPin className="w-5 h-5 mr-3 text-slate-400 shrink-0" />
-                      <span className={cn(selectedProvince === 'all' ? "" : "text-black")}>
-                        {selectedProvince === 'all'
-                          ? "Tất cả tỉnh thành"
-                          : provinces.find((province) => province.id === selectedProvince)?.name || "Chọn tỉnh thành"}
-                      </span>
-                    </div>
+                    <MapPin className="w-5 h-5 text-muted-foreground mr-1" />
+                    <span className="font-semibold">
+                      {selectedProvince === 'all'
+                        ? "Tất cả địa điểm"
+                        : provinces.find((p) => p.id === selectedProvince)?.name}
+                    </span>
                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0 rounded-2xl border-slate-200 shadow-xl" align="end">
+                <PopoverContent className="w-[300px] p-0 rounded-2xl border-border shadow-xl bg-card" align="end">
                   <Command>
-                    <CommandInput placeholder="Tìm nhanh tỉnh thành..." />
+                    <CommandInput
+                      placeholder="Tìm nhanh tỉnh thành..."
+                      className="h-11 border-none focus-visible:ring-0"
+                    />
                     <CommandList>
                       <CommandEmpty>Không tìm thấy tỉnh thành.</CommandEmpty>
                       <CommandGroup>
@@ -340,14 +342,14 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
         {/* Results Count */}
         {templates.length > 0 && (
           <div className="mb-8 flex items-center justify-center space-x-3">
-            <div className="h-px w-8 bg-slate-200" />
-            <p className="text-sm font-semibold text-slate-500 tracking-wide uppercase">
+            <div className="h-px w-8 bg-border" />
+            <p className="text-sm font-semibold text-muted-foreground tracking-wide uppercase">
               Hiển thị {templates.length} template{templates.length !== 1 ? 's' : ''}
               {pagination.total > templates.length && (
                 <span className="ml-1 text-[#6347f9]">/ {pagination.total}</span>
               )}
             </p>
-            <div className="h-px w-8 bg-slate-200" />
+            <div className="h-px w-8 bg-border" />
           </div>
         )}
 
@@ -390,11 +392,11 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
             )}
           </>
         ) : (
-          <Card>
+          <Card className="bg-card border-border">
             <CardContent className="text-center py-12">
               <div className="text-muted-foreground">
                 <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">Không tìm thấy template nào</h3>
+                <h3 className="text-lg font-semibold mb-2 text-foreground">Không tìm thấy template nào</h3>
                 <p className="mb-4">
                   {hasActiveFilters
                     ? 'Thử thay đổi bộ lọc để tìm thấy nhiều template hơn.'
