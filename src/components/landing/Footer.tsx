@@ -10,9 +10,6 @@ import {
     Shield,
     HelpCircle,
     MessageCircle, // For Feedback/Zalo
-    Facebook,
-    Instagram,
-    Video, // Placeholder for TikTok
     Cookie
 } from 'lucide-react';
 
@@ -101,19 +98,19 @@ export const Footer = () => {
                             <li>
                                 <Link to="/create-trip" className="flex items-center gap-2 hover:text-primary transition-colors">
                                     <Map className="w-4 h-4" />
-                                    <span>Smart Planner</span>
+                                    <span>Lập kế hoạch chuyến đi</span>
                                 </Link>
                             </li>
                             <li>
-                                <div className="flex items-center gap-2 text-gray-400 cursor-not-allowed" title="Sắp ra mắt">
+                                <div className="flex items-center gap-2 hover:text-primary transition-colors">
                                     <Split className="w-4 h-4" />
-                                    <span>Split Bills (Coming Soon)</span>
+                                    <span>Chia hóa đơn</span>
                                 </div>
                             </li>
                             <li>
-                                <div className="flex items-center gap-2 text-gray-400 cursor-not-allowed" title="Sắp ra mắt">
+                                <div className="flex items-center gap-2 hover:text-primary transition-colors">
                                     <FileText className="w-4 h-4" />
-                                    <span>Templates Library (Coming Soon)</span>
+                                    <span>Mẫu chuyến đi</span>
                                 </div>
                             </li>
                         </ul>
@@ -147,19 +144,31 @@ export const Footer = () => {
                         <ul className="space-y-3 text-sm text-gray-600">
                             <li>
                                 <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
-                                    <Video className="w-4 h-4" />
+                                    <img
+                                        src="https://www.vectorlogo.zone/logos/tiktok/tiktok-icon.svg"
+                                        alt="TikTok"
+                                        className="w-6 h-6 object-contain"
+                                    />
                                     <span>TikTok</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
-                                    <Instagram className="w-4 h-4" />
+                                    <img
+                                        src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg"
+                                        alt="Instagram"
+                                        className="w-6 h-6 object-contain"
+                                    />
                                     <span>Instagram</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
-                                    <Facebook className="w-4 h-4" />
+                                    <img
+                                        src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg"
+                                        alt="Facebook"
+                                        className="w-6 h-6 object-contain"
+                                    />
                                     <span>Facebook</span>
                                 </a>
                             </li>
