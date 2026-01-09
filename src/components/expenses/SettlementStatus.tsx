@@ -69,13 +69,8 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
     toast.info('Hãy nhập số tiền và bấm "Ghi nhận" để tạo giao dịch');
   };
 
-  const getTotalPaid = (settlementId: string) => {
-    const list = transactionsBySettlement[settlementId] || [];
-    return list.reduce((sum, tx) => sum + (tx.status === 'success' ? tx.amount : 0), 0);
-  };
-
   const getRemaining = (s: PaymentSettlementResponse) => {
-    return Math.max(0, s.amount - getTotalPaid(s.id));
+    return Math.max(0, s.amount);
   };
 
   const clampAmountInput = (s: PaymentSettlementResponse, raw: string) => {
