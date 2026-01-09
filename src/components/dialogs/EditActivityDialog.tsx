@@ -130,18 +130,18 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="[&>button]:hidden sm:[&>button]:flex p-0 gap-0 sm:max-w-md w-full rounded-2xl sm:rounded-[32px] overflow-hidden border-border dark:bg-card dark:shadow-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px] p-0 gap-0">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col h-full">
-          <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-border space-y-0 text-center sm:text-left dark:bg-card">
+          <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 space-y-0 bg-card dark:bg-[#1c1e26]">
             <Button
               type="button"
               variant="ghost"
-              className="p-0 h-auto font-medium text-muted-foreground hover:text-foreground hover:bg-transparent text-base sm:hidden"
+              className="p-0 h-auto font-medium text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-transparent text-base sm:hidden"
               onClick={() => handleOpenChange(false)}
             >
               Hủy
             </Button>
-            <DialogTitle className="flex items-center gap-2 text-lg font-bold dark:text-foreground">
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-foreground dark:text-white">
               <Edit className="w-5 h-5 text-[#6347f9]" />
               <span>Chỉnh sửa hoạt động</span>
             </DialogTitle>
@@ -158,9 +158,9 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
             </Button>
           </DialogHeader>
 
-          <div className="p-4 sm:p-6 space-y-4 dark:bg-card">
+          <div className="p-6 space-y-6 bg-card dark:bg-[#1c1e26]">
             <div className="space-y-2">
-              <Label htmlFor="title" className="dark:text-muted-foreground font-medium text-sm">
+              <Label htmlFor="title" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
                 Tên hoạt động <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -168,23 +168,23 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="VD: Tham quan bảo tàng"
-                className="h-12 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground dark:placeholder:text-muted-foreground/60 focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
+                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 required
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="startTime" className="dark:text-muted-foreground font-medium text-sm">Giờ bắt đầu</Label>
+                <Label htmlFor="startTime" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Giờ bắt đầu</Label>
                 <Input
                   id="startTime"
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                  className="h-12 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
+                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="durationMin" className="dark:text-muted-foreground font-medium text-sm">Thời lượng (phút)</Label>
+                <Label htmlFor="durationMin" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Thời lượng (phút)</Label>
                 <Input
                   id="durationMin"
                   type="number"
@@ -192,29 +192,29 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                   max="1440"
                   value={formData.durationMin}
                   onChange={(e) => setFormData({ ...formData, durationMin: parseInt(e.target.value) || 0 })}
-                  className="h-12 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
+                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location" className="dark:text-muted-foreground font-medium text-sm">Địa điểm</Label>
+              <Label htmlFor="location" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Địa điểm</Label>
               <Input
                 id="location"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 placeholder="VD: Thành phố Hồ Chí Minh"
-                className="h-12 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground dark:placeholder:text-muted-foreground/60 focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
+                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="notes" className="dark:text-muted-foreground font-medium text-sm">Ghi chú</Label>
+              <Label htmlFor="notes" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Ghi chú</Label>
               <Textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Ghi chú thêm về hoạt động..."
                 rows={3}
-                className="h-24 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground dark:placeholder:text-muted-foreground/60 focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none resize-none"
+                className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
               />
             </div>
             <div className="flex items-center space-x-2 pt-2">
@@ -224,28 +224,32 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                 onCheckedChange={(checked) => setFormData({ ...formData, important: !!checked })}
                 className="rounded-md border-border dark:data-[state=checked]:bg-[#6347f9] dark:data-[state=checked]:border-[#6347f9]"
               />
-              <Label htmlFor="important" className="text-sm font-medium dark:text-foreground cursor-pointer">Đánh dấu là hoạt động quan trọng</Label>
+              <Label htmlFor="important" className="text-sm font-medium text-foreground dark:text-white cursor-pointer">Đánh dấu là hoạt động quan trọng</Label>
             </div>
           </div>
 
-          <DialogFooter className="hidden sm:flex px-6 py-4 border-t border-gray-100 dark:border-border gap-2 dark:bg-card">
+          <DialogFooter className="hidden sm:flex px-6 py-4 border-t border-gray-100 dark:border-gray-800 gap-3 bg-card dark:bg-[#1c1e26]">
             <Button
               type="button"
               variant="outline"
               onClick={() => handleOpenChange(false)}
-              className="flex-1 rounded-xl h-12 dark:border-border dark:bg-transparent dark:text-muted-foreground dark:hover:bg-secondary dark:hover:text-foreground transition-all"
+              className="h-11 rounded-xl border-border dark:border-gray-700 bg-transparent text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-gray-800 hover:text-foreground dark:hover:text-white transition-all px-6"
             >
               Hủy
             </Button>
             <Button
               type="submit"
-              className="flex-1 rounded-xl h-12 bg-primary dark:bg-[#6347f9] dark:hover:bg-[#5136db] dark:text-white dark:shadow-lg dark:hover:shadow-[#6347f9]/20 transition-all font-bold"
+              className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold px-6"
               disabled={loading}
             >
-              {loading && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  Đang cập nhật...
+                </>
+              ) : (
+                'Lưu thay đổi'
               )}
-              Lưu thay đổi
             </Button>
           </DialogFooter>
         </form>

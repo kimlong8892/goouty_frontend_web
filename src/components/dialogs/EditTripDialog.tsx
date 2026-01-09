@@ -190,13 +190,13 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[#1c1e26] border-gray-800 text-white shadow-2xl rounded-[24px]">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2 text-white">
+          <DialogTitle className="flex items-center space-x-2 text-foreground dark:text-white">
             <Edit className="h-5 w-5 text-[#6347f9]" />
             <span>Chỉnh sửa chuyến đi</span>
           </DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogDescription className="text-muted-foreground dark:text-slate-400">
             Cập nhật thông tin cho chuyến đi "{trip.title}"
           </DialogDescription>
         </DialogHeader>
@@ -204,9 +204,9 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
         <div className="space-y-6 py-4">
           {/* Trip Avatar Upload */}
           <div className="space-y-2">
-            <Label className="text-slate-300">Ảnh đại diện chuyến đi</Label>
+            <Label className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Ảnh đại diện chuyến đi</Label>
             <div className="flex justify-center">
-              <div className="relative w-32 h-32 rounded-2xl overflow-hidden bg-[#242731] border-2 border-gray-700 group shadow-inner">
+              <div className="relative w-32 h-32 rounded-2xl overflow-hidden bg-secondary dark:bg-[#242731] border-2 border-border dark:border-gray-700 group shadow-inner">
                 {(avatarPreview || currentAvatar) ? (
                   <img
                     src={avatarPreview || currentAvatar || ''}
@@ -214,8 +214,8 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#1c1e26]">
-                    <Camera className="h-8 w-8 text-slate-500" />
+                  <div className="w-full h-full flex items-center justify-center bg-card dark:bg-[#1c1e26]">
+                    <Camera className="h-8 w-8 text-muted-foreground dark:text-slate-500" />
                   </div>
                 )}
 
@@ -259,14 +259,14 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
               </div>
             </div>
             {selectedAvatarFile && (
-              <p className="text-xs text-center text-slate-500">
+              <p className="text-xs text-center text-muted-foreground dark:text-slate-500">
                 Ảnh mới sẽ được cập nhật khi bấm "Cập nhật"
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tripName" className="text-slate-300">
+            <Label htmlFor="tripName" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
               Tên chuyến đi <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -280,7 +280,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                 }
               }}
               className={cn(
-                "h-12 bg-[#242731] border-gray-700 text-white placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                 errors.tripName ? 'border-red-500 focus:border-red-500' : ''
               )}
             />
@@ -290,7 +290,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="provinceId" className="text-slate-300">
+            <Label htmlFor="provinceId" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
               Tỉnh thành <span className="text-red-500">*</span>
             </Label>
             <ProvinceSelector
@@ -303,8 +303,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
               }}
               placeholder="Chọn tỉnh thành"
               error={!!errors.provinceId}
-              darkMode={true}
-              className="h-12"
+              className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700"
             />
             {errors.provinceId && (
               <p className="text-sm text-red-500">{errors.provinceId}</p>
@@ -313,7 +312,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
 
           {/* Start Date Picker */}
           <div className="space-y-2">
-            <Label className="text-slate-300">
+            <Label className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
               Ngày đi
             </Label>
             <Popover>
@@ -321,11 +320,11 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full h-12 justify-start text-left font-normal bg-[#242731] border-gray-700 rounded-xl hover:bg-[#2d313d] hover:text-white transition-colors duration-200",
-                    !startDate ? "text-slate-500" : "text-white"
+                    "w-full h-12 justify-start text-left font-normal bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 rounded-xl hover:bg-secondary/80 dark:hover:bg-[#2d313d] text-foreground dark:text-white transition-all duration-200",
+                    !startDate ? "text-muted-foreground/60 dark:text-slate-500" : "text-foreground dark:text-white"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4 text-slate-400" />
+                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground dark:text-slate-400" />
                   {startDate ? (
                     format(startDate, "dd/MM/yyyy", { locale: vi })
                   ) : (
@@ -333,7 +332,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-[#1c1e26] border-gray-700" align="start">
+              <PopoverContent className="w-auto p-0 bg-card dark:bg-[#1c1e26] border-border dark:border-gray-700" align="start">
                 <Calendar
                   initialFocus
                   mode="single"
@@ -343,21 +342,21 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                     setStartDate(date);
                   }}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  className="bg-[#1c1e26] text-white"
+                  className="bg-card dark:bg-[#1c1e26] text-foreground dark:text-white"
                 />
               </PopoverContent>
             </Popover>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-slate-300">Mô tả chuyến đi</Label>
+            <Label htmlFor="description" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Mô tả chuyến đi</Label>
             <Textarea
               id="description"
               placeholder="Chia sẻ về chuyến đi này - điều gì khiến bạn hứng thú?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="bg-[#242731] border-gray-700 text-white placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+              className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
             />
           </div>
         </div>
@@ -367,7 +366,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={updateTripMutation.isPending}
-            className="h-11 rounded-xl border-gray-700 bg-transparent text-slate-400 hover:bg-gray-800 hover:text-white transition-all px-6"
+            className="h-11 rounded-xl border-border dark:border-gray-700 bg-transparent text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-gray-800 hover:text-foreground dark:hover:text-white transition-all px-6"
           >
             Hủy
           </Button>
