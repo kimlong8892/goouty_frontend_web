@@ -132,7 +132,7 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
                     </div>
                     <div className="text-right">
                       <p className={cn("text-xl font-black", isCompleted ? 'text-green-700 dark:text-green-500' : 'text-orange-700 dark:text-orange-500')}>
-                        {formatCurrency(settlement.amount)}
+                        {formatCurrency(isCompleted ? settlement.amount : remainingAmount)}
                       </p>
                       {isCompleted && settlement.settledAt && (
                         <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1">
@@ -200,12 +200,14 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
                       <div className="space-y-2">
                         {transactionsBySettlement[settlement.id].map(tx => (
                           <div key={tx.id} className="flex items-center justify-between bg-white/60 dark:bg-white/5 p-3 rounded-xl border border-white dark:border-white/5">
-                            <div className="flex flex-col">
-                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                {tx.note || (tx.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản')}
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                {debtorName} <span className="text-slate-400 font-normal">đã chuyển cho</span> {creditorName}
                               </span>
-                              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold">
-                                {formatDateTime(String(tx.createdAt))}
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                                <span>{tx.note || (tx.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản')}</span>
+                                <span className="w-0.5 h-0.5 rounded-full bg-slate-400" />
+                                <span>{formatDateTime(String(tx.createdAt))}</span>
                               </span>
                             </div>
                             <span className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(tx.amount)}</span>
