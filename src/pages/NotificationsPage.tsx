@@ -241,7 +241,7 @@ function NotificationsPage() {
 
   return (
     <div className={cn(
-      "min-h-screen bg-white", // Change to white as per image
+      "min-h-screen bg-white dark:bg-background", // Change to white as per image
       isMobileView ? "pb-20" : ""
     )}>
       {/* Horizontal Tabs - Hide on Mobile */}
@@ -251,26 +251,26 @@ function NotificationsPage() {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           onMarkAllAsRead={handleMarkAllAsRead}
-          className="sticky top-0 z-50 bg-white"
+          className="sticky top-0 z-50 bg-white dark:bg-card"
         />
       )}
 
       {/* Mobile Special Header */}
       {isMobileView && (
-        <div className="px-4 pt-6 pb-2 flex items-center justify-between bg-white sticky top-0 z-40">
-          <h1 className="text-3xl font-bold text-[#1A1D1F]">Thông báo</h1>
+        <div className="px-4 pt-6 pb-2 flex items-center justify-between bg-white dark:bg-card sticky top-0 z-40 border-b border-transparent dark:border-border transition-colors">
+          <h1 className="text-3xl font-bold text-[#1A1D1F] dark:text-foreground">Thông báo</h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="bg-gray-50 rounded-full h-10 w-10">
-                <MoreVertical className="w-5 h-5 text-gray-600" />
+              <Button variant="ghost" size="icon" className="bg-gray-50 dark:bg-secondary rounded-full h-10 w-10">
+                <MoreVertical className="w-5 h-5 text-gray-600 dark:text-secondary-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-xl">
-              <DropdownMenuItem onClick={handleMarkAllAsRead}>
+            <DropdownMenuContent align="end" className="w-56 rounded-xl dark:bg-popover dark:border-border">
+              <DropdownMenuItem onClick={handleMarkAllAsRead} className="dark:focus:bg-secondary">
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Đánh dấu tất cả đã đọc
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleRefresh}>
+              <DropdownMenuItem onClick={handleRefresh} className="dark:focus:bg-secondary">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Làm mới
               </DropdownMenuItem>
@@ -301,11 +301,11 @@ function NotificationsPage() {
 
           {/* Load More Button - Only for Desktop Web mode */}
           {!isMobileView && hasMore && (
-            <div className="bg-white rounded-xl p-4 shadow-sm border-0 mt-4">
+            <div className="bg-white dark:bg-card rounded-xl p-4 shadow-sm border-0 mt-4">
               <Button
                 onClick={loadMore}
                 disabled={loadingMore}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white dark:bg-primary dark:hover:bg-primary/90"
               >
                 {loadingMore ? (
                   <>
@@ -324,8 +324,8 @@ function NotificationsPage() {
 
           {/* Mobile/PWA Loading Indicator */}
           {isMobileView && hasMore && loadingMore && (
-            <div className="bg-white rounded-xl p-4 shadow-sm border-0 mt-2">
-              <div className="flex items-center justify-center gap-2 text-gray-400 py-4">
+            <div className="bg-white dark:bg-card rounded-xl p-4 shadow-sm border-0 mt-2">
+              <div className="flex items-center justify-center gap-2 text-gray-400 dark:text-muted-foreground py-4">
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 <span className="text-sm font-medium">Đang tải thêm...</span>
               </div>

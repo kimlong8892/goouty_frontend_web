@@ -178,19 +178,21 @@ export function NotificationCard({
   return (
     <div
       className={cn(
-        "group relative flex gap-3 p-4 transition-all duration-200 cursor-pointer border-b border-gray-100 last:border-0",
-        isUnread ? "bg-[#FFF8F8]" : "bg-white",
-        "active:bg-gray-100"
+        "group relative flex gap-3 p-4 transition-all duration-200 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0",
+        isUnread
+          ? "bg-[#FFF8F8] hover:bg-[#FFF0F0] dark:bg-blue-900/30 dark:hover:bg-blue-900/50"
+          : "bg-white hover:bg-gray-50 dark:bg-card dark:hover:bg-gray-800/50",
+        "active:bg-gray-100 dark:active:bg-gray-800"
       )}
       onClick={handleClick}
     >
       {/* Avatar Container */}
       <div className="relative flex-shrink-0">
-        <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 border border-gray-100 shadow-sm">
+        <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 shadow-sm">
           {sender.profilePicture ? (
             <img src={sender.profilePicture} alt={sender.fullName} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-bold text-lg">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-bold text-lg dark:text-blue-400">
               {sender.fullName?.charAt(0).toUpperCase() || 'G'}
             </div>
           )}
@@ -198,7 +200,7 @@ export function NotificationCard({
 
         {/* Type Icon Overlay */}
         <div className={cn(
-          "absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-[3px] border-white flex items-center justify-center shadow-sm",
+          "absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-[3px] border-white dark:border-gray-950 flex items-center justify-center shadow-sm",
           style.bgColor
         )}>
           {style.icon}
@@ -210,12 +212,12 @@ export function NotificationCard({
         <div className="flex justify-between items-start gap-2">
           <div className="flex-1">
             <h4 className={cn(
-              "text-[15px] leading-[1.5] text-gray-900",
+              "text-[15px] leading-[1.5] text-gray-900 dark:text-gray-100",
               isUnread && "font-medium"
             )}>
               <span>{sender.fullName}</span> {notification.body}
             </h4>
-            <span className="text-[13px] text-gray-500 mt-1 block">
+            <span className="text-[13px] text-gray-500 dark:text-gray-400 mt-1 block">
               {formatDate(notification.createdAt)}
             </span>
 
@@ -224,7 +226,7 @@ export function NotificationCard({
               <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
                 <Button
                   size="sm"
-                  className="bg-[#FF4D4C] hover:bg-[#FF3333] text-white rounded-full px-8 h-10 font-bold text-sm shadow-sm"
+                  className="bg-[#FF4D4C] hover:bg-[#FF3333] text-white rounded-full px-8 h-10 font-bold text-sm shadow-sm dark:bg-red-600 dark:hover:bg-red-700"
                   onClick={() => {/* Handle Accept */ }}
                 >
                   Chấp nhận
@@ -232,7 +234,7 @@ export function NotificationCard({
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="bg-[#E9ECEF] hover:bg-gray-200 text-[#495057] rounded-full px-8 h-10 font-bold text-sm"
+                  className="bg-[#E9ECEF] hover:bg-gray-200 text-[#495057] rounded-full px-8 h-10 font-bold text-sm dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                   onClick={() => {/* Handle Decline */ }}
                 >
                   Từ chối
@@ -242,7 +244,7 @@ export function NotificationCard({
 
             {/* Status if responded */}
             {notification.data?.responded && (
-              <p className="text-[13px] text-gray-400 mt-2 font-medium">
+              <p className="text-[13px] text-gray-400 dark:text-gray-500 mt-2 font-medium">
                 Bạn đã {notification.data?.response === 'accept' ? 'chấp nhận' : 'từ chối'} lời mời này.
               </p>
             )}
@@ -255,17 +257,17 @@ export function NotificationCard({
         <div className="absolute top-4 right-2" onClick={(e) => e.stopPropagation()}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gray-600 rounded-full">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-800 rounded-full">
                 <MoreVertical size={18} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl">
+            <DropdownMenuContent align="end" className="rounded-xl dark:bg-gray-900 dark:border-gray-800">
               {isUnread ? (
-                <DropdownMenuItem onClick={() => onMarkAsRead(notification.id)}>
+                <DropdownMenuItem onClick={() => onMarkAsRead(notification.id)} className="dark:focus:bg-gray-800">
                   <Check className="w-4 h-4 mr-2" /> Đánh dấu đã đọc
                 </DropdownMenuItem>
               ) : (
-                <DropdownMenuItem onClick={() => onMarkAsUnread(notification.id)}>
+                <DropdownMenuItem onClick={() => onMarkAsUnread(notification.id)} className="dark:focus:bg-gray-800">
                   <Bell className="w-4 h-4 mr-2" /> Đánh dấu chưa đọc
                 </DropdownMenuItem>
               )}
