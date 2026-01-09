@@ -455,7 +455,7 @@ const EditProfile = () => {
                   <Button
                     variant="outline"
                     onClick={handleBack}
-                    className="px-6 h-11"
+                    className="h-11 rounded-xl border-border dark:border-gray-700 bg-transparent text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-gray-800 hover:text-foreground dark:hover:text-white transition-all px-6"
                   >
                     Hủy
                   </Button>
