@@ -101,6 +101,13 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
     try {
       const remaining = getRemaining(settlement);
       const entered = Number(amountInputs[settlement.id] ?? remaining);
+
+      // Security check: Only the creditor (receiver) can record the transaction
+      if (user?.id !== settlement.creditorId) {
+        toast.error('Chỉ người nhận tiền mới có quyền ghi nhận thanh toán');
+        return;
+      }
+
       if (!entered || entered <= 0) {
         toast.error('Số tiền phải > 0');
         return;
@@ -200,6 +207,9 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
             const remaining = getRemaining(settlement);
             if (remaining === 0) return null;
 
+            const isReceiver = user?.id === settlement.creditorId;
+            const isPayer = user?.id === settlement.debtorId;
+
             return (
               <div
                 key={settlement.id}
@@ -246,56 +256,72 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                     </div>
                   </div>
 
-                  {/* Payment Form */}
-                  <div className={cn("bg-slate-50/50 dark:bg-white/5 rounded-[20px] space-y-4", isMobileView ? "p-4" : "p-6")}>
-                    <div className={cn("grid gap-4", isMobileView ? "grid-cols-1" : "grid-cols-2")}>
-                      <div className="space-y-1.5">
-                        <label className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest pl-1">Bạn đã trả bao nhiêu?</label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          className="w-full px-4 h-11 rounded-xl border-none focus:ring-2 focus:ring-orange-500 bg-white dark:bg-slate-800 shadow-sm font-black text-slate-900 dark:text-white"
-                          value={formatWithSeparators(amountInputs[settlement.id] ?? remaining.toString())}
-                          onChange={e => setAmountInputs(prev => ({ ...prev, [settlement.id]: clampAmountInput(settlement, e.target.value) }))}
-                        />
-                      </div>
+                  {/* Payment Form / Message */}
+                  {(isReceiver || (isPayer && (settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber)) && (
+                    <div className={cn("bg-slate-50/50 dark:bg-white/5 rounded-[20px] space-y-4", isMobileView ? "p-4" : "p-6")}>
+                      {isReceiver ? (
+                        <div className={cn("grid gap-4", isMobileView ? "grid-cols-1" : "grid-cols-2")}>
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest pl-1">Bạn đã trả bao nhiêu?</label>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              className="w-full px-4 h-11 rounded-xl border-none focus:ring-2 focus:ring-orange-500 bg-white dark:bg-slate-800 shadow-sm font-black text-slate-900 dark:text-white"
+                              value={formatWithSeparators(amountInputs[settlement.id] ?? remaining.toString())}
+                              onChange={e => setAmountInputs(prev => ({ ...prev, [settlement.id]: clampAmountInput(settlement, e.target.value) }))}
+                            />
+                          </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest pl-1">Phương thức</label>
-                        <select
-                          className="w-full px-4 h-11 rounded-xl border-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-500 shadow-sm font-bold text-slate-700 dark:text-slate-200 appearance-none bg-white dark:bg-slate-800 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
-                          value={methodInputs[settlement.id] || 'cash'}
-                          onChange={e => setMethodInputs(prev => ({ ...prev, [settlement.id]: e.target.value }))}
-                        >
-                          <option value="cash">Tiền mặt</option>
-                          <option value="bank_transfer">Chuyển khoản</option>
-                          <option value="momo">MoMo</option>
-                          <option value="zalo_pay">ZaloPay</option>
-                        </select>
-                      </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest pl-1">Phương thức</label>
+                            <select
+                              className="w-full px-4 h-11 rounded-xl border-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-500 shadow-sm font-bold text-slate-700 dark:text-slate-200 appearance-none bg-white dark:bg-slate-800 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                              value={methodInputs[settlement.id] || 'cash'}
+                              onChange={e => setMethodInputs(prev => ({ ...prev, [settlement.id]: e.target.value }))}
+                            >
+                              <option value="cash">Tiền mặt</option>
+                              <option value="bank_transfer">Chuyển khoản</option>
+                              <option value="momo">MoMo</option>
+                              <option value="zalo_pay">ZaloPay</option>
+                            </select>
+                          </div>
 
-                      <div className={cn("flex gap-2", isMobileView ? "flex-col" : "col-span-2")}>
-                        <Button
-                          className="flex-1 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none"
-                          disabled={isUpdating}
-                          onClick={() => handleCreateTransaction(settlement)}
-                        >
-                          {isUpdating ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Check className="w-4 h-4 mr-2" /> Ghi nhận thanh toán</>}
-                        </Button>
+                          <div className={cn("flex gap-2", isMobileView ? "flex-col" : "col-span-2")}>
+                            <Button
+                              className="flex-1 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none"
+                              disabled={isUpdating}
+                              onClick={() => handleCreateTransaction(settlement)}
+                            >
+                              {isUpdating ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Check className="w-4 h-4 mr-2" /> Ghi nhận thanh toán</>}
+                            </Button>
 
-                        {(settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber && (
-                          <Button
-                            variant="outline"
-                            className={cn("h-11 rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5", isMobileView ? "w-full" : "w-11 p-0")}
-                            onClick={() => setQrSettlementId(settlement.id)}
-                          >
-                            <QrCode className="w-5 h-5 text-slate-600 dark:text-slate-400 mr-2" />
-                            {isMobileView && "Quét QR Chuyển khoản"}
-                          </Button>
-                        )}
-                      </div>
+                            {(settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber && (
+                              <Button
+                                variant="outline"
+                                className={cn("h-11 rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5", isMobileView ? "w-full" : "w-11 p-0")}
+                                onClick={() => setQrSettlementId(settlement.id)}
+                              >
+                                <QrCode className="w-5 h-5 text-slate-600 dark:text-slate-400 mr-2" />
+                                {isMobileView && "QR Profile"}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {isPayer && (settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber && (
+                            <Button
+                              className="w-full h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none"
+                              onClick={() => setQrSettlementId(settlement.id)}
+                            >
+                              <QrCode className="w-4 h-4 mr-2" />
+                              Quét QR Chuyển khoản
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             );
