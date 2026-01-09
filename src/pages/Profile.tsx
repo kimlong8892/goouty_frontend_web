@@ -283,7 +283,7 @@ const Profile = () => {
               <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Tài khoản</h3>
               <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm">
                 <MenuRow
-                  icon={<User className="text-blue-500 w-5 h-5" />}
+                  icon={<User className="text-primary w-5 h-5" />}
                   label="Thông tin cá nhân"
                   onClick={() => navigate('/profile/edit')}
                 />
@@ -306,7 +306,7 @@ const Profile = () => {
 
                 {/* Notification Settings - chỉ hiển thị trong PWA */}
                 {isPWA && (
-                  <div className="p-4 border-b border-gray-50">
+                  <div className="p-4 border-b border-border">
                     <NotificationSettings showCard={false} />
                   </div>
                 )}
@@ -314,7 +314,7 @@ const Profile = () => {
                 {/* Mobile Change Password */}
                 <button
                   onClick={() => setIsPasswordDialogOpen(true)}
-                  className="w-full p-4 flex items-center justify-between active:bg-gray-50 transition-colors"
+                  className="w-full p-4 flex items-center justify-between active:bg-secondary transition-colors"
                 >
                   <div className="flex items-center gap-3 text-sm">
                     <div className="p-2 bg-secondary rounded-xl text-primary"><Lock className="w-5 h-5" /></div>
