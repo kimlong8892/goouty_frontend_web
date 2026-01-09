@@ -10,6 +10,14 @@ import { EditExpenseDialog } from '@/components/dialogs/EditExpenseDialog.tsx';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog.tsx';
 
 interface Member {
   id: string;
@@ -42,6 +50,8 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<DATABASE_TYPES.expenses | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<DATABASE_TYPES.expenses | null>(null);
 
   const fetchExpenses = async () => {
     try {
@@ -109,16 +119,21 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
     setShowEditDialog(true);
   };
 
-  const handleDeleteExpense = async (expenseId: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa chi phí này?')) {
-      return;
-    }
+  const handleDeleteExpense = (expense: DATABASE_TYPES.expenses) => {
+    setExpenseToDelete(expense);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!expenseToDelete) return;
 
     try {
-      await api.expenses.delete(expenseId);
+      await api.expenses.delete(expenseToDelete.id);
       toast.success('Đã xóa chi phí thành công');
       fetchExpenses();
       onExpenseChange?.();
+      setShowDeleteDialog(false);
+      setExpenseToDelete(null);
     } catch (error: any) {
       toast.error(error.response?.data?.message || error.message || 'Không thể xóa chi phí');
     }
@@ -215,7 +230,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleDeleteExpense(expense.id)}
+                              onClick={() => handleDeleteExpense(expense)}
                               className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 transition-colors"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -298,6 +313,32 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
           onExpenseChange?.();
         }}
       />
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="rounded-2xl bg-white dark:bg-[#1a1a2e] border-none shadow-2xl max-w-[90vw] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Xác nhận xóa chi phí</DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400 mt-2">
+              Bạn có chắc chắn muốn xóa chi phí "{expenseToDelete?.title}"? Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-row gap-3 mt-6 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              className="flex-1 sm:flex-none rounded-xl bg-white text-[#6347f9] hover:bg-purple-50 border-slate-200 hover:border-purple-200 font-bold transition-all h-11"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              className="flex-1 sm:flex-none bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-purple-500/20 h-11"
+            >
+              Xóa chi phí
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
