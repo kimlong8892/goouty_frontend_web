@@ -31,21 +31,21 @@ export const PersonalBalance: React.FC<PersonalBalanceProps> = ({ userBalances }
 
     if (net > 0) {
       return (
-        <div className="flex items-center gap-1 text-green-600 bg-green-50 dark:bg-green-500/10 dark:text-green-500 px-3 py-1 rounded-full text-xs font-bold">
+        <div className="flex items-center gap-1 text-amber-600 dark:text-amber-500 bg-white dark:bg-amber-500/10 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-amber-100 dark:border-amber-500/20">
           <ArrowDownLeft className="w-3 h-3" />
           <span>+{formatCurrency(net)}</span>
         </div>
       );
     } else if (net < 0) {
       return (
-        <div className="flex items-center gap-1 text-red-600 bg-red-50 dark:bg-red-500/10 dark:text-red-500 px-3 py-1 rounded-full text-xs font-bold">
+        <div className="flex items-center gap-1 text-red-600 dark:text-red-500 bg-white dark:bg-red-500/10 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-red-100 dark:border-red-500/20">
           <ArrowUpRight className="w-3 h-3" />
           <span>{formatCurrency(net)}</span>
         </div>
       );
     }
     return (
-      <div className="text-slate-400 bg-slate-50 dark:bg-white/5 dark:text-slate-500 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap">
+      <div className="text-green-600 dark:text-green-500 bg-white dark:bg-green-500/10 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-sm border border-green-100 dark:border-green-500/20">
         Đã cân bằng
       </div>
     );
