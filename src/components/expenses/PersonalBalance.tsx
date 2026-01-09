@@ -105,13 +105,13 @@ export const PersonalBalance: React.FC<PersonalBalanceProps> = ({ userBalances }
                 <div className="bg-white/50 dark:bg-white/5 p-2 rounded-xl">
                   <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter mb-1">Phải thu</p>
                   <p className="text-xs font-bold text-green-600 dark:text-green-500">
-                    {formatCurrency(userBalance.totalReceived + (userBalance.remaining > 0 ? userBalance.remaining : 0))}
+                    {formatCurrency(userBalance.remaining !== undefined && userBalance.remaining > 0 ? userBalance.remaining : 0)}
                   </p>
                 </div>
                 <div className="bg-white/50 dark:bg-white/5 p-2 rounded-xl">
                   <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter mb-1">Phải trả</p>
                   <p className="text-xs font-bold text-red-600 dark:text-red-500">
-                    {formatCurrency(userBalance.totalPaidOut + (userBalance.remaining < 0 ? Math.abs(userBalance.remaining) : 0))}
+                    {formatCurrency(userBalance.remaining !== undefined && userBalance.remaining < 0 ? Math.abs(userBalance.remaining) : 0)}
                   </p>
                 </div>
               </div>
