@@ -140,11 +140,11 @@ const AuthPage = () => {
   return (
     <div className="min-h-screen pt-8 pb-12 px-4 flex flex-col items-center justify-center">
       <AnimatedTransition show={show} animation="slide-up" className="w-full max-w-[1000px]">
-        <Card className="w-full grid grid-cols-1 md:grid-cols-2 rounded-[40px] overflow-hidden shadow-[0_12px_40px_rgb(0,0,0,0.06)] border-none bg-white p-6 md:p-8">
+        <Card className="w-full grid grid-cols-1 md:grid-cols-2 rounded-[40px] overflow-hidden shadow-[0_12px_40px_rgb(0,0,0,0.06)] border-none bg-white dark:bg-card p-6 md:p-8">
 
           {/* Mascot Image Section */}
           <div className={`hidden md:block ${mode === 'signup' ? 'md:order-2' : 'md:order-1'} self-center`}>
-            <div className="aspect-square w-full overflow-hidden rounded-[32px] bg-[#f8f9fa]">
+            <div className="aspect-square w-full overflow-hidden rounded-[32px] bg-[#f8f9fa] dark:bg-secondary">
               <img
                 src="/auth_mascot.png"
                 alt="Goouty Mascot"
@@ -159,7 +159,7 @@ const AuthPage = () => {
               <h1 className="text-[44px] font-black text-[#6347f9] mb-3 uppercase tracking-tight leading-tight font-sans">
                 {mode === 'login' ? 'Đăng nhập' : 'ĐĂNG KÝ'}
               </h1>
-              <p className="text-slate-600 font-semibold text-lg">
+              <p className="text-slate-600 dark:text-muted-foreground font-semibold text-lg">
                 Cùng Goouty lập kế hoạch chuyến đi
               </p>
             </div>
@@ -170,7 +170,7 @@ const AuthPage = () => {
                 <>
                   <Button
                     variant="outline"
-                    className="w-full h-[56px] rounded-2xl border-slate-200 hover:bg-slate-50 text-slate-700 font-bold gap-3 text-base shadow-sm transition-all"
+                    className="w-full h-[56px] rounded-2xl border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-primary hover:text-accent-foreground dark:hover:text-primary-foreground dark:text-foreground font-bold gap-3 text-base shadow-sm transition-all"
                     onClick={handleGoogleLogin}
                   >
                     <GoogleIcon size={24} />
@@ -179,10 +179,10 @@ const AuthPage = () => {
 
                   <div className="relative py-2">
                     <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-slate-100" />
+                      <span className="w-full border-t border-slate-100 dark:border-border" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="bg-white px-4 text-slate-400 font-bold">Hoặc</span>
+                      <span className="bg-white dark:bg-card px-4 text-slate-400 dark:text-muted-foreground font-bold">Hoặc</span>
                     </div>
                   </div>
                 </>
@@ -193,11 +193,11 @@ const AuthPage = () => {
                 {/* Name - Signup Only */}
                 {mode === 'signup' && (
                   <div className="space-y-1.5">
-                    <Label htmlFor="fullname" className="text-slate-400 text-sm font-bold ml-1">Name</Label>
+                    <Label htmlFor="fullname" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">Name</Label>
                     <Input
                       id="fullname"
                       type="text"
-                      className="h-[56px] rounded-2xl bg-[#f3f4f6] border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400"
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
                       placeholder="Shane Watson"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -206,13 +206,13 @@ const AuthPage = () => {
                 )}
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-slate-400 text-sm font-bold ml-1">
+                  <Label htmlFor="email" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">
                     {mode === 'signup' ? 'Email Address' : 'Địa chỉ email'}
                   </Label>
                   <Input
                     id="email"
                     type="email"
-                    className="h-[56px] rounded-2xl bg-[#f3f4f6] border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400"
+                    className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
                     placeholder={mode === 'signup' ? "shane.watson@example.com" : "Nhập địa chỉ email của bạn"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -220,14 +220,14 @@ const AuthPage = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-slate-400 text-sm font-bold ml-1">
+                  <Label htmlFor="password" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">
                     {mode === 'signup' ? 'Password' : 'Mật khẩu'}
                   </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      className="h-[56px] rounded-2xl bg-[#f3f4f6] border-none focus:ring-2 focus:ring-[#6347f9]/20 outline-none transition-colors duration-200 px-5 pr-12 text-base font-medium placeholder:text-slate-400"
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 outline-none transition-colors duration-200 px-5 pr-12 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
                       placeholder={mode === 'signup' ? "••••••••" : "Nhập mật khẩu"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -235,7 +235,7 @@ const AuthPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#6347f9] transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground hover:text-[#6347f9] transition-colors"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -249,9 +249,9 @@ const AuthPage = () => {
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-[18px] h-[18px] rounded border-slate-300 text-[#6347f9] focus:ring-[#6347f9] cursor-pointer accent-[#6347f9]"
+                        className="w-[18px] h-[18px] rounded border-slate-300 dark:border-border text-[#6347f9] focus:ring-[#6347f9] cursor-pointer accent-[#6347f9]"
                       />
-                      <span className="text-[14px] text-slate-600 font-bold group-hover:text-slate-800 transition-colors">Ghi nhớ tài khoản</span>
+                      <span className="text-[14px] text-slate-600 dark:text-muted-foreground font-bold group-hover:text-slate-800 dark:group-hover:text-foreground transition-colors">Ghi nhớ tài khoản</span>
                     </label>
 
                     <button
@@ -273,7 +273,7 @@ const AuthPage = () => {
               </form>
 
               <div className="pt-4 text-center">
-                <p className="text-slate-600 font-bold text-[15px]">
+                <p className="text-slate-600 dark:text-muted-foreground font-bold text-[15px]">
                   {mode === 'login' ? 'Bạn không có tài khoản? ' : 'Bạn đã có tài khoản? '}
                   <button
                     onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
