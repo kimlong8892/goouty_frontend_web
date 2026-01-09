@@ -42,8 +42,14 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
     }
   };
 
-  const getTotalPaid = (settlementId: string) => {
-    const list = transactionsBySettlement[settlementId] || [];
+  const getTotalPaid = (settlement: PaymentSettlementResponse) => {
+    // Use backend-calculated totalPaid if available
+    if (settlement.totalPaid !== undefined) {
+      return settlement.totalPaid;
+    }
+
+    // Fallback: calculate from local transactions
+    const list = transactionsBySettlement[settlement.id] || [];
     return list.reduce((sum, tx) => sum + (tx.status === 'success' ? tx.amount : 0), 0);
   };
 
@@ -99,7 +105,10 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
             const isCompleted = settlement.status === 'completed';
             const debtorName = (settlement.debtor.fullName || settlement.debtor.email) + (user && settlement.debtor.id === user.id ? ' (bạn)' : '');
             const creditorName = (settlement.creditor.fullName || settlement.creditor.email) + (user && settlement.creditor.id === user.id ? ' (bạn)' : '');
-            const remainingAmount = Math.max(0, settlement.amount - getTotalPaid(settlement.id));
+            // Use backend-calculated remaining if available, otherwise calculate
+            const remainingAmount = settlement.remaining !== undefined
+              ? settlement.remaining
+              : Math.max(0, settlement.amount - getTotalPaid(settlement));
 
             return (
               <div
