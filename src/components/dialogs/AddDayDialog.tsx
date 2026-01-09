@@ -13,6 +13,8 @@ import { api } from '@/lib/api.ts';
 import { toast } from 'sonner';
 import { CreateDayRequest, Day } from '@/lib/types.ts';
 
+import { usePWA } from '@/pwa/hooks/usePWA.ts';
+
 interface AddDayDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -26,6 +28,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
   tripId,
   onSuccess
 }) => {
+  const { isPWA } = usePWA();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -72,7 +75,6 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
       today.setHours(0, 0, 0, 0);
       if (selectedDate < today) {
         newErrors.date = 'Không thể chọn ngày trong quá khứ';
-        newErrors.date = 'Không thể chọn ngày trong quá khứ';
       }
     }
 
@@ -106,29 +108,29 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="[&>button]:hidden sm:[&>button]:flex p-0 gap-0 sm:max-w-md w-full rounded-2xl sm:rounded-[32px] overflow-hidden border-border dark:bg-card dark:shadow-2xl">
+      <DialogContent
+        hideClose={isPWA}
+        className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px] p-0 gap-0"
+      >
         <form onSubmit={handleSubmit} noValidate className="flex flex-col h-full">
-          <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-border space-y-0 text-center sm:text-left dark:bg-card">
+          <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 space-y-0 bg-card dark:bg-[#1c1e26]">
             <Button
               type="button"
               variant="ghost"
-              className="p-0 h-auto font-medium text-muted-foreground hover:text-gray-900 hover:bg-transparent text-base sm:hidden"
+              className="p-0 h-auto font-medium text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-transparent text-base sm:hidden"
               onClick={() => handleOpenChange(false)}
             >
               Hủy
             </Button>
-            <DialogTitle className="flex items-center gap-2 text-lg font-bold dark:text-foreground">
-              {/* Icon only on mobile or both? Keep as is, maybe remove icon on desktop if needed, but keeping it is fine */}
-              <CalendarIcon className="w-5 h-5 sm:hidden" />
-              <Plus className="w-5 h-5 hidden sm:block text-[#6347f9]" />
-              <span className="sm:hidden">Thêm ngày mới</span>
-              <span className="hidden sm:inline">Thêm ngày mới</span>
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-foreground dark:text-white">
+              <Plus className="w-5 h-5 text-[#6347f9]" />
+              <span>Thêm ngày mới</span>
             </DialogTitle>
             <Button
               type="submit"
               variant="ghost"
               disabled={loading}
-              className="p-0 h-auto font-bold text-primary hover:text-primary/80 hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
+              className="p-0 h-auto font-bold text-[#6347f9] hover:text-[#5136db] hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
             >
               {loading && (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
@@ -137,9 +139,11 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
             </Button>
           </DialogHeader>
 
-          <div className="p-4 sm:p-6 space-y-4 dark:bg-card">
-            <div>
-              <Label htmlFor="title" className="dark:text-muted-foreground font-medium text-sm">Tiêu đề ngày <span className="text-destructive">*</span></Label>
+          <div className="p-6 space-y-6 bg-card dark:bg-[#1c1e26]">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
+                Tiêu đề ngày <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
                 ref={titleRef}
@@ -148,39 +152,43 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
                 placeholder="VD: Ngày 1 - Khám phá thành phố"
                 aria-invalid={!!errors.title}
                 className={cn(
-                  "h-12 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground dark:placeholder:text-muted-foreground/60 focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none",
-                  errors.title ? 'border-destructive focus-visible:ring-destructive' : ''
+                  "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                  errors.title ? 'border-red-500 focus:border-red-500' : ''
                 )}
               />
               {errors.title && (
-                <p className="mt-1 text-xs text-destructive">{errors.title}</p>
+                <p className="text-sm text-red-500">{errors.title}</p>
               )}
             </div>
-            <div>
-              <Label htmlFor="description" className="dark:text-muted-foreground font-medium text-sm">Mô tả ngày</Label>
+
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Mô tả ngày</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Mô tả chi tiết về ngày này..."
-                rows={2}
-                className="h-24 rounded-xl dark:bg-secondary dark:border-border dark:text-foreground dark:placeholder:text-muted-foreground/60 focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none resize-none"
+                rows={3}
+                className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
               />
             </div>
-            <div>
-              <Label htmlFor="date" className="dark:text-muted-foreground font-medium text-sm">Ngày <span className="text-destructive">*</span></Label>
+
+            <div className="space-y-2">
+              <Label htmlFor="date" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
+                Ngày <span className="text-red-500">*</span>
+              </Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     id="date"
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal h-12 dark:bg-secondary dark:border-border rounded-xl hover:bg-white dark:hover:bg-secondary/80 dark:text-foreground transition-all duration-200",
-                      !formData.date && "text-muted-foreground dark:text-muted-foreground/60",
-                      errors.date && "border-destructive hover:border-destructive/80"
+                      "w-full h-12 justify-start text-left font-normal bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 rounded-xl hover:bg-secondary/80 dark:hover:bg-[#2d313d] text-foreground dark:text-white transition-all duration-200",
+                      !formData.date ? "text-muted-foreground/60 dark:text-slate-500" : "text-foreground dark:text-white",
+                      errors.date && "border-red-500 hover:border-red-500/80"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4 dark:text-muted-foreground" />
+                    <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground dark:text-slate-400" />
                     {formData.date ? (
                       format(new Date(formData.date), "dd/MM/yyyy")
                     ) : (
@@ -188,39 +196,44 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 dark:bg-card dark:border-border" align="start">
+                <PopoverContent className="w-auto p-0 bg-card dark:bg-[#1c1e26] border-border dark:border-gray-700" align="start">
                   <Calendar
                     mode="single"
                     selected={formData.date ? new Date(formData.date) : undefined}
                     onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
                     initialFocus
+                    className="bg-card dark:bg-[#1c1e26] text-foreground dark:text-white"
                   />
                 </PopoverContent>
               </Popover>
               {errors.date && (
-                <p className="mt-1 text-xs text-destructive">{errors.date}</p>
+                <p className="text-sm text-red-500">{errors.date}</p>
               )}
             </div>
           </div>
 
-          <DialogFooter className="hidden sm:flex px-6 py-4 border-t border-gray-100 dark:border-border gap-2 dark:bg-card">
+          <DialogFooter className="hidden sm:flex px-6 py-4 border-t border-gray-100 dark:border-gray-800 gap-3 bg-card dark:bg-[#1c1e26]">
             <Button
               type="button"
               variant="outline"
               onClick={() => handleOpenChange(false)}
-              className="flex-1 rounded-xl h-12 dark:border-border dark:bg-transparent dark:text-muted-foreground dark:hover:bg-secondary dark:hover:text-foreground transition-all"
+              className="h-11 rounded-xl border-border dark:border-gray-700 bg-transparent text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-gray-800 hover:text-foreground dark:hover:text-white transition-all px-6"
             >
               Hủy
             </Button>
             <Button
               type="submit"
-              className="flex-1 rounded-xl h-12 bg-primary dark:bg-[#6347f9] dark:hover:bg-[#5136db] dark:text-white dark:shadow-lg dark:hover:shadow-[#6347f9]/20 transition-all font-bold"
+              className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold px-6"
               disabled={loading}
             >
-              {loading && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  Đang xử lý...
+                </>
+              ) : (
+                'Thêm ngày'
               )}
-              Thêm ngày
             </Button>
           </DialogFooter>
         </form>
