@@ -70,15 +70,19 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
   };
 
   const getRemaining = (s: PaymentSettlementResponse) => {
-    // Use backend-calculated remaining if available
+    // Prioritize calculating from local transactions for immediate real-time updates
+    const transactions = transactionsBySettlement[s.id];
+    if (transactions) {
+      const totalPaid = transactions.reduce((sum, tx) => sum + (tx.status === 'success' ? tx.amount : 0), 0);
+      return Math.max(0, s.amount - totalPaid);
+    }
+
+    // Use backend-calculated remaining if available (fallback)
     if (s.remaining !== undefined) {
       return Math.max(0, s.remaining);
     }
 
-    // Fallback: calculate from transactions (for backward compatibility)
-    const transactions = transactionsBySettlement[s.id] || [];
-    const totalPaid = transactions.reduce((sum, tx) => sum + (tx.status === 'success' ? tx.amount : 0), 0);
-    return Math.max(0, s.amount - totalPaid);
+    return s.amount;
   };
 
   const clampAmountInput = (s: PaymentSettlementResponse, raw: string) => {
