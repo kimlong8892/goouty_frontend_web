@@ -132,7 +132,7 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
                     </div>
                     <div className="text-right">
                       <p className={cn("text-xl font-black", isCompleted ? 'text-green-700 dark:text-green-500' : 'text-orange-700 dark:text-orange-500')}>
-                        {formatCurrency(settlement.amount)}
+                        {formatCurrency(isCompleted ? settlement.amount : remainingAmount)}
                       </p>
                       {isCompleted && settlement.settledAt && (
                         <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1">
