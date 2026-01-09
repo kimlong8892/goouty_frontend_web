@@ -161,7 +161,7 @@ export const BankSearch: React.FC<BankSearchProps> = ({
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled}
-            className="pl-10 pr-10 bg-slate-50 border-gray-200 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200 h-12 rounded-xl"
+            className="pl-10 pr-10 bg-secondary/50 border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200 h-12 rounded-xl text-foreground placeholder:text-muted-foreground"
           />
           {selectedBank ? (
             <button
@@ -185,15 +185,15 @@ export const BankSearch: React.FC<BankSearchProps> = ({
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto"
+            className="absolute z-50 w-full mt-1 bg-card border border-border rounded-xl shadow-xl max-h-60 overflow-auto"
           >
             {filteredBanks.length > 0 ? (
               filteredBanks.map((bank) => (
                 <div
                   key={bank.code}
                   className={cn(
-                    "px-3 py-2 cursor-pointer hover:bg-gray-100 flex items-center justify-between",
-                    selectedBank?.code === bank.code && "bg-blue-50"
+                    "px-3 py-2 cursor-pointer hover:bg-secondary flex items-center justify-between text-foreground transition-colors",
+                    selectedBank?.code === bank.code && "bg-primary/10"
                   )}
                   onClick={() => handleBankSelect(bank)}
                 >
@@ -202,7 +202,7 @@ export const BankSearch: React.FC<BankSearchProps> = ({
                     <div className="text-sm text-muted-foreground">{bank.code}</div>
                   </div>
                   {selectedBank?.code === bank.code && (
-                    <Check className="h-4 w-4 text-blue-600" />
+                    <Check className="h-4 w-4 text-primary" />
                   )}
                 </div>
               ))
