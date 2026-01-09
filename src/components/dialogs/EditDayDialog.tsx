@@ -10,6 +10,8 @@ import { api } from '@/integrations/api/client.ts';
 import { cn } from '@/lib/utils.ts';
 import { Plus } from 'lucide-react';
 
+import { usePWA } from '@/pwa/hooks/usePWA.ts';
+
 interface EditDayDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -23,6 +25,7 @@ interface EditDayDialogProps {
 }
 
 export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange, day, onSuccess }) => {
+  const { isPWA } = usePWA();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -93,7 +96,10 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px] p-0 gap-0">
+      <DialogContent
+        hideClose={isPWA}
+        className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px] p-0 gap-0"
+      >
         <form onSubmit={handleSubmit} noValidate className="flex flex-col h-full">
           <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 space-y-0 bg-card dark:bg-[#1c1e26]">
             <Button

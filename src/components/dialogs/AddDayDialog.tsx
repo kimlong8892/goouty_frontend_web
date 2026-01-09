@@ -13,6 +13,8 @@ import { api } from '@/lib/api.ts';
 import { toast } from 'sonner';
 import { CreateDayRequest, Day } from '@/lib/types.ts';
 
+import { usePWA } from '@/pwa/hooks/usePWA.ts';
+
 interface AddDayDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -26,6 +28,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
   tripId,
   onSuccess
 }) => {
+  const { isPWA } = usePWA();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -72,7 +75,6 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
       today.setHours(0, 0, 0, 0);
       if (selectedDate < today) {
         newErrors.date = 'Không thể chọn ngày trong quá khứ';
-        newErrors.date = 'Không thể chọn ngày trong quá khứ';
       }
     }
 
@@ -106,7 +108,10 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px] p-0 gap-0">
+      <DialogContent
+        hideClose={isPWA}
+        className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px] p-0 gap-0"
+      >
         <form onSubmit={handleSubmit} noValidate className="flex flex-col h-full">
           <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 space-y-0 bg-card dark:bg-[#1c1e26]">
             <Button
