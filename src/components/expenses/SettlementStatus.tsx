@@ -273,7 +273,7 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
 
                       <div className={cn("flex gap-2", isMobileView ? "flex-col" : "col-span-2")}>
                         <Button
-                          className="flex-1 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200"
+                          className="flex-1 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none"
                           disabled={isUpdating}
                           onClick={() => handleCreateTransaction(settlement)}
                         >
@@ -364,7 +364,7 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                 </Button>
                 <Button
                   onClick={() => handleDownloadQr(settlements.find((s) => s.id === qrSettlementId)!)}
-                  className="h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200"
+                  className="h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none"
                 >
                   Tải QR
                 </Button>
