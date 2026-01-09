@@ -193,12 +193,12 @@ const AuthPage = () => {
                 {/* Name - Signup Only */}
                 {mode === 'signup' && (
                   <div className="space-y-1.5">
-                    <Label htmlFor="fullname" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">Name</Label>
+                    <Label htmlFor="fullname" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">Họ và tên</Label>
                     <Input
                       id="fullname"
                       type="text"
                       className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
-                      placeholder="Shane Watson"
+                      placeholder="Nguyễn Văn A"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                     />
@@ -207,13 +207,13 @@ const AuthPage = () => {
 
                 <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">
-                    {mode === 'signup' ? 'Email Address' : 'Địa chỉ email'}
+                    Địa chỉ email
                   </Label>
                   <Input
                     id="email"
                     type="email"
                     className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
-                    placeholder={mode === 'signup' ? "shane.watson@example.com" : "Nhập địa chỉ email của bạn"}
+                    placeholder={mode === 'signup' ? "nguyenvan.a@example.com" : "Nhập địa chỉ email của bạn"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -221,7 +221,7 @@ const AuthPage = () => {
 
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">
-                    {mode === 'signup' ? 'Password' : 'Mật khẩu'}
+                    Mật khẩu
                   </Label>
                   <div className="relative">
                     <Input

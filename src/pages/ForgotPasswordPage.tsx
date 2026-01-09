@@ -50,7 +50,7 @@ const ForgotPasswordPage = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="email" className="text-slate-600 dark:text-muted-foreground font-medium">Email Address</Label>
+                            <Label htmlFor="email" className="text-slate-600 dark:text-muted-foreground font-medium">Địa chỉ email</Label>
                             <Input
                                 id="email"
                                 type="email"
