@@ -51,7 +51,7 @@ export function NotificationTabs({
   if (!isPWA) {
     return (
       <div className={cn("w-full", className)}>
-        <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="bg-white dark:bg-card border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center justify-center py-3">
               {/* Centered Tabs */}
@@ -65,7 +65,7 @@ export function NotificationTabs({
                       "active:bg-blue-600 active:text-white active:scale-95",
                       activeTab === tab.id
                         ? "bg-blue-600 text-white shadow-sm"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                     )}
                   >
                     <span className="flex items-center gap-2">
@@ -75,7 +75,7 @@ export function NotificationTabs({
                           "px-2 py-0.5 rounded-full text-xs font-medium min-w-[20px] text-center",
                           activeTab === tab.id
                             ? "bg-white/20 text-white"
-                            : "bg-gray-200 text-gray-600"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                         )}>
                           {tab.count}
                         </span>
@@ -89,7 +89,7 @@ export function NotificationTabs({
               {onMarkAllAsRead && (
                 <button
                   onClick={onMarkAllAsRead}
-                  className="ml-4 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-150"
+                  className="ml-4 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-150"
                 >
                   Đánh dấu đã đọc
                 </button>
@@ -105,7 +105,7 @@ export function NotificationTabs({
   return (
     <div className={cn("w-full", className)}>
       {/* Horizontal scrollable tabs */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="bg-white dark:bg-card border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             {/* Tabs */}
@@ -119,7 +119,7 @@ export function NotificationTabs({
                     "active:bg-blue-600 active:text-white active:scale-95",
                     activeTab === tab.id
                       ? "bg-blue-600 text-white shadow-sm"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export function NotificationTabs({
                         "px-2 py-0.5 rounded-full text-xs font-medium min-w-[20px] text-center",
                         activeTab === tab.id
                           ? "bg-white/20 text-white"
-                          : "bg-gray-200 text-gray-600"
+                          : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                       )}>
                         {tab.count}
                       </span>
@@ -143,7 +143,7 @@ export function NotificationTabs({
             {onMarkAllAsRead && (
               <button
                 onClick={onMarkAllAsRead}
-                className="flex-shrink-0 ml-2 p-2 rounded-full hover:bg-gray-100 transition-colors duration-150"
+                className="flex-shrink-0 ml-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150"
                 title="Đánh dấu tất cả đã đọc"
               >
                 <MarkAllAsReadIcon />

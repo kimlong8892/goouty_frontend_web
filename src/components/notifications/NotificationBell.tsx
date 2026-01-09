@@ -246,11 +246,11 @@ export function NotificationBell() {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-80 max-h-96 flex flex-col">
+      <DropdownMenuContent align="end" className="w-80 max-h-96 flex flex-col dark:bg-popover dark:border-gray-800">
         {/* Header */}
-        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+        <div className="px-4 py-3 bg-gray-50 dark:bg-muted/50 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-foreground">
               Thông báo
             </h3>
             <button
@@ -259,8 +259,8 @@ export function NotificationBell() {
                 handleMarkAllAsRead();
               }}
               className={`text-sm font-medium transition-colors ${unreadCount > 0
-                ? 'text-blue-600 hover:text-blue-700'
-                : 'text-gray-400 cursor-not-allowed'
+                ? 'text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
+                : 'text-gray-400 dark:text-muted-foreground cursor-not-allowed'
                 }`}
               disabled={unreadCount === 0}
             >
@@ -272,17 +272,17 @@ export function NotificationBell() {
         {/* Notifications List */}
         <div className="flex-1 overflow-y-auto max-h-80" onScroll={handleScroll}>
           {loading ? (
-            <div className="p-6 text-center text-gray-500">
+            <div className="p-6 text-center text-gray-500 dark:text-muted-foreground">
               <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-2"></div>
               <p className="text-sm">Đang tải...</p>
             </div>
           ) : displayNotifications.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Bell className="w-6 h-6 text-gray-400" />
+            <div className="p-6 text-center text-gray-500 dark:text-muted-foreground">
+              <div className="w-12 h-12 bg-gray-100 dark:bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+                <Bell className="w-6 h-6 text-gray-400 dark:text-gray-500" />
               </div>
               <p className="text-sm font-medium">Chưa có thông báo</p>
-              <p className="text-xs text-gray-400 mt-1">Khi có thông báo mới, chúng sẽ xuất hiện ở đây</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Khi có thông báo mới, chúng sẽ xuất hiện ở đây</p>
             </div>
           ) : (
             <div className="py-1">
@@ -290,35 +290,37 @@ export function NotificationBell() {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-b-0 ${notification.status === NotificationStatus.UNREAD ? 'bg-[#FFF8F8]' : ''
+                  className={`px-4 py-3 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-b-0 ${notification.status === NotificationStatus.UNREAD
+                    ? 'bg-[#FFF8F8] hover:bg-[#FFF0F0] dark:bg-blue-900/30 dark:hover:bg-blue-900/50'
+                    : 'hover:bg-orange-50 dark:hover:bg-muted/50'
                     }`}
                 >
                   <div className="flex items-start gap-3">
                     {/* Category Icon */}
                     <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center shadow-sm relative ${getNotificationStyle(notification).bgColor
-                      }`}>
+                      } dark:opacity-90`}>
                       {getNotificationStyle(notification).icon}
 
                       {/* Unread dot */}
                       {notification.status === NotificationStatus.UNREAD && (
-                        <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-blue-500 border-2 border-white rounded-full"></div>
+                        <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-blue-500 border-2 border-white dark:border-background rounded-full"></div>
                       )}
                     </div>
 
                     <div className="flex-1 min-w-0">
                       {/* Title */}
-                      <h4 className={`text-sm font-semibold leading-tight mb-1 ${notification.status === NotificationStatus.UNREAD ? 'text-gray-900' : 'text-gray-600'
+                      <h4 className={`text-sm font-semibold leading-tight mb-1 ${notification.status === NotificationStatus.UNREAD ? 'text-gray-900 dark:text-foreground' : 'text-gray-600 dark:text-muted-foreground'
                         }`}>
                         {notification.title}
                       </h4>
 
                       {/* Body */}
-                      <p className="text-sm text-gray-600 leading-relaxed mb-2">
+                      <p className="text-sm text-gray-600 dark:text-muted-foreground leading-relaxed mb-2">
                         {notification.body}
                       </p>
 
                       {/* Footer */}
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
                         <Clock className="w-3 h-3" />
                         <span>{formatDate(notification.createdAt)}</span>
                       </div>
@@ -329,7 +331,7 @@ export function NotificationBell() {
 
               {/* Loading more indicator */}
               {loadingMore && (
-                <div className="p-3 text-center text-gray-500">
+                <div className="p-3 text-center text-gray-500 dark:text-muted-foreground">
                   <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-1"></div>
                   <p className="text-xs">Đang tải thêm...</p>
                 </div>
