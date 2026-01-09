@@ -175,14 +175,14 @@ const EditProfile = () => {
   // PWA Layout
   if (isPWA) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background transition-colors duration-300">
         <AnimatedTransition show={showContent} animation="slide-up">
           {/* Content */}
           <div>
             {isEditing ? (
               // EDIT MODE
               <>
-                <div className="sticky top-0 z-50 flex-shrink-0 bg-white border-b border-gray-200/50 px-4 py-4 shadow-sm">
+                <div className="sticky top-0 z-50 flex-shrink-0 bg-card border-b border-border px-4 py-4 shadow-md">
                   <div className="flex items-center justify-between">
                     <button
                       onClick={handleBack}
@@ -193,7 +193,7 @@ const EditProfile = () => {
                       Hủy
                     </button>
 
-                    <h2 className="text-lg font-bold text-gray-900">Chỉnh sửa thông tin</h2>
+                    <h2 className="text-lg font-bold text-foreground">Chỉnh sửa thông tin</h2>
 
                     <button
                       onClick={handleSaveProfile}
@@ -220,31 +220,31 @@ const EditProfile = () => {
                     />
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="bg-card rounded-2xl p-6 shadow-2xl border border-border space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="fullName" className="text-black font-semibold">Tên</Label>
+                      <Label htmlFor="fullName" className="text-sm font-semibold text-muted-foreground">Tên</Label>
                       <Input
                         id="fullName"
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="bg-slate-50 border-gray-200 rounded-xl h-12 text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
+                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
                         placeholder="Nhập tên của bạn"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-black font-semibold">Email</Label>
+                      <Label htmlFor="email" className="text-sm font-semibold text-muted-foreground">Email</Label>
                       <Input
                         id="email"
                         type="email"
                         value={formData.email}
                         disabled
-                        className="bg-slate-50 border-gray-200 rounded-xl h-12 text-gray-500 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
+                        className="bg-secondary border-border rounded-xl h-12 text-muted-foreground opacity-70 border-dashed focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="phoneNumber" className="text-black font-semibold">Số điện thoại</Label>
+                      <Label htmlFor="phoneNumber" className="text-sm font-semibold text-muted-foreground">Số điện thoại</Label>
                       <Input
                         id="phoneNumber"
                         type="tel"
@@ -253,13 +253,13 @@ const EditProfile = () => {
                           const value = e.target.value.replace(/[^0-9]/g, '');
                           setFormData({ ...formData, phoneNumber: value });
                         }}
-                        className="bg-slate-50 border-gray-200 rounded-xl h-12 text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
+                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
                         placeholder="Nhập số điện thoại"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-black font-semibold">Ngân hàng</Label>
+                      <Label className="text-sm font-semibold text-muted-foreground">Ngân hàng</Label>
                       <BankSearch
                         value={formData.bankId}
                         onChange={(value) => setFormData({ ...formData, bankId: value })}
@@ -268,7 +268,7 @@ const EditProfile = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="bankNumber" className="text-black font-semibold">Số tài khoản</Label>
+                      <Label htmlFor="bankNumber" className="text-sm font-semibold text-muted-foreground">Số tài khoản</Label>
                       <Input
                         id="bankNumber"
                         type="tel"
@@ -277,11 +277,10 @@ const EditProfile = () => {
                           const value = e.target.value.replace(/[^0-9]/g, '');
                           setFormData({ ...formData, bankNumber: value });
                         }}
-                        className="bg-slate-50 border-gray-200 rounded-xl h-12 text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
+                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
                         placeholder="Nhập số tài khoản"
                       />
                     </div>
-
                   </div>
                 </div>
               </>
@@ -289,7 +288,7 @@ const EditProfile = () => {
               // VIEW MODE
               <div className="space-y-4 px-4 py-6 pb-24">
                 <div className="flex flex-col items-center mb-6">
-                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-slate-100 shadow-sm">
+                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-border shadow-sm">
                     {profile.profilePicture ? (
                       <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
                     ) : (
@@ -298,7 +297,7 @@ const EditProfile = () => {
                       </div>
                     )}
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900">{profile.fullName}</h2>
+                  <h2 className="text-xl font-bold text-foreground">{profile.fullName}</h2>
 
                   {/* Edit Button below Name */}
                   <Button
@@ -310,39 +309,39 @@ const EditProfile = () => {
                   </Button>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-sm">
-                  <div className="p-4 border-b border-gray-50 last:border-0 flex justify-between items-center bg-gray-50/50">
-                    <span className="text-gray-500 font-medium">Email</span>
-                    <span className="text-gray-900 font-medium max-w-[200px] truncate" title={profile.email}>{profile.email}</span>
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden text-sm">
+                  <div className="p-4 border-b border-border last:border-0 flex justify-between items-center bg-secondary/30 transition-colors">
+                    <span className="text-muted-foreground font-medium">Email</span>
+                    <span className="text-foreground font-medium max-w-[200px] truncate" title={profile.email}>{profile.email}</span>
                   </div>
 
-                  <div className="p-4 border-b border-gray-50 last:border-0 flex justify-between items-center">
-                    <span className="text-gray-500 font-medium">Số điện thoại</span>
-                    <span className="text-gray-900 font-medium">{profile.phoneNumber || '---'}</span>
+                  <div className="p-4 border-b border-border last:border-0 flex justify-between items-center">
+                    <span className="text-muted-foreground font-medium">Số điện thoại</span>
+                    <span className="text-foreground font-medium">{profile.phoneNumber || '---'}</span>
                   </div>
-                  <div className="p-4 border-b border-gray-50 last:border-0 flex justify-between items-center">
-                    <span className="text-gray-500 font-medium">Ngân hàng</span>
-                    <span className="text-gray-900 font-medium">
+                  <div className="p-4 border-b border-border last:border-0 flex justify-between items-center">
+                    <span className="text-muted-foreground font-medium">Ngân hàng</span>
+                    <span className="text-foreground font-medium">
                       {BANKS.find(b => b.code === profile.bankId)?.name || profile.bankId || '---'}
                     </span>
                   </div>
-                  <div className="p-4 border-b border-gray-50 last:border-0 flex justify-between items-center">
-                    <span className="text-gray-500 font-medium">Số tài khoản</span>
-                    <span className="text-gray-900 font-medium">{profile.bankNumber || '---'}</span>
+                  <div className="p-4 border-b border-border last:border-0 flex justify-between items-center">
+                    <span className="text-muted-foreground font-medium">Số tài khoản</span>
+                    <span className="text-foreground font-medium">{profile.bankNumber || '---'}</span>
                   </div>
                 </div>
 
                 {profile.bankId && profile.bankNumber && (
-                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center mt-4">
-                    <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Mã QR Chuyển khoản</p>
-                    <div className="bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
+                  <div className="bg-card rounded-2xl border border-border shadow-sm p-6 flex flex-col items-center mt-4">
+                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Mã QR Chuyển khoản</p>
+                    <div className="bg-white p-2 rounded-xl border border-border shadow-sm">
                       <img
                         src={`https://img.vietqr.io/image/${profile.bankId}-${profile.bankNumber}-${VIETQR_TEMPLATE}.png`}
                         alt="QR Chuyển khoản"
                         className="w-full max-w-[280px] h-auto rounded-lg"
                       />
                     </div>
-                    <p className="text-xs text-center text-gray-400 mt-4">
+                    <p className="text-xs text-center text-muted-foreground mt-4">
                       {BANKS.find(b => b.code === profile.bankId)?.name} - {profile.bankNumber}
                     </p>
                   </div>
