@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, ChevronDown, Search } from 'lucide-react';
+import { MapPin, ChevronDown, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,14 +13,16 @@ interface ProvinceSelectorProps {
   placeholder?: string;
   className?: string;
   error?: boolean;
+  darkMode?: boolean;
 }
 
-export function ProvinceSelector({ 
-  value, 
-  onChange, 
+export function ProvinceSelector({
+  value,
+  onChange,
   placeholder = "Chọn tỉnh thành",
   className,
-  error = false
+  error = false,
+  darkMode = false
 }: ProvinceSelectorProps) {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -35,8 +37,8 @@ export function ProvinceSelector({
     const loadProvinces = async () => {
       setLoading(true);
       try {
-        const response = await api.get<{data: Province[]}>('/provinces?limit=100');
-        setProvinces(response.data);
+        const provincesResponse = await api.provinces.getAll();
+        setProvinces(provincesResponse);
       } catch (error) {
         console.error('Error loading provinces:', error);
         toast.error('Không thể tải danh sách tỉnh thành');
@@ -88,7 +90,7 @@ export function ProvinceSelector({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setSearchQuery(newValue);
-    
+
     // Always show dropdown when typing
     if (newValue.trim()) {
       setIsOpen(true);
@@ -108,51 +110,56 @@ export function ProvinceSelector({
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative w-full" ref={dropdownRef}>
       <div className="relative">
-        <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <MapPin className={cn(
+          "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 z-10 transition-colors",
+          darkMode ? "text-muted-foreground" : "text-muted-foreground"
+        )} />
         <Input
           ref={inputRef}
+          placeholder={placeholder}
           value={selectedProvince ? selectedProvince.name : searchQuery}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          placeholder={placeholder}
           className={cn(
-            "pl-10 pr-10",
-            error ? 'border-red-500 focus:border-red-500' : '',
+            "pl-10 pr-20 h-12 w-full border-border focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200 rounded-xl",
+            darkMode ? "bg-secondary text-foreground" : "bg-secondary text-foreground",
             className
           )}
         />
-        <div className="absolute right-1 top-1 flex items-center">
+        <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center pr-1 gap-1">
           {selectedProvince && (
             <Button
               type="button"
               variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 hover:bg-transparent mr-1"
+              size="icon"
+              className="h-8 w-8 rounded-full hover:bg-muted"
               onClick={handleClear}
             >
-              <span className="text-xs">×</span>
+              <X className="h-4 w-4 text-muted-foreground" />
             </Button>
           )}
           <Button
             type="button"
             variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 hover:bg-transparent"
+            size="icon"
+            className="h-8 w-8 rounded-full hover:bg-muted"
             onClick={() => setIsOpen(!isOpen)}
           >
             <ChevronDown className={cn(
-              "h-4 w-4 transition-transform",
+              "h-4 w-4 transition-transform text-muted-foreground",
               isOpen ? "rotate-180" : ""
             )} />
           </Button>
         </div>
       </div>
 
-      {/* Autocomplete Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-[50vh] overflow-hidden">
+        <div className={cn(
+          "absolute z-[100] w-full mt-2 border border-border rounded-2xl shadow-2xl max-h-[50vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 bg-card",
+          darkMode ? "bg-card" : "bg-card"
+        )}>
           {/* Loading state */}
           {loading && (
             <div className="p-4 text-center text-sm text-muted-foreground">
@@ -165,52 +172,46 @@ export function ProvinceSelector({
 
           {/* Provinces list */}
           {!loading && (
-            <div className="max-h-[40vh] overflow-y-auto">
+            <div className="max-h-[40vh] overflow-y-auto custom-scrollbar">
               {filteredProvinces.length > 0 ? (
                 <>
-                  {/* Show all provinces when no search query */}
-                  {!searchQuery && (
-                    <div className="px-3 py-2 text-xs font-medium text-muted-foreground bg-gray-50 border-b">
-                      Danh sách tỉnh thành ({provinces.length})
-                    </div>
-                  )}
-                  
-                  {/* Show filtered results when searching */}
-                  {searchQuery && (
-                    <div className="px-3 py-2 text-xs font-medium text-muted-foreground bg-blue-50 border-b">
-                      Kết quả tìm kiếm cho "{searchQuery}" ({filteredProvinces.length})
-                    </div>
-                  )}
-                  
+                  <div className="px-4 py-2 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider bg-muted/30 border-b border-border">
+                    {searchQuery ? `Kết quả cho "${searchQuery}"` : "Danh sách tỉnh thành"} ({filteredProvinces.length})
+                  </div>
+
                   {filteredProvinces.map((province) => (
                     <button
                       key={province.id}
                       type="button"
-                      className="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors touch-manipulation"
+                      className={cn(
+                        "w-full px-4 py-3 text-left text-sm transition-all flex items-center justify-between group",
+                        darkMode
+                          ? "hover:bg-primary/20 focus:bg-primary/20 text-foreground"
+                          : "hover:bg-primary/10 focus:bg-primary/10 text-foreground"
+                      )}
                       onClick={() => handleProvinceSelect(province)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="h-3 w-3 text-muted-foreground" />
-                          <span className="font-medium">{province.name}</span>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <MapPin className="h-4 w-4 text-primary" />
                         </div>
-                        <span className="text-xs text-muted-foreground">
-                          {province.divisionType}
-                        </span>
+                        <span className="font-medium">{province.name}</span>
                       </div>
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/60 bg-muted px-2 py-0.5 rounded">
+                        {province.divisionType}
+                      </span>
                     </button>
                   ))}
                 </>
               ) : (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                  {searchQuery ? (
-                    <div className="space-y-2">
-                      <div>Không tìm thấy tỉnh thành nào</div>
-                      <div className="text-xs">Thử tìm kiếm với từ khóa khác</div>
+                <div className="p-8 text-center text-sm text-muted-foreground">
+                  <div className="mb-2 flex justify-center">
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                      <Search className="h-6 w-6 opacity-20" />
                     </div>
-                  ) : (
-                    'Không có dữ liệu'
-                  )}
+                  </div>
+                  <div className="font-medium">Không tìm thấy tỉnh thành nào</div>
+                  <div className="text-xs opacity-60">Thử tìm kiếm với từ khóa khác</div>
                 </div>
               )}
             </div>

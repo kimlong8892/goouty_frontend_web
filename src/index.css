@@ -8,14 +8,15 @@
     --font-sans: 'Lexend', 'Inter', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Background: Soft Purple tint #edeeff */
+    --background: 236 100% 97%;
+    --foreground: 224 71% 4%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 224 71% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 224 71% 4%;
 
     /* Primary Purple: #6347f9 */
     --primary: 249 94% 63%;
@@ -25,26 +26,55 @@
     --secondary: 249 30% 96%;
     --secondary-foreground: 249 94% 63%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
 
     /* Accent: Orange/Gold for badges */
     --accent: 35 95% 60%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent-foreground: 224 71% 4%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
 
     /* Ring matches Primary Purple */
     --ring: 249 94% 63%;
 
     --radius: 0.75rem;
-    /* Larger radius (12px) for softer look */
   }
 
+  .dark {
+    /* Deep Purple Night */
+    --background: 249 22% 5%;
+    --foreground: 210 40% 98%;
+
+    --card: 249 18% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 249 18% 7%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 249 94% 63%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 249 15% 12%;
+    --secondary-foreground: 249 94% 63%;
+
+    --muted: 249 10% 12%;
+    --muted-foreground: 249 5% 65%;
+
+    --accent: 35 90% 65%;
+    --accent-foreground: 249 22% 5%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 249 12% 14%;
+    --input: 249 12% 14%;
+    --ring: 249 94% 63%;
+  }
 }
 
 @layer utilities {
@@ -106,7 +136,7 @@
   }
 
   body {
-    @apply font-sans text-slate-900 antialiased bg-[#edeeff];
+    @apply font-sans text-foreground antialiased bg-background;
     /* touch-action: manipulation; */
   }
 

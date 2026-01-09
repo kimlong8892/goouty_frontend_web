@@ -65,7 +65,11 @@ export interface PaymentSettlementResponse {
     fullName: string;
     profilePicture?: string;
   };
+  // Calculated fields from backend
+  totalPaid?: number;  // Total amount paid through successful transactions
+  remaining?: number;  // Amount still to be paid (amount - totalPaid)
 }
+
 
 export interface PaymentTransactionResponse {
   id: string;

@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea.tsx';
 import { CalendarIcon, X, Image as ImageIcon, Camera } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { cn } from '@/lib/utils.ts';
 
 const PWAEditTripPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -150,10 +151,10 @@ const PWAEditTripPage = () => {
 
     if (authLoading || initialLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="flex items-center justify-center min-h-screen bg-background text-foreground">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-gray-600">Đang tải...</p>
+                    <p className="text-muted-foreground">Đang tải thông tin...</p>
                 </div>
             </div>
         );
@@ -161,29 +162,31 @@ const PWAEditTripPage = () => {
 
     return (
         <div
-            className="min-h-screen flex flex-col"
+            className="min-h-screen flex flex-col bg-background transition-colors duration-300"
             style={{
                 minHeight: '100dvh',
                 paddingTop: 'env(safe-area-inset-top)'
             }}
         >
             {/* Header */}
-            <div className="sticky top-0 z-50 flex-shrink-0 bg-white border-b border-gray-200/50 px-4 py-4 shadow-sm">
+            <div className="sticky top-0 z-50 flex-shrink-0 bg-card border-b border-border px-4 py-4 shadow-md">
                 <div className="flex items-center justify-between">
                     <button
                         onClick={handleCancel}
                         disabled={loading}
-                        className="flex items-center text-muted-foreground hover:text-gray-900 disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+                        className="flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+                        style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                         Hủy
                     </button>
 
-                    <h2 className="text-lg font-bold text-gray-900">Sửa chuyến đi</h2>
+                    <h2 className="text-lg font-bold text-foreground">Sửa chuyến đi</h2>
 
                     <button
                         onClick={handleUpdateTrip}
                         disabled={loading}
-                        className="flex items-center text-primary hover:text-primary/80 disabled:text-gray-400 transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+                        className="flex items-center text-primary hover:text-primary/80 disabled:text-muted-foreground transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+                        style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                         {loading ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
@@ -194,11 +197,12 @@ const PWAEditTripPage = () => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto px-4 py-4">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-gray-200/50 space-y-4">
+            <div className="flex-1 overflow-y-auto px-4 py-6">
+                {/* Form Section */}
+                <div className="bg-card rounded-2xl p-6 shadow-2xl border border-border space-y-5">
                     {/* Trip Name Section */}
                     <div className="space-y-2">
-                        <Label htmlFor="tripName" className="text-sm font-semibold text-gray-700">
+                        <Label htmlFor="tripName" className="text-sm font-semibold text-muted-foreground">
                             Tên chuyến đi <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -209,14 +213,19 @@ const PWAEditTripPage = () => {
                                 setTripName(e.target.value);
                                 if (errors.tripName) setErrors(prev => ({ ...prev, tripName: '' }));
                             }}
-                            className={`w-full text-base border-gray-200 focus:border-primary focus:ring-primary/20 ${errors.tripName ? 'border-red-500' : ''}`}
+                            className={cn(
+                                "w-full h-12 text-base bg-secondary border-border text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none",
+                                errors.tripName && "border-red-500 focus:border-red-500 focus-visible:ring-red-500/20"
+                            )}
                         />
-                        {errors.tripName && <p className="text-sm text-red-500 animate-fade-in">{errors.tripName}</p>}
+                        {errors.tripName && (
+                            <p className="text-sm text-red-500 animate-fade-in">{errors.tripName}</p>
+                        )}
                     </div>
 
                     {/* Destination Section */}
                     <div className="space-y-2">
-                        <Label htmlFor="destination" className="text-sm font-semibold text-gray-700">
+                        <Label htmlFor="destination" className="text-sm font-semibold text-muted-foreground">
                             Điểm đến <span className="text-red-500">*</span>
                         </Label>
                         <ProvinceSelector
@@ -225,38 +234,53 @@ const PWAEditTripPage = () => {
                                 setDestination(value);
                                 if (errors.destination) setErrors(prev => ({ ...prev, destination: '' }));
                             }}
-                            placeholder="Chọn tỉnh thành"
+                            placeholder="Ví dụ: Đà Lạt, Lâm Đồng"
                             error={!!errors.destination}
+                            className="w-full h-12 bg-secondary text-foreground border-border placeholder:text-muted-foreground/60 focus:border-primary/50"
                         />
-                        {errors.destination && <p className="text-sm text-red-500 animate-fade-in">{errors.destination}</p>}
+                        {errors.destination && (
+                            <p className="text-sm text-red-500 animate-fade-in">{errors.destination}</p>
+                        )}
                     </div>
 
                     {/* Start Date Section */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-semibold text-gray-700">Ngày đi</Label>
+                        <Label className="text-sm font-semibold text-muted-foreground">
+                            Ngày đi
+                        </Label>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start text-left font-normal h-12 text-base border-gray-200 hover:border-primary/50 focus:border-primary"
+                                    className={cn(
+                                        "w-full justify-start text-left font-normal h-12 text-base bg-secondary border-border hover:bg-secondary/80 text-foreground transition-all duration-200",
+                                        !startDate && "text-muted-foreground/60"
+                                    )}
                                 >
-                                    <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
+                                    <CalendarIcon className="mr-3 h-5 w-5 text-muted-foreground" />
                                     {startDate ? (
                                         format(startDate, "dd/MM/yyyy", { locale: vi })
                                     ) : (
-                                        <span className="text-gray-500">Chọn ngày đi</span>
+                                        <span>Chọn ngày đi</span>
                                     )}
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                            <PopoverContent
+                                className="w-auto p-0 bg-card border-border shadow-xl"
+                                align="start"
+                                side="bottom"
+                                sideOffset={4}
+                            >
                                 <Calendar
                                     initialFocus
                                     mode="single"
                                     defaultMonth={startDate}
                                     selected={startDate}
-                                    onSelect={setStartDate}
+                                    onSelect={(date) => {
+                                        setStartDate(date);
+                                    }}
                                     disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                    className="rounded-md"
+                                    className="bg-card text-foreground"
                                 />
                             </PopoverContent>
                         </Popover>
@@ -264,39 +288,43 @@ const PWAEditTripPage = () => {
 
                     {/* Description Section */}
                     <div className="space-y-2">
-                        <Label htmlFor="description" className="text-sm font-semibold text-gray-700">Mô tả chuyến đi</Label>
+                        <Label htmlFor="description" className="text-sm font-semibold text-muted-foreground">
+                            Mô tả chuyến đi
+                        </Label>
                         <Textarea
                             id="description"
-                            placeholder="Chia sẻ về chuyến đi này..."
+                            placeholder="Chia sẻ về chuyến đi này - điều gì khiến bạn hứng thú?"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             rows={3}
-                            className="w-full text-base border-gray-200 focus:border-primary focus:ring-primary/20 resize-none"
+                            className="w-full text-base bg-secondary text-foreground border-border placeholder:text-muted-foreground/60 focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 resize-none outline-none transition-all duration-200"
                         />
                     </div>
 
-                    {/* Cover Image Section */}
+                    {/* Trip Avatar Section */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-semibold text-gray-700">Ảnh đại diện chuyến đi</Label>
+                        <Label className="text-sm font-semibold text-muted-foreground">
+                            Ảnh đại diện chuyến đi
+                        </Label>
 
-                        {(imagePreview || currentAvatar) ? (
+                        {imagePreview || currentAvatar ? (
                             <div className="relative group">
                                 <img
                                     src={imagePreview || currentAvatar || ''}
                                     alt="Trip cover preview"
-                                    className="w-full h-32 object-cover rounded-xl border border-gray-200 shadow-sm"
+                                    className="w-full h-40 object-cover rounded-xl border border-border shadow-lg"
                                 />
                                 <div className="absolute top-2 right-2 flex gap-2">
                                     <button
                                         onClick={() => document.getElementById('edit-cover-image-upload')?.click()}
-                                        className="p-1.5 bg-white/90 text-primary rounded-full shadow-lg"
+                                        className="p-2 bg-white/20 text-white hover:bg-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all active:scale-90"
                                     >
                                         <Camera className="w-4 h-4" />
                                     </button>
                                     {imagePreview && (
                                         <button
                                             onClick={removeImage}
-                                            className="p-1.5 bg-red-500 text-white rounded-full shadow-lg"
+                                            className="p-2 bg-destructive/90 text-destructive-foreground rounded-full shadow-lg hover:bg-destructive transition-all active:scale-90"
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
@@ -305,14 +333,14 @@ const PWAEditTripPage = () => {
                             </div>
                         ) : (
                             <div
-                                className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 cursor-pointer"
+                                className="border-2 border-dashed border-border rounded-xl p-8 text-center bg-secondary hover:bg-secondary/80 hover:border-primary/50 outline-none transition-all duration-300 cursor-pointer group shadow-inner"
                                 onClick={() => document.getElementById('edit-cover-image-upload')?.click()}
                             >
-                                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 text-gray-400">
+                                <div className="w-12 h-12 bg-card rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg text-muted-foreground group-hover:text-primary transition-colors">
                                     <ImageIcon className="w-6 h-6" />
                                 </div>
-                                <p className="text-sm font-semibold text-gray-700">Tải lên ảnh đại diện</p>
-                                <p className="text-xs text-gray-500">PNG, JPG tối đa 5MB</p>
+                                <p className="text-sm font-semibold text-muted-foreground">Tải lên ảnh đại diện</p>
+                                <p className="text-xs text-muted-foreground/60 mt-1">PNG, JPG tối đa 5MB</p>
                             </div>
                         )}
                         <input

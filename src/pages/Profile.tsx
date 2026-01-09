@@ -35,6 +35,8 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog.tsx";
+import { useTheme } from '@/contexts/ThemeContext';
+import { Moon, Sun } from 'lucide-react';
 
 interface UserProfile {
   id: number;
@@ -58,6 +60,7 @@ const Profile = () => {
   const showContent = useAnimateIn(false, 300);
   const { user, logout } = useAuth();
   const { isPWA } = usePWA();
+  const { theme, toggleTheme } = useTheme();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -232,7 +235,7 @@ const Profile = () => {
       <div className="min-h-screen pb-24">
         <AnimatedTransition show={showContent} animation="fade">
           {/* Header Section */}
-          <div className="bg-white px-6 pt-12 pb-8 rounded-b-[40px] shadow-sm border-b border-gray-100 flex flex-col items-center">
+          <div className="bg-card px-6 pt-12 pb-8 rounded-b-[40px] shadow-sm border-b border-border flex flex-col items-center">
             <div className="relative mb-4 group">
               <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-100 ring-1 ring-purple-100">
                 {profile.profilePicture ? (
@@ -249,19 +252,19 @@ const Profile = () => {
               </label>
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900">{profile.fullName}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{profile.fullName}</h1>
             <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
 
             {/* Stats Card - Mobile */}
-            <div className="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-3 flex items-center gap-6">
+            <div className="mt-6 bg-card rounded-2xl border border-border shadow-sm px-6 py-3 flex items-center gap-6">
               <div className="text-center">
-                <div className="text-lg font-bold text-gray-900">{profile.tripsCount ?? 0}</div>
-                <div className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">CHUYẾN ĐI</div>
+                <div className="text-lg font-bold text-foreground">{profile.tripsCount ?? 0}</div>
+                <div className="text-[9px] font-bold text-muted-foreground mt-0.5 uppercase tracking-wider">CHUYẾN ĐI</div>
               </div>
-              <div className="w-px h-6 bg-gray-100"></div>
+              <div className="w-px h-6 bg-border"></div>
               <div className="text-center">
-                <div className="text-lg font-bold text-gray-900">{profile.placesCount ?? 0}</div>
-                <div className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">ĐỊA ĐIỂM</div>
+                <div className="text-lg font-bold text-foreground">{profile.placesCount ?? 0}</div>
+                <div className="text-[9px] font-bold text-muted-foreground mt-0.5 uppercase tracking-wider">ĐỊA ĐIỂM</div>
               </div>
             </div>
 
@@ -278,9 +281,9 @@ const Profile = () => {
           <div className="px-6 py-8 space-y-6">
             <div>
               <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Tài khoản</h3>
-              <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+              <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm">
                 <MenuRow
-                  icon={<User className="text-blue-500 w-5 h-5" />}
+                  icon={<User className="text-primary w-5 h-5" />}
                   label="Thông tin cá nhân"
                   onClick={() => navigate('/profile/edit')}
                 />
@@ -289,11 +292,21 @@ const Profile = () => {
             </div>
 
             <div>
-              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Ứng dụng</h3>
-              <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Cài đặt</h3>
+              <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm">
+                <div className="w-full p-4 flex items-center justify-between border-b border-border active:bg-secondary transition-colors last:border-0">
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="p-2 bg-secondary rounded-xl">
+                      {theme === 'dark' ? <Moon className="text-primary w-5 h-5" /> : <Sun className="text-amber-500 w-5 h-5" />}
+                    </div>
+                    <span className="font-semibold text-foreground">Chế độ tối</span>
+                  </div>
+                  <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
+                </div>
+
                 {/* Notification Settings - chỉ hiển thị trong PWA */}
                 {isPWA && (
-                  <div className="p-4 border-b border-gray-50">
+                  <div className="p-4 border-b border-border">
                     <NotificationSettings showCard={false} />
                   </div>
                 )}
@@ -301,13 +314,13 @@ const Profile = () => {
                 {/* Mobile Change Password */}
                 <button
                   onClick={() => setIsPasswordDialogOpen(true)}
-                  className="w-full p-4 flex items-center justify-between active:bg-gray-50 transition-colors"
+                  className="w-full p-4 flex items-center justify-between active:bg-secondary transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-50 rounded-xl text-purple-600"><Lock className="w-5 h-5" /></div>
-                    <span className="font-semibold text-gray-700">Đổi mật khẩu</span>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="p-2 bg-secondary rounded-xl text-primary"><Lock className="w-5 h-5" /></div>
+                    <span className="font-semibold text-foreground">Đổi mật khẩu</span>
                   </div>
-                  <Settings className="w-4 h-4 text-gray-300 transform rotate-[-90deg]" />
+                  <Settings className="w-4 h-4 text-muted-foreground transform rotate-[-90deg]" />
                 </button>
               </div>
             </div>
@@ -315,7 +328,7 @@ const Profile = () => {
             <Button
               variant="ghost"
               onClick={handleLogout}
-              className="w-full h-14 rounded-2xl bg-white border border-red-50 text-red-500 font-bold flex items-center justify-center gap-2 mt-4 active:bg-red-50 shadow-sm"
+              className="w-full h-14 rounded-2xl bg-card border border-destructive/20 text-destructive font-bold flex items-center justify-center gap-2 mt-4 active:bg-destructive/10 shadow-sm"
             >
               <LogOut className="w-5 h-5" /> Đăng xuất tài khoản
             </Button>
@@ -328,67 +341,72 @@ const Profile = () => {
 
         {/* Change Password Dialog */}
         <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Đổi mật khẩu</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleChangePassword} className="space-y-4 pt-4">
-              {profile?.hasPassword && (
-                <div className="space-y-2">
-                  <Label>Mật khẩu hiện tại</Label>
-                  <Input
-                    type="password"
-                    required
-                    value={passwordForm.currentPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
-                  />
-                </div>
-              )}
-              {!profile?.hasPassword && (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-                  <p className="text-sm text-blue-800">
-                    <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
-                  </p>
-                </div>
-              )}
-              <div className="space-y-2">
-                <Label>Mật khẩu mới</Label>
-                <Input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={passwordForm.newPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Xác nhận mật khẩu mới</Label>
-                <Input
-                  type="password"
-                  required
-                  value={passwordForm.confirmPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
-                />
-              </div>
-              <DialogFooter className="pt-4">
+          <DialogContent className="w-screen h-screen max-w-full m-0 rounded-none border-none p-0 gap-0 [&>button]:hidden flex flex-col bg-background">
+            <form onSubmit={handleChangePassword} className="flex flex-col h-full">
+              <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border sticky top-0 z-10">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsPasswordDialogOpen(false)}
+                  className="text-muted-foreground text-base font-normal h-auto p-0 hover:bg-transparent"
                 >
                   Hủy
                 </Button>
+                <DialogTitle className="text-lg font-bold text-foreground">Đổi mật khẩu</DialogTitle>
                 <Button
                   type="submit"
                   disabled={changingPassword}
-                  className="bg-[#6347f9] hover:bg-[#5136db]"
+                  variant="ghost"
+                  className="text-primary text-base font-bold h-auto p-0 hover:bg-transparent hover:text-primary/80"
                 >
-                  {changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
+                  {changingPassword ? '...' : 'Xong'}
                 </Button>
-              </DialogFooter>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="bg-card rounded-2xl p-4 shadow-sm space-y-4">
+                  {profile?.hasPassword && (
+                    <div className="space-y-2">
+                      <Label>Mật khẩu hiện tại</Label>
+                      <Input
+                        type="password"
+                        required
+                        value={passwordForm.currentPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                        className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                      />
+                    </div>
+                  )}
+                  {!profile?.hasPassword && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                      <p className="text-sm text-blue-800">
+                        <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
+                      </p>
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label>Mật khẩu mới</Label>
+                    <Input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Xác nhận mật khẩu mới</Label>
+                    <Input
+                      type="password"
+                      required
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                      className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                    />
+                  </div>
+                </div>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
@@ -401,7 +419,7 @@ const Profile = () => {
       <AnimatedTransition show={showContent} animation="slide-up">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header Card */}
-          <div className="bg-white rounded-[32px] shadow-xl overflow-hidden relative group">
+          <div className="bg-card rounded-[32px] shadow-xl overflow-hidden relative group">
             <div className="h-48 md:h-64 bg-gradient-to-r from-violet-900 to-fuchsia-900 relative">
               <img
                 src="https://images.unsplash.com/photo-1762090326569-f3c698bee480?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsJTIwYWJzdHJhY3QlMjB0cmF2ZWwlMjBsYW5kc2NhcGUlMjBncmFkaWVudCUyMHB1cnBsZXxlbnwxfHx8fDE3NjU4OTUzMTZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
@@ -413,7 +431,7 @@ const Profile = () => {
             <div className="px-6 md:px-10 pb-8 flex flex-col md:flex-row items-end md:items-center justify-between relative mt-[-60px] md:mt-0">
               <div className="flex flex-col md:flex-row items-center gap-6 z-10 w-full md:w-auto">
                 <div className="relative md:-mt-16">
-                  <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-[6px] border-white shadow-xl bg-white overflow-hidden relative">
+                  <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-[6px] border-card shadow-xl bg-card overflow-hidden relative">
                     {profile.profilePicture ? (
                       <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
                     ) : (
@@ -429,23 +447,23 @@ const Profile = () => {
                 </div>
 
                 <div className="text-center md:text-left pt-2 md:pt-4">
-                  <h1 className="text-3xl font-bold text-slate-900">{profile.fullName}</h1>
-                  <div className="flex items-center justify-center md:justify-start gap-2 text-slate-500 font-medium mt-1">
+                  <h1 className="text-3xl font-bold text-foreground">{profile.fullName}</h1>
+                  <div className="flex items-center justify-center md:justify-start gap-2 text-muted-foreground font-medium mt-1">
                     <span>Việt Nam</span>
                   </div>
                 </div>
               </div>
 
               {/* Stats Card - Right */}
-              <div className="bg-white rounded-2xl shadow-xl border border-slate-50 px-6 py-3 flex items-center gap-5 z-10 md:mt-8">
+              <div className="bg-card rounded-2xl shadow-xl border border-border px-6 py-3 flex items-center gap-5 z-10 md:mt-8">
                 <div className="text-center">
-                  <div className="text-xl font-black text-slate-900">{profile.tripsCount ?? 0}</div>
-                  <div className="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">CHUYẾN ĐI</div>
+                  <div className="text-xl font-black text-foreground">{profile.tripsCount ?? 0}</div>
+                  <div className="text-[9px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">CHUYẾN ĐI</div>
                 </div>
-                <div className="w-px h-8 bg-slate-100"></div>
+                <div className="w-px h-8 bg-border"></div>
                 <div className="text-center">
-                  <div className="text-xl font-black text-slate-900">{profile.placesCount ?? 0}</div>
-                  <div className="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">ĐỊA ĐIỂM</div>
+                  <div className="text-xl font-black text-foreground">{profile.placesCount ?? 0}</div>
+                  <div className="text-[9px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">ĐỊA ĐIỂM</div>
                 </div>
               </div>
             </div>
@@ -453,50 +471,50 @@ const Profile = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <Card className="rounded-[32px] border-none shadow-xl bg-white overflow-hidden h-full">
+              <Card className="rounded-[32px] border-none shadow-xl bg-card overflow-hidden h-full">
                 <CardContent className="p-8">
                   <div className="flex items-center justify-between mb-8">
                     <div>
-                      <h2 className="text-xl font-bold text-slate-900">Thông tin cá nhân</h2>
-                      <p className="text-slate-500 text-sm mt-1">Quản lý thông tin hồ sơ của bạn</p>
+                      <h2 className="text-xl font-bold text-foreground">Thông tin cá nhân</h2>
+                      <p className="text-muted-foreground text-sm mt-1">Quản lý thông tin hồ sơ của bạn</p>
                     </div>
                   </div>
 
                   <div className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label className="flex items-center gap-2 text-slate-600 font-medium">
-                          <User className="w-4 h-4" /> Họ và tên <span className="text-red-500">*</span>
+                        <Label className="flex items-center gap-2 text-muted-foreground font-medium">
+                          <User className="w-4 h-4" /> Họ và tên <span className="text-destructive">*</span>
                         </Label>
                         <Input
                           value={formData.fullName}
                           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                          className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="flex items-center gap-2 text-slate-600 font-medium">
+                        <Label className="flex items-center gap-2 text-muted-foreground font-medium">
                           <Mail className="w-4 h-4" /> Email
                         </Label>
                         <Input
                           value={profile.email}
                           disabled
-                          className="h-12 rounded-xl bg-slate-50/50 border-transparent text-slate-500"
+                          className="h-12 rounded-xl bg-secondary/50 border-border opacity-70"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="flex items-center gap-2 text-slate-600 font-medium">
+                        <Label className="flex items-center gap-2 text-muted-foreground font-medium">
                           <Phone className="w-4 h-4" /> Số điện thoại
                         </Label>
                         <Input
                           placeholder="+84 909 123 456"
                           value={formData.phoneNumber}
                           onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                          className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="flex items-center gap-2 text-slate-600 font-medium">
+                        <Label className="flex items-center gap-2 text-muted-foreground font-medium">
                           <CreditCard className="w-4 h-4" /> Ngân hàng
                         </Label>
                         <BankSearch
@@ -506,7 +524,7 @@ const Profile = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="flex items-center gap-2 text-slate-600 font-medium">
+                        <Label className="flex items-center gap-2 text-muted-foreground font-medium">
                           <CreditCard className="w-4 h-4" /> Số tài khoản
                         </Label>
                         <Input
@@ -516,7 +534,7 @@ const Profile = () => {
                             const value = e.target.value.replace(/[^0-9]/g, '');
                             setFormData({ ...formData, bankNumber: value })
                           }}
-                          className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                          className="h-12 rounded-xl bg-secondary/50 border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </div>
                     </div>
@@ -525,8 +543,8 @@ const Profile = () => {
                   </div>
 
                   {formData.bankId && formData.bankNumber && (
-                    <div className="mt-8 bg-slate-50 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-8 border border-slate-100">
-                      <div className="p-2 bg-white rounded-xl shadow-sm">
+                    <div className="mt-8 bg-secondary/30 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-8 border border-border">
+                      <div className="p-2 bg-card rounded-xl shadow-sm">
                         <img
                           src={`https://img.vietqr.io/image/${formData.bankId}-${formData.bankNumber}-${VIETQR_TEMPLATE}.png`}
                           alt="QR Chuyển khoản"
@@ -534,36 +552,36 @@ const Profile = () => {
                         />
                       </div>
                       <div className="text-center md:text-left flex-1">
-                        <h3 className="text-lg font-bold text-slate-900 mb-1">QR Chuyển khoản</h3>
-                        <p className="text-slate-500 text-sm mb-3">
+                        <h3 className="text-lg font-bold text-foreground mb-1">QR Chuyển khoản</h3>
+                        <p className="text-muted-foreground text-sm mb-3">
                           Quét mã để chuyển khoản nhanh cho <strong>{formData.fullName}</strong>
                         </p>
                         <div className="flex flex-col gap-1">
-                          <div className="bg-white px-3 py-2 rounded-lg border border-slate-100 inline-block w-fit">
-                            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider mr-2">NGÂN HÀNG</span>
-                            <span className="text-slate-700 font-semibold">{BANKS.find(b => b.code === formData.bankId)?.name || formData.bankId}</span>
+                          <div className="bg-card px-3 py-2 rounded-lg border border-border inline-block w-fit">
+                            <span className="text-xs text-muted-foreground font-bold uppercase tracking-wider mr-2">NGÂN HÀNG</span>
+                            <span className="text-foreground font-semibold">{BANKS.find(b => b.code === formData.bankId)?.name || formData.bankId}</span>
                           </div>
-                          <div className="bg-white px-3 py-2 rounded-lg border border-slate-100 inline-block w-fit">
-                            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider mr-2">SỐ TÀI KHOẢN</span>
-                            <span className="text-slate-700 font-semibold">{formData.bankNumber}</span>
+                          <div className="bg-card px-3 py-2 rounded-lg border border-border inline-block w-fit">
+                            <span className="text-xs text-muted-foreground font-bold uppercase tracking-wider mr-2">SỐ TÀI KHOẢN</span>
+                            <span className="text-foreground font-semibold">{formData.bankNumber}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  <div className="flex justify-end gap-3 mt-10 pt-6 border-t border-slate-100">
+                  <div className="flex justify-end gap-3 mt-10 pt-6 border-t border-border">
                     <Button
                       variant="outline"
                       onClick={handleCancelEdit}
-                      className="px-6 h-11 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50"
+                      className="h-11 rounded-xl border-border dark:border-gray-700 bg-transparent text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-gray-800 hover:text-foreground dark:hover:text-white transition-all px-6"
                     >
                       Hủy
                     </Button>
                     <Button
                       onClick={handleSaveProfile}
                       disabled={saving}
-                      className="px-8 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg shadow-purple-200"
+                      className="px-8 h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
                     >
                       {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
                     </Button>
@@ -576,16 +594,28 @@ const Profile = () => {
               {/* Notification Settings - chỉ hiển thị trong PWA */}
               {isPWA && <NotificationSettings />}
 
-              <Card className="rounded-[24px] border-none shadow-lg overflow-hidden bg-white">
+              <Card className="rounded-[24px] border-none shadow-lg overflow-hidden bg-card">
                 <CardContent className="p-6">
-                  <div className="font-bold text-slate-900 flex items-center gap-2 mb-6">
-                    <Shield className="w-5 h-5 text-[#6347f9]" /> Bảo mật
+                  <div className="font-bold text-foreground flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-5 h-5 text-primary" /> Cài đặt hiển thị
+                    </div>
+                    <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
                   </div>
-                  <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Chuyển đổi giữa chế độ sáng và tối để bảo vệ mắt của bạn.</p>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-[24px] border-none shadow-lg overflow-hidden bg-card">
+                <CardContent className="p-6">
+                  <div className="font-bold text-foreground flex items-center gap-2 mb-6">
+                    <Shield className="w-5 h-5 text-primary" /> Bảo mật
+                  </div>
+                  <div className="space-y-4">
                     <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start h-12 rounded-xl border-slate-100 hover:bg-slate-50 hover:text-[#6347f9] font-medium text-slate-600">
-                          <Lock className="w-4 h-4 mr-3" /> Đổi mật khẩu
+                        <Button variant="ghost" className="group w-full justify-start h-16 rounded-[24px] bg-[#eff1f5] hover:bg-[#e2e5eb] dark:bg-secondary dark:hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6">
+                          <Lock className="w-5 h-5 mr-4 text-gray-500 group-hover:text-primary transition-colors" /> Đổi mật khẩu
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
@@ -601,7 +631,7 @@ const Profile = () => {
                                 required
                                 value={passwordForm.currentPassword}
                                 onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                                className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
                               />
                             </div>
                           )}
@@ -620,7 +650,7 @@ const Profile = () => {
                               minLength={6}
                               value={passwordForm.newPassword}
                               onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                              className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
                             />
                           </div>
                           <div className="space-y-2">
@@ -630,21 +660,22 @@ const Profile = () => {
                               required
                               value={passwordForm.confirmPassword}
                               onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                              className="h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-[#6347f9]"
+                              className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
                             />
                           </div>
                           <DialogFooter className="pt-4">
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="outline"
                               onClick={() => setIsPasswordDialogOpen(false)}
+                              className="hover:bg-transparent hover:text-primary hover:border-primary"
                             >
                               Hủy
                             </Button>
                             <Button
                               type="submit"
                               disabled={changingPassword}
-                              className="bg-[#6347f9] hover:bg-[#5136db]"
+                              className="bg-primary hover:bg-primary/90"
                             >
                               {changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
                             </Button>
@@ -656,9 +687,9 @@ const Profile = () => {
                     <Button
                       variant="ghost"
                       onClick={handleLogout}
-                      className="w-full justify-start h-12 rounded-xl hover:bg-red-50 text-red-500 font-medium hover:text-red-600 mt-2"
+                      className="group w-full justify-start h-16 rounded-[24px] bg-[#fff0f0] hover:bg-[#ffe4e4] dark:bg-red-500/10 dark:hover:bg-red-500/20 text-foreground hover:text-red-500 font-bold transition-all pl-6"
                     >
-                      <LogOut className="w-4 h-4 mr-3" /> Đăng xuất thiết bị
+                      <LogOut className="w-5 h-5 mr-4 text-foreground group-hover:text-red-500 transition-colors" /> Đăng xuất thiết bị
                     </Button>
                   </div>
                 </CardContent>
@@ -674,15 +705,15 @@ const Profile = () => {
 const MenuRow = ({ icon, label, onClick, value }: { icon: React.ReactNode, label: string, onClick: () => void, value?: string }) => (
   <button
     onClick={onClick}
-    className="w-full p-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors last:border-0"
+    className="w-full p-4 flex items-center justify-between border-b border-border active:bg-secondary transition-colors last:border-0"
   >
     <div className="flex items-center gap-3 text-sm">
-      <div className="p-2 bg-slate-50 rounded-xl">{icon}</div>
-      <span className="font-semibold text-gray-700">{label}</span>
+      <div className="p-2 bg-secondary rounded-xl">{icon}</div>
+      <span className="font-semibold text-foreground">{label}</span>
     </div>
     <div className="flex items-center gap-2">
-      {value && <span className="text-xs text-gray-400 font-medium">{value}</span>}
-      <Settings className="w-4 h-4 text-gray-300 transform rotate-[-90deg]" />
+      {value && <span className="text-xs text-muted-foreground font-medium">{value}</span>}
+      <Settings className="w-4 h-4 text-muted-foreground transform rotate-[-90deg]" />
     </div>
   </button>
 );

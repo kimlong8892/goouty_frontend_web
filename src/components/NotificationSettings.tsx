@@ -114,12 +114,12 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   const content = (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-blue-50 rounded-xl text-blue-600">
+        <div className="p-2 bg-secondary rounded-xl text-primary">
           <Bell className="w-5 h-5" />
         </div>
         <div className="flex flex-col">
-          <span className="font-semibold text-gray-700">Thông báo</span>
-          <span className="text-xs text-gray-500">Nhận thông báo về chuyến đi</span>
+          <span className="font-semibold text-foreground">Thông báo</span>
+          <span className="text-xs text-muted-foreground">Nhận thông báo về chuyến đi</span>
         </div>
       </div>
       <Switch
@@ -135,7 +135,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   }
 
   return (
-    <Card className="w-full border-gray-100 shadow-sm">
+    <Card className="w-full border-border shadow-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Cài đặt thông báo</CardTitle>
         <CardDescription>Quản lý nhận thông báo trên thiết bị này</CardDescription>

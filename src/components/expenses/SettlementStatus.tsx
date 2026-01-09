@@ -69,13 +69,16 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
     toast.info('Hãy nhập số tiền và bấm "Ghi nhận" để tạo giao dịch');
   };
 
-  const getTotalPaid = (settlementId: string) => {
-    const list = transactionsBySettlement[settlementId] || [];
-    return list.reduce((sum, tx) => sum + (tx.status === 'success' ? tx.amount : 0), 0);
-  };
-
   const getRemaining = (s: PaymentSettlementResponse) => {
-    return Math.max(0, s.amount - getTotalPaid(s.id));
+    // Use backend-calculated remaining if available
+    if (s.remaining !== undefined) {
+      return Math.max(0, s.remaining);
+    }
+
+    // Fallback: calculate from transactions (for backward compatibility)
+    const transactions = transactionsBySettlement[s.id] || [];
+    const totalPaid = transactions.reduce((sum, tx) => sum + (tx.status === 'success' ? tx.amount : 0), 0);
+    return Math.max(0, s.amount - totalPaid);
   };
 
   const clampAmountInput = (s: PaymentSettlementResponse, raw: string) => {
@@ -98,6 +101,13 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
     try {
       const remaining = getRemaining(settlement);
       const entered = Number(amountInputs[settlement.id] ?? remaining);
+
+      // Security check: Only the creditor (receiver) can record the transaction
+      if (user?.id !== settlement.creditorId) {
+        toast.error('Chỉ người nhận tiền mới có quyền ghi nhận thanh toán');
+        return;
+      }
+
       if (!entered || entered <= 0) {
         toast.error('Số tiền phải > 0');
         return;
@@ -188,8 +198,8 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
     <>
       <div className={cn("space-y-4", isMobileView ? "mb-6" : "mb-8")}>
         <div className="flex items-center gap-2 px-1">
-          <CreditCard className="w-5 h-5 text-orange-600" />
-          <h3 className={cn("font-bold text-slate-900", isMobileView ? "text-base" : "text-lg")}>Thanh toán</h3>
+          <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
+          <h3 className={cn("font-bold text-slate-900 dark:text-white", isMobileView ? "text-base" : "text-lg")}>Thanh toán</h3>
         </div>
         <div className={cn("grid gap-4", isMobileView ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2")}>
           {pendingSettlements.map((settlement) => {
@@ -197,102 +207,121 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
             const remaining = getRemaining(settlement);
             if (remaining === 0) return null;
 
+            const isReceiver = user?.id === settlement.creditorId;
+            const isPayer = user?.id === settlement.debtorId;
+
             return (
               <div
                 key={settlement.id}
-                className="bg-white border border-slate-100 rounded-[24px] overflow-hidden hover:border-orange-200 transition-colors shadow-sm"
+                className="bg-white dark:bg-card/50 border border-slate-100 dark:border-white/5 rounded-[24px] overflow-hidden hover:border-orange-200 dark:hover:border-orange-500/30 transition-colors shadow-sm"
               >
                 <div className={cn(isMobileView ? "p-4" : "p-6", "space-y-6")}>
                   {/* Participant Flow */}
                   <div className="flex items-center gap-2 sm:gap-4">
                     <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-                      <Avatar className={cn("border-2 border-white shadow-sm font-bold", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
+                      <Avatar className={cn("border-2 border-white dark:border-slate-800 shadow-sm font-bold", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
                         {settlement.debtor.profilePicture && <AvatarImage src={settlement.debtor.profilePicture} />}
-                        <AvatarFallback className={cn("bg-orange-50 text-orange-600 uppercase", isMobileView ? "text-sm" : "text-base")}>
+                        <AvatarFallback className={cn("bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 uppercase", isMobileView ? "text-sm" : "text-base")}>
                           {(settlement.debtor.fullName || settlement.debtor.email).charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="text-center w-full">
-                        <p className={cn("font-bold text-slate-900 truncate", isMobileView ? "text-xs" : "text-sm")}>
+                        <p className={cn("font-bold text-slate-900 dark:text-white truncate", isMobileView ? "text-xs" : "text-sm")}>
                           {(settlement.debtor.fullName || settlement.debtor.email)}
                         </p>
                       </div>
                     </div>
 
-                    <ArrowRight className={cn("text-slate-300 flex-shrink-0", isMobileView ? "w-4 h-4" : "w-5 h-5")} />
+                    <ArrowRight className={cn("text-slate-300 dark:text-slate-600 flex-shrink-0", isMobileView ? "w-4 h-4" : "w-5 h-5")} />
 
                     <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-                      <Avatar className={cn("border-2 border-white shadow-sm font-bold", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
+                      <Avatar className={cn("border-2 border-white dark:border-slate-800 shadow-sm font-bold", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
                         {settlement.creditor.profilePicture && <AvatarImage src={settlement.creditor.profilePicture} />}
-                        <AvatarFallback className={cn("bg-green-50 text-green-600 uppercase", isMobileView ? "text-sm" : "text-base")}>
+                        <AvatarFallback className={cn("bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-500 uppercase", isMobileView ? "text-sm" : "text-base")}>
                           {(settlement.creditor.fullName || settlement.creditor.email).charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="text-center w-full">
-                        <p className={cn("font-bold text-slate-900 truncate", isMobileView ? "text-xs" : "text-sm")}>
+                        <p className={cn("font-bold text-slate-900 dark:text-white truncate", isMobileView ? "text-xs" : "text-sm")}>
                           {(settlement.creditor.fullName || settlement.creditor.email)}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex flex-col items-end gap-1 flex-[1.2] min-w-0">
-                      <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider">Cần trả</span>
-                      <span className={cn("font-black text-orange-600 leading-none", isMobileView ? "text-lg" : "text-xl")}>
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-wider">Cần trả</span>
+                      <span className={cn("font-black text-orange-600 dark:text-orange-500 leading-none", isMobileView ? "text-lg" : "text-xl")}>
                         {formatCurrency(remaining)}
                       </span>
                     </div>
                   </div>
 
-                  {/* Payment Form */}
-                  <div className={cn("bg-slate-50/50 rounded-[20px] space-y-4", isMobileView ? "p-4" : "p-6")}>
-                    <div className={cn("grid gap-4", isMobileView ? "grid-cols-1" : "grid-cols-2")}>
-                      <div className="space-y-1.5">
-                        <label className="text-[9px] text-slate-400 font-black uppercase tracking-widest pl-1">Bạn đã trả bao nhiêu?</label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          className="w-full px-4 h-11 rounded-xl border-none focus:ring-2 focus:ring-orange-500 shadow-sm font-black text-slate-900"
-                          value={formatWithSeparators(amountInputs[settlement.id] ?? remaining.toString())}
-                          onChange={e => setAmountInputs(prev => ({ ...prev, [settlement.id]: clampAmountInput(settlement, e.target.value) }))}
-                        />
-                      </div>
+                  {/* Payment Form / Message */}
+                  {(isReceiver || (isPayer && (settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber)) && (
+                    <div className={cn("bg-slate-50/50 dark:bg-white/5 rounded-[20px] space-y-4", isMobileView ? "p-4" : "p-6")}>
+                      {isReceiver ? (
+                        <div className={cn("grid gap-4", isMobileView ? "grid-cols-1" : "grid-cols-2")}>
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest pl-1">Bạn đã trả bao nhiêu?</label>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              className="w-full px-4 h-11 rounded-xl border-none focus:ring-2 focus:ring-orange-500 bg-white dark:bg-slate-800 shadow-sm font-black text-slate-900 dark:text-white"
+                              value={formatWithSeparators(amountInputs[settlement.id] ?? remaining.toString())}
+                              onChange={e => setAmountInputs(prev => ({ ...prev, [settlement.id]: clampAmountInput(settlement, e.target.value) }))}
+                            />
+                          </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-[9px] text-slate-400 font-black uppercase tracking-widest pl-1">Phương thức</label>
-                        <select
-                          className="w-full px-4 h-11 rounded-xl border-none focus:ring-2 focus:ring-orange-500 shadow-sm font-bold text-slate-700 appearance-none bg-white bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
-                          value={methodInputs[settlement.id] || 'cash'}
-                          onChange={e => setMethodInputs(prev => ({ ...prev, [settlement.id]: e.target.value }))}
-                        >
-                          <option value="cash">Tiền mặt</option>
-                          <option value="bank_transfer">Chuyển khoản</option>
-                          <option value="momo">MoMo</option>
-                          <option value="zalo_pay">ZaloPay</option>
-                        </select>
-                      </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest pl-1">Phương thức</label>
+                            <select
+                              className="w-full px-4 h-11 rounded-xl border-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-500 shadow-sm font-bold text-slate-700 dark:text-slate-200 appearance-none bg-white dark:bg-slate-800 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                              value={methodInputs[settlement.id] || 'cash'}
+                              onChange={e => setMethodInputs(prev => ({ ...prev, [settlement.id]: e.target.value }))}
+                            >
+                              <option value="cash">Tiền mặt</option>
+                              <option value="bank_transfer">Chuyển khoản</option>
+                              <option value="momo">MoMo</option>
+                              <option value="zalo_pay">ZaloPay</option>
+                            </select>
+                          </div>
 
-                      <div className={cn("flex gap-2", isMobileView ? "flex-col" : "col-span-2")}>
-                        <Button
-                          className="flex-1 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200"
-                          disabled={isUpdating}
-                          onClick={() => handleCreateTransaction(settlement)}
-                        >
-                          {isUpdating ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Check className="w-4 h-4 mr-2" /> Ghi nhận thanh toán</>}
-                        </Button>
+                          <div className={cn("flex gap-2", isMobileView ? "flex-col" : "col-span-2")}>
+                            <Button
+                              className="flex-1 h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none"
+                              disabled={isUpdating}
+                              onClick={() => handleCreateTransaction(settlement)}
+                            >
+                              {isUpdating ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Check className="w-4 h-4 mr-2" /> Ghi nhận thanh toán</>}
+                            </Button>
 
-                        {(settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber && (
-                          <Button
-                            variant="outline"
-                            className={cn("h-11 rounded-xl border-slate-200 hover:bg-slate-100", isMobileView ? "w-full" : "w-11 p-0")}
-                            onClick={() => setQrSettlementId(settlement.id)}
-                          >
-                            <QrCode className="w-5 h-5 text-slate-600 mr-2" />
-                            {isMobileView && "Quét QR Chuyển khoản"}
-                          </Button>
-                        )}
-                      </div>
+                            {(settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber && (
+                              <Button
+                                variant="outline"
+                                className={cn("h-11 rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5", isMobileView ? "w-full" : "w-11 p-0")}
+                                onClick={() => setQrSettlementId(settlement.id)}
+                              >
+                                <QrCode className="w-5 h-5 text-slate-600 dark:text-slate-400 mr-2" />
+                                {isMobileView && "QR Profile"}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {isPayer && (settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber && (
+                            <Button
+                              className="w-full h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none"
+                              onClick={() => setQrSettlementId(settlement.id)}
+                            >
+                              <QrCode className="w-4 h-4 mr-2" />
+                              Quét QR Chuyển khoản
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             );
@@ -300,13 +329,13 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
         </div>
 
         {/* Global Help Info */}
-        <div className="mt-8 p-6 bg-indigo-50/50 rounded-[24px] border border-indigo-100 flex items-start gap-4">
-          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+        <div className="mt-8 p-6 bg-indigo-50/50 dark:bg-indigo-500/10 rounded-[24px] border border-indigo-100 dark:border-indigo-500/20 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center flex-shrink-0 shadow-sm">
             <Info className="w-5 h-5 text-indigo-500" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-indigo-900 mb-1">Hướng dẫn thanh toán</h4>
-            <div className="space-y-1 text-xs text-indigo-700/80 font-medium">
+            <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-400 mb-1">Hướng dẫn thanh toán</h4>
+            <div className="space-y-1 text-xs text-indigo-700/80 dark:text-indigo-500/60 font-medium">
               <p>• Hệ thống đã tính toán các khoản bù trừ để tối ưu hóa số lượng giao dịch.</p>
               <p>• Bạn có thể thanh toán một phần hoặc toàn bộ số tiền cần chuyển.</p>
               <p>• Sử dụng mã QR để chuyển khoản nhanh chóng và chính xác.</p>
@@ -318,14 +347,14 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
       {/* QR Modal */}
       <Dialog open={!!qrSettlementId} onOpenChange={(open) => !open && setQrSettlementId(null)}>
         <DialogContent className={cn(
-          "bg-white border-none shadow-2xl overflow-hidden flex flex-col",
+          "bg-white dark:bg-slate-900 border-none shadow-2xl overflow-hidden flex flex-col",
           isMobileView ? "h-full w-full max-w-none rounded-none p-4" : "rounded-[32px] p-8 max-w-sm"
         )}>
           <DialogHeader className={cn(isMobileView ? "mb-4 pt-10" : "mb-6")}>
             <div className="w-12 h-12 rounded-2xl bg-[#6347f9]/10 flex items-center justify-center mx-auto mb-4">
               <QrCode className="w-6 h-6 text-[#6347f9]" />
             </div>
-            <DialogTitle className="text-center text-xl font-black text-slate-900">
+            <DialogTitle className="text-center text-xl font-black text-slate-900 dark:text-white">
               Quét QR Chuyển Khoản
             </DialogTitle>
           </DialogHeader>
@@ -339,15 +368,15 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                 />
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-xl flex items-center gap-3">
+              <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl flex items-center gap-3">
                 <div className="flex-1">
-                  <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Thanh toán cho</p>
-                  <p className="text-sm font-bold text-slate-700">
+                  <p className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest leading-none mb-1">Thanh toán cho</p>
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
                     {(settlements.find(s => s.id === qrSettlementId)?.creditor?.fullName || 'Người dùng')}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Số tiền</p>
+                  <p className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest leading-none mb-1">Số tiền</p>
                   <p className="text-sm font-black text-[#6347f9]">
                     {formatCurrency(Number(amountInputs[qrSettlementId] || settlements.find(s => s.id === qrSettlementId)?.amount || 0))}
                   </p>
@@ -358,13 +387,13 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                 <Button
                   variant="outline"
                   onClick={() => setQrSettlementId(null)}
-                  className="h-12 rounded-2xl border-slate-200 font-bold text-slate-600"
+                  className="h-12 rounded-2xl border-slate-200 dark:border-white/10 font-bold text-slate-600 dark:text-slate-400 dark:hover:bg-white/5"
                 >
                   Đóng
                 </Button>
                 <Button
                   onClick={() => handleDownloadQr(settlements.find((s) => s.id === qrSettlementId)!)}
-                  className="h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200"
+                  className="h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none"
                 >
                   Tải QR
                 </Button>
