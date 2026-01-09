@@ -72,7 +72,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
 
   const handleDeleteAvatar = async () => {
     if (!onImageDelete) return;
-    
+
     try {
       setIsDeleting(true);
       await onImageDelete();
@@ -91,26 +91,26 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
 
   return (
     <div className="relative inline-block">
-      <div className={`${sizeClasses[size]} rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mx-auto relative group`}>
+      <div className={`${sizeClasses[size]} rounded-full bg-secondary flex items-center justify-center overflow-hidden mx-auto relative group border border-border/50 shadow-inner transition-colors duration-300`}>
         {currentImage ? (
-          <img 
-            src={currentImage} 
+          <img
+            src={currentImage}
             alt={userName || 'Profile'}
-            className="w-full h-full object-cover" 
+            className="w-full h-full object-cover"
           />
         ) : (
-          <span className={`${size === 'sm' ? 'text-lg' : size === 'md' ? 'text-2xl' : 'text-3xl'} font-light text-gray-600`}>
+          <span className={`${size === 'sm' ? 'text-lg' : size === 'md' ? 'text-2xl' : 'text-3xl'} font-bold text-muted-foreground`}>
             {userName?.charAt(0).toUpperCase() || 'U'}
           </span>
         )}
-        
+
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-full flex items-center justify-center">
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2">
-            <button 
+            <button
               onClick={handleCameraClick}
               disabled={isUploading}
-              className="bg-white text-black rounded-full p-2 hover:bg-gray-100 transition-colors disabled:opacity-50"
+              className="bg-card text-foreground rounded-full p-2 hover:bg-secondary transition-colors disabled:opacity-50 shadow-lg border border-border"
               title="Thay đổi ảnh"
             >
               {isUploading ? (
@@ -119,9 +119,9 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
                 <Camera className="h-4 w-4" />
               )}
             </button>
-            
+
             {showDeleteButton && currentImage && onImageDelete && (
-              <button 
+              <button
                 onClick={handleDeleteAvatar}
                 disabled={isDeleting}
                 className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors disabled:opacity-50"
@@ -137,10 +137,10 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
           </div>
         </div>
       </div>
-      
+
       {/* Mobile-friendly buttons */}
       <div className="flex justify-center space-x-2 mt-2 md:hidden">
-        <button 
+        <button
           onClick={handleCameraClick}
           disabled={isUploading}
           className="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600 transition-colors disabled:opacity-50"
@@ -152,9 +152,9 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
             <Camera className="h-4 w-4" />
           )}
         </button>
-        
+
         {showDeleteButton && currentImage && onImageDelete && (
-          <button 
+          <button
             onClick={handleDeleteAvatar}
             disabled={isDeleting}
             className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors disabled:opacity-50"
@@ -168,7 +168,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
           </button>
         )}
       </div>
-      
+
       <input
         ref={fileInputRef}
         type="file"
