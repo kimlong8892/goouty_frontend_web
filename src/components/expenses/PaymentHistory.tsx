@@ -104,16 +104,16 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
               <div
                 key={settlement.id}
                 className={`group rounded-[24px] border transition-all duration-300 overflow-hidden ${isCompleted
-                    ? 'border-green-100 bg-green-50/30'
-                    : 'border-orange-100 bg-orange-50/30 shadow-sm'
+                  ? 'border-green-100 bg-green-50/30'
+                  : 'border-orange-100 bg-orange-50/30 shadow-sm'
                   }`}
               >
                 <div className="p-5 md:p-6 space-y-6">
                   {/* Status header */}
                   <div className="flex items-center justify-between">
                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isCompleted
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-orange-100 text-orange-700'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-orange-100 text-orange-700'
                       }`}>
                       {isCompleted ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
                       {isCompleted ? 'Đã hoàn tất' : 'Chờ thanh toán'}

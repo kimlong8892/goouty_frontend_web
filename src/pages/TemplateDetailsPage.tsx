@@ -129,10 +129,10 @@ const TripTemplateDetailPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0a0a0a]">
                 <div className="flex flex-col items-center gap-4">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9]"></div>
-                    <p className="text-slate-500 font-medium">Đang tải template...</p>
+                    <p className="text-slate-500 dark:text-zinc-400 font-medium">Đang tải template...</p>
                 </div>
             </div>
         );
@@ -141,7 +141,7 @@ const TripTemplateDetailPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-[#edeeff]">
+        <div className="min-h-screen bg-[#edeeff] dark:bg-[#0a0a0a]">
             {/* HERO SECTION */}
             <div className="relative w-full h-[40vh] min-h-[350px] lg:h-[450px] group">
                 {template.avatar ? (
@@ -151,7 +151,7 @@ const TripTemplateDetailPage = () => {
                         className="w-full h-full object-cover transition-transform duration-700"
                     />
                 ) : (
-                    <div className="w-full h-full bg-slate-200 flex items-center justify-center">
+                    <div className="w-full h-full bg-slate-200 dark:bg-zinc-800 flex items-center justify-center">
                         <Camera className="w-16 h-16 text-slate-300" />
                     </div>
                 )}
@@ -170,7 +170,7 @@ const TripTemplateDetailPage = () => {
 
 
                 {/* Content Overlay */}
-                <div className="absolute bottom-0 left-0 w-full pb-24 pt-24 bg-gradient-to-t from-[#f8f9fc] via-transparent to-transparent">
+                <div className="absolute bottom-0 left-0 w-full pb-24 pt-24 bg-gradient-to-t from-[#f8f9fc] dark:from-[#0a0a0a] via-transparent to-transparent">
                     {/* This gradient blends the image into the background color if needed, but we used negative margin instead typically. 
                         Let's stick to the design: The text is ON the image. 
                         The 'Giới thiệu' card is below.
@@ -216,11 +216,11 @@ const TripTemplateDetailPage = () => {
                     {/* LEFT COLUMN */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Description Card */}
-                        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
-                            <h2 className="text-[#6347f9] text-xl font-bold mb-4 flex items-center gap-2">
+                        <div className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 shadow-sm border border-gray-100 dark:border-zinc-800">
+                            <h2 className="text-[#6347f9] dark:text-primary text-xl font-bold mb-4 flex items-center gap-2">
                                 Giới thiệu chuyến đi
                             </h2>
-                            <p className="text-slate-600 leading-relaxed font-medium text-lg whitespace-pre-line">
+                            <p className="text-slate-600 dark:text-zinc-400 leading-relaxed font-medium text-lg whitespace-pre-line">
                                 {template.description || "Chưa có mô tả chi tiết cho mẫu chuyến đi này."}
                             </p>
                         </div>
@@ -228,7 +228,7 @@ const TripTemplateDetailPage = () => {
                         {/* Itinerary Section */}
                         <div>
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold text-slate-900">Lịch trình chi tiết</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-zinc-100">Lịch trình chi tiết</h3>
                             </div>
 
                             <div className="space-y-6">
@@ -241,18 +241,18 @@ const TripTemplateDetailPage = () => {
 
                                             <div
                                                 className={cn(
-                                                    "group/day relative bg-white border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300",
+                                                    "group/day relative bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl overflow-hidden transition-all duration-300",
                                                     isExpanded ? "shadow-md ring-1 ring-[#6347f9]/10" : "hover:shadow-sm"
                                                 )}
                                             >
                                                 {/* Day Header */}
                                                 <div
-                                                    className="flex items-start gap-4 p-5 cursor-pointer select-none bg-white"
+                                                    className="flex items-start gap-4 p-5 cursor-pointer select-none bg-white dark:bg-zinc-900"
                                                     onClick={() => toggleDay(day.id.toString())}
                                                 >
                                                     <div className={cn(
                                                         "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-all z-10",
-                                                        isExpanded ? "bg-[#6347f9] text-white shadow-lg shadow-indigo-200" : "bg-slate-100 text-slate-500 group-hover/day:bg-slate-200"
+                                                        isExpanded ? "bg-[#6347f9] text-white shadow-lg shadow-indigo-200/50 dark:shadow-none" : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 group-hover/day:bg-slate-200 dark:group-hover/day:bg-zinc-700"
                                                     )}>
                                                         {index + 1}
                                                     </div>
@@ -260,7 +260,7 @@ const TripTemplateDetailPage = () => {
                                                         <div className="flex items-center justify-between">
                                                             <h3 className={cn(
                                                                 "text-xl font-bold message-heading transition-colors",
-                                                                isExpanded ? "text-slate-900" : "text-slate-600"
+                                                                isExpanded ? "text-slate-900 dark:text-zinc-100" : "text-slate-600 dark:text-zinc-400"
                                                             )}>
                                                                 {day.title}
                                                             </h3>
@@ -270,7 +270,7 @@ const TripTemplateDetailPage = () => {
                                                             }
                                                         </div>
                                                         {day.description && (
-                                                            <p className="text-slate-500 text-sm mt-1">{day.description}</p>
+                                                            <p className="text-slate-500 dark:text-zinc-500 text-sm mt-1">{day.description}</p>
                                                         )}
                                                     </div>
                                                 </div>
@@ -278,26 +278,26 @@ const TripTemplateDetailPage = () => {
                                                 {/* Day Activities */}
                                                 {isExpanded && (
                                                     <div className="px-5 pb-5 pt-0 space-y-3">
-                                                        <div className="h-px w-full bg-slate-50 mb-4" />
+                                                        <div className="h-px w-full bg-slate-50 dark:bg-zinc-800 mb-4" />
                                                         {day.activities?.length > 0 ? (
                                                             day.activities.map((act) => (
                                                                 <div
                                                                     key={act.id}
-                                                                    className="flex gap-4 p-4 rounded-xl bg-slate-50/50 border border-slate-100 hover:border-indigo-100 hover:bg-indigo-50/30 transition-colors group/act"
+                                                                    className="flex gap-4 p-4 rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border border-slate-100 dark:border-zinc-800 hover:border-indigo-100 dark:hover:border-indigo-900/50 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors group/act"
                                                                 >
-                                                                    <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-white text-[#6347f9] shadow-sm flex items-center justify-center border border-indigo-100">
+                                                                    <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 text-[#6347f9] dark:text-primary shadow-sm flex items-center justify-center border border-indigo-100 dark:border-zinc-700">
                                                                         {getActivityIcon(act.title)}
                                                                     </div>
                                                                     <div className="flex-1">
                                                                         <div className="flex items-start justify-between">
-                                                                            <h4 className="font-semibold text-slate-900">{act.title}</h4>
+                                                                            <h4 className="font-semibold text-slate-900 dark:text-zinc-100">{act.title}</h4>
                                                                             {act.startTime && (
-                                                                                <span className="text-xs font-bold text-[#6347f9] bg-white px-2 py-1 rounded shadow-sm border border-slate-100">
+                                                                                <span className="text-xs font-bold text-[#6347f9] dark:text-primary bg-white dark:bg-zinc-800 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-zinc-700">
                                                                                     {formatTime(act.startTime)}
                                                                                 </span>
                                                                             )}
                                                                         </div>
-                                                                        <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-500">
+                                                                        <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-500 dark:text-zinc-400">
                                                                             {act.location && (
                                                                                 <span className="flex items-center gap-1.5">
                                                                                     <MapPin className="w-3.5 h-3.5 text-red-500" /> {act.location}
@@ -310,7 +310,7 @@ const TripTemplateDetailPage = () => {
                                                                             )}
                                                                         </div>
                                                                         {act.notes && (
-                                                                            <p className="mt-2 text-sm text-slate-500 italic">
+                                                                            <p className="mt-2 text-sm text-slate-500 dark:text-zinc-500 italic">
                                                                                 "{act.notes}"
                                                                             </p>
                                                                         )}
@@ -318,7 +318,7 @@ const TripTemplateDetailPage = () => {
                                                                 </div>
                                                             ))
                                                         ) : (
-                                                            <div className="text-center py-6 text-slate-400 italic text-sm border-2 border-dashed border-slate-100 rounded-xl">
+                                                            <div className="text-center py-6 text-slate-400 dark:text-zinc-500 italic text-sm border-2 border-dashed border-slate-100 dark:border-zinc-800 rounded-xl">
                                                                 Chưa có hoạt động nào cho ngày này
                                                             </div>
                                                         )}
@@ -335,12 +335,12 @@ const TripTemplateDetailPage = () => {
                     {/* RIGHT COLUMN */}
                     <div className="hidden lg:block lg:col-span-1">
                         <div className="sticky top-24">
-                            <div className="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
+                            <div className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-zinc-800 relative overflow-hidden">
                                 {/* Decorative bg blob */}
                                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#6347f9]/10 rounded-full blur-2xl" />
 
-                                <h3 className="text-2xl font-black text-slate-900 mb-2 relative z-10">Sẵn sàng đi chưa?</h3>
-                                <p className="text-slate-500 mb-8 leading-relaxed relative z-10">
+                                <h3 className="text-2xl font-black text-slate-900 dark:text-zinc-100 mb-2 relative z-10">Sẵn sàng đi chưa?</h3>
+                                <p className="text-slate-500 dark:text-zinc-400 mb-8 leading-relaxed relative z-10">
                                     Sử dụng mẫu này để tạo ngay chuyến đi của riêng bạn và tùy chỉnh theo ý thích.
                                 </p>
 
@@ -372,7 +372,7 @@ const TripTemplateDetailPage = () => {
             {/* Mobile Footer Action */}
             {
                 isMobileView && (
-                    <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 z-50 safe-area-bottom pb-8 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                    <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 p-4 z-50 safe-area-bottom pb-8 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
                         <Button
                             onClick={handleUseTemplate}
                             disabled={usingTemplate}

@@ -124,10 +124,10 @@ const PWATemplateDetailsPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0a0a0a]">
                 <div className="flex flex-col items-center gap-4">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9]"></div>
-                    <p className="text-slate-500 font-medium">Đang tải template...</p>
+                    <p className="text-slate-500 dark:text-zinc-400 font-medium">Đang tải template...</p>
                 </div>
             </div>
         );
@@ -136,7 +136,7 @@ const PWATemplateDetailsPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-[#edeeff] pb-[100px]">
+        <div className="min-h-screen bg-[#edeeff] dark:bg-[#0a0a0a] pb-[100px]">
             {/* HERO SECTION */}
             <div className="relative w-full h-[45vh] min-h-[360px]">
                 {template.avatar ? (
@@ -146,8 +146,8 @@ const PWATemplateDetailsPage = () => {
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                        <Camera className="w-12 h-12 text-slate-300" />
+                    <div className="w-full h-full bg-slate-200 dark:bg-zinc-800 flex items-center justify-center">
+                        <Camera className="w-12 h-12 text-slate-300 dark:text-zinc-700" />
                     </div>
                 )}
 
@@ -198,30 +198,30 @@ const PWATemplateDetailsPage = () => {
             <AnimatedTransition show={showContent} animation="fade">
                 <div className="px-4 -mt-6 relative z-10">
                     {/* Description Card */}
-                    <div className="bg-white rounded-[1.5rem] p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 mb-6">
-                        <h2 className="text-[#6347f9] text-lg font-bold mb-3 flex items-center gap-2">
+                    <div className="bg-white dark:bg-zinc-900 rounded-[1.5rem] p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-zinc-800 mb-6">
+                        <h2 className="text-[#6347f9] dark:text-primary text-lg font-bold mb-3 flex items-center gap-2">
                             Giới thiệu chuyến đi
                         </h2>
-                        <p className="text-slate-600 text-[15px] leading-relaxed whitespace-pre-line font-medium">
+                        <p className="text-slate-600 dark:text-zinc-400 text-[15px] leading-relaxed whitespace-pre-line font-medium">
                             {template.description || "Chưa có mô tả chi tiết cho mẫu chuyến đi này."}
                         </p>
                     </div>
 
                     {/* Itinerary Section */}
                     <div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-4 px-1">Lịch trình chi tiết</h3>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 mb-4 px-1">Lịch trình chi tiết</h3>
                         <div className="space-y-4">
                             {(template.days || []).map((day, index) => {
                                 const isExpanded = expandedDayIds.includes(day.id.toString());
                                 return (
                                     <div key={day.id} className="relative">
                                         <div
-                                            className="flex items-start gap-4 mb-3 cursor-pointer select-none active:scale-[0.99] transition-transform bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
+                                            className="flex items-start gap-4 mb-3 cursor-pointer select-none active:scale-[0.99] transition-transform bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-zinc-800"
                                             onClick={() => toggleDay(day.id.toString())}
                                         >
                                             <div className={cn(
                                                 "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all w-9 h-9 text-sm",
-                                                isExpanded ? "bg-[#6347f9] text-white shadow-indigo-200" : "bg-slate-100 text-slate-500"
+                                                isExpanded ? "bg-[#6347f9] text-white shadow-indigo-200/50 dark:shadow-none" : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400"
                                             )}>
                                                 {index + 1}
                                             </div>
@@ -229,40 +229,40 @@ const PWATemplateDetailsPage = () => {
                                                 <div className="flex items-center justify-between gap-2">
                                                     <h3 className={cn(
                                                         "font-bold leading-tight text-[17px] transition-colors",
-                                                        isExpanded ? "text-slate-900" : "text-slate-600"
+                                                        isExpanded ? "text-slate-900 dark:text-zinc-100" : "text-slate-600 dark:text-zinc-400"
                                                     )}>
                                                         {day.title}
                                                     </h3>
                                                     {isExpanded ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
                                                 </div>
                                                 {day.description && (
-                                                    <p className="text-slate-500 mt-1 text-xs line-clamp-2 leading-relaxed">{day.description}</p>
+                                                    <p className="text-slate-500 dark:text-zinc-500 mt-1 text-xs line-clamp-2 leading-relaxed">{day.description}</p>
                                                 )}
                                             </div>
                                         </div>
 
                                         {isExpanded && (
-                                            <div className="pl-4 ml-4 border-l-2 border-dashed border-slate-200 space-y-3 pb-2 pt-1">
+                                            <div className="pl-4 ml-4 border-l-2 border-dashed border-slate-200 dark:border-zinc-800 space-y-3 pb-2 pt-1">
                                                 {day.activities?.length > 0 ? (
                                                     day.activities.map((act) => (
-                                                        <div key={act.id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm relative group">
+                                                        <div key={act.id} className="bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl p-4 shadow-sm relative group">
                                                             {/* Connector dot */}
-                                                            <div className="absolute -left-[21px] top-6 w-2.5 h-2.5 rounded-full bg-white border-2 border-indigo-300" />
+                                                            <div className="absolute -left-[21px] top-6 w-2.5 h-2.5 rounded-full bg-white dark:bg-zinc-900 border-2 border-indigo-300 dark:border-indigo-500" />
 
                                                             <div className="flex items-start gap-3">
-                                                                <div className="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-indigo-50 text-[#6347f9] flex items-center justify-center">
+                                                                <div className="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-[#6347f9] dark:text-primary flex items-center justify-center">
                                                                     {getActivityIcon(act.title)}
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
                                                                     <div className="flex items-start justify-between gap-2 mb-1.5">
-                                                                        <h4 className="font-bold text-slate-900 text-[15px] leading-tight">{act.title}</h4>
+                                                                        <h4 className="font-bold text-slate-900 dark:text-zinc-100 text-[15px] leading-tight">{act.title}</h4>
                                                                         {act.startTime && (
-                                                                            <span className="text-[10px] font-bold text-[#6347f9] bg-slate-100 px-2 py-1 rounded-md flex-shrink-0">
+                                                                            <span className="text-[10px] font-bold text-[#6347f9] dark:text-primary bg-slate-100 dark:bg-zinc-800 px-2 py-1 rounded-md flex-shrink-0">
                                                                                 {formatTime(act.startTime)}
                                                                             </span>
                                                                         )}
                                                                     </div>
-                                                                    <div className="flex flex-wrap gap-3 text-xs text-slate-500 mb-2">
+                                                                    <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-zinc-400 mb-2">
                                                                         {act.location && (
                                                                             <span className="flex items-center gap-1">
                                                                                 <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-red-500" /> <span className="truncate max-w-[150px]">{act.location}</span>
@@ -275,7 +275,7 @@ const PWATemplateDetailsPage = () => {
                                                                         )}
                                                                     </div>
                                                                     {act.notes && (
-                                                                        <p className="text-xs text-slate-500 italic bg-slate-50 p-2.5 rounded-xl border border-dashed border-slate-200">
+                                                                        <p className="text-xs text-slate-500 dark:text-zinc-500 italic bg-slate-50 dark:bg-zinc-800/50 p-2.5 rounded-xl border border-dashed border-slate-200 dark:border-zinc-700">
                                                                             "{act.notes}"
                                                                         </p>
                                                                     )}
@@ -297,7 +297,7 @@ const PWATemplateDetailsPage = () => {
                 </div>
 
                 {/* Fixed Bottom Action for PWA */}
-                <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 z-50 safe-area-bottom pb-8 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 p-4 z-50 safe-area-bottom pb-8 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
                     <Button
                         size="lg"
                         className="w-full h-12 text-base font-bold bg-[#6347f9] hover:bg-[#5136db] shadow-lg shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"

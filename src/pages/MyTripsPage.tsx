@@ -426,7 +426,7 @@ const MyTripsPage = () => {
                   {trips.map((trip) => (
                     <div
                       key={trip.id}
-                      className="group relative rounded-[32px] overflow-hidden border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-card h-[450px] w-full flex flex-col cursor-pointer"
+                      className="group relative rounded-[32px] overflow-hidden border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(99,71,249,0.15)] transition-all duration-500 bg-card h-[450px] w-full flex flex-col cursor-pointer"
                       onClick={() => handleTripAction('view', trip)}
                     >
                       {/* Background Image - Full Cover */}
@@ -523,7 +523,7 @@ const MyTripsPage = () => {
                         {/* Action Button */}
                         <div className="pt-2">
                           <Button
-                            className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-11 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
+                            className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-11 shadow-[0_4px_15px_rgba(99,71,249,0.3)] hover:shadow-[0_8px_25px_rgba(99,71,249,0.4)] transition-all active:scale-[0.98]"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleTripAction('view', trip);
@@ -545,7 +545,7 @@ const MyTripsPage = () => {
                       variant="outline"
                       onClick={handleLoadMore}
                       disabled={loadingMore}
-                      className="px-8 h-12 rounded-xl border-purple-200 text-[#6347f9] hover:bg-purple-50 font-medium"
+                      className="px-8 h-12 rounded-xl border-[#6347f9]/20 text-[#6347f9] hover:bg-[#6347f9]/5 font-medium"
                     >
                       {loadingMore ? (
                         <>
@@ -565,7 +565,7 @@ const MyTripsPage = () => {
                 {/* End of results */}
                 {!hasMore && trips.length > 0 && (
                   <div className="text-center py-12">
-                    <div className="w-16 h-1 bg-purple-100 mx-auto rounded-full mb-4"></div>
+                    <div className="w-16 h-1 bg-[#6347f9]/10 mx-auto rounded-full mb-4"></div>
                     <p className="text-slate-400 font-medium">Bạn đã xem hết danh sách</p>
                   </div>
                 )}
@@ -576,7 +576,7 @@ const MyTripsPage = () => {
             {trips.length === 0 && !loading && !searchLoading && (
               <div className="text-center py-20">
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6 shadow-md">
-                  <MapPin className="w-10 h-10 text-purple-300" />
+                  <MapPin className="w-10 h-10 text-[#6347f9]/30" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-slate-800">
                   {searchQuery ? 'Không tìm thấy chuyến đi' : 'Chưa có chuyến đi nào'}

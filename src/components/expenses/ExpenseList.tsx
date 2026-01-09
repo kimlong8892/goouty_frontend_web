@@ -154,8 +154,8 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
       {expenses.length === 0 ? (
         <Card className="rounded-[32px] border-2 border-dashed border-slate-100 dark:border-border shadow-none bg-slate-50/50 dark:bg-card/50">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-6">
-              <ReceiptText className="w-8 h-8 text-indigo-200 dark:text-indigo-400/50" />
+            <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-[#6347f9]/20 flex items-center justify-center mb-6">
+              <ReceiptText className="w-8 h-8 text-indigo-200 dark:text-[#6347f9]/50" />
             </div>
             <h3 className="text-lg font-bold text-slate-800 dark:text-foreground mb-2">Chưa có chi phí nào</h3>
             <p className="text-slate-500 dark:text-muted-foreground text-sm max-w-xs mb-8">
@@ -265,7 +265,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm border border-indigo-100/50 dark:border-indigo-500/20">
+                      <div className="bg-indigo-50 dark:bg-[#6347f9]/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm border border-indigo-100/50 dark:border-[#6347f9]/20">
                         <Users className="w-3 h-3 text-[#6347f9]" />
                         <span className="text-[10px] font-bold text-[#6347f9]">{expense.participants.length} người</span>
                       </div>

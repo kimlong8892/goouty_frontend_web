@@ -766,7 +766,7 @@ const TripDetailsPage = () => {
                               <div className={cn(
                                 "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
                                 isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
-                                isExpanded ? "bg-primary text-white" : "bg-secondary text-muted-foreground"
+                                isExpanded ? "bg-[#6347f9] text-white dark:shadow-[0_0_15px_rgba(99,71,249,0.7)]" : "bg-secondary text-muted-foreground"
                               )}>
                                 {index + 1}
                               </div>
