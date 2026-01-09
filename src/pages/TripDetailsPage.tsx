@@ -1017,24 +1017,24 @@ const TripDetailsPage = () => {
 
       {/* Delete Activity Dialog */}
       <Dialog open={deleteActivityDialogOpen} onOpenChange={setDeleteActivityDialogOpen}>
-        <DialogContent className="rounded-2xl">
+        <DialogContent className="rounded-2xl bg-white dark:bg-[#1a1a2e] border-none shadow-2xl max-w-[90vw] sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Xác nhận xóa hoạt động</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Xác nhận xóa hoạt động</DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400 mt-2">
               Bạn có chắc chắn muốn xóa hoạt động "{activityToDelete?.title}"? Hành động này không thể hoàn tác.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="flex flex-row gap-3 mt-6 sm:justify-end">
             <Button
               variant="outline"
               onClick={() => setDeleteActivityDialogOpen(false)}
-              className="rounded-xl hover:bg-purple-50 hover:text-[#6347f9] border-slate-200"
+              className="flex-1 sm:flex-none rounded-xl bg-white text-[#6347f9] hover:bg-purple-50 border-slate-200 hover:border-purple-200 font-bold transition-all h-11"
             >
               Hủy
             </Button>
             <Button
               onClick={handleConfirmDeleteActivity}
-              className="bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white"
+              className="flex-1 sm:flex-none bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-purple-500/20 h-11"
             >
               Xóa hoạt động
             </Button>
