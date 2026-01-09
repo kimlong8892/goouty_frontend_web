@@ -574,7 +574,7 @@ const Profile = () => {
                     <Button
                       variant="outline"
                       onClick={handleCancelEdit}
-                      className="px-6 h-11 rounded-xl border-border text-muted-foreground hover:bg-secondary"
+                      className="h-11 rounded-xl border-border dark:border-gray-700 bg-transparent text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-gray-800 hover:text-foreground dark:hover:text-white transition-all px-6"
                     >
                       Hủy
                     </Button>
@@ -611,11 +611,11 @@ const Profile = () => {
                   <div className="font-bold text-foreground flex items-center gap-2 mb-6">
                     <Shield className="w-5 h-5 text-primary" /> Bảo mật
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start h-12 rounded-xl border-border hover:bg-secondary hover:text-primary font-medium text-muted-foreground">
-                          <Lock className="w-4 h-4 mr-3" /> Đổi mật khẩu
+                        <Button variant="ghost" className="group w-full justify-start h-16 rounded-[24px] bg-[#eff1f5] hover:bg-[#e2e5eb] dark:bg-secondary dark:hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6">
+                          <Lock className="w-5 h-5 mr-4 text-gray-500 group-hover:text-primary transition-colors" /> Đổi mật khẩu
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
@@ -687,9 +687,9 @@ const Profile = () => {
                     <Button
                       variant="ghost"
                       onClick={handleLogout}
-                      className="w-full justify-start h-12 rounded-xl hover:bg-destructive/10 text-destructive font-medium mt-2"
+                      className="group w-full justify-start h-16 rounded-[24px] bg-[#fff0f0] hover:bg-[#ffe4e4] dark:bg-red-500/10 dark:hover:bg-red-500/20 text-foreground hover:text-red-500 font-bold transition-all pl-6"
                     >
-                      <LogOut className="w-4 h-4 mr-3" /> Đăng xuất thiết bị
+                      <LogOut className="w-5 h-5 mr-4 text-foreground group-hover:text-red-500 transition-colors" /> Đăng xuất thiết bị
                     </Button>
                   </div>
                 </CardContent>
