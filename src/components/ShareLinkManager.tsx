@@ -9,9 +9,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogFooter,
 } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import {
   Share2,
@@ -122,34 +121,34 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
   return (
     <div className={cn("space-y-6 animate-in fade-in duration-500", isMobileView && "space-y-4")}>
       <div className={cn(
-        "flex justify-between gap-4 border-b border-gray-100 pb-6",
+        "flex justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-6",
         isMobileView ? "flex-col pb-4" : "flex-row items-center"
       )}>
         <div>
-          <h2 className={cn("font-bold text-gray-900 flex items-center gap-2", isMobileView ? "text-lg" : "text-2xl")}>
-            <div className={cn("rounded-xl relative overflow-hidden group", isMobileView ? "p-1.5" : "p-2 bg-indigo-50")}>
-              <Share2 className={cn("text-[#6347f9] relative z-10", isMobileView ? "w-5 h-5" : "w-6 h-6")} />
+          <h2 className={cn("font-bold text-gray-900 dark:text-gray-50 flex items-center gap-2", isMobileView ? "text-lg" : "text-2xl")}>
+            <div className={cn("rounded-xl relative overflow-hidden group", isMobileView ? "p-1.5" : "p-2 bg-indigo-50 dark:bg-indigo-500/10")}>
+              <Share2 className={cn("text-[#6347f9] dark:text-[#7c66ff] relative z-10", isMobileView ? "w-5 h-5" : "w-6 h-6")} />
             </div>
             Chia sẻ
           </h2>
-          {!isMobileView && <p className="text-gray-500 mt-1 text-sm font-medium">
+          {!isMobileView && <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
             Quản lý quyền truy cập và mời bạn bè tham gia
           </p>}
         </div>
         <div className={cn(
           "flex items-center gap-3 rounded-xl",
-          !isMobileView && "bg-gray-50/50 p-1.5 border border-gray-100"
+          !isMobileView && "bg-gray-50/50 dark:bg-gray-800/50 p-1.5 border border-gray-100 dark:border-gray-800"
         )}>
           {hasActiveShareLink ? (
-            <Badge variant="secondary" className="px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 border-green-100 transition-colors gap-1.5 text-xs font-semibold rounded-lg">
+            <Badge variant="secondary" className="px-3 py-1 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-500/20 border-green-100 dark:border-green-500/20 transition-colors gap-1.5 text-xs font-semibold rounded-lg">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500 dark:bg-green-400"></span>
               </span>
               Công khai
             </Badge>
           ) : (
-            <Badge variant="outline" className="px-3 py-1 bg-gray-50 text-gray-500 gap-1.5 text-xs font-semibold rounded-lg border-gray-200">
+            <Badge variant="outline" className="px-3 py-1 bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 gap-1.5 text-xs font-semibold rounded-lg border-gray-200 dark:border-gray-700">
               <EyeOff className="w-3 h-3" />
               Riêng tư
             </Badge>
@@ -160,15 +159,15 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
       <div className="grid gap-8">
         {hasActiveShareLink || shareLink ? (
           <div className="space-y-6">
-            <div className="relative overflow-hidden group rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50/50 via-white to-purple-50/30 p-8 shadow-sm transition-all hover:shadow-md">
+            <div className="relative overflow-hidden group rounded-3xl border border-indigo-100 dark:border-indigo-500/20 bg-gradient-to-br from-indigo-50/50 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-indigo-950/20 p-8 shadow-sm transition-all hover:shadow-md">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Share2 className="w-32 h-32 text-indigo-500 -rotate-12 transform translate-x-8 -translate-y-8" />
               </div>
 
               <div className="relative z-10 space-y-6">
                 <div>
-                  <h4 className={cn("font-bold text-gray-900 mb-1", isMobileView ? "text-base" : "text-lg")}>Liên kết chia sẻ</h4>
-                  <p className="text-gray-500 text-sm leading-relaxed">
+                  <h4 className={cn("font-bold text-gray-900 dark:text-gray-50 mb-1", isMobileView ? "text-base" : "text-lg")}>Liên kết chia sẻ</h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                     Bất kỳ ai có liên kết này đều có thể xem và tham gia chuyến đi
                   </p>
                 </div>
@@ -182,7 +181,7 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
                       <Input
                         value={currentShareLink}
                         readOnly
-                        className="pl-10 h-11 bg-white border-gray-200 focus:border-[#6347f9] focus:ring-[#6347f9]/20 rounded-xl font-medium text-gray-600 transition-all text-[13px]"
+                        className="pl-10 h-11 bg-white dark:bg-gray-950/50 border-gray-200 dark:border-gray-800 focus:border-[#6347f9] dark:focus:border-[#7c66ff] focus:ring-[#6347f9]/20 rounded-xl font-medium text-gray-600 dark:text-gray-300 transition-all text-[13px]"
                       />
                     </div>
                     <div className="flex gap-2">
@@ -197,7 +196,7 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
                       <Button
                         size="icon"
                         variant="outline"
-                        className="h-11 w-11 rounded-xl border-gray-200 hover:bg-gray-50 text-gray-600 active:scale-95 transition-all"
+                        className="h-11 w-11 rounded-xl border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 active:scale-95 transition-all"
                         onClick={() => window.open(currentShareLink, '_blank')}
                       >
                         <ExternalLink className="h-4 w-4" />
@@ -212,7 +211,7 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
                     size="sm"
                     onClick={handleRevokeShareLink}
                     disabled={revokeShareLinkMutation.isPending}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg px-3 -ml-3 transition-colors text-sm font-medium"
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg px-3 -ml-3 transition-colors text-sm font-medium"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     {revokeShareLinkMutation.isPending ? 'Đang thu hồi...' : 'Thu hồi liên kết này'}
@@ -222,19 +221,19 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 px-4 bg-gradient-to-b from-gray-50/50 to-transparent rounded-3xl border-2 border-dashed border-gray-200">
-            <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6 shadow-inner ring-4 ring-white">
+          <div className="flex flex-col items-center justify-center py-16 px-4 bg-gradient-to-b from-gray-50/50 to-transparent dark:from-gray-900/50 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+            <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-500/10 rounded-full flex items-center justify-center mb-6 shadow-inner ring-4 ring-white dark:ring-gray-900">
               <Users className="h-10 w-10 text-indigo-400" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Chưa có liên kết chia sẻ</h3>
-            <p className="text-gray-500 mb-8 max-w-md text-center">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-2">Chưa có liên kết chia sẻ</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md text-center">
               Tạo liên kết để mời bạn bè, gia đình cùng tham gia lên kế hoạch cho chuyến đi tuyệt vời này
             </p>
             <Button
               size="lg"
               onClick={handleGenerateShareLink}
               disabled={generateShareLinkMutation.isPending}
-              className="h-12 px-8 bg-[#6347f9] hover:bg-[#5136db] text-white rounded-xl shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-0.5 transition-all duration-300 font-semibold"
+              className="h-12 px-8 bg-[#6347f9] hover:bg-[#5136db] text-white rounded-xl shadow-xl shadow-indigo-200 dark:shadow-none hover:shadow-indigo-300 dark:hover:shadow-none hover:-translate-y-0.5 transition-all duration-300 font-semibold"
             >
               {generateShareLinkMutation.isPending ? (
                 <>
@@ -255,35 +254,35 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
           "grid gap-4 pt-4",
           isMobileView ? "grid-cols-1" : "grid-cols-2"
         )}>
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2 text-sm">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-gray-900/50 border border-slate-100 dark:border-gray-800">
+            <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2 text-sm">
               <Users className="w-4 h-4 text-[#6347f9]" />
               Tham gia
             </h4>
             <ul className="space-y-2">
-              <li className="flex gap-2 text-xs text-slate-500">
-                <div className="w-1 h-1 rounded-full bg-slate-400 mt-1.5 shrink-0" />
+              <li className="flex gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <div className="w-1 h-1 rounded-full bg-slate-400 dark:bg-slate-600 mt-1.5 shrink-0" />
                 Có thể xem chi tiết chuyến đi
               </li>
-              <li className="flex gap-2 text-xs text-slate-500">
-                <div className="w-1 h-1 rounded-full bg-slate-400 mt-1.5 shrink-0" />
+              <li className="flex gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <div className="w-1 h-1 rounded-full bg-slate-400 dark:bg-slate-600 mt-1.5 shrink-0" />
                 Yêu cầu tham gia làm thành viên
               </li>
             </ul>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2 text-sm">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-gray-900/50 border border-slate-100 dark:border-gray-800">
+            <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2 text-sm">
               <EyeOff className="w-4 h-4 text-orange-500" />
               Riêng tư
             </h4>
             <ul className="space-y-2">
-              <li className="flex gap-2 text-xs text-slate-500">
-                <div className="w-1 h-1 rounded-full bg-slate-400 mt-1.5 shrink-0" />
+              <li className="flex gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <div className="w-1 h-1 rounded-full bg-slate-400 dark:bg-slate-600 mt-1.5 shrink-0" />
                 Tới quản lý thành viên
               </li>
-              <li className="flex gap-2 text-xs text-slate-500">
-                <div className="w-1 h-1 rounded-full bg-slate-400 mt-1.5 shrink-0" />
+              <li className="flex gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <div className="w-1 h-1 rounded-full bg-slate-400 dark:bg-slate-600 mt-1.5 shrink-0" />
                 Thu hồi link bất cứ lúc nào
               </li>
             </ul>
@@ -291,44 +290,48 @@ export function ShareLinkManager({ trip }: ShareLinkManagerProps) {
         </div>
       </div>
 
-      <AlertDialog open={revokeConfirmOpen} onOpenChange={setRevokeConfirmOpen}>
-        <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center space-x-2 text-xl">
-              <span className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center mr-2">
+      <Dialog open={revokeConfirmOpen} onOpenChange={setRevokeConfirmOpen}>
+        <DialogContent className={cn("rounded-2xl border-none shadow-2xl", isMobileView && "w-[90%] max-w-[340px] p-5 rounded-[24px]")}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2 text-xl">
+              <span className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mr-2">
                 <Trash2 className="h-5 w-5 text-red-500" />
               </span>
               Thu hồi liên kết?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-4 pt-2">
-              <p className="text-gray-600">
+            </DialogTitle>
+            <DialogDescription className="space-y-4 pt-2">
+              <p className="text-gray-600 dark:text-gray-300">
                 Hành động này sẽ vô hiệu hóa liên kết chia sẻ hiện tại. Những người chưa tham gia sẽ không thể truy cập được nữa.
               </p>
-              <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
-                <p className="text-sm text-orange-800 font-medium flex items-center gap-2">
+              <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-xl border border-orange-100 dark:border-orange-900/30">
+                <p className="text-sm text-orange-800 dark:text-orange-400 font-medium flex items-center gap-2">
                   <EyeOff className="w-4 h-4" />
                   Lưu ý
                 </p>
-                <p className="text-sm text-orange-700 mt-1">
+                <p className="text-sm text-orange-700 dark:text-orange-500 mt-1">
                   Thành viên đã tham gia sẽ không bị ảnh hưởng.
                 </p>
               </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-4">
-            <AlertDialogCancel className="rounded-xl border-gray-200 hover:bg-gray-50 hover:text-gray-900">
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className={cn("mt-4", isMobileView && "gap-3")}>
+            <Button
+              variant="outline"
+              onClick={() => setRevokeConfirmOpen(false)}
+              className="rounded-xl border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-50"
+            >
               Giữ lại thông tin
-            </AlertDialogCancel>
-            <AlertDialogAction
+            </Button>
+            <Button
               onClick={confirmRevokeShareLink}
-              className="bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-lg shadow-red-200"
+              className="bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-lg shadow-red-200 dark:shadow-none"
               disabled={revokeShareLinkMutation.isPending}
             >
               {revokeShareLinkMutation.isPending ? 'Đang xử lý...' : 'Xác nhận thu hồi'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
