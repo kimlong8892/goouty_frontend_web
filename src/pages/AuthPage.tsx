@@ -170,7 +170,7 @@ const AuthPage = () => {
                 <>
                   <Button
                     variant="outline"
-                    className="w-full h-[56px] rounded-2xl border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-accent hover:text-accent-foreground dark:text-foreground font-bold gap-3 text-base shadow-sm transition-all"
+                    className="w-full h-[56px] rounded-2xl border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-primary hover:text-accent-foreground dark:hover:text-primary-foreground dark:text-foreground font-bold gap-3 text-base shadow-sm transition-all"
                     onClick={handleGoogleLogin}
                   >
                     <GoogleIcon size={24} />
