@@ -59,7 +59,7 @@ const PWAEditTripPage = () => {
         } catch (error: any) {
             console.error('Fetch trip error:', error);
             showToast('Không thể tải thông tin chuyến đi', 'error');
-            navigate('/pwa-trips');
+            navigate('/');
         } finally {
             setInitialLoading(false);
         }
