@@ -328,7 +328,7 @@ const Profile = () => {
             <Button
               variant="ghost"
               onClick={handleLogout}
-              className="w-full h-14 rounded-2xl bg-card border border-destructive/20 text-destructive font-bold flex items-center justify-center gap-2 mt-4 active:bg-destructive/10 shadow-sm"
+              className="w-full h-14 rounded-2xl bg-red-500/10 dark:bg-red-500/5 border border-red-500/20 dark:border-red-500/10 text-red-600 dark:text-red-400 font-bold flex items-center justify-center gap-2 mt-4 hover:bg-red-600 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all active:scale-[0.98] shadow-sm"
             >
               <LogOut className="w-5 h-5" /> Đăng xuất tài khoản
             </Button>
