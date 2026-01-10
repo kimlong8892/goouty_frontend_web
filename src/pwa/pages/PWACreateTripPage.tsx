@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
-import { api } from '@/lib/api.ts';
-import { useGlobalToast } from '@/utils/globalToast';
-import { CreateTripRequest, Trip } from '@/lib/types.ts';
+import { api } from '@/integrations/api/client.ts';
+import { useGlobalToast } from '@/utils/globalToast.ts';
+import { DATABASE_TYPES } from '@/integrations/api/types.ts';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
 import { Calendar } from '@/components/ui/calendar.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
@@ -80,14 +80,14 @@ const PWACreateTripPage = () => {
 
     setLoading(true);
     try {
-      const tripData: CreateTripRequest = {
+      const tripData: any = {
         title: tripName.trim(),
         provinceId: destination.trim() || undefined,
         description: description.trim() || undefined,
         ...(startDate && { startDate: startDate.toISOString() })
       };
 
-      const trip = await api.post<Trip>('/trips', tripData);
+      const trip = await api.trips.create(tripData);
 
       // Upload avatar if provided
       if (coverImage) {
@@ -297,8 +297,8 @@ const PWACreateTripPage = () => {
         </div>
       </div>
 
-      {/* Sticky Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-safe z-50">
+      {/* Sticky Bottom Button - Positioned above PWA Navbar */}
+      <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/50 pb-safe z-40">
         <Button
           onClick={handleCreateTrip}
           disabled={loading}

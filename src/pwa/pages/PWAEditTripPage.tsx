@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
-import { api } from '@/lib/api.ts';
-import { useGlobalToast } from '@/utils/globalToast';
-import { UpdateTripRequest } from '@/lib/types.ts';
+import { api } from '@/integrations/api/client.ts';
+import { useGlobalToast } from '@/utils/globalToast.ts';
+import { DATABASE_TYPES } from '@/integrations/api/types.ts';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
 import { Calendar } from '@/components/ui/calendar.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
@@ -98,14 +98,14 @@ const PWAEditTripPage = () => {
                 }
             }
 
-            const tripData: UpdateTripRequest = {
+            const tripData: any = {
                 title: tripName.trim(),
                 provinceId: destination.trim(),
                 description: description.trim() || undefined,
                 ...(startDate && { startDate: startDate.toISOString() })
             };
 
-            await api.put(`/trips/${id}`, tripData);
+            await api.trips.update(id, tripData);
             showToast('Cập nhật chuyến đi thành công!', 'success');
             navigate(`/trip/${id}`);
         } catch (error: any) {
@@ -295,8 +295,8 @@ const PWAEditTripPage = () => {
                 </div>
             </div>
 
-            {/* Sticky Bottom Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-safe z-50">
+            {/* Sticky Bottom Button - Positioned above PWA Navbar */}
+            <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/50 pb-safe z-40">
                 <Button
                     onClick={handleUpdateTrip}
                     disabled={loading}

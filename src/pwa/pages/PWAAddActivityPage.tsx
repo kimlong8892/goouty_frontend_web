@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
-import { api } from '@/lib/api.ts';
+import { api } from '@/integrations/api/client.ts';
 import { useGlobalToast } from '@/utils/globalToast.ts';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
@@ -63,7 +63,7 @@ const PWAAddActivityPage = () => {
                 dayId: dayId
             };
 
-            await api.post('/activities', activityData);
+            await api.activities.create(activityData);
 
             showToast('Đã thêm hoạt động thành công', 'success');
             navigate(-1);

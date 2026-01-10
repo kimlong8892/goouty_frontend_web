@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
-import { api } from '@/lib/api.ts';
+import { api } from '@/integrations/api/client.ts';
 import { useGlobalToast } from '@/utils/globalToast.ts';
-import { CreateDayRequest, Day } from '@/lib/types.ts';
+import { DATABASE_TYPES } from '@/integrations/api/types.ts';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
@@ -69,14 +69,14 @@ const PWAAddDayPage = () => {
 
         setLoading(true);
         try {
-            const dayData: CreateDayRequest = {
+            const dayData: any = {
                 title: formData.title.trim(),
                 description: formData.description.trim() || undefined,
                 date: new Date(`${formData.date}T00:00:00`).toISOString(),
                 tripId: tripId
             };
 
-            await api.post<Day>('/days', dayData);
+            await api.days.create(dayData);
 
             showToast('Đã thêm ngày thành công', 'success');
             navigate(-1);
