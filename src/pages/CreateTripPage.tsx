@@ -205,8 +205,8 @@ const CreateTripPage = () => {
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal h-12 bg-secondary border-border rounded-xl hover:bg-secondary/80 text-foreground transition-all duration-200",
-                          !startDate && "text-muted-foreground/60"
+                          "w-full justify-start text-left font-normal h-12 bg-secondary border-border rounded-xl hover:bg-secondary/80 transition-all duration-200",
+                          startDate ? "text-foreground hover:text-foreground" : "text-muted-foreground/60 hover:text-muted-foreground/60"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
