@@ -99,7 +99,7 @@ export const Footer = () => {
                             <li>
                                 <Link to="/create-trip" className="flex items-center gap-2 hover:text-primary transition-colors">
                                     <Map className="w-4 h-4" />
-                                    <span>Lập kế hoạch chuyến đi</span>
+                                    <span>Lập kế hoạch</span>
                                 </Link>
                             </li>
                             <li>

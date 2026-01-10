@@ -339,7 +339,7 @@ const TripTemplateDetailPage = () => {
                                 {/* Decorative bg blob */}
                                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#6347f9]/10 rounded-full blur-2xl" />
 
-                                <h3 className="text-2xl font-black text-slate-900 dark:text-zinc-100 mb-2 relative z-10">Sẵn sàng đi chưa?</h3>
+                                <h3 className="text-2xl font-black text-slate-900 dark:text-zinc-100 mb-2 relative z-10">Bạn đã sẵn sàng chưa?</h3>
                                 <p className="text-slate-500 dark:text-zinc-400 mb-8 leading-relaxed relative z-10">
                                     Sử dụng mẫu này để tạo ngay chuyến đi của riêng bạn và tùy chỉnh theo ý thích.
                                 </p>
