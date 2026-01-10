@@ -17,7 +17,10 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Filter, Check } from 'lucide-react';
+import { Filter, Check, Bell, SlidersHorizontal } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNotificationCountContext } from '@/contexts/NotificationCountContext';
 
 interface PWATripTemplatesListProps {
   onUseTemplate?: (template: DATABASE_TYPES.tripTemplates) => void;
@@ -27,6 +30,8 @@ interface PWATripTemplatesListProps {
 export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTemplatesListProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user, isAuthenticated } = useAuth();
+  const { unreadCount } = useNotificationCountContext();
   const [templates, setTemplates] = useState<DATABASE_TYPES.tripTemplates[]>([]);
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
   const [loading, setLoading] = useState(true);
@@ -279,41 +284,63 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
 
       {/* Search and Filter - Sticky at top */}
 
-      <div className={cn(
-        "fixed top-0 left-0 right-0 z-50 pt-[max(env(safe-area-inset-top),12px)] pb-2 px-4 transition-all duration-200",
-        isScrolled ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm" : "bg-transparent"
-      )}>
-        <div className="max-w-6xl mx-auto space-y-3">
-          <div className="flex gap-2">
-            {/* Search Bar */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder={t('template.searchTemplates')}
-                value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-10 h-11 bg-card shadow-sm border-border focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl text-base text-foreground placeholder:text-muted-foreground/60"
-              />
+      {/* Custom Header Section - Based on requested UI */}
+      <div className="pt-6 pb-4 space-y-6">
+        {/* Top Row: Profile and Notification */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
+              <AvatarImage src={user?.profilePicture} alt={user?.fullName || 'User'} />
+              <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                {(user?.fullName || 'G').charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-muted-foreground text-sm font-medium flex items-center gap-1">
+                {t('common.greeting', { defaultValue: 'Hello' })}, {user?.fullName.split(' ')[0] || 'Shane'} <span className="animate-wave">👋</span>
+              </span>
+              <h1 className="text-xl font-bold text-foreground leading-tight">
+                {t('template.whereToGo', { defaultValue: 'Where do you want to go?' })}
+              </h1>
             </div>
+          </div>
 
-            {/* Filter Button */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-border bg-card shadow-sm relative group hover:bg-secondary transition-all"
+            onClick={() => navigate('/notifications')}
+          >
+            <Bell className="w-6 h-6 text-foreground group-hover:scale-110 transition-transform" />
+            {unreadCount > 0 && (
+              <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-background" />
+            )}
+          </Button>
+        </div>
+
+        {/* Search and Filter Row */}
+        <div className="flex gap-2">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 w-5 h-5 group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder={t('template.searchTemplates')}
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="pl-12 pr-12 h-14 bg-card shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border-border/50 focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/10 rounded-2xl text-base text-foreground placeholder:text-muted-foreground/40 transition-all font-medium"
+            />
             <Drawer open={isProvinceDrawerOpen} onOpenChange={setIsProvinceDrawerOpen}>
               <DrawerTrigger asChild>
-                <Button
-                  size="icon"
+                <button
                   className={cn(
-                    "h-11 w-11 rounded-xl shadow-sm shrink-0",
+                    "absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all",
                     selectedProvince !== 'all'
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-card text-muted-foreground border border-border hover:bg-secondary hover:text-primary"
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground/60 hover:text-primary hover:bg-secondary"
                   )}
                 >
-                  <Filter className="w-5 h-5" />
-                  {selectedProvince !== 'all' && (
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full border-2 border-background ring-0" />
-                  )}
-                </Button>
+                  <SlidersHorizontal className="w-5 h-5" />
+                </button>
               </DrawerTrigger>
               <DrawerContent className="max-h-[85vh] bg-card border-t border-border">
                 <DrawerHeader className="border-b border-border pb-4">
@@ -367,43 +394,29 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
         </div>
       </div>
 
-      {/* Spacer for fixed header */}
-      <div className="h-[max(calc(env(safe-area-inset-top)+60px),70px)]"></div>
-
-      {/* Hero Section - Custom UI */}
-      <div className="flex flex-col items-center justify-center pt-2 pb-6 text-center px-4 animate-fade-in">
-        <h1 className="text-2xl font-black text-[#6347f9] uppercase tracking-wide mb-3 leading-tight drop-shadow-sm w-full">
-          VI VU THẢ GA,<br />KHÔNG LO RẮC RỐI.
-        </h1>
-
-        <div className="space-y-1 mb-4">
-          <p className="text-muted-foreground font-bold text-sm">
-            Nền tảng 2 trong 1
-          </p>
-          <ul className="text-muted-foreground font-bold text-sm list-none space-y-1">
-            <li>• Quản lý lịch trình và Chi phí nhóm.</li>
-            <li>• Chia sẻ dễ dàng qua một đường link duy nhất.</li>
-          </ul>
-        </div>
-
-        <Button
-          onClick={() => navigate('/create-trip')}
-          className="mb-6 rounded-full bg-[#6347f9] hover:bg-[#5136db] text-white font-bold h-10 px-6 shadow-[0_4px_14px_0_rgba(99,71,249,0.39)] hover:shadow-[0_6px_20px_rgba(99,71,249,0.23)] hover:scale-[1.02] transition-all"
-        >
-          Bắt đầu hành trình <ChevronRight className="w-4 h-4 ml-1" />
-        </Button>
-
-
+      {/* Hero Section - Hidden in new UI but kept logic if needed */}
+      <div className="hidden">
+        <div className="h-[max(calc(env(safe-area-inset-top)+60px),70px)]"></div>
       </div>
 
+      {/* Sections separator */}
+      <div className="h-px bg-border/50 mb-8" />
+
       {/* Services Section - KHÁM PHÁ TEMPLATES */}
-      <div className="text-center px-4 mb-8 animate-fade-in delay-100">
-        <h2 className="text-2xl font-black text-[#6347f9] uppercase tracking-wide mb-3 drop-shadow-sm">
-          KHÁM PHÁ TEMPLATES
+      <div className="px-2 mb-6 flex items-center justify-between">
+        <h2 className="text-xl font-bold text-foreground">
+          {t('template.exploreTemplates', { defaultValue: 'Explore Templates' })}
         </h2>
-        <p className="text-muted-foreground font-bold text-sm leading-relaxed max-w-xs mx-auto">
-          Duyệt qua và sử dụng các kế hoạch chuyến đi có sẵn để bắt đầu hành trình của bạn ngay lập tức
-        </p>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="text-primary hover:bg-primary/10 font-bold"
+          >
+            {t('common.clearFilters')}
+          </Button>
+        )}
       </div>
 
       {/* Results summary if filtering */}
