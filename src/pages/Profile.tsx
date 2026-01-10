@@ -25,7 +25,9 @@ import {
   Bell,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  Heart,
+  Loader2
 } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import NotificationSettings from '@/components/NotificationSettings';
@@ -121,8 +123,9 @@ const Profile = () => {
         setLoading(false);
       }
     };
+
     initData();
-  }, [user]);
+  }, [user, isPWA]);
 
   const handleSaveProfile = async () => {
     try {
@@ -675,6 +678,23 @@ const Profile = () => {
               <Card className="rounded-[24px] border-none shadow-lg overflow-hidden bg-card">
                 <CardContent className="p-6">
                   <div className="font-bold text-foreground flex items-center gap-2 mb-6">
+                    <Heart className="w-5 h-5 text-red-500 fill-red-500" /> Thư viện & Lưu trữ
+                  </div>
+                  <div className="space-y-4">
+                    <Button
+                      variant="ghost"
+                      onClick={() => navigate('/wishlist')}
+                      className="group w-full justify-start h-16 rounded-[24px] bg-[#eff1f5] hover:bg-[#e2e5eb] dark:bg-secondary dark:hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6"
+                    >
+                      <Heart className="w-5 h-5 mr-4 text-red-500 group-hover:scale-110 transition-transform" /> Mẫu đã lưu
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-[24px] border-none shadow-lg overflow-hidden bg-card">
+                <CardContent className="p-6">
+                  <div className="font-bold text-foreground flex items-center gap-2 mb-6">
                     <Shield className="w-5 h-5 text-primary" /> Bảo mật
                   </div>
                   <div className="space-y-4">
@@ -799,8 +819,8 @@ const Profile = () => {
             </div>
           </div>
         </div>
-      </AnimatedTransition >
-    </div >
+      </AnimatedTransition>
+    </div>
   );
 };
 

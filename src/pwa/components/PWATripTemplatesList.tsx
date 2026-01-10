@@ -403,16 +403,16 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       <div className="h-px bg-border/50 mb-8" />
 
       {/* Services Section - KHÁM PHÁ TEMPLATES */}
-      <div className="px-2 mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-foreground">
-          {t('template.exploreTemplates', { defaultValue: 'Explore Templates' })}
+      <div className="px-2 mb-6 flex items-center justify-center relative">
+        <h2 className="text-[20px] font-black text-[#7c66fd] uppercase tracking-tighter">
+          KHÁM PHÁ TEMPLATES
         </h2>
         {hasActiveFilters && (
           <Button
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="text-primary hover:bg-primary/10 font-bold"
+            className="absolute right-2 text-primary hover:bg-primary/10 font-bold"
           >
             {t('common.clearFilters')}
           </Button>
