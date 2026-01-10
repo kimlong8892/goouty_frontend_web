@@ -26,7 +26,8 @@
         "error": "Lỗi",
         "success": "Thành công",
         "warning": "Cảnh báo",
-        "info": "Thông tin"
+        "info": "Thông tin",
+        "greeting": "Xin chào"
     },
     "auth": {
         "login": "Đăng nhập",
@@ -89,7 +90,9 @@
         "noTemplatesDescription": "Thử điều chỉnh tiêu chí tìm kiếm hoặc bộ lọc của bạn",
         "noTemplatesAvailable": "Hiện tại chưa có mẫu chuyến đi nào",
         "templatesFound": "Tìm thấy {{count}} mẫu chuyến đi",
-        "loadingTemplates": "Đang tải mẫu chuyến đi..."
+        "loadingTemplates": "Đang tải mẫu chuyến đi...",
+        "whereToGo": "Bạn muốn đi đâu?",
+        "exploreTemplates": "Khám phá mẫu"
     },
     "profile": {
         "title": "Hồ sơ",
