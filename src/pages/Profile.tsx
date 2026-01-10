@@ -231,7 +231,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    navigate('/auth');
   };
 
   if (loading) {
