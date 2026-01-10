@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
-import { api } from '@/lib/api.ts';
+import { api } from '@/integrations/api/client.ts';
 import { useGlobalToast } from '@/utils/globalToast.ts';
-import { Activity } from '@/lib/types.ts';
+import { DATABASE_TYPES } from '@/integrations/api/types.ts';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
@@ -50,7 +50,7 @@ const PWAEditActivityPage = () => {
             if (!activityId) return;
             try {
                 setLoading(true);
-                // Directly using fetch instead of api.activities.getById as it might not exist
+                // Directly using api.get instead of fetch from lib/api
                 const data = await api.get<any>(`/activities/${activityId}`);
 
                 // Handle different field names between UI and API
@@ -104,11 +104,15 @@ const PWAEditActivityPage = () => {
                 durationMin: formData.durationMin,
                 location: formData.location.trim() || undefined,
                 notes: formData.notes.trim() || undefined,
-                important: formData.important,
-                pinned: formData.important // Update both for compatibility
+                important: formData.important
             };
 
-            await api.patch(`/activities/${activityId}`, updateData);
+            // Remove undefined values to be clean
+            Object.keys(updateData).forEach(key =>
+                updateData[key] === undefined && delete updateData[key]
+            );
+
+            await api.activities.update(activityId, updateData);
 
             showToast('Đã cập nhật hoạt động thành công', 'success');
             navigate(-1);

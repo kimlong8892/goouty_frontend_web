@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
-import { api } from '@/lib/api.ts';
+import { api } from '@/integrations/api/client.ts';
 import { useGlobalToast } from '@/utils/globalToast.ts';
-import { Day } from '@/lib/types.ts';
+import { DATABASE_TYPES } from '@/integrations/api/types.ts';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
@@ -50,7 +50,8 @@ const PWAEditDayPage = () => {
             if (!dayId) return;
             try {
                 setLoading(true);
-                const data = await api.get<Day>(`/days/${dayId}`);
+                // Directly using api.get instead of fetch from lib/api
+                const data = await api.get<any>(`/days/${dayId}`);
                 setFormData({
                     title: data.title,
                     description: data.description || '',
@@ -95,7 +96,7 @@ const PWAEditDayPage = () => {
                 date: new Date(`${formData.date}T00:00:00`).toISOString(),
             };
 
-            await api.patch<Day>(`/days/${dayId}`, dayData);
+            await api.days.update(dayId, dayData);
 
             showToast('Đã cập nhật ngày thành công', 'success');
             navigate(-1);

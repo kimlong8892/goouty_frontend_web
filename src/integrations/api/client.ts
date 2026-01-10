@@ -117,6 +117,19 @@ export const api = {
     delete: async (id: string) => {
       return await api.delete(`/trips/${id}`);
     },
+    uploadAvatar: async (id: string, file: File) => {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      return await apiClient.post(`/trips/${id}/avatar`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
+    deleteAvatar: async (id: string) => {
+      return await api.delete(`/trips/${id}/avatar`);
+    },
   },
 
   // Member-specific API methods

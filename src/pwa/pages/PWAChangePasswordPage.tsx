@@ -193,8 +193,8 @@ const PWAChangePasswordPage = () => {
                     </div>
                 </div>
 
-                {/* Sticky Bottom Button */}
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-safe z-50">
+                {/* Sticky Bottom Button - Positioned above PWA Navbar */}
+                <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/50 pb-safe z-40">
                     <Button
                         onClick={handleSubmit}
                         disabled={changingPassword || !formData.newPassword || !formData.confirmPassword}
