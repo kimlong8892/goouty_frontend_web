@@ -138,6 +138,7 @@ export namespace DATABASE_TYPES {
     };
     isPublic: boolean;
     fee?: string;
+    isWishlisted?: boolean;
     createdAt: string;
     updatedAt: string;
     userId: string;

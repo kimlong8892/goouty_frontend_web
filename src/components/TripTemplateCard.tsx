@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { MapPin, Star, Heart, ChevronRight, Loader2 } from 'lucide-react';
 import { DATABASE_TYPES } from '@/integrations/api/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { usePWA } from '@/pwa/hooks/usePWA';
@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface TripTemplateCardProps {
-  template: DATABASE_TYPES.tripTemplates & { isWishlisted?: boolean };
+  template: DATABASE_TYPES.tripTemplates;
   onUseTemplate?: (template: DATABASE_TYPES.tripTemplates) => void;
   usingTemplate?: boolean;
   onWishlistUpdate?: (templateId: string, isWishlisted: boolean) => void;
@@ -25,6 +25,11 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate, onWis
   const { isAuthenticated } = useAuth();
   const [isFavorite, setIsFavorite] = useState(template.isWishlisted || false);
   const [isWishlisting, setIsWishlisting] = useState(false);
+
+  // Sync state if template prop changes (e.g. after search/fetch)
+  useEffect(() => {
+    setIsFavorite(template.isWishlisted || false);
+  }, [template.isWishlisted]);
 
   const handleViewDetails = () => {
     if (isPWA) {
