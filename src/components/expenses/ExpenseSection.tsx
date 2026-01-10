@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { usePWA } from '@/pwa/hooks/usePWA.ts';
 import { ExpenseSummary } from './ExpenseSummary';
 import { PersonalBalance } from './PersonalBalance';
 import { SettlementStatus } from './SettlementStatus';
@@ -21,6 +23,8 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   isOwner,
   isMember = false
 }) => {
+  const navigate = useNavigate();
+  const { isPWA } = usePWA();
   const [calculation, setCalculation] = useState<ExpenseCalculationResponse | null>(null);
   const [settlements, setSettlements] = useState<PaymentSettlementResponse[]>([]);
   const [transactions, setTransactions] = useState<PaymentTransactionResponse[]>([]);
@@ -81,7 +85,11 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   }, [tripId]);
 
   const handleAddExpense = () => {
-    setShowAddExpenseDialog(true);
+    if (isPWA) {
+      navigate(`/pwa-add-expense/${tripId}`);
+    } else {
+      setShowAddExpenseDialog(true);
+    }
   };
 
   const handleExpenseAdded = async () => {

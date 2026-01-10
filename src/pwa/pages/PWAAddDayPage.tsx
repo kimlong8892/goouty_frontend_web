@@ -114,7 +114,7 @@ const PWAAddDayPage = () => {
 
                     {/* Title Input */}
                     <div className="space-y-2">
-                        <Label htmlFor="title" className="text-muted-foreground font-medium text-sm ml-1">
+                        <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
                             Tiêu đề ngày <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -124,7 +124,7 @@ const PWAAddDayPage = () => {
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             placeholder="VD: Ngày 1 - Khám phá thành phố"
                             className={cn(
-                                "h-12 rounded-xl bg-card border-input focus:ring-primary/20 transition-all",
+                                "h-14 rounded-xl bg-card border-input focus:ring-primary/20 transition-all px-4 text-base",
                                 errors.title && "border-destructive focus-visible:ring-destructive/20"
                             )}
                         />
@@ -135,7 +135,7 @@ const PWAAddDayPage = () => {
 
                     {/* Date Input */}
                     <div className="space-y-2">
-                        <Label htmlFor="date" className="text-muted-foreground font-medium text-sm ml-1">
+                        <Label htmlFor="date" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
                             Ngày <span className="text-red-500">*</span>
                         </Label>
                         <Popover>
@@ -144,12 +144,12 @@ const PWAAddDayPage = () => {
                                     id="date"
                                     variant="outline"
                                     className={cn(
-                                        "w-full h-12 justify-start text-left font-normal rounded-xl bg-card border-input hover:bg-card/80 transition-all",
+                                        "w-full h-14 justify-start text-left font-normal rounded-xl bg-card border-input hover:bg-card/80 transition-all px-4 text-base shadow-sm",
                                         !formData.date && "text-muted-foreground",
                                         errors.date && "border-destructive text-destructive"
                                     )}
                                 >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    <CalendarIcon className="mr-3 h-5 w-5 text-muted-foreground" />
                                     {formData.date ? (
                                         format(new Date(formData.date), "dd/MM/yyyy")
                                     ) : (
@@ -174,7 +174,7 @@ const PWAAddDayPage = () => {
 
                     {/* Description Input */}
                     <div className="space-y-2">
-                        <Label htmlFor="description" className="text-muted-foreground font-medium text-sm ml-1">
+                        <Label htmlFor="description" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
                             Mô tả (tùy chọn)
                         </Label>
                         <Textarea
@@ -182,8 +182,8 @@ const PWAAddDayPage = () => {
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder="Mô tả chi tiết về ngày này..."
-                            rows={3}
-                            className="resize-none rounded-xl bg-card border-input"
+                            rows={4}
+                            className="resize-none rounded-xl bg-card border-input px-4 py-3 text-base focus:ring-primary/20 transition-all shadow-sm"
                         />
                     </div>
 
@@ -191,11 +191,11 @@ const PWAAddDayPage = () => {
             </div>
 
             {/* Sticky Bottom Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-safe z-50">
+            <div className="sticky bottom-20 mt-10 z-10 w-full">
                 <Button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="w-full h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary/25"
+                    className="w-full h-14 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
                 >
                     {loading ? (
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />

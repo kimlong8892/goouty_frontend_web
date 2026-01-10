@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ interface TripMembersProps {
 }
 
 export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersProps) {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
@@ -207,6 +209,12 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
             <DialogTrigger asChild>
               <Button
                 size={isMobileView ? "sm" : "default"}
+                onClick={(e) => {
+                  if (isPWA) {
+                    e.preventDefault();
+                    navigate(`/pwa-invite-member/${tripId}`);
+                  }
+                }}
                 className="bg-[#6347f9] hover:bg-[#5136db] text-white rounded-xl shadow-md transition-all hover:shadow-lg h-10 px-4"
               >
                 {isMobileView ? <UserPlus className="h-5 w-5" /> : <Plus className="h-5 w-5 mr-2" />}
