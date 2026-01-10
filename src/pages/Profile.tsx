@@ -341,14 +341,19 @@ const Profile = () => {
 
         {/* Change Password Dialog */}
         <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-          <DialogContent className="w-screen h-screen max-w-full m-0 rounded-none border-none p-0 gap-0 [&>button]:hidden flex flex-col bg-background">
+          <DialogContent
+            className="w-screen h-[100dvh] max-w-full m-0 rounded-none border-none p-0 gap-0 [&>button]:hidden flex flex-col bg-background overflow-hidden"
+            onPointerDownOutside={(e) => e.preventDefault()}
+            onInteractOutside={(e) => e.preventDefault()}
+            onFocusOutside={(e) => e.preventDefault()}
+          >
             <form onSubmit={handleChangePassword} className="flex flex-col h-full">
-              <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border sticky top-0 z-10">
+              <div className="flex items-center justify-between px-4 pb-3 pt-[calc(env(safe-area-inset-top)+12px)] bg-card border-b border-border sticky top-0 z-10">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsPasswordDialogOpen(false)}
-                  className="text-muted-foreground text-base font-normal h-auto p-0 hover:bg-transparent"
+                  className="text-muted-foreground text-base font-normal h-10 px-2 -ml-2 hover:bg-transparent"
                 >
                   Hủy
                 </Button>
@@ -357,52 +362,61 @@ const Profile = () => {
                   type="submit"
                   disabled={changingPassword}
                   variant="ghost"
-                  className="text-primary text-base font-bold h-auto p-0 hover:bg-transparent hover:text-primary/80"
+                  className="text-primary text-base font-bold h-10 px-2 -mr-2 hover:bg-transparent hover:text-primary/80"
                 >
                   {changingPassword ? '...' : 'Xong'}
                 </Button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4">
-                <div className="bg-card rounded-2xl p-4 shadow-sm space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 bg-background">
+                <div className="bg-card rounded-2xl p-6 shadow-2xl border border-border space-y-5">
                   {profile?.hasPassword && (
                     <div className="space-y-2">
-                      <Label>Mật khẩu hiện tại</Label>
+                      <Label className="text-sm font-semibold text-muted-foreground">Mật khẩu hiện tại</Label>
                       <Input
                         type="password"
                         required
                         value={passwordForm.currentPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                        className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                        autoComplete="current-password"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200"
                       />
                     </div>
                   )}
                   {!profile?.hasPassword && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-                      <p className="text-sm text-blue-800">
+                    <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
+                      <p className="text-sm text-blue-800 dark:text-blue-400">
                         <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
                       </p>
                     </div>
                   )}
                   <div className="space-y-2">
-                    <Label>Mật khẩu mới</Label>
+                    <Label className="text-sm font-semibold text-muted-foreground">Mật khẩu mới</Label>
                     <Input
                       type="password"
                       required
                       minLength={6}
                       value={passwordForm.newPassword}
                       onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                      className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Xác nhận mật khẩu mới</Label>
+                    <Label className="text-sm font-semibold text-muted-foreground">Xác nhận mật khẩu mới</Label>
                     <Input
                       type="password"
                       required
                       value={passwordForm.confirmPassword}
                       onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                      className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200"
                     />
                   </div>
                 </div>
