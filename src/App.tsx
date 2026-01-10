@@ -22,6 +22,7 @@ import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
 import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
 import TemplateDetailsPage from "./pages/TemplateDetailsPage.tsx";
 import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
+import PWAWishlistPage from "@/pwa/pages/PWAWishlistPage.tsx";
 
 
 import MyTripsPage from "./pages/MyTripsPage.tsx";
@@ -236,6 +237,16 @@ const AppRoutes = () => {
           <AuthGuard forceWebAuth>
             <PageTransition>
               <NotificationsPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/wishlist"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAWishlistPage />
             </PageTransition>
           </AuthGuard>
         }

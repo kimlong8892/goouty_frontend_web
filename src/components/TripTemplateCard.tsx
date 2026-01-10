@@ -6,19 +6,25 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { usePWA } from '@/pwa/hooks/usePWA';
 import { api } from '@/integrations/api/client';
+import { cn } from '@/lib/utils';
+
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TripTemplateCardProps {
-  template: DATABASE_TYPES.tripTemplates;
+  template: DATABASE_TYPES.tripTemplates & { isWishlisted?: boolean };
   onUseTemplate?: (template: DATABASE_TYPES.tripTemplates) => void;
   usingTemplate?: boolean;
+  onWishlistUpdate?: (templateId: string, isWishlisted: boolean) => void;
 }
 
-export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: TripTemplateCardProps) => {
+export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate, onWishlistUpdate }: TripTemplateCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isPWA } = usePWA();
+  const { isAuthenticated } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(template.isWishlisted || false);
+  const [isWishlisting, setIsWishlisting] = useState(false);
 
   const handleViewDetails = () => {
     if (isPWA) {
@@ -59,7 +65,11 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
   // Dummy data for design match since API might not return these yet
   const rating = 5.0;
   const reviewCount = "6k";
-  const price = "1.200.000 VNĐ";
+  const displayPrice = template.fee === "0" || !template.fee
+    ? "Miễn phí"
+    : template.fee.includes('VNĐ')
+      ? template.fee
+      : `${Number(template.fee).toLocaleString('vi-VN')} VNĐ`;
 
   return (
     <div
@@ -81,16 +91,67 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
 
         {/* Favorite Button */}
         <button
-          className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md hover:bg-white/40 transition-all border border-white/20 active:scale-95"
-          onClick={(e) => {
+          className={cn(
+            "absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-md transition-all border active:scale-95 disabled:opacity-50",
+            isFavorite
+              ? "bg-red-500/20 border-red-500/50"
+              : "bg-white/20 border-white/20 hover:bg-white/40"
+          )}
+          onClick={async (e) => {
             e.stopPropagation();
-            setIsFavorite(!isFavorite);
+            if (!isAuthenticated) {
+              toast({
+                title: "Yêu cầu đăng nhập",
+                description: "Vui lòng đăng nhập để lưu mẫu yêu thích.",
+                variant: "destructive",
+              });
+              navigate('/auth');
+              return;
+            }
+
+            if (isWishlisting) return;
+
+            setIsWishlisting(true);
+            const newFavoriteStatus = !isFavorite;
+            try {
+              if (newFavoriteStatus) {
+                await api.tripTemplates.addToWishlist(template.id);
+                toast({
+                  title: "Đã thêm vào yêu thích",
+                  description: `Đã thêm "${template.title}" vào danh sách của bạn.`,
+                });
+              } else {
+                await api.tripTemplates.removeFromWishlist(template.id);
+                toast({
+                  title: "Đã xóa khỏi yêu thích",
+                  description: `Đã xóa "${template.title}" khỏi danh sách của bạn.`,
+                });
+              }
+              setIsFavorite(newFavoriteStatus);
+              if (onWishlistUpdate) {
+                onWishlistUpdate(template.id, newFavoriteStatus);
+              }
+            } catch (error) {
+              console.error('Error toggling wishlist:', error);
+              toast({
+                title: "Lỗi",
+                description: "Không thể cập nhật danh sách yêu thích. Vui lòng thử lại.",
+                variant: "destructive",
+              });
+            } finally {
+              setIsWishlisting(false);
+            }
           }}
+          disabled={isWishlisting}
         >
-          <Heart
-            size={20}
-            className={isFavorite ? "fill-red-500 text-red-500" : "text-white"}
-          />
+          {isWishlisting ? (
+            <Loader2 className="w-5 h-5 animate-spin text-white" />
+          ) : (
+            <Heart
+              size={20}
+              className={isFavorite ? "fill-red-500 text-red-500" : "text-white"}
+            />
+          )}
         </button>
       </div>
 
@@ -103,7 +164,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
               {template.title}
             </h3>
             <div className="flex flex-col items-end">
-              <span className="text-primary font-black text-lg">{price}</span>
+              <span className="text-primary font-black text-lg">{displayPrice}</span>
               <span className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">/ người</span>
             </div>
           </div>

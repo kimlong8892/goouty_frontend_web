@@ -17,7 +17,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Filter, Check, Bell, SlidersHorizontal } from 'lucide-react';
+import { Filter, Check, Heart, SlidersHorizontal } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotificationCountContext } from '@/contexts/NotificationCountContext';
@@ -309,12 +309,9 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
             variant="outline"
             size="icon"
             className="h-12 w-12 rounded-full border-border bg-card shadow-sm relative group hover:bg-secondary transition-all"
-            onClick={() => navigate('/notifications')}
+            onClick={() => navigate('/wishlist')}
           >
-            <Bell className="w-6 h-6 text-foreground group-hover:scale-110 transition-transform" />
-            {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-background" />
-            )}
+            <Heart className="w-6 h-6 text-foreground group-hover:scale-110 transition-transform" />
           </Button>
         </div>
 

@@ -71,6 +71,9 @@ const PWATemplateDetailsPage = () => {
             setLoading(true);
             const response = await api.tripTemplates.getById(id!);
             setTemplate(response);
+            if ((response as any).isWishlisted !== undefined) {
+                setIsFavorite((response as any).isWishlisted);
+            }
             if (response.days) {
                 setExpandedDayIds(response.days.map(d => d.id.toString()));
             }
@@ -190,7 +193,26 @@ const PWATemplateDetailsPage = () => {
                 </button>
                 <div className="flex items-center gap-1">
                     <button
-                        onClick={() => setIsFavorite(!isFavorite)}
+                        onClick={async () => {
+                            if (!isAuthenticated) {
+                                showToast("Vui lòng đăng nhập để lưu mẫu yêu thích.", "warning");
+                                navigate('/auth');
+                                return;
+                            }
+                            if (!template) return;
+                            try {
+                                if (isFavorite) {
+                                    await api.tripTemplates.removeFromWishlist(template.id);
+                                    showToast("Đã xóa khỏi yêu thích", "success");
+                                } else {
+                                    await api.tripTemplates.addToWishlist(template.id);
+                                    showToast("Đã thêm vào yêu thích", "success");
+                                }
+                                setIsFavorite(!isFavorite);
+                            } catch (e) {
+                                showToast("Không thể cập nhật danh sách yêu thích", "error");
+                            }
+                        }}
                         className={cn(
                             "w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-all",
                             isFavorite ? "text-red-500" : "text-slate-900 dark:text-white"
@@ -234,6 +256,13 @@ const PWATemplateDetailsPage = () => {
                     )}
                     <Badge className="bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border-none px-3 py-1.5 text-xs font-bold rounded-xl">
                         {getTotalDays()} Days
+                    </Badge>
+                    <Badge className="bg-indigo-500 text-white border-none px-3 py-1.5 text-xs font-bold rounded-xl shadow-sm">
+                        {template.fee === "0" || !template.fee
+                            ? "Miễn phí"
+                            : template.fee.includes('VNĐ')
+                                ? template.fee
+                                : `${Number(template.fee).toLocaleString('vi-VN')} VNĐ`}
                     </Badge>
                 </div>
 

@@ -137,6 +137,7 @@ export namespace DATABASE_TYPES {
       phoneCode: number;
     };
     isPublic: boolean;
+    fee?: string;
     createdAt: string;
     updatedAt: string;
     userId: string;
