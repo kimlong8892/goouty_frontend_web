@@ -136,7 +136,7 @@ const PWATemplateDetailsPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-[#edeeff] dark:bg-[#0a0a0a] pb-[100px]">
+        <div className="min-h-screen bg-[#edeeff] dark:bg-[#0a0a0a] pb-[200px]">
             {/* HERO SECTION */}
             <div className="relative w-full h-[45vh] min-h-[360px]">
                 {template.avatar ? (
@@ -297,7 +297,10 @@ const PWATemplateDetailsPage = () => {
                 </div>
 
                 {/* Fixed Bottom Action for PWA */}
-                <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 p-4 z-50 safe-area-bottom pb-8 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                <div className={cn(
+                    "fixed left-0 w-full bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 p-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] transition-all duration-300",
+                    isAuthenticated ? "bottom-[85px] pb-4" : "bottom-0 pb-8 safe-area-bottom"
+                )}>
                     <Button
                         size="lg"
                         className="w-full h-12 text-base font-bold bg-[#6347f9] hover:bg-[#5136db] shadow-lg shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"
