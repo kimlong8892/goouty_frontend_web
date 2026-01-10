@@ -23,7 +23,6 @@ import {
   Trash2,
   ChevronDown,
   ChevronRight,
-  MoreVertical,
   GripVertical
 } from 'lucide-react';
 import { cn } from '@/lib/utils.ts';
@@ -857,18 +856,17 @@ const TripDetailsPage = () => {
                                     {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
 
                                     <div onClick={(e) => e.stopPropagation()}>
-                                      <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-secondary text-muted-foreground/70 opacity-0 group-hover/header:opacity-100 transition-opacity">
-                                            <MoreVertical className="w-4 h-4" />
-                                          </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="start">
-                                          <DropdownMenuItem onClick={() => { setEditingDay(day); setShowEditDay(true); }}>
-                                            <Edit className="w-4 h-4 mr-2" /> Chỉnh sửa ngày
-                                          </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                      </DropdownMenu>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className={cn(
+                                          "h-8 w-8 p-0 rounded-full hover:bg-secondary text-[#6347f9] bg-[#6347f9]/10",
+                                          isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
+                                        )}
+                                        onClick={() => { setEditingDay(day); setShowEditDay(true); }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                      </Button>
                                     </div>
                                   </div>
 
