@@ -21,6 +21,12 @@ import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
 import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
 import PWAAddDayPage from "@/pwa/pages/PWAAddDayPage.tsx";
+import PWAEditDayPage from "@/pwa/pages/PWAEditDayPage.tsx";
+import PWAAddActivityPage from "@/pwa/pages/PWAAddActivityPage.tsx";
+import PWAEditActivityPage from "@/pwa/pages/PWAEditActivityPage.tsx";
+import PWAAddExpensePage from "@/pwa/pages/PWAAddExpensePage.tsx";
+import PWAInviteMemberPage from "@/pwa/pages/PWAInviteMemberPage.tsx";
+import PWAChangePasswordPage from "@/pwa/pages/PWAChangePasswordPage.tsx";
 import TemplateDetailsPage from "./pages/TemplateDetailsPage.tsx";
 import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
 import PWAWishlistPage from "@/pwa/pages/PWAWishlistPage.tsx";
@@ -144,6 +150,66 @@ const AppRoutes = () => {
           <AuthGuard>
             <PageTransition>
               <PWAAddDayPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-edit-day/:dayId"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAEditDayPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-add-activity/:dayId"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAAddActivityPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-edit-activity/:activityId"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAEditActivityPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-add-expense/:tripId"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAAddExpensePage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-invite-member/:tripId"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAInviteMemberPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-change-password"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAChangePasswordPage />
             </PageTransition>
           </AuthGuard>
         }
