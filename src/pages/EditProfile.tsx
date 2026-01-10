@@ -182,105 +182,146 @@ const EditProfile = () => {
             {isEditing ? (
               // EDIT MODE
               <>
-                <div className="sticky top-0 z-50 flex-shrink-0 bg-card border-b border-border px-4 py-4 shadow-md">
-                  <div className="flex items-center justify-between">
+                <div className="sticky top-0 z-50 flex-shrink-0 bg-background/80 backdrop-blur-lg border-b border-border/50 px-4 py-4">
+                  <div className="flex items-center justify-between relative">
                     <button
                       onClick={handleBack}
-                      disabled={saving}
-                      className="flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+                      className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full hover:bg-secondary/80 text-foreground transition-all active:scale-95 touch-manipulation"
                       style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
-                      Hủy
+                      <ChevronLeft className="w-6 h-6" />
                     </button>
 
-                    <h2 className="text-lg font-bold text-foreground">Chỉnh sửa thông tin</h2>
+                    <h2 className="text-lg font-bold text-foreground absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-max">
+                      Chỉnh sửa thông tin
+                    </h2>
 
-                    <button
-                      onClick={handleSaveProfile}
-                      disabled={saving || !formData.fullName.trim()}
-                      className="flex items-center text-primary hover:text-primary/80 disabled:text-muted-foreground transition-colors font-bold text-lg active:scale-95 touch-manipulation"
-                      style={{ WebkitTapHighlightColor: 'transparent' }}
-                    >
-                      {saving ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                      ) : null}
-                      Xong
-                    </button>
+                    <div className="w-8"></div> {/* Spacer for balance */}
                   </div>
                 </div>
 
-                <div className="px-4 py-6 pb-24">
-                  <div className="text-center mb-8">
-                    <ProfilePictureUpload
-                      currentImage={profile.profilePicture}
-                      onImageChange={handleProfilePictureChange}
-                      onImageDelete={handleDeleteAvatar}
-                      userName={profile.fullName}
-                      size="lg"
-                    />
+                <div className="px-5 py-6 flex flex-col min-h-[calc(100vh-80px)]">
+                  <div className="flex-1">
+                    <div className="text-center mb-10">
+                      <ProfilePictureUpload
+                        currentImage={profile.profilePicture}
+                        onImageChange={handleProfilePictureChange}
+                        onImageDelete={handleDeleteAvatar}
+                        userName={profile.fullName}
+                        size="lg"
+                      />
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName" className="text-base text-muted-foreground/80 font-normal pl-1">
+                          Tên
+                        </Label>
+                        <Input
+                          id="fullName"
+                          value={formData.fullName}
+                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                          className="bg-card border-border/60 shadow-sm rounded-xl h-14 px-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
+                          placeholder="Nhập tên của bạn"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-base text-muted-foreground/80 font-normal pl-1">
+                          Email
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          disabled
+                          className="bg-card/50 border-border/60 rounded-xl h-14 px-4 text-muted-foreground/70"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="phoneNumber" className="text-base text-muted-foreground/80 font-normal pl-1">
+                          Số điện thoại
+                        </Label>
+                        <Input
+                          id="phoneNumber"
+                          type="tel"
+                          value={formData.phoneNumber}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setFormData({ ...formData, phoneNumber: value });
+                          }}
+                          className="bg-card border-border/60 shadow-sm rounded-xl h-14 px-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
+                          placeholder="Nhập số điện thoại"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-base text-muted-foreground/80 font-normal pl-1">
+                          Ngân hàng
+                        </Label>
+                        <div className="bg-card border border-border/60 shadow-sm rounded-xl overflow-hidden focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+                          <BankSearch
+                            value={formData.bankId}
+                            onChange={(value) => setFormData({ ...formData, bankId: value })}
+                            placeholder="Tìm kiếm ngân hàng..."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="bankNumber" className="text-base text-muted-foreground/80 font-normal pl-1">
+                          Số tài khoản
+                        </Label>
+                        <Input
+                          id="bankNumber"
+                          type="tel"
+                          value={formData.bankNumber}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setFormData({ ...formData, bankNumber: value });
+                          }}
+                          className="bg-card border-border/60 shadow-sm rounded-xl h-14 px-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
+                          placeholder="Nhập số tài khoản"
+                        />
+                      </div>
+
+                      {/* Live QR Code Preview */}
+                      {formData.bankId && formData.bankNumber && (
+                        <div className="mt-8 bg-white dark:bg-card border border-border/60 shadow-sm rounded-2xl p-6 flex flex-col items-center animate-in fade-in zoom-in duration-300">
+                          <p className="text-xs font-extra-bold text-gray-400 dark:text-muted-foreground uppercase tracking-[0.15em] mb-6">Mã QR Chuyển khoản</p>
+                          <div className="bg-white p-3 rounded-xl border border-gray-100 dark:border-border shadow-sm mb-4">
+                            <img
+                              src={`https://img.vietqr.io/image/${formData.bankId}-${formData.bankNumber}-${VIETQR_TEMPLATE}.png`}
+                              alt="QR Chuyển khoản"
+                              className="w-[180px] h-[180px] object-contain rounded-lg"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-foreground">
+                            <span>{BANKS.find(b => b.code === formData.bankId)?.name || formData.bankId}</span>
+                            <span className="text-gray-300 dark:text-gray-600">|</span>
+                            <span>{formData.bankNumber}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="bg-card rounded-2xl p-6 shadow-2xl border border-border space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName" className="text-sm font-semibold text-muted-foreground">Tên</Label>
-                      <Input
-                        id="fullName"
-                        value={formData.fullName}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
-                        placeholder="Nhập tên của bạn"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-semibold text-muted-foreground">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        disabled
-                        className="bg-secondary border-border rounded-xl h-12 text-muted-foreground opacity-70 border-dashed focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="phoneNumber" className="text-sm font-semibold text-muted-foreground">Số điện thoại</Label>
-                      <Input
-                        id="phoneNumber"
-                        type="tel"
-                        value={formData.phoneNumber}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/[^0-9]/g, '');
-                          setFormData({ ...formData, phoneNumber: value });
-                        }}
-                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
-                        placeholder="Nhập số điện thoại"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm font-semibold text-muted-foreground">Ngân hàng</Label>
-                      <BankSearch
-                        value={formData.bankId}
-                        onChange={(value) => setFormData({ ...formData, bankId: value })}
-                        placeholder="Tìm kiếm ngân hàng..."
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="bankNumber" className="text-sm font-semibold text-muted-foreground">Số tài khoản</Label>
-                      <Input
-                        id="bankNumber"
-                        type="tel"
-                        value={formData.bankNumber}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/[^0-9]/g, '');
-                          setFormData({ ...formData, bankNumber: value });
-                        }}
-                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
-                        placeholder="Nhập số tài khoản"
-                      />
-                    </div>
+                  <div className="sticky bottom-4 mt-10 z-10 w-full">
+                    <Button
+                      onClick={handleSaveProfile}
+                      disabled={saving || !formData.fullName.trim()}
+                      className="w-full h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
+                    >
+                      {saving ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          <span>Đang cập nhật...</span>
+                        </div>
+                      ) : (
+                        'Cập nhật'
+                      )}
+                    </Button>
                   </div>
                 </div>
               </>
