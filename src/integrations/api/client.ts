@@ -175,6 +175,9 @@ export const api = {
     delete: async (id: string) => {
       return await api.delete(`/activities/${id}`);
     },
+    reorder: async (activities: { id: string; sortOrder: number }[]) => {
+      return await api.post('/activities/reorder', { activities });
+    },
     uploadImage: async (activityId: string, file: File) => {
       const formData = new FormData();
       formData.append('file', file);
