@@ -302,9 +302,10 @@ const EditProfile = () => {
                   {/* Edit Button below Name */}
                   <Button
                     onClick={() => setIsEditing(true)}
-                    className="mt-4 w-full max-w-xs h-11 bg-primary hover:bg-primary/90 flex items-center justify-center gap-2"
+                    variant="outline"
+                    className="mt-4 px-8 h-10 rounded-full border-gray-200 dark:border-white/10 text-gray-700 dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-white/10 bg-white dark:bg-white/5 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
                   >
-                    <Pencil className="w-4 h-4" />
+                    <Pencil className="w-3.5 h-3.5" />
                     Chỉnh sửa thông tin
                   </Button>
                 </div>
