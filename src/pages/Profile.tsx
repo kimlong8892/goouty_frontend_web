@@ -29,6 +29,7 @@ import {
   Heart,
   Loader2,
   ChevronRight,
+  ChevronLeft,
   FileText,
   Layout
 } from 'lucide-react';
@@ -65,7 +66,7 @@ const VIETQR_TEMPLATE = 'compact';
 const Profile = () => {
   const navigate = useNavigate();
   const showContent = useAnimateIn(false, 300);
-  const [subPage, setSubPage] = useState<'settings' | null>(null);
+  const [subPage, setSubPage] = useState<'settings' | 'change-password' | null>(null);
   const { user, logout } = useAuth();
   const { isPWA } = usePWA();
   const { theme, toggleTheme } = useTheme();
@@ -213,6 +214,9 @@ const Profile = () => {
       await api.users.changePassword(passwordForm);
       toast.success('Đổi mật khẩu thành công');
       setIsPasswordDialogOpen(false);
+      if (subPage === 'change-password') {
+        setSubPage('settings');
+      }
       setPasswordForm({
         currentPassword: '',
         newPassword: '',
@@ -381,7 +385,7 @@ const Profile = () => {
             </div>
 
             <div className="p-6 space-y-6">
-              <div onClick={() => setIsPasswordDialogOpen(true)} className="flex items-center justify-between py-2 cursor-pointer active:opacity-70">
+              <div onClick={() => setSubPage('change-password')} className="flex items-center justify-between py-2 cursor-pointer active:opacity-70">
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
                     <Lock className="w-5 h-5" />
@@ -407,49 +411,36 @@ const Profile = () => {
           </div>
         </AnimatedTransition>
 
-        {/* Change Password Dialog */}
-        <Dialog
-          open={isPasswordDialogOpen}
-          onOpenChange={(open) => {
-            setIsPasswordDialogOpen(open);
-            if (!open) resetPasswordForm();
-          }}
-        >
-          <DialogContent
-            className="w-screen h-[100dvh] max-w-full m-0 rounded-none border-none p-0 gap-0 [&>button]:hidden flex flex-col bg-background overflow-hidden"
-            onPointerDownOutside={(e) => e.preventDefault()}
-            onInteractOutside={(e) => e.preventDefault()}
-            onFocusOutside={(e) => e.preventDefault()}
-          >
-            <form onSubmit={handleChangePassword} className="flex flex-col h-full">
-              <div className="flex items-center justify-between px-4 pb-3 pt-[calc(env(safe-area-inset-top)+12px)] bg-card border-b border-border sticky top-0 z-10">
-                <Button
+        {/* Sub-page: Change Password */}
+        <AnimatedTransition show={subPage === 'change-password'} animation="slide-up">
+          <div className={`fixed inset-0 bg-background z-[60] overflow-y-auto ${subPage === 'change-password' ? 'block' : 'hidden'}`}>
+            <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50 px-4 py-4">
+              <div className="flex items-center justify-between relative">
+                <button
                   type="button"
-                  variant="ghost"
                   onClick={() => {
-                    setIsPasswordDialogOpen(false);
+                    setSubPage('settings');
                     resetPasswordForm();
                   }}
-                  className="text-muted-foreground text-base font-normal h-10 px-2 -ml-2 hover:bg-transparent"
+                  className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full hover:bg-secondary/80 text-foreground transition-all active:scale-95 touch-manipulation"
                 >
-                  Hủy
-                </Button>
-                <DialogTitle className="text-lg font-bold text-foreground">Đổi mật khẩu</DialogTitle>
-                <Button
-                  type="submit"
-                  disabled={changingPassword}
-                  variant="ghost"
-                  className="text-primary text-base font-bold h-10 px-2 -mr-2 hover:bg-transparent hover:text-primary/80"
-                >
-                  {changingPassword ? '...' : 'Xong'}
-                </Button>
-              </div>
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
 
-              <div className="flex-1 overflow-y-auto p-4 bg-background">
-                <div className="bg-card rounded-2xl p-6 shadow-2xl border border-border space-y-5">
+                <h2 className="text-lg font-bold text-foreground absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-max">
+                  Đổi mật khẩu
+                </h2>
+
+                <div className="w-8"></div>
+              </div>
+            </div>
+
+            <div className="px-5 py-6 flex flex-col min-h-[calc(100vh-80px)]">
+              <form onSubmit={handleChangePassword} className="flex-1 flex flex-col">
+                <div className="flex-1 space-y-6">
                   {profile?.hasPassword && (
                     <div className="space-y-2">
-                      <Label className="text-sm font-semibold text-muted-foreground">Mật khẩu hiện tại</Label>
+                      <Label className="text-base text-muted-foreground/80 font-normal pl-1">Mật khẩu hiện tại</Label>
                       <div className="relative">
                         <Input
                           type={showCurrentPassword ? "text" : "password"}
@@ -459,12 +450,12 @@ const Profile = () => {
                           autoComplete="current-password"
                           autoCorrect="off"
                           autoCapitalize="off"
-                          className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200 pr-12"
+                          className="bg-card border-border/60 shadow-sm rounded-xl h-14 px-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 pr-12"
                         />
                         <button
                           type="button"
                           onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-2"
                         >
                           {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
@@ -472,14 +463,17 @@ const Profile = () => {
                     </div>
                   )}
                   {!profile?.hasPassword && (
-                    <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
-                      <p className="text-sm text-blue-800 dark:text-blue-400">
-                        <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
+                    <div className="bg-blue-50/50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-xl p-4 flex gap-3">
+                      <div className="shrink-0 mt-0.5">
+                        <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-xs">i</div>
+                      </div>
+                      <p className="text-sm text-blue-800 dark:text-blue-400 leading-relaxed">
+                        Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu mới để đăng nhập bằng email.
                       </p>
                     </div>
                   )}
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-muted-foreground">Mật khẩu mới</Label>
+                    <Label className="text-base text-muted-foreground/80 font-normal pl-1">Mật khẩu mới</Label>
                     <div className="relative">
                       <Input
                         type={showNewPassword ? "text" : "password"}
@@ -490,19 +484,19 @@ const Profile = () => {
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="off"
-                        className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200 pr-12"
+                        className="bg-card border-border/60 shadow-sm rounded-xl h-14 px-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 pr-12"
                       />
                       <button
                         type="button"
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-2"
                       >
                         {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-muted-foreground">Xác nhận mật khẩu mới</Label>
+                    <Label className="text-base text-muted-foreground/80 font-normal pl-1">Xác nhận mật khẩu mới</Label>
                     <div className="relative">
                       <Input
                         type={showConfirmPassword ? "text" : "password"}
@@ -512,22 +506,39 @@ const Profile = () => {
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="off"
-                        className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200 pr-12"
+                        className="bg-card border-border/60 shadow-sm rounded-xl h-14 px-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 pr-12"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-2"
                       >
                         {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+
+                <div className="sticky bottom-4 mt-10 z-10 w-full">
+                  <Button
+                    type="submit"
+                    disabled={changingPassword}
+                    className="w-full h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
+                  >
+                    {changingPassword ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>Đang cập nhật...</span>
+                      </div>
+                    ) : (
+                      'Cập nhật'
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </AnimatedTransition>
       </div>
     );
   }
