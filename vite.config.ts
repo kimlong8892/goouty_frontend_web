@@ -29,7 +29,8 @@ export default defineConfig(({ mode }) => {
       allowedHosts: [
         'localhost',
         'local.goouty.com',
-        env.VITE_FRONTEND_URL ? new URL(env.VITE_FRONTEND_URL).hostname : undefined
+        env.VITE_FRONTEND_URL ? new URL(env.VITE_FRONTEND_URL).hostname : undefined,
+        'hoang-local.goouty.com',
       ].filter(Boolean) as string[],
       // Enable SPA fallback for client-side routing
       historyApiFallback: true,
