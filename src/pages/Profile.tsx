@@ -27,7 +27,10 @@ import {
   Eye,
   EyeOff,
   Heart,
-  Loader2
+  Loader2,
+  ChevronRight,
+  FileText,
+  Layout
 } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import NotificationSettings from '@/components/NotificationSettings';
@@ -62,6 +65,7 @@ const VIETQR_TEMPLATE = 'compact';
 const Profile = () => {
   const navigate = useNavigate();
   const showContent = useAnimateIn(false, 300);
+  const [subPage, setSubPage] = useState<'settings' | null>(null);
   const { user, logout } = useAuth();
   const { isPWA } = usePWA();
   const { theme, toggleTheme } = useTheme();
@@ -249,111 +253,169 @@ const Profile = () => {
 
   const isMobileView = isPWA || (window.innerWidth < 768);
 
+
   if (isMobileView) {
     return (
-      <div className="min-h-screen pb-24">
-        <AnimatedTransition show={showContent} animation="fade">
-          {/* Header Section */}
-          <div className="bg-card px-6 pt-12 pb-8 rounded-b-[40px] shadow-sm border-b border-border flex flex-col items-center">
-            <div className="relative mb-4 group">
-              <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-100 ring-1 ring-purple-100">
-                {profile.profilePicture ? (
-                  <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#6347f9] to-[#8c7df0] flex items-center justify-center text-3xl font-bold text-white uppercase">
-                    {profile.fullName.charAt(0)}
-                  </div>
-                )}
-              </div>
-              <label className="absolute bottom-0 right-0 bg-[#6347f9] text-white p-2 rounded-full cursor-pointer shadow-lg transform translate-x-1/4 translate-y-1/4 active:scale-95 transition-transform">
-                <Camera className="w-4 h-4" />
-                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
-              </label>
-            </div>
-
-            <h1 className="text-2xl font-bold text-foreground">{profile.fullName}</h1>
-            <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
-
-            {/* Stats Card - Mobile */}
-            <div className="mt-6 bg-card rounded-2xl border border-border shadow-sm px-6 py-3 flex items-center gap-6">
-              <div className="text-center">
-                <div className="text-lg font-bold text-foreground">{profile.tripsCount ?? 0}</div>
-                <div className="text-[9px] font-bold text-muted-foreground mt-0.5 uppercase tracking-wider">CHUYẾN ĐI</div>
-              </div>
-              <div className="w-px h-6 bg-border"></div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-foreground">{profile.placesCount ?? 0}</div>
-                <div className="text-[9px] font-bold text-muted-foreground mt-0.5 uppercase tracking-wider">ĐỊA ĐIỂM</div>
-              </div>
-            </div>
-
-            <Button
-              onClick={() => navigate('/profile/edit', { state: { mode: 'edit' } })}
-              variant="outline"
-              className="mt-6 rounded-full px-8 h-10 border-gray-200 dark:border-white/10 text-gray-700 dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-white/10 bg-white dark:bg-white/5 shadow-sm active:scale-95 transition-all"
-            >
-              <Pencil className="w-3.5 h-3.5 mr-2" /> Chỉnh sửa hồ sơ
-            </Button>
+      <div className="min-h-screen bg-background pb-24">
+        {/* Main PWA Profile View */}
+        <AnimatedTransition show={showContent && !subPage} animation="fade">
+          <div className="text-center pb-8 pt-4">
+            <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold">Goouty v2.4.0 (PWA)</p>
           </div>
-
-          {/* Menu Sections */}
-          <div className="px-6 py-8 space-y-6">
-            <div>
-              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Tài khoản</h3>
-              <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm">
-                <MenuRow
-                  icon={<User className="text-primary w-5 h-5" />}
-                  label="Thông tin cá nhân"
-                  onClick={() => navigate('/profile/edit')}
-                />
-
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Cài đặt</h3>
-              <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm">
-                <div className="w-full p-4 flex items-center justify-between border-b border-border active:bg-secondary transition-colors last:border-0">
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="p-2 bg-secondary rounded-xl">
-                      {theme === 'dark' ? <Moon className="text-primary w-5 h-5" /> : <Sun className="text-amber-500 w-5 h-5" />}
+          <div className={`${subPage ? 'hidden' : 'block'}`}>
+            <div className="px-6 space-y-8">
+              {/* User Info */}
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white dark:border-white/10 shadow-sm shrink-0">
+                  {profile.profilePicture ? (
+                    <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#6347f9] to-[#8c7df0] flex items-center justify-center text-xl font-bold text-white uppercase">
+                      {profile.fullName.charAt(0)}
                     </div>
-                    <span className="font-semibold text-foreground">Chế độ tối</span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg font-bold text-foreground truncate">{profile.fullName}</h2>
+                  <p className="text-sm text-muted-foreground truncate">{profile.email}</p>
+                </div>
+                <Button
+                  onClick={() => navigate('/profile/edit', { state: { mode: 'edit' } })}
+                  size="icon"
+                  className="h-10 w-10 bg-[#6347f9] hover:bg-[#5136db] text-white rounded-[12px] shadow-sm shrink-0 border-none"
+                >
+                  <Pencil className="w-5 h-5" />
+                </Button>
+              </div>
+
+              {/* Menu Sections */}
+              <div className="space-y-6">
+                {/* Group 1 */}
+                <div className="space-y-2">
+                  <div
+                    onClick={() => navigate('/profile/edit')}
+                    className="flex items-center justify-between py-2 cursor-pointer active:opacity-70 transition-opacity"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                        <CreditCard className="w-5 h-5" />
+                      </div>
+                      <span className="text-base font-medium text-foreground">Thẻ của tôi</span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
                   </div>
-                  <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
                 </div>
 
-                {/* Notification Settings - chỉ hiển thị trong PWA */}
-                {isPWA && (
-                  <div className="p-4 border-b border-border">
-                    <NotificationSettings showCard={false} />
+                {/* Group 2 */}
+                <div className="space-y-2">
+                  <div
+                    onClick={() => setSubPage('settings')}
+                    className="flex items-center justify-between py-2 cursor-pointer active:opacity-70 transition-opacity"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                        <Settings className="w-5 h-5" />
+                      </div>
+                      <span className="text-base font-medium text-foreground">Cài đặt</span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
                   </div>
-                )}
 
-                {/* Mobile Change Password */}
-                <button
-                  onClick={() => setIsPasswordDialogOpen(true)}
-                  className="w-full p-4 flex items-center justify-between active:bg-secondary transition-colors"
-                >
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="p-2 bg-secondary rounded-xl text-primary"><Lock className="w-5 h-5" /></div>
-                    <span className="font-semibold text-foreground">Đổi mật khẩu</span>
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                        {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </div>
+                      <span className="text-base font-medium text-foreground">Chế độ tối</span>
+                    </div>
+                    <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
                   </div>
-                  <Settings className="w-4 h-4 text-muted-foreground transform rotate-[-90deg]" />
-                </button>
+                </div>
+
+                {/* Group 3 */}
+                <div className="space-y-2">
+                  <div
+                    onClick={() => toast.info('Tính năng đang phát triển')}
+                    className="flex items-center justify-between py-2 cursor-pointer active:opacity-70 transition-opacity"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                        <Shield className="w-5 h-5" />
+                      </div>
+                      <span className="text-base font-medium text-foreground">Chính sách bảo mật</span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
+
+                  <div
+                    onClick={() => toast.info('Tính năng đang phát triển')}
+                    className="flex items-center justify-between py-2 cursor-pointer active:opacity-70 transition-opacity"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                        <Layout className="w-5 h-5" />
+                      </div>
+                      <span className="text-base font-medium text-foreground">Điều khoản sử dụng</span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
+                </div>
+
+                {/* Logout */}
+                <div className="pt-2">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-4 w-full py-2 group active:opacity-70 transition-opacity"
+                  >
+                    <div className="w-11 h-11 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
+                      <LogOut className="w-5 h-5" />
+                    </div>
+                    <span className="text-base font-medium text-red-500">Đăng xuất</span>
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
+        </AnimatedTransition>
 
-            <Button
-              variant="ghost"
-              onClick={handleLogout}
-              className="w-full h-14 rounded-2xl bg-red-500/10 dark:bg-red-500/5 border border-red-500/20 dark:border-red-500/10 text-red-600 dark:text-red-400 font-bold flex items-center justify-center gap-2 mt-4 hover:bg-red-600 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all active:scale-[0.98] shadow-sm"
-            >
-              <LogOut className="w-5 h-5" /> Đăng xuất tài khoản
-            </Button>
+        {/* Sub-page: Settings */}
+        <AnimatedTransition show={subPage === 'settings'} animation="slide-up">
+          <div className={`fixed inset-0 bg-background z-50 overflow-y-auto ${subPage === 'settings' ? 'block' : 'hidden'}`}>
+            <div className="px-6 pt-12 pb-6 flex items-center gap-4 border-b border-border/40">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSubPage(null)}
+                className="-ml-2 hover:bg-transparent"
+              >
+                <ChevronRight className="w-6 h-6 rotate-180" />
+              </Button>
+              <h2 className="text-2xl font-bold text-foreground">Cài đặt</h2>
+            </div>
 
-            <div className="text-center pb-8 pt-4">
-              <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold">Goouty v2.4.0 (PWA)</p>
+            <div className="p-6 space-y-6">
+              <div onClick={() => setIsPasswordDialogOpen(true)} className="flex items-center justify-between py-2 cursor-pointer active:opacity-70">
+                <div className="flex items-center gap-4">
+                  <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <span className="text-base font-medium text-foreground">Đổi mật khẩu</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-gray-400" />
+              </div>
+
+              {/* Notification Toggle */}
+              {isPWA && (
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                      <Bell className="w-5 h-5" />
+                    </div>
+                    <span className="text-base font-medium text-foreground">Thông báo</span>
+                  </div>
+                  <Switch checked={pushEnabled} onCheckedChange={handleTogglePush} />
+                </div>
+              )}
             </div>
           </div>
         </AnimatedTransition>
