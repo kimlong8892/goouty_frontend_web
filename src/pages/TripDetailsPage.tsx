@@ -796,7 +796,13 @@ const TripDetailsPage = () => {
                     {!isMobileView && <p className="text-muted-foreground font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
                   </div>
                   <Button
-                    onClick={() => setShowAddDay(true)}
+                    onClick={() => {
+                      if (isMobileView && id) {
+                        navigate(`/pwa-add-day/${id}`);
+                      } else {
+                        setShowAddDay(true);
+                      }
+                    }}
                     size={isMobileView ? "sm" : "default"}
                     className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg"
                   >

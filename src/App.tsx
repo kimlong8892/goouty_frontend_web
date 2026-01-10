@@ -20,6 +20,7 @@ import Index from "./pages/Index.tsx";
 import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
 import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
+import PWAAddDayPage from "@/pwa/pages/PWAAddDayPage.tsx";
 import TemplateDetailsPage from "./pages/TemplateDetailsPage.tsx";
 import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
 import PWAWishlistPage from "@/pwa/pages/PWAWishlistPage.tsx";
@@ -133,6 +134,16 @@ const AppRoutes = () => {
           <AuthGuard>
             <PageTransition>
               <PWAEditTripPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-add-day/:tripId"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWAAddDayPage />
             </PageTransition>
           </AuthGuard>
         }
