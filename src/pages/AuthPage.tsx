@@ -63,7 +63,7 @@ const AuthPage = () => {
       } else if (fromPath) {
         navigate(fromPath);
       } else {
-        navigate('/my-trips');
+        navigate('/');
       }
     }
   }, [isAuthenticated, navigate, inviteToken, fromPath]);

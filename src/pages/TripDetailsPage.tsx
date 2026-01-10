@@ -397,10 +397,10 @@ const TripDetailsPage = () => {
 
       if (apiError.status === 404) {
         showToast('Chuyến đi không tồn tại', 'error');
-        navigate('/my-trips');
+        navigate('/');
       } else if (apiError.status === 403) {
         showToast('Bạn không có quyền truy cập chuyến đi này', 'error');
-        navigate('/my-trips');
+        navigate('/');
       } else if (apiError.status === 401) {
         showToast('Phiên đăng nhập đã hết hạn', 'error');
         navigate('/auth');

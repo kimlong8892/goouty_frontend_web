@@ -55,18 +55,18 @@ const GoogleCallbackPage = () => {
 
         // Store token
         localStorage.setItem('accessToken', (response as any).accessToken);
-        
+
         // Dispatch custom event to notify AuthContext
         const event = new CustomEvent('tokenUpdated', {
           detail: { token: (response as any).accessToken }
         });
         window.dispatchEvent(event);
-        
+
         toast.success('Đăng nhập Google thành công');
-        
+
         // Small delay to ensure AuthContext has updated
         setTimeout(() => {
-          navigate('/my-trips');
+          navigate('/');
         }, 100);
       } catch (error) {
         console.error('Google OAuth callback error:', error);
