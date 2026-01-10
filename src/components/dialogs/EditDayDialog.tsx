@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Plus } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar.tsx';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { api } from '@/integrations/api/client.ts';
 import { cn } from '@/lib/utils.ts';
-import { Plus } from 'lucide-react';
 
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
 
@@ -111,7 +113,7 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
               Hủy
             </Button>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-foreground dark:text-white">
-              <Calendar className="w-5 h-5 text-[#6347f9]" />
+              <CalendarIcon className="w-5 h-5 text-[#6347f9]" />
               <span>Chỉnh sửa ngày</span>
             </DialogTitle>
             <Button
@@ -142,6 +144,7 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
                   "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                   errors.title ? 'border-red-500 focus:border-red-500' : ''
                 )}
+                placeholder="VD: Ngày 1 - Khám phá thành phố"
               />
               {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
             </div>
@@ -154,6 +157,7 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
                 className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+                placeholder="Mô tả chi tiết về ngày này..."
               />
             </div>
 
@@ -161,18 +165,50 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
               <Label htmlFor="date" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
                 Ngày <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="date"
-                type="date"
-                ref={dateRef}
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                aria-invalid={!!errors.date}
-                className={cn(
-                  "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 block w-full",
-                  errors.date ? 'border-red-500 focus:border-red-500' : ''
-                )}
-              />
+              {isPWA ? (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="date"
+                      variant="outline"
+                      className={cn(
+                        "w-full h-12 justify-start text-left font-normal bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 rounded-xl hover:bg-secondary/80 dark:hover:bg-[#2d313d] text-foreground dark:text-white transition-all duration-200",
+                        !formData.date ? "text-muted-foreground/60 dark:text-slate-500" : "text-foreground dark:text-white",
+                        errors.date && "border-red-500 hover:border-red-500/80"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground dark:text-slate-400" />
+                      {formData.date ? (
+                        format(new Date(formData.date), "dd/MM/yyyy")
+                      ) : (
+                        <span>dd/mm/yyyy</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-card dark:bg-[#1c1e26] border-border dark:border-gray-700" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.date ? new Date(formData.date) : undefined}
+                      onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                      initialFocus
+                      className="bg-card dark:bg-[#1c1e26] text-foreground dark:text-white"
+                    />
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <Input
+                  id="date"
+                  type="date"
+                  ref={dateRef}
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  aria-invalid={!!errors.date}
+                  className={cn(
+                    "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 block w-full",
+                    errors.date ? 'border-red-500 focus:border-red-500' : ''
+                  )}
+                />
+              )}
               {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
             </div>
           </div>
