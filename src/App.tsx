@@ -42,6 +42,7 @@ import ChromePWATestPage from "@/pwa/pages/ChromePWATestPage.tsx";
 import InviteAcceptPage from "./pages/InviteAcceptPage.tsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
+import AboutPage from "./pages/AboutPage.tsx";
 
 import { queryClient } from "@/lib/queryClient";
 
@@ -273,6 +274,14 @@ const AppRoutes = () => {
               <PWATemplateDetailsPage />
             </PageTransition>
           </AuthGuard>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <PageTransition>
+            <AboutPage />
+          </PageTransition>
         }
       />
       <Route
