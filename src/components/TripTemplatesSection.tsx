@@ -374,7 +374,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
                   variant="outline"
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="h-12 px-8 rounded-full border-2 border-[#6347f9] text-[#6347f9] hover:bg-[#6347f9] hover:text-white transition-all font-bold min-w-[200px]"
+                  className="h-11 px-6 rounded-full border-2 border-[#6347f9] text-[#6347f9] hover:bg-[#6347f9] hover:text-white transition-all font-bold"
                 >
                   {loadingMore ? (
                     <>
@@ -383,7 +383,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
                     </>
                   ) : (
                     <>
-                      Tải thêm template
+                      Xem thêm
                       <ChevronDown className="ml-2 w-5 h-5" />
                     </>
                   )}
