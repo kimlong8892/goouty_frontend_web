@@ -187,7 +187,7 @@ const EditProfile = () => {
                     <button
                       onClick={handleBack}
                       disabled={saving}
-                      className="flex items-center text-muted-foreground hover:text-gray-900 disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+                      className="flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
                       style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                       Hủy
@@ -198,7 +198,7 @@ const EditProfile = () => {
                     <button
                       onClick={handleSaveProfile}
                       disabled={saving || !formData.fullName.trim()}
-                      className="flex items-center text-primary hover:text-primary/80 disabled:text-gray-400 transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+                      className="flex items-center text-primary hover:text-primary/80 disabled:text-muted-foreground transition-colors font-bold text-lg active:scale-95 touch-manipulation"
                       style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                       {saving ? (
