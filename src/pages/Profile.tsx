@@ -23,7 +23,9 @@ import {
   Pencil,
   Shield,
   Bell,
-  Lock
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import NotificationSettings from '@/components/NotificationSettings';
@@ -72,6 +74,9 @@ const Profile = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
 
   const [pushEnabled, setPushEnabled] = useState(false);
@@ -213,6 +218,17 @@ const Profile = () => {
     }
   };
 
+  const resetPasswordForm = () => {
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+  };
+
   const handleLogout = async () => {
     await logout();
     navigate('/');
@@ -328,7 +344,7 @@ const Profile = () => {
             <Button
               variant="ghost"
               onClick={handleLogout}
-              className="w-full h-14 rounded-2xl bg-card border border-destructive/20 text-destructive font-bold flex items-center justify-center gap-2 mt-4 active:bg-destructive/10 shadow-sm"
+              className="w-full h-14 rounded-2xl bg-red-500/10 dark:bg-red-500/5 border border-red-500/20 dark:border-red-500/10 text-red-600 dark:text-red-400 font-bold flex items-center justify-center gap-2 mt-4 hover:bg-red-600 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all active:scale-[0.98] shadow-sm"
             >
               <LogOut className="w-5 h-5" /> Đăng xuất tài khoản
             </Button>
@@ -340,15 +356,29 @@ const Profile = () => {
         </AnimatedTransition>
 
         {/* Change Password Dialog */}
-        <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-          <DialogContent className="w-screen h-screen max-w-full m-0 rounded-none border-none p-0 gap-0 [&>button]:hidden flex flex-col bg-background">
+        <Dialog
+          open={isPasswordDialogOpen}
+          onOpenChange={(open) => {
+            setIsPasswordDialogOpen(open);
+            if (!open) resetPasswordForm();
+          }}
+        >
+          <DialogContent
+            className="w-screen h-[100dvh] max-w-full m-0 rounded-none border-none p-0 gap-0 [&>button]:hidden flex flex-col bg-background overflow-hidden"
+            onPointerDownOutside={(e) => e.preventDefault()}
+            onInteractOutside={(e) => e.preventDefault()}
+            onFocusOutside={(e) => e.preventDefault()}
+          >
             <form onSubmit={handleChangePassword} className="flex flex-col h-full">
-              <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border sticky top-0 z-10">
+              <div className="flex items-center justify-between px-4 pb-3 pt-[calc(env(safe-area-inset-top)+12px)] bg-card border-b border-border sticky top-0 z-10">
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setIsPasswordDialogOpen(false)}
-                  className="text-muted-foreground text-base font-normal h-auto p-0 hover:bg-transparent"
+                  onClick={() => {
+                    setIsPasswordDialogOpen(false);
+                    resetPasswordForm();
+                  }}
+                  className="text-muted-foreground text-base font-normal h-10 px-2 -ml-2 hover:bg-transparent"
                 >
                   Hủy
                 </Button>
@@ -357,53 +387,89 @@ const Profile = () => {
                   type="submit"
                   disabled={changingPassword}
                   variant="ghost"
-                  className="text-primary text-base font-bold h-auto p-0 hover:bg-transparent hover:text-primary/80"
+                  className="text-primary text-base font-bold h-10 px-2 -mr-2 hover:bg-transparent hover:text-primary/80"
                 >
                   {changingPassword ? '...' : 'Xong'}
                 </Button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4">
-                <div className="bg-card rounded-2xl p-4 shadow-sm space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 bg-background">
+                <div className="bg-card rounded-2xl p-6 shadow-2xl border border-border space-y-5">
                   {profile?.hasPassword && (
                     <div className="space-y-2">
-                      <Label>Mật khẩu hiện tại</Label>
-                      <Input
-                        type="password"
-                        required
-                        value={passwordForm.currentPassword}
-                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                        className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
-                      />
+                      <Label className="text-sm font-semibold text-muted-foreground">Mật khẩu hiện tại</Label>
+                      <div className="relative">
+                        <Input
+                          type={showCurrentPassword ? "text" : "password"}
+                          required
+                          value={passwordForm.currentPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                          autoComplete="current-password"
+                          autoCorrect="off"
+                          autoCapitalize="off"
+                          className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200 pr-12"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
                     </div>
                   )}
                   {!profile?.hasPassword && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-                      <p className="text-sm text-blue-800">
+                    <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
+                      <p className="text-sm text-blue-800 dark:text-blue-400">
                         <strong>Lưu ý:</strong> Tài khoản của bạn đăng nhập qua Google. Bạn có thể đặt mật khẩu để đăng nhập bằng email.
                       </p>
                     </div>
                   )}
                   <div className="space-y-2">
-                    <Label>Mật khẩu mới</Label>
-                    <Input
-                      type="password"
-                      required
-                      minLength={6}
-                      value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                      className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
-                    />
+                    <Label className="text-sm font-semibold text-muted-foreground">Mật khẩu mới</Label>
+                    <div className="relative">
+                      <Input
+                        type={showNewPassword ? "text" : "password"}
+                        required
+                        minLength={6}
+                        value={passwordForm.newPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200 pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Xác nhận mật khẩu mới</Label>
-                    <Input
-                      type="password"
-                      required
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                      className="h-12 rounded-xl border border-gray-200 bg-white focus:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
-                    />
+                    <Label className="text-sm font-semibold text-muted-foreground">Xác nhận mật khẩu mới</Label>
+                    <div className="relative">
+                      <Input
+                        type={showConfirmPassword ? "text" : "password"}
+                        required
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        className="h-12 rounded-xl border border-border bg-secondary text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all duration-200 pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -612,7 +678,13 @@ const Profile = () => {
                     <Shield className="w-5 h-5 text-primary" /> Bảo mật
                   </div>
                   <div className="space-y-4">
-                    <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+                    <Dialog
+                      open={isPasswordDialogOpen}
+                      onOpenChange={(open) => {
+                        setIsPasswordDialogOpen(open);
+                        if (!open) resetPasswordForm();
+                      }}
+                    >
                       <DialogTrigger asChild>
                         <Button variant="ghost" className="group w-full justify-start h-16 rounded-[24px] bg-[#eff1f5] hover:bg-[#e2e5eb] dark:bg-secondary dark:hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6">
                           <Lock className="w-5 h-5 mr-4 text-gray-500 group-hover:text-primary transition-colors" /> Đổi mật khẩu
@@ -626,13 +698,22 @@ const Profile = () => {
                           {profile?.hasPassword && (
                             <div className="space-y-2">
                               <Label>Mật khẩu hiện tại</Label>
-                              <Input
-                                type="password"
-                                required
-                                value={passwordForm.currentPassword}
-                                onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
-                              />
+                              <div className="relative">
+                                <Input
+                                  type={showCurrentPassword ? "text" : "password"}
+                                  required
+                                  value={passwordForm.currentPassword}
+                                  onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                  className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200 pr-12"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                  {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                              </div>
                             </div>
                           )}
                           {!profile?.hasPassword && (
@@ -644,30 +725,51 @@ const Profile = () => {
                           )}
                           <div className="space-y-2">
                             <Label>Mật khẩu mới</Label>
-                            <Input
-                              type="password"
-                              required
-                              minLength={6}
-                              value={passwordForm.newPassword}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                              className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
-                            />
+                            <div className="relative">
+                              <Input
+                                type={showNewPassword ? "text" : "password"}
+                                required
+                                minLength={6}
+                                value={passwordForm.newPassword}
+                                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200 pr-12"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                              </button>
+                            </div>
                           </div>
                           <div className="space-y-2">
                             <Label>Xác nhận mật khẩu mới</Label>
-                            <Input
-                              type="password"
-                              required
-                              value={passwordForm.confirmPassword}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                              className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200"
-                            />
+                            <div className="relative">
+                              <Input
+                                type={showConfirmPassword ? "text" : "password"}
+                                required
+                                value={passwordForm.confirmPassword}
+                                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                                className="h-12 rounded-xl border border-border bg-card hover:border-primary/50 focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none transition-colors duration-200 pr-12"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                              </button>
+                            </div>
                           </div>
                           <DialogFooter className="pt-4">
                             <Button
                               type="button"
                               variant="outline"
-                              onClick={() => setIsPasswordDialogOpen(false)}
+                              onClick={() => {
+                                setIsPasswordDialogOpen(false);
+                                resetPasswordForm();
+                              }}
                               className="hover:bg-transparent hover:text-primary hover:border-primary"
                             >
                               Hủy
