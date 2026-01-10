@@ -869,7 +869,14 @@ const TripDetailsPage = () => {
                                           "h-8 w-8 p-0 rounded-full hover:bg-secondary text-[#6347f9] bg-[#6347f9]/10",
                                           isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
                                         )}
-                                        onClick={() => { setEditingDay(day); setShowEditDay(true); }}
+                                        onClick={() => {
+                                          if (isMobileView) {
+                                            navigate(`/pwa-edit-day/${day.id}`);
+                                          } else {
+                                            setEditingDay(day);
+                                            setShowEditDay(true);
+                                          }
+                                        }}
                                       >
                                         <Edit className="w-4 h-4" />
                                       </Button>
@@ -934,18 +941,22 @@ const TripDetailsPage = () => {
                                                   size="icon"
                                                   className="h-8 w-8 text-slate-400 hover:text-purple-600 active:bg-purple-50 rounded-full"
                                                   onClick={() => {
-                                                    setEditingActivity({
-                                                      id: activity.id,
-                                                      title: activity.title,
-                                                      startTime: activity.timeStart || undefined,
-                                                      durationMin: activity.durationMin,
-                                                      location: activity.location,
-                                                      notes: activity.notes,
-                                                      important: activity.pinned || false,
-                                                      dayId: activity.dayId,
-                                                      images: activity.images
-                                                    } as any);
-                                                    setShowEditActivity(true);
+                                                    if (isMobileView) {
+                                                      navigate(`/pwa-edit-activity/${activity.id}`);
+                                                    } else {
+                                                      setEditingActivity({
+                                                        id: activity.id,
+                                                        title: activity.title,
+                                                        startTime: activity.timeStart || undefined,
+                                                        durationMin: activity.durationMin,
+                                                        location: activity.location,
+                                                        notes: activity.notes,
+                                                        important: activity.pinned || false,
+                                                        dayId: activity.dayId,
+                                                        images: activity.images
+                                                      } as any);
+                                                      setShowEditActivity(true);
+                                                    }
                                                   }}
                                                 >
                                                   <Edit className="w-4 h-4" />
@@ -1033,7 +1044,14 @@ const TripDetailsPage = () => {
 
                                 <Button
                                   variant="outline"
-                                  onClick={() => { setSelectedDayId(day.id); setShowAddActivity(true); }}
+                                  onClick={() => {
+                                    if (isMobileView) {
+                                      navigate(`/pwa-add-activity/${day.id}`);
+                                    } else {
+                                      setSelectedDayId(day.id);
+                                      setShowAddActivity(true);
+                                    }
+                                  }}
                                   className="w-full border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-12 rounded-2xl font-medium transition-all"
                                 >
                                   <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
