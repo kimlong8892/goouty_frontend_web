@@ -287,7 +287,7 @@ const Profile = () => {
             <Button
               onClick={() => navigate('/profile/edit', { state: { mode: 'edit' } })}
               variant="outline"
-              className="mt-6 rounded-full px-8 h-10 border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 bg-white shadow-sm"
+              className="mt-6 rounded-full px-8 h-10 border-gray-200 dark:border-white/10 text-gray-700 dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-white/10 bg-white dark:bg-white/5 shadow-sm active:scale-95 transition-all"
             >
               <Pencil className="w-3.5 h-3.5 mr-2" /> Chỉnh sửa hồ sơ
             </Button>
