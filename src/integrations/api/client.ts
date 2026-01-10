@@ -344,6 +344,21 @@ export const api = {
     createTripFromTemplate: async (id: string, tripTitle?: string) => {
       return await api.post<{ template: DATABASE_TYPES.tripTemplates; suggestedTripData: any }>(`/trip-templates/${id}/create-trip`, { title: tripTitle });
     },
+    getWishlist: async (params?: { page?: number; limit?: number }) => {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+      const queryString = queryParams.toString();
+      const endpoint = queryString ? `/trip-templates/wishlist?${queryString}` : '/trip-templates/wishlist';
+      return await api.get<{ templates: DATABASE_TYPES.tripTemplates[]; pagination: any }>(endpoint);
+    },
+    addToWishlist: async (id: string) => {
+      return await api.post(`/trip-templates/${id}/wishlist`);
+    },
+    removeFromWishlist: async (id: string) => {
+      return await api.delete(`/trip-templates/${id}/wishlist`);
+    },
   },
 
   // Province-specific API methods
