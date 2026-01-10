@@ -32,6 +32,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { usePWA } from '@/pwa/hooks/usePWA';
+import {
+  ClipboardList,
+  Key,
+  User,
+  Ticket,
+  Lock,
+  CheckCircle2,
+  Wallet,
+  Tag,
+  MapPin,
+  MessageSquare,
+  AlertCircle,
+  Megaphone,
+  ShoppingBag,
+  Car
+} from 'lucide-react';
 
 interface NotificationCardProps {
   notification: Notification;
@@ -50,6 +67,7 @@ export function NotificationCard({
   onArchive,
   showActions = true
 }: NotificationCardProps) {
+  const { isPWA } = usePWA();
   const typeConfig = NOTIFICATION_TYPE_CONFIG[notification.type];
   const isUnread = notification.status?.toUpperCase() === 'UNREAD';
 
@@ -159,13 +177,6 @@ export function NotificationCard({
           bgColor: "bg-sky-500"
         };
       default:
-        // Check for invitation in body if it's not a specific type
-        if (isInvitation) {
-          return {
-            icon: <UserPlus size={12} className="text-white" />,
-            bgColor: "bg-pink-500"
-          };
-        }
         return {
           icon: <Bell size={12} className="text-white" />,
           bgColor: "bg-gray-400"
@@ -173,91 +184,160 @@ export function NotificationCard({
     }
   };
 
-  const style = getNotificationStyle();
+  const getPWAStyle = () => {
+    const bodyLower = notification.body.toLowerCase();
+    const titleLower = (notification.title || "").toLowerCase();
+
+    // Default PWA style properties
+    const pwaBgColor = "bg-[#F5F3FF]";
+    const pwaIconColor = "text-primary";
+    const iconSize = 22;
+
+    // 1. Trip Invitations (Highest Priority)
+    if (isInvitation ||
+      bodyLower.includes('mời') || titleLower.includes('mời') ||
+      bodyLower.includes('lời mời') || titleLower.includes('lời mời')) {
+      return {
+        icon: <UserPlus size={iconSize} className={pwaIconColor} />,
+        bgColor: pwaBgColor
+      };
+    }
+
+    // 2. Payments & Settlements (Specific Keywords)
+    if (notification.type === NotificationType.SETTLEMENT_CREATED ||
+      bodyLower.includes('thanh toán') || titleLower.includes('thanh toán') ||
+      bodyLower.includes('payment') || bodyLower.includes('card')) {
+      return {
+        icon: <CreditCard size={iconSize} className={pwaIconColor} />,
+        bgColor: pwaBgColor
+      };
+    }
+
+    // 3. Expenses (Specific Keywords)
+    if (notification.type === NotificationType.EXPENSE_ADDED ||
+      notification.type === NotificationType.EXPENSE_UPDATED ||
+      bodyLower.includes('chi phí') || titleLower.includes('chi phí') ||
+      bodyLower.includes('expense')) {
+      return {
+        icon: <Banknote size={iconSize} className={pwaIconColor} />,
+        bgColor: pwaBgColor
+      };
+    }
+
+    // 4. Trips & Booking (General Trip related)
+    if (notification.type === NotificationType.TRIP_CREATED ||
+      notification.type === NotificationType.TRIP_UPDATED ||
+      notification.type === NotificationType.TRIP_DELETED ||
+      bodyLower.includes('booking') || titleLower.includes('chuyến đi') || titleLower.includes('trip')) {
+      return {
+        icon: <Car size={iconSize} className={pwaIconColor} />,
+        bgColor: pwaBgColor
+      };
+    }
+
+    // 5. Security & System
+    if (bodyLower.includes('password') || titleLower.includes('password')) {
+      return { icon: <Lock size={iconSize} className={pwaIconColor} />, bgColor: pwaBgColor };
+    }
+
+    // Default Fallback
+    return {
+      icon: <Bell size={iconSize} className={pwaIconColor} />,
+      bgColor: pwaBgColor
+    };
+  };
+
+  const style = isPWA ? getPWAStyle() : getNotificationStyle();
 
   return (
     <div
       className={cn(
-        "group relative flex gap-3 p-4 transition-all duration-200 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0",
+        "group relative flex gap-4 p-5 transition-all duration-200 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0",
         isUnread
-          ? "bg-[#FFF8F8] hover:bg-[#FFF0F0] dark:bg-blue-900/30 dark:hover:bg-blue-900/50"
+          ? (isPWA
+            ? "bg-[#F8FAFF] dark:bg-blue-900/20"
+            : "bg-[#FFF8F8] hover:bg-[#FFF0F0] dark:bg-blue-900/30 dark:hover:bg-blue-900/50")
           : "bg-white hover:bg-gray-50 dark:bg-card dark:hover:bg-gray-800/50",
         "active:bg-gray-100 dark:active:bg-gray-800"
       )}
       onClick={handleClick}
     >
-      {/* Avatar Container */}
+      {/* Icon Container */}
       <div className="relative flex-shrink-0">
-        <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 shadow-sm">
-          {sender.profilePicture ? (
-            <img src={sender.profilePicture} alt={sender.fullName} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-bold text-lg dark:text-blue-400">
-              {sender.fullName?.charAt(0).toUpperCase() || 'G'}
-            </div>
-          )}
-        </div>
-
-        {/* Type Icon Overlay */}
         <div className={cn(
-          "absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-[3px] border-white dark:border-gray-950 flex items-center justify-center shadow-sm",
+          "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
           style.bgColor
         )}>
           {style.icon}
         </div>
+        {/* Unread Dot for PWA */}
+        {isPWA && isUnread && (
+          <div className="absolute top-0 right-0 w-3 h-3 bg-blue-500 rounded-full border-2 border-white dark:border-gray-900" />
+        )}
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 pr-12">
-        <div className="flex justify-between items-start gap-2">
-          <div className="flex-1">
-            <h4 className={cn(
-              "text-[15px] leading-[1.5] text-gray-900 dark:text-gray-100",
-              isUnread && "font-medium"
-            )}>
-              <span>{sender.fullName}</span> {notification.body}
-            </h4>
+      <div className="flex-1 min-w-0 pr-8">
+        <div className="flex flex-col gap-0.5">
+          <h4 className={cn(
+            "text-[16px] leading-tight text-gray-900 dark:text-gray-100 font-bold",
+            isUnread && "text-blue-600 dark:text-blue-400"
+          )}>
+            {notification.title || sender.fullName}
+          </h4>
+          <p className={cn(
+            "text-[14px] leading-snug text-gray-500 dark:text-gray-400",
+            isUnread && "text-gray-900 dark:text-gray-200"
+          )}>
+            {notification.body}
+          </p>
+
+          {/* Action Buttons for Invitations (Keep these for functionality) */}
+          {isInvitation && !notification.data?.responded && (
+            <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+              <Button
+                size="sm"
+                className="bg-[#FF4D4C] hover:bg-[#FF3333] text-white rounded-full px-6 h-9 font-bold text-xs shadow-sm dark:bg-red-600 dark:hover:bg-red-700"
+                onClick={() => {/* Handle Accept */ }}
+              >
+                Chấp nhận
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-[#E9ECEF] hover:bg-gray-200 text-[#495057] rounded-full px-6 h-9 font-bold text-xs dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                onClick={() => {/* Handle Decline */ }}
+              >
+                Từ chối
+              </Button>
+            </div>
+          )}
+
+          {/* Status if responded */}
+          {notification.data?.responded && (
+            <p className="text-[13px] text-gray-400 dark:text-gray-500 mt-1 font-medium">
+              Bạn đã {notification.data?.response === 'accept' ? 'chấp nhận' : 'từ chối'} lời mời này.
+            </p>
+          )}
+
+          {!isPWA && (
             <span className="text-[13px] text-gray-500 dark:text-gray-400 mt-1 block">
               {formatDate(notification.createdAt)}
             </span>
-
-            {/* Action Buttons for Invitations */}
-            {isInvitation && !notification.data?.responded && (
-              <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
-                <Button
-                  size="sm"
-                  className="bg-[#FF4D4C] hover:bg-[#FF3333] text-white rounded-full px-8 h-10 font-bold text-sm shadow-sm dark:bg-red-600 dark:hover:bg-red-700"
-                  onClick={() => {/* Handle Accept */ }}
-                >
-                  Chấp nhận
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="bg-[#E9ECEF] hover:bg-gray-200 text-[#495057] rounded-full px-8 h-10 font-bold text-sm dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                  onClick={() => {/* Handle Decline */ }}
-                >
-                  Từ chối
-                </Button>
-              </div>
-            )}
-
-            {/* Status if responded */}
-            {notification.data?.responded && (
-              <p className="text-[13px] text-gray-400 dark:text-gray-500 mt-2 font-medium">
-                Bạn đã {notification.data?.response === 'accept' ? 'chấp nhận' : 'từ chối'} lời mời này.
-              </p>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
       {/* More Options Menu */}
       {showActions && (
-        <div className="absolute top-4 right-2" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute top-5 right-2" onClick={(e) => e.stopPropagation()}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-800 rounded-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+              >
                 <MoreVertical size={18} />
               </Button>
             </DropdownMenuTrigger>
