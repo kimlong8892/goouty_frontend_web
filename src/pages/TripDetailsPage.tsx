@@ -15,6 +15,7 @@ import {
   Settings,
   Plus,
   Clock,
+  Camera,
   DollarSign,
   ArrowLeft,
   Pin,
@@ -41,7 +42,7 @@ import { AddExpenseDialog } from '@/components/dialogs/AddExpenseDialog.tsx';
 import { TripMembers } from '@/components/TripMembers.tsx';
 import { ShareLinkManager } from '@/components/ShareLinkManager.tsx';
 import { ExpenseSection } from '@/components/expenses/ExpenseSection.tsx';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog.tsx';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { EditTripDialog } from '@/components/dialogs/EditTripDialog.tsx';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -80,7 +81,6 @@ type TripDetails = {
   name: string;
   description: string;
   startDate: string;
-  endDate: string;
   provinceId?: string;
   province?: {
     id: string;
@@ -104,7 +104,10 @@ type TripDetails = {
       profilePicture?: string;
     };
     role: string;
+    status?: string;
   }[];
+  memberCount?: number;
+  avatar?: string | null;
 };
 
 type Day = {
@@ -160,6 +163,30 @@ const TripDetailsPage = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [apiData, setApiData] = useState<ApiTrip | null>(null);
 
+  // Scroll direction logic for hiding/showing tabs
+  const [isTabsVisible, setIsTabsVisible] = useState(true);
+  const lastScrollY = React.useRef(0);
+
+  useEffect(() => {
+    if (!isMobileView) return;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      // Scroll down -> hide
+      if (currentScrollY > lastScrollY.current + 5 && currentScrollY > 60) {
+        setIsTabsVisible(false);
+      }
+      // Scroll up -> show
+      else if (currentScrollY < lastScrollY.current - 5) {
+        setIsTabsVisible(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMobileView]);
+
   // State for collapsible days (default empty = all collapsed)
   const [expandedDayIds, setExpandedDayIds] = useState<string[]>([]);
   const [showAddDay, setShowAddDay] = useState(false);
@@ -181,6 +208,9 @@ const TripDetailsPage = () => {
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [selectedDayId, setSelectedDayId] = useState<string>('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editTripDialogOpen, setEditTripDialogOpen] = useState(false);
+  const [deleteActivityDialogOpen, setDeleteActivityDialogOpen] = useState(false);
+  const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
 
   const { id } = useParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -223,6 +253,18 @@ const TripDetailsPage = () => {
     }
   }, [trip?.userRole, activeTab]);
 
+  // Check for edit query param and open dialog
+  useEffect(() => {
+    const editParam = searchParams.get('edit');
+    if (editParam === 'true' && trip && trip.userRole === 'owner') {
+      setEditTripDialogOpen(true);
+      // Remove edit param from URL
+      const next = new URLSearchParams(searchParams);
+      next.delete('edit');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, trip, setSearchParams]);
+
   const fetchDaysAndActivities = async () => {
     if (!id || !apiData) return;
 
@@ -239,6 +281,7 @@ const TripDetailsPage = () => {
       }));
 
       setDays(transformedDays);
+      setExpandedDayIds(transformedDays.map(day => day.id));
 
       const activitiesByDayMap: Record<string, Activity[]> = {};
       tripData.days.forEach(day => {
@@ -296,7 +339,6 @@ const TripDetailsPage = () => {
         name: tripData.title,
         description: tripData.description,
         startDate: tripData.startDate,
-        endDate: tripData.endDate,
         provinceId: tripData.provinceId,
         province: tripData.province,
         isPublic: tripData.isPublic || false,
@@ -304,7 +346,9 @@ const TripDetailsPage = () => {
         userId: tripData.userId,
         slug: tripData.id,
         shareToken: tripData.shareToken,
-        members: membersData
+        members: membersData,
+        memberCount: (membersData?.filter(m => m && m.user?.id !== tripData.userId && (m.status === 'accepted' || !m.status)).length || 0) + 1,
+        avatar: tripData.avatar,
       };
 
       setTrip(transformedTrip);
@@ -319,6 +363,7 @@ const TripDetailsPage = () => {
         }));
 
         setDays(transformedDays);
+        setExpandedDayIds(transformedDays.map(day => day.id));
 
         const activitiesByDayMap: Record<string, Activity[]> = {};
         tripData.days.forEach(day => {
@@ -352,10 +397,10 @@ const TripDetailsPage = () => {
 
       if (apiError.status === 404) {
         showToast('Chuyến đi không tồn tại', 'error');
-        navigate('/my-trips');
+        navigate('/');
       } else if (apiError.status === 403) {
         showToast('Bạn không có quyền truy cập chuyến đi này', 'error');
-        navigate('/my-trips');
+        navigate('/');
       } else if (apiError.status === 401) {
         showToast('Phiên đăng nhập đã hết hạn', 'error');
         navigate('/auth');
@@ -372,21 +417,30 @@ const TripDetailsPage = () => {
     }
   };
 
-  const handleDeleteActivity = async (activityId: string) => {
-    if (!confirm('Bạn có chắc muốn xóa hoạt động này?')) return;
+  const openDeleteActivityDialog = (activity: Activity) => {
+    setActivityToDelete(activity);
+    setDeleteActivityDialogOpen(true);
+  };
+
+  const handleConfirmDeleteActivity = async () => {
+    if (!activityToDelete) return;
 
     try {
+      await api.activities.delete(activityToDelete.id);
+
       setActivitiesByDay(prev => {
         const newActivitiesByDay = { ...prev };
         for (const dayId in newActivitiesByDay) {
           newActivitiesByDay[dayId] = newActivitiesByDay[dayId].filter(
-            activity => activity.id !== activityId
+            activity => activity.id !== activityToDelete.id
           );
         }
         return newActivitiesByDay;
       });
 
       showToast('Đã xóa hoạt động', 'success');
+      setDeleteActivityDialogOpen(false);
+      setActivityToDelete(null);
     } catch (error: unknown) {
       showToast('Không thể xóa hoạt động', 'error');
     }
@@ -394,26 +448,40 @@ const TripDetailsPage = () => {
 
   const formatTime = (timeString: string | null): string => {
     if (!timeString) return '';
-    const date = new Date(timeString);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+    // If it's a full ISO string like "2025-09-15T22:00:00.000Z"
+    // we want to extract the time part directly to avoid timezone conversion
+    if (timeString.includes('T')) {
+      try {
+        const timePart = timeString.split('T')[1];
+        return timePart.substring(0, 5); // HH:mm
+      } catch (e) {
+        // Fallback to standard behavior if parsing fails
+        const date = new Date(timeString);
+        if (isNaN(date.getTime())) return timeString;
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      }
+    }
+    // If it's already in "HH:mm" format or other format without 'T'
+    return timeString;
   };
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '—';
     const d = new Date(dateString);
-    return `${d.getDate()} Tháng ${d.getMonth() + 1}, ${d.getFullYear()}`;
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    return `${day}/${month}/${d.getFullYear()}`;
   };
 
-  const getStatus = (startDate: string | null, endDate: string | null) => {
+  const getStatus = (startDate: string | null) => {
     if (!startDate) return 'planning';
     const today = new Date();
     const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : start;
 
-    if (end < today) return 'completed';
-    if (start <= today && today <= end) return 'ongoing';
+    if (start < today) return 'completed';
+    if (start.toDateString() === today.toDateString()) return 'ongoing';
     return 'upcoming';
   };
 
@@ -433,166 +501,206 @@ const TripDetailsPage = () => {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen pt-20 px-4 flex items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6c5dd3]"></div>
+      <div className="min-h-screen pt-20 px-4 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6347f9]"></div>
       </div>
     );
   }
 
   if (!trip) return null;
 
-  const status = getStatus(trip.startDate, trip.endDate);
+  const status = getStatus(trip.startDate);
 
   return (
-    <div className={cn(
-      "min-h-screen bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50",
-      isMobileView ? "pt-0 pb-20" : "pt-4 pb-20 px-4"
-    )}>
+    <div className="min-h-screen bg-background">
       {/* Mobile Sticky Header */}
       {isMobileView && (
-        <div className="sticky top-0 z-[60] bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+        <div className="sticky top-0 z-[60] bg-background/80 backdrop-blur-md border-b border-border px-4 py-3 flex items-center justify-between support-backdrop-blur">
           <div className="flex items-center gap-3 overflow-hidden">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
+              className="p-2 -ml-2 rounded-full hover:bg-secondary active:bg-secondary transition-colors"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-800" />
+              <ArrowLeft className="w-6 h-6 text-foreground" />
             </button>
-            <h1 className="text-lg font-bold text-slate-900 truncate">
+            <h1 className="text-lg font-bold text-foreground truncate">
               {trip.name}
             </h1>
           </div>
           <div className="flex items-center gap-1">
             {trip.userRole === 'owner' && (
-              <EditTripDialog
-                trip={{
-                  ...trip as any,
-                  title: trip.name,
-                }}
-                onSuccess={fetchTripDetails}
+              <button
+                onClick={() => navigate(`/pwa-edit-trip/${id}`)}
+                className="p-2 rounded-full hover:bg-secondary active:bg-secondary"
               >
-                <button className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200">
-                  <Edit className="w-5 h-5 text-gray-600" />
-                </button>
-              </EditTripDialog>
+                <Edit className="w-5 h-5 text-muted-foreground" />
+              </button>
             )}
           </div>
         </div>
       )}
 
       <AnimatedTransition show={showContent} animation="slide-up">
-        <div className={cn("max-w-6xl mx-auto", isMobileView && "px-4 pt-6")}>
-          {/* Header Section */}
-          <div className={cn("mb-8", isMobileView && "mb-6")}>
-            <div className="flex gap-2 mb-4">
-              <Badge className={cn(
-                "rounded-md hover:bg-opacity-80 px-3 py-1 font-medium border-0",
-                statusColors[status as keyof typeof statusColors]
-              )}>
-                {statusLabels[status as keyof typeof statusLabels]}
-              </Badge>
-              <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0">
-                {trip.userRole === 'owner' ? 'Chủ chuyến đi' : 'Thành viên'}
-              </Badge>
+        {/* HERO SECTION */}
+        <div className="relative w-full h-[40vh] min-h-[350px] lg:h-[450px] group">
+          {trip.avatar ? (
+            <img
+              src={trip.avatar}
+              alt={trip.name}
+              className="w-full h-full object-cover transition-transform duration-700"
+            />
+          ) : (
+            <div className="w-full h-full bg-secondary flex items-center justify-center">
+              <Camera className="w-16 h-16 text-muted-foreground/50" />
             </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/40 to-transparent opacity-90" />
 
-            <div className="flex items-center gap-3 mb-4 group">
-              {!isMobileView && (
-                <button
-                  onClick={() => navigate(-1)}
-                  className="p-2 -ml-12 rounded-full hover:bg-white/50 text-slate-400 hover:text-slate-600 transition-all active:scale-95"
-                  title="Quay lại"
-                >
-                  <ArrowLeft className="w-6 h-6" />
-                </button>
-              )}
-              <h1 className={cn(
-                "font-black text-slate-800 tracking-tight leading-tight",
-                isMobileView ? "text-2xl" : "text-3xl md:text-5xl"
-              )}>
-                {trip.name}
-              </h1>
-              {trip.userRole === 'owner' && !isMobileView && (
-                <EditTripDialog
-                  trip={{
-                    ...trip as any,
-                    title: trip.name,
-                  }}
-                  onSuccess={fetchTripDetails}
-                >
-                  <button className="text-slate-400 hover:text-[#6c5dd3] transition-colors p-1">
-                    <Edit className="w-5 h-5" />
-                  </button>
-                </EditTripDialog>
-              )}
+          {/* Back Button (Desktop) */}
+          {!isMobileView && (
+            <div className="absolute top-6 left-6 z-20">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 pl-3 pr-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all border border-white/10 active:scale-95 text-sm font-medium"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Quay lại</span>
+              </button>
             </div>
+          )}
 
-            <div className={cn(
-              "flex flex-wrap items-center gap-y-3 gap-x-6 text-slate-500 font-medium text-sm mb-4",
-              isMobileView && "gap-x-4"
-            )}>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#6c5dd3]" />
-                <span>{formatDate(trip.startDate)} - {formatDate(trip.endDate)}</span>
+          {/* Content Overlay */}
+          <div className="absolute bottom-16 left-0 w-full px-4 lg:px-0">
+            <div className="max-w-6xl mx-auto">
+              {/* Badges */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                <Badge className={cn(
+                  "border-none px-3 py-1.5 text-sm rounded-lg shadow-lg",
+                  statusColors[status as keyof typeof statusColors]
+                )}>
+                  {statusLabels[status as keyof typeof statusLabels]}
+                </Badge>
+                <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-3 py-1.5 text-sm rounded-lg">
+                  {trip.userRole === 'owner'
+                    ? `Chủ chuyến đi (${trip.memberCount || 1})`
+                    : `Thành viên (${trip.memberCount || 1})`}
+                </Badge>
               </div>
-              {trip.province && (
+
+              {/* Title */}
+              <div className="flex items-center gap-3 mb-4 group">
+                <h1 className="text-3xl md:text-5xl lg:text-[3.5rem] font-black text-white leading-tight tracking-tight drop-shadow-sm max-w-4xl">
+                  {trip.name}
+                </h1>
+                {trip.userRole === 'owner' && !isMobileView && (
+                  <EditTripDialog
+                    trip={{
+                      ...trip as any,
+                      title: trip.name,
+                    }}
+                    onSuccess={fetchTripDetails}
+                    open={editTripDialogOpen}
+                    onOpenChange={setEditTripDialogOpen}
+                  >
+                    <button className="text-white/70 hover:text-white transition-colors p-1 bg-white/10 rounded-full hover:bg-white/20 backdrop-blur-sm ml-2">
+                      <Edit className="w-6 h-6 p-1" />
+                    </button>
+                  </EditTripDialog>
+                )}
+              </div>
+
+              {/* Meta Info */}
+              <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-white/90 font-medium text-base">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#FF4D4C]" />
-                  <span>{trip.province.name}</span>
+                  <Calendar className="w-5 h-5 text-white" />
+                  <span>{formatDate(trip.startDate)}</span>
                 </div>
-              )}
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-slate-400" />
-                <span>{trip.members?.length || 1} người</span>
+                {trip.province && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-[#FF4D4C]" />
+                    <span>{trip.province.name}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[#6347f9]" />
+                  <span>{trip.memberCount || 1} người</span>
+                </div>
               </div>
             </div>
-
-            {trip.description && (
-              <p className={cn(
-                "text-slate-600 max-w-3xl leading-relaxed bg-white/50 p-4 rounded-2xl border border-white/80 shadow-sm",
-                isMobileView ? "text-sm" : "text-base"
-              )}>
-                {trip.description}
-              </p>
-            )}
           </div>
+        </div>
+
+        {/* MAIN CONTENT CONTAINER */}
+        <div className="max-w-6xl mx-auto px-4 lg:px-0 -mt-8 relative z-10 pb-20">
+          {/* Description Card */}
+          <div className="bg-card rounded-[2rem] p-8 shadow-sm border border-border mb-8">
+            <h2 className="text-[#6347f9] text-xl font-bold mb-4 flex items-center gap-2">
+              Giới thiệu chuyến đi
+            </h2>
+            <p className="text-muted-foreground leading-relaxed font-medium text-lg whitespace-pre-line">
+              {trip.description || "Chưa có mô tả chi tiết cho chuyến đi này."}
+            </p>
+          </div>
+
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className={cn(
-              "sticky top-[60px] z-50 mb-8 w-full -mx-4 px-4 py-2 bg-white",
-              !isMobileView && "relative top-0 mx-0 px-0 bg-transparent"
+              "z-30 mb-8 w-full -mx-4 px-4 py-2 transition-[top] duration-300",
+              isMobileView
+                ? cn("sticky", isTabsVisible ? "top-[60px]" : "top-[-100px]")
+                : "relative top-0 mx-0 px-0 bg-transparent z-0"
             )}>
               <TabsList className={cn(
-                "bg-transparent h-auto p-0 gap-3 flex w-full overflow-x-auto scrollbar-hide pb-2 justify-start",
-                !isMobileView && "justify-between"
+                "bg-transparent h-auto p-0 gap-3 flex w-full overflow-x-auto scrollbar-hide pb-2",
+                isMobileView ? "justify-start" : "justify-between"
               )}>
                 <TabsTrigger
                   value="itinerary"
-                  className="whitespace-nowrap rounded-full px-6 py-2.5 h-auto text-sm font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95"
+                  className={cn(
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                    isMobileView
+                      ? "whitespace-nowrap px-6 py-3.5 text-base"
+                      : "flex-1 px-8 py-4 text-base"
+                  )}
                 >
-                  <Clock className="w-4 h-4 mr-2" />
+                  <Clock className="mr-2 w-5 h-5" />
                   Lịch trình
                 </TabsTrigger>
                 <TabsTrigger
                   value="expenses"
-                  className="whitespace-nowrap rounded-full px-6 py-2.5 h-auto text-sm font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95"
+                  className={cn(
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                    isMobileView
+                      ? "whitespace-nowrap px-6 py-3.5 text-base"
+                      : "flex-1 px-8 py-4 text-base"
+                  )}
                 >
-                  <DollarSign className="w-4 h-4 mr-2" />
+                  <DollarSign className="mr-2 w-5 h-5" />
                   Chi phí
                 </TabsTrigger>
                 <TabsTrigger
                   value="members"
-                  className="whitespace-nowrap rounded-full px-6 py-2.5 h-auto text-sm font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95"
+                  className={cn(
+                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                    isMobileView
+                      ? "whitespace-nowrap px-6 py-3.5 text-base"
+                      : "flex-1 px-8 py-4 text-base"
+                  )}
                 >
-                  <Users className="w-4 h-4 mr-2" />
-                  Thành viên
+                  <Users className="mr-2 w-5 h-5" />
+                  Thành viên ({trip.memberCount || 1})
                 </TabsTrigger>
                 {trip.userRole === 'owner' && (
                   <TabsTrigger
                     value="share"
-                    className="whitespace-nowrap rounded-full px-6 py-2.5 h-auto text-sm font-semibold data-[state=active]:bg-[#6c5dd3] data-[state=active]:text-white data-[state=active]:shadow-md bg-white text-slate-600 shadow-sm border border-transparent hover:bg-white/80 transition-all active:scale-95"
+                    className={cn(
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                      isMobileView
+                        ? "whitespace-nowrap px-6 py-3.5 text-base"
+                        : "flex-1 px-8 py-4 text-base"
+                    )}
                   >
-                    <Share2 className="w-4 h-4 mr-2" />
+                    <Share2 className="mr-2 w-5 h-5" />
                     Chia sẻ
                   </TabsTrigger>
                 )}
@@ -601,7 +709,7 @@ const TripDetailsPage = () => {
 
             <TabsContent value="itinerary" className="mt-0">
               <Card className={cn(
-                "border-none shadow-xl bg-white overflow-hidden",
+                "border-none shadow-xl bg-card overflow-hidden text-card-foreground",
                 isMobileView ? "rounded-3xl" : "rounded-[32px]"
               )}>
                 <CardHeader className={cn(
@@ -610,15 +718,15 @@ const TripDetailsPage = () => {
                 )}>
                   <div>
                     <h2 className={cn(
-                      "font-bold text-slate-900 mb-1",
+                      "font-bold text-foreground mb-1",
                       isMobileView ? "text-xl" : "text-2xl"
                     )}>Lịch trình</h2>
-                    {!isMobileView && <p className="text-slate-500 font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
+                    {!isMobileView && <p className="text-muted-foreground font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
                   </div>
                   <Button
                     onClick={() => setShowAddDay(true)}
                     size={isMobileView ? "sm" : "default"}
-                    className="rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white shadow-lg"
+                    className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg"
                   >
                     <Plus className="w-4 h-4 mr-1.5" />
                     Thêm ngày
@@ -630,15 +738,15 @@ const TripDetailsPage = () => {
                   isMobileView ? "px-5" : "px-8"
                 )}>
                   {days.length === 0 ? (
-                    <div className="text-center py-20 border-2 border-dashed border-slate-100 rounded-3xl bg-slate-50/50">
+                    <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl bg-secondary/50">
                       <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center">
-                          <Calendar className="w-8 h-8 text-indigo-300" />
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Calendar className="w-8 h-8 text-primary/40" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-800 mb-2">Chưa có lịch trình</h3>
-                      <p className="text-slate-500 mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
-                      <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2]">
+                      <h3 className="text-lg font-semibold text-foreground mb-2">Chưa có lịch trình</h3>
+                      <p className="text-muted-foreground mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
+                      <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-[#6347f9] hover:bg-[#5136db]">
                         <Plus className="w-4 h-4 mr-2" />
                         Thêm ngày đầu tiên
                       </Button>
@@ -650,7 +758,7 @@ const TripDetailsPage = () => {
                         return (
                           <div key={day.id} className="relative">
                             <div className={cn(
-                              "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-slate-50/50 rounded-xl transition-colors",
+                              "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-secondary rounded-xl transition-colors",
                               isMobileView ? "p-1 -mx-1" : "p-2 -mx-2"
                             )}
                               onClick={() => toggleDay(day.id)}
@@ -658,7 +766,7 @@ const TripDetailsPage = () => {
                               <div className={cn(
                                 "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
                                 isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
-                                isExpanded ? "bg-[#6c5dd3] text-white" : "bg-slate-200 text-slate-500"
+                                isExpanded ? "bg-[#6347f9] text-white dark:shadow-[0_0_15px_rgba(99,71,249,0.7)]" : "bg-secondary text-muted-foreground"
                               )}>
                                 {index + 1}
                               </div>
@@ -666,19 +774,19 @@ const TripDetailsPage = () => {
                                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                                   <h3 className={cn(
                                     "font-bold leading-tight transition-colors",
-                                    isExpanded ? "text-slate-900" : "text-slate-600",
+                                    isExpanded ? "text-foreground" : "text-muted-foreground",
                                     isMobileView ? "text-lg" : "text-xl"
                                   )}>
                                     {day.title}
                                   </h3>
 
                                   <div className="flex items-center gap-1">
-                                    {isExpanded ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+                                    {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
 
                                     <div onClick={(e) => e.stopPropagation()}>
                                       <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-400 opacity-0 group-hover/header:opacity-100 transition-opacity">
+                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-secondary text-muted-foreground/70 opacity-0 group-hover/header:opacity-100 transition-opacity">
                                             <MoreVertical className="w-4 h-4" />
                                           </Button>
                                         </DropdownMenuTrigger>
@@ -691,12 +799,12 @@ const TripDetailsPage = () => {
                                     </div>
                                   </div>
 
-                                  <Badge variant="outline" className="text-slate-500 font-normal bg-slate-50 border-slate-200 ml-auto md:ml-0">
+                                  <Badge variant="outline" className="text-primary font-normal bg-secondary border-border ml-auto md:ml-0">
                                     {formatDate(day.date)}
                                   </Badge>
                                 </div>
                                 {day.description && (
-                                  <p className="text-slate-500 mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>
+                                  <p className="text-muted-foreground mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>
                                 )}
                               </div>
                             </div>
@@ -715,9 +823,9 @@ const TripDetailsPage = () => {
                                     <div
                                       key={activity.id}
                                       className={cn(
-                                        "group bg-white border rounded-2xl transition-all duration-200",
+                                        "group bg-card border rounded-2xl transition-all duration-200",
                                         isMobileView ? "p-4" : "p-5",
-                                        activity.pinned ? "border-purple-200 shadow-sm ring-1 ring-purple-100" : "border-slate-200 hover:border-purple-200",
+                                        activity.pinned ? "border-primary/50 shadow-sm ring-1 ring-primary/20" : "border-border hover:border-primary/30",
                                         !isMobileView && "hover:shadow-md"
                                       )}
                                     >
@@ -725,7 +833,7 @@ const TripDetailsPage = () => {
                                         <div className="space-y-2 flex-1 min-w-0">
                                           <div className="flex items-start justify-between">
                                             <h4 className={cn(
-                                              "font-bold text-slate-800 break-words",
+                                              "font-bold text-foreground break-words",
                                               isMobileView ? "text-base" : "text-lg"
                                             )}>{activity.title}</h4>
 
@@ -756,7 +864,7 @@ const TripDetailsPage = () => {
                                                   variant="ghost"
                                                   size="icon"
                                                   className="h-8 w-8 text-slate-400 hover:text-red-500 active:bg-red-50 rounded-full"
-                                                  onClick={() => handleDeleteActivity(activity.id)}
+                                                  onClick={() => openDeleteActivityDialog(activity)}
                                                 >
                                                   <Trash2 className="w-4 h-4" />
                                                 </Button>
@@ -766,41 +874,41 @@ const TripDetailsPage = () => {
 
                                           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-slate-500">
                                             {activity.pinned && (
-                                              <Badge className="bg-[#6c5dd3] text-white hover:bg-[#5b4ec2] rounded-md px-2 py-0.5 border-0">
+                                              <Badge className="bg-[#6347f9] text-white hover:bg-[#5136db] rounded-md px-2 py-0.5 border-0">
                                                 Quan trọng
                                               </Badge>
                                             )}
 
                                             {activity.timeStart && (
-                                              <div className="flex items-center text-slate-700 bg-slate-50 px-2 py-1 rounded-md">
-                                                <Clock className="w-3 h-3 mr-1 text-[#6c5dd3]" />
+                                              <div className="flex items-center text-foreground bg-secondary px-2 py-1 rounded-md">
+                                                <Clock className="w-3 h-3 mr-1 text-primary" />
                                                 {formatTime(activity.timeStart)}
-                                                {activity.durationMin && <span className="text-slate-400 mx-1">|</span>}
+                                                {activity.durationMin && <span className="text-muted-foreground/50 mx-1">|</span>}
                                                 {activity.durationMin && <span>{activity.durationMin}p</span>}
                                               </div>
                                             )}
 
                                             {activity.location && (
-                                              <div className="flex items-center truncate max-w-[200px]">
-                                                <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C]" />
-                                                <span className="truncate">{activity.location}</span>
+                                              <div className="flex items-start">
+                                                <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C] mt-0.5 flex-shrink-0" />
+                                                <span>{activity.location}</span>
                                               </div>
                                             )}
                                           </div>
 
                                           {activity.notes && (
-                                            <div className="pt-2 text-slate-600 text-[13px] leading-relaxed bg-slate-50/50 p-2.5 rounded-xl mt-2 border border-slate-100/50">
+                                            <div className="pt-2 text-muted-foreground text-[13px] leading-relaxed bg-secondary/50 p-2.5 rounded-xl mt-2 border border-border/50">
                                               {activity.notes}
                                             </div>
                                           )}
                                         </div>
 
                                         {!isMobileView && (
-                                          <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <div className="flex items-center gap-1">
                                             <Button
                                               variant="ghost"
                                               size="sm"
-                                              className="h-8 w-8 p-0 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-full"
+                                              className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-full transition-colors"
                                               onClick={() => {
                                                 setEditingActivity({
                                                   id: activity.id,
@@ -821,8 +929,8 @@ const TripDetailsPage = () => {
                                             <Button
                                               variant="ghost"
                                               size="sm"
-                                              className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full"
-                                              onClick={() => handleDeleteActivity(activity.id)}
+                                              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 rounded-full transition-colors"
+                                              onClick={() => openDeleteActivityDialog(activity)}
                                             >
                                               <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -836,7 +944,7 @@ const TripDetailsPage = () => {
                                 <Button
                                   variant="outline"
                                   onClick={() => { setSelectedDayId(day.id); setShowAddActivity(true); }}
-                                  className="w-full border-2 border-dashed border-slate-200 hover:border-purple-300 text-slate-400 hover:text-purple-600 hover:bg-purple-50/50 h-12 rounded-2xl font-medium transition-all"
+                                  className="w-full border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-12 rounded-2xl font-medium transition-all"
                                 >
                                   <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
                                 </Button>
@@ -853,7 +961,7 @@ const TripDetailsPage = () => {
 
             <TabsContent value="expenses" className="mt-0">
               <Card className={cn(
-                "border-none shadow-xl bg-white overflow-hidden min-h-[500px]",
+                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
                 isMobileView ? "rounded-3xl" : "rounded-[32px]"
               )}>
                 <CardContent className={isMobileView ? "p-4" : "p-8"}>
@@ -868,14 +976,14 @@ const TripDetailsPage = () => {
 
             <TabsContent value="members" className="mt-0">
               <Card className={cn(
-                "border-none shadow-xl bg-white overflow-hidden min-h-[500px]",
+                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
                 isMobileView ? "rounded-3xl" : "rounded-[32px]"
               )}>
                 <CardContent className={isMobileView ? "p-4" : "p-8"}>
                   <TripMembers
                     tripId={id || ''}
                     tripOwnerId={trip.userId}
-                    onCountChange={(count) => setTrip((prev) => prev ? { ...prev, members: new Array(count).fill(null) as any } : prev)}
+                    onCountChange={(count) => setTrip((prev) => prev ? { ...prev, memberCount: count } : prev)}
                   />
                 </CardContent>
               </Card>
@@ -883,7 +991,7 @@ const TripDetailsPage = () => {
 
             <TabsContent value="share" className="mt-0">
               <Card className={cn(
-                "border-none shadow-xl bg-white overflow-hidden min-h-[500px]",
+                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
                 isMobileView ? "rounded-3xl" : "rounded-[32px]"
               )}>
                 <CardContent className={isMobileView ? "p-4" : "p-8"}>
@@ -893,7 +1001,6 @@ const TripDetailsPage = () => {
                     provinceId: trip.provinceId || '',
                     province: trip.province,
                     startDate: trip.startDate,
-                    endDate: trip.endDate,
                     description: trip.description,
                     userId: trip.userId,
                     shareToken: trip.shareToken,
@@ -907,6 +1014,33 @@ const TripDetailsPage = () => {
 
         </div>
       </AnimatedTransition>
+
+      {/* Delete Activity Dialog */}
+      <Dialog open={deleteActivityDialogOpen} onOpenChange={setDeleteActivityDialogOpen}>
+        <DialogContent className="rounded-2xl bg-white dark:bg-[#1a1a2e] border-none shadow-2xl max-w-[90vw] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Xác nhận xóa hoạt động</DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400 mt-2">
+              Bạn có chắc chắn muốn xóa hoạt động "{activityToDelete?.title}"? Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-row gap-3 mt-6 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteActivityDialogOpen(false)}
+              className="flex-1 sm:flex-none rounded-xl bg-white text-[#6347f9] hover:bg-purple-50 border-slate-200 hover:border-purple-200 font-bold transition-all h-11"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleConfirmDeleteActivity}
+              className="flex-1 sm:flex-none bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-purple-500/20 h-11"
+            >
+              Xóa hoạt động
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AddDayDialog
         open={showAddDay}

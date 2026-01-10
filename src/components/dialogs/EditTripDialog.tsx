@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -15,35 +15,40 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, MapPin, Edit, Loader2 } from 'lucide-react';
+import { CalendarIcon, MapPin, Edit, Loader2, Camera, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { api } from '@/lib/api';
 import { Trip } from '@/lib/types';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
-import { TripAvatarUpload } from '@/components/TripAvatarUpload.tsx';
 import { useAuth } from '@/contexts/AuthContext';
-import { DateRange } from 'react-day-picker';
+import { cn } from '@/lib/utils';
 
 interface EditTripDialogProps {
   trip: Trip;
   children: React.ReactNode;
   onSuccess?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProps) {
+export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen, onOpenChange: controlledOnOpenChange }: EditTripDialogProps) {
   const { user } = useAuth();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? (controlledOnOpenChange || (() => { })) : setInternalOpen;
   const [tripName, setTripName] = useState(trip.title);
   const [provinceId, setProvinceId] = useState(trip.provinceId || '');
   const [description, setDescription] = useState(trip.description || '');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
-    const from = trip.startDate ? new Date(trip.startDate) : undefined;
-    const to = trip.endDate ? new Date(trip.endDate) : undefined;
-    return from || to ? { from, to } : undefined;
+  const [startDate, setStartDate] = useState<Date | undefined>(() => {
+    return trip.startDate ? new Date(trip.startDate) : undefined;
   });
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [currentAvatar, setCurrentAvatar] = useState(trip.avatar || '');
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   // Check if current user is the trip owner
@@ -61,12 +66,53 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
       setProvinceId(trip.provinceId || '');
       setDescription(trip.description || '');
       setCurrentAvatar(trip.avatar || '');
-      const from = trip.startDate ? new Date(trip.startDate) : undefined;
-      const to = trip.endDate ? new Date(trip.endDate) : undefined;
-      setDateRange(from || to ? { from, to } : undefined);
+      setSelectedAvatarFile(null);
+      setAvatarPreview(null);
+      setStartDate(trip.startDate ? new Date(trip.startDate) : undefined);
       setErrors({});
     }
   }, [open, trip]);
+
+  const handleAvatarFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Vui lòng chọn file hình ảnh');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Kích thước file không được vượt quá 5MB');
+      return;
+    }
+
+    // Validate file format
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Chỉ hỗ trợ định dạng JPEG, PNG, WebP, GIF');
+      return;
+    }
+
+    setSelectedAvatarFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveAvatarFile = () => {
+    setSelectedAvatarFile(null);
+    setAvatarPreview(null);
+    if (avatarFileInputRef.current) {
+      avatarFileInputRef.current.value = '';
+    }
+  };
 
   const updateTripMutation = useMutation({
     mutationFn: (data: any) => api.put(`/trips/${trip.id}`, data),
@@ -88,7 +134,7 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
     setErrors({});
 
     // Validation
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!tripName.trim()) {
       newErrors.tripName = 'Vui lòng nhập tên chuyến đi';
@@ -98,34 +144,45 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
       newErrors.provinceId = 'Vui lòng chọn tỉnh thành';
     }
 
-    if (dateRange?.from && dateRange?.to && dateRange.from > dateRange.to) {
-      newErrors.dateRange = 'Ngày bắt đầu phải trước ngày kết thúc';
-    }
 
     // If there are errors, set them and focus on first error
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      
+
       // Focus on first error field
       const firstErrorField = Object.keys(newErrors)[0];
       const element = document.getElementById(firstErrorField);
       if (element) {
         element.focus();
       }
-      
+
       toast.error('Vui lòng kiểm tra lại thông tin');
       return;
     }
 
-    const updateData = {
-      title: tripName.trim(),
-      provinceId: provinceId.trim(),
-      description: description.trim() || undefined,
-      ...(dateRange?.from && { startDate: dateRange.from.toISOString() }),
-      ...(dateRange?.to && { endDate: dateRange.to.toISOString() })
-    };
+    try {
+      // Upload avatar first if a new file is selected
+      if (selectedAvatarFile) {
+        try {
+          await api.trips.uploadAvatar(trip.id, selectedAvatarFile);
+        } catch (error: any) {
+          toast.error('Không thể tải lên ảnh đại diện: ' + (error.message || 'Lỗi không xác định'));
+          return;
+        }
+      }
 
-    updateTripMutation.mutate(updateData);
+      // Update trip information
+      const updateData = {
+        title: tripName.trim(),
+        provinceId: provinceId.trim(),
+        description: description.trim() || undefined,
+        ...(startDate && { startDate: startDate.toISOString() })
+      };
+
+      updateTripMutation.mutate(updateData);
+    } catch (error: any) {
+      toast.error('Có lỗi xảy ra khi cập nhật chuyến đi');
+    }
   };
 
   return (
@@ -133,13 +190,13 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <Edit className="h-5 w-5" />
+          <DialogTitle className="flex items-center space-x-2 text-foreground dark:text-white">
+            <Edit className="h-5 w-5 text-[#6347f9]" />
             <span>Chỉnh sửa chuyến đi</span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-muted-foreground dark:text-slate-400">
             Cập nhật thông tin cho chuyến đi "{trip.title}"
           </DialogDescription>
         </DialogHeader>
@@ -147,23 +204,69 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
         <div className="space-y-6 py-4">
           {/* Trip Avatar Upload */}
           <div className="space-y-2">
-            <Label>Ảnh đại diện chuyến đi</Label>
+            <Label className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Ảnh đại diện chuyến đi</Label>
             <div className="flex justify-center">
-              <TripAvatarUpload
-                tripId={trip.id}
-                currentAvatar={currentAvatar}
-                onAvatarChange={setCurrentAvatar}
-                onAvatarDelete={() => setCurrentAvatar('')}
-                tripTitle={trip.title}
-                size="lg"
-                showDeleteButton={true}
-                disabled={updateTripMutation.isPending}
-              />
+              <div className="relative w-32 h-32 rounded-2xl overflow-hidden bg-secondary dark:bg-[#242731] border-2 border-border dark:border-gray-700 group shadow-inner">
+                {(avatarPreview || currentAvatar) ? (
+                  <img
+                    src={avatarPreview || currentAvatar || ''}
+                    alt={trip.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-card dark:bg-[#1c1e26]">
+                    <Camera className="h-8 w-8 text-muted-foreground dark:text-slate-500" />
+                  </div>
+                )}
+
+                {/* Overlay on hover */}
+                {!updateTripMutation.isPending && (
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => avatarFileInputRef.current?.click()}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/20 hover:bg-white/30 text-white border-0"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Remove button */}
+                {(avatarPreview || (currentAvatar && !selectedAvatarFile)) && !updateTripMutation.isPending && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleRemoveAvatarFile}
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full p-0 flex items-center justify-center shadow-lg border border-red-500/50"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+
+                {/* Hidden file input */}
+                <input
+                  ref={avatarFileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleAvatarFileSelect}
+                  className="hidden"
+                  disabled={updateTripMutation.isPending}
+                />
+              </div>
             </div>
+            {selectedAvatarFile && (
+              <p className="text-xs text-center text-muted-foreground dark:text-slate-500">
+                Ảnh mới sẽ được cập nhật khi bấm "Cập nhật"
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tripName">
+            <Label htmlFor="tripName" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
               Tên chuyến đi <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -176,7 +279,10 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
                   setErrors(prev => ({ ...prev, tripName: '' }));
                 }
               }}
-              className={errors.tripName ? 'border-red-500 focus:border-red-500' : ''}
+              className={cn(
+                "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                errors.tripName ? 'border-red-500 focus:border-red-500' : ''
+              )}
             />
             {errors.tripName && (
               <p className="text-sm text-red-500">{errors.tripName}</p>
@@ -184,7 +290,7 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="provinceId">
+            <Label htmlFor="provinceId" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
               Tỉnh thành <span className="text-red-500">*</span>
             </Label>
             <ProvinceSelector
@@ -197,83 +303,77 @@ export function EditTripDialog({ trip, children, onSuccess }: EditTripDialogProp
               }}
               placeholder="Chọn tỉnh thành"
               error={!!errors.provinceId}
+              className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700"
             />
             {errors.provinceId && (
               <p className="text-sm text-red-500">{errors.provinceId}</p>
             )}
           </div>
 
-          {/* Date Range Picker */}
+          {/* Start Date Picker */}
           <div className="space-y-2">
-            <Label>
-              Thời gian chuyến đi
+            <Label className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
+              Ngày đi
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-full justify-start text-left font-normal ${errors.dateRange ? 'border-red-500' : ''}`}
+                  className={cn(
+                    "w-full h-12 justify-start text-left font-normal bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 rounded-xl hover:bg-secondary/80 dark:hover:bg-[#2d313d] text-foreground dark:text-white transition-all duration-200",
+                    !startDate ? "text-muted-foreground/60 dark:text-slate-500" : "text-foreground dark:text-white"
+                  )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>
-                        {format(dateRange.from, "dd/MM/yyyy", { locale: vi })} -{" "}
-                        {format(dateRange.to, "dd/MM/yyyy", { locale: vi })}
-                      </>
-                    ) : (
-                      format(dateRange.from, "dd/MM/yyyy", { locale: vi })
-                    )
+                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground dark:text-slate-400" />
+                  {startDate ? (
+                    format(startDate, "dd/MM/yyyy", { locale: vi })
                   ) : (
-                    <span>Chọn thời gian chuyến đi</span>
+                    <span>Chọn ngày đi</span>
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-card dark:bg-[#1c1e26] border-border dark:border-gray-700" align="start">
                 <Calendar
                   initialFocus
-                  mode="range"
-                  defaultMonth={dateRange?.from}
-                  selected={dateRange}
-                  onSelect={(range) => {
-                    setDateRange(range);
-                    if (errors.dateRange) {
-                      setErrors(prev => ({ ...prev, dateRange: '' }));
-                    }
+                  mode="single"
+                  defaultMonth={startDate}
+                  selected={startDate}
+                  onSelect={(date) => {
+                    setStartDate(date);
                   }}
-                  numberOfMonths={2}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  className="bg-card dark:bg-[#1c1e26] text-foreground dark:text-white"
                 />
               </PopoverContent>
             </Popover>
-            {errors.dateRange && (
-              <p className="text-sm text-red-500">{errors.dateRange}</p>
-            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả chuyến đi</Label>
+            <Label htmlFor="description" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Mô tả chuyến đi</Label>
             <Textarea
               id="description"
               placeholder="Chia sẻ về chuyến đi này - điều gì khiến bạn hứng thú?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
+              className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
             />
           </div>
         </div>
 
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-3 pt-2">
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={updateTripMutation.isPending}
+            className="h-11 rounded-xl border-border dark:border-gray-700 bg-transparent text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-gray-800 hover:text-foreground dark:hover:text-white transition-all px-6"
           >
             Hủy
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={updateTripMutation.isPending}
+            className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold px-6"
           >
             {updateTripMutation.isPending ? (
               <>

@@ -35,14 +35,14 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
     <div className={cn("space-y-6", isMobileView && "space-y-4")}>
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className={cn("font-bold text-slate-900", isMobileView ? "text-lg" : "text-xl")}>Chi phí</h2>
-          {!isMobileView && <p className="text-slate-500 text-sm mt-1">Quản lý ngân sách và chi tiêu</p>}
+          <h2 className={cn("font-bold text-slate-900 dark:text-foreground", isMobileView ? "text-lg" : "text-xl")}>Chi phí</h2>
+          {!isMobileView && <p className="text-slate-500 dark:text-muted-foreground text-sm mt-1">Quản lý ngân sách và chi tiêu</p>}
         </div>
         {canAddExpense && (
           <Button
             onClick={onAddExpense}
             size={isMobileView ? "sm" : "default"}
-            className="rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white shadow-lg shadow-purple-100 flex-shrink-0"
+            className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg shadow-purple-100 dark:shadow-none flex-shrink-0"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             {isMobileView ? "Thêm" : "Thêm chi phí"}
@@ -51,7 +51,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-        <Card className="rounded-[24px] border-none shadow-sm bg-gradient-to-br from-[#6c5dd3] to-[#8673f5] text-white overflow-hidden relative">
+        <Card className="rounded-[24px] border-none shadow-sm bg-gradient-to-br from-[#6347f9] to-[#8673f5] text-white overflow-hidden relative">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <DollarSign className={cn(isMobileView ? "w-16 h-16" : "w-24 h-24", "rotate-12")} />
           </div>
@@ -63,17 +63,17 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
           </CardContent>
         </Card>
 
-        <Card className="rounded-[24px] border-none shadow-sm bg-white border border-slate-100 overflow-hidden relative group hover:shadow-md transition-shadow">
+        <Card className="rounded-[24px] bg-white dark:bg-secondary/40 border border-slate-100 dark:border-border overflow-hidden relative shadow-sm">
           <CardContent className={cn(isMobileView ? "p-4" : "p-6")}>
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Số giao dịch</span>
+                  <span className="text-[10px] font-black text-slate-400 dark:text-muted-foreground uppercase tracking-widest">Số giao dịch</span>
                 </div>
-                <p className={cn("font-black text-slate-900", isMobileView ? "text-2xl" : "text-3xl")}>{calculation.transactionCount}</p>
+                <p className={cn("font-black text-slate-900 dark:text-foreground", isMobileView ? "text-2xl" : "text-3xl")}>{calculation.transactionCount}</p>
               </div>
-              <div className={cn("rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-slate-100 transition-colors", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
-                <ReceiptText className={cn("text-slate-300 group-hover:text-[#6c5dd3] transition-colors", isMobileView ? "w-6 h-6" : "w-8 h-8")} />
+              <div className={cn("rounded-2xl bg-indigo-50/50 dark:bg-[#6347f9]/10 flex items-center justify-center", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
+                <ReceiptText className={cn("text-[#6347f9]", isMobileView ? "w-6 h-6" : "w-8 h-8")} />
               </div>
             </div>
           </CardContent>

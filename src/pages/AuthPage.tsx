@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label.tsx';
 import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
 import { useAnimateIn } from '@/lib/animations.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useGlobalToast } from '../utils/globalToast';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -48,6 +48,9 @@ const AuthPage = () => {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const inviteToken = (location.state as any)?.inviteToken;
+  const fromPath = (location.state as any)?.from;
 
   useEffect(() => {
     document.title = mode === 'login' ? 'Đăng nhập - Goouty' : 'Đăng ký - Goouty';
@@ -55,9 +58,15 @@ const AuthPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/my-trips');
+      if (inviteToken) {
+        navigate(`/invite?token=${inviteToken}`);
+      } else if (fromPath) {
+        navigate(fromPath);
+      } else {
+        navigate('/');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, inviteToken, fromPath]);
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -77,21 +86,47 @@ const AuthPage = () => {
     if (mode === 'login') {
       const { error } = await login(email, password);
       if (error) {
-        showToast(error.message || 'Đăng nhập thất bại', 'error');
-        if (error.message?.includes('not confirmed')) setShowResendConfirmation(true);
+        let errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
+        if (error.message) {
+          if (error.message.includes('Email hoặc mật khẩu không đúng') || error.message.includes('Invalid credentials')) {
+            errorMessage = 'Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.';
+          } else if (error.message.includes('sử dụng Google') || error.message.includes('social login')) {
+            errorMessage = 'Tài khoản này chỉ có thể đăng nhập bằng Google. Vui lòng sử dụng nút đăng nhập Google.';
+          } else if (error.message.includes('email hợp lệ') || error.message.includes('valid email')) {
+            errorMessage = 'Địa chỉ email không hợp lệ. Vui lòng kiểm tra lại.';
+          } else if (error.message.includes('not confirmed')) {
+            errorMessage = 'Tài khoản chưa được xác nhận. Vui lòng kiểm tra email để xác nhận tài khoản.';
+            setShowResendConfirmation(true);
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        showToast(errorMessage, 'error');
       } else {
-        showToast('Đăng nhập thành công', 'success');
-        navigate('/my-trips');
+        showToast('Đăng nhập thành công! Đang chuyển hướng...', 'success');
       }
     } else {
       if (!fullName) {
         showToast('Vui lòng nhập họ tên', 'error');
         return;
       }
-      const { error } = await signup(email, password, fullName); // Pass fullName to signup
-      if (error) showToast(error.message || 'Đăng ký thất bại', 'error');
-      else {
-        showToast('Đăng ký thành công. Kiểm tra email để xác nhận.', 'success');
+      const { error } = await signup(email, password, fullName);
+      if (error) {
+        let errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
+        if (error.message) {
+          if (error.message.includes('Email đã tồn tại') || error.message.includes('already exists')) {
+            errorMessage = 'Email này đã được sử dụng. Vui lòng sử dụng email khác hoặc đăng nhập.';
+          } else if (error.message.includes('email hợp lệ') || error.message.includes('valid email')) {
+            errorMessage = 'Địa chỉ email không hợp lệ. Vui lòng kiểm tra lại.';
+          } else if (error.message.includes('mật khẩu') || error.message.includes('password')) {
+            errorMessage = error.message;
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        showToast(errorMessage, 'error');
+      } else {
+        showToast('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản trước khi đăng nhập.', 'success');
         setMode('login');
       }
     }
@@ -103,50 +138,51 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 flex items-start md:items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
-      <AnimatedTransition show={show} animation="slide-up" className="w-full">
-        <Card className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 rounded-[32px] overflow-hidden shadow-2xl border-none">
+    <div className="min-h-screen pt-8 pb-12 px-4 flex flex-col items-center justify-center">
+      <AnimatedTransition show={show} animation="slide-up" className="w-full max-w-[1000px]">
+        <Card className="w-full grid grid-cols-1 md:grid-cols-2 rounded-[40px] overflow-hidden shadow-[0_12px_40px_rgb(0,0,0,0.06)] border-none bg-white dark:bg-card p-6 md:p-8">
 
-          {/* Mascot Image - Conditional Order */}
-          <div className={`hidden md:block relative h-full min-h-[600px] bg-sky-100 ${mode === 'signup' ? 'md:order-2' : 'md:order-1'}`}>
-            <img
-              src="/create_trip_mascot.png"
-              alt="Goouty Mascot"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+          {/* Mascot Image Section */}
+          <div className={`hidden md:block ${mode === 'signup' ? 'md:order-2' : 'md:order-1'} self-center`}>
+            <div className="aspect-square w-full overflow-hidden rounded-[32px] bg-[#f8f9fa] dark:bg-secondary">
+              <img
+                src="/auth_mascot.png"
+                alt="Goouty Mascot"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
 
-          {/* Form Content - Conditional Order */}
-          <div className={`p-8 md:p-12 lg:p-16 bg-white flex flex-col justify-center ${mode === 'signup' ? 'md:order-1' : 'md:order-2'}`}>
-            <div className="mb-6 text-center md:text-left">
-              <h1 className="text-4xl font-black text-[#6c5dd3] mb-2 uppercase tracking-wide">
+          {/* Form Content */}
+          <div className={`p-6 md:p-8 lg:p-10 flex flex-col justify-center ${mode === 'signup' ? 'md:order-1' : 'md:order-2'}`}>
+            <div className={`mb-10 ${mode === 'login' ? 'md:text-left' : ''}`}>
+              <h1 className="text-[44px] font-black text-[#6347f9] mb-3 uppercase tracking-tight leading-tight font-sans">
                 {mode === 'login' ? 'Đăng nhập' : 'ĐĂNG KÝ'}
               </h1>
-              <p className="text-slate-500 font-medium">
+              <p className="text-slate-600 dark:text-muted-foreground font-semibold text-lg">
                 Cùng Goouty lập kế hoạch chuyến đi
               </p>
             </div>
 
             <div className="space-y-6">
-              {/* Only show Google Login on Login Mode */}
+              {/* Google Login */}
               {mode === 'login' && (
                 <>
                   <Button
                     variant="outline"
-                    className="w-full h-12 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold gap-3 text-base"
+                    className="w-full h-[56px] rounded-2xl border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-primary hover:text-accent-foreground dark:hover:text-primary-foreground dark:text-foreground font-bold gap-3 text-base shadow-sm transition-all"
                     onClick={handleGoogleLogin}
                   >
-                    <GoogleIcon size={22} />
+                    <GoogleIcon size={24} />
                     Google
                   </Button>
 
-                  <div className="relative">
+                  <div className="relative py-2">
                     <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-slate-100" />
+                      <span className="w-full border-t border-slate-100 dark:border-border" />
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-4 text-slate-400 font-medium">Hoặc</span>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="bg-white dark:bg-card px-4 text-slate-400 dark:text-muted-foreground font-bold">Hoặc</span>
                     </div>
                   </div>
                 </>
@@ -156,46 +192,50 @@ const AuthPage = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Name - Signup Only */}
                 {mode === 'signup' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="fullname" className="text-slate-600 font-medium">Name</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="fullname" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">Họ và tên</Label>
                     <Input
                       id="fullname"
                       type="text"
-                      className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4"
-                      placeholder="Shane Watson"
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
+                      placeholder="Nguyễn Văn A"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                     />
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-600 font-medium">{mode === 'login' ? 'Địa chỉ email' : 'Email Address'}</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">
+                    Địa chỉ email
+                  </Label>
                   <Input
                     id="email"
                     type="email"
-                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4"
-                    placeholder={mode === 'login' ? "Nhập địa chỉ email của bạn" : "shane.watson@example.com"}
+                    className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
+                    placeholder={mode === 'signup' ? "nguyenvan.a@example.com" : "Nhập địa chỉ email của bạn"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-slate-600 font-medium">{mode === 'login' ? 'Mật khẩu' : 'Password'}</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-slate-400 dark:text-muted-foreground text-sm font-bold ml-1">
+                    Mật khẩu
+                  </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4 pr-12"
-                      placeholder={mode === 'login' ? "Nhập mật khẩu" : "........"}
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 outline-none transition-colors duration-200 px-5 pr-12 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
+                      placeholder={mode === 'signup' ? "••••••••" : "Nhập mật khẩu"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#6c5dd3] transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground hover:text-[#6347f9] transition-colors"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -203,41 +243,41 @@ const AuthPage = () => {
                 </div>
 
                 {mode === 'login' && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between pt-1">
                     <label className="flex items-center gap-2 cursor-pointer group">
                       <input
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 rounded border-slate-300 text-[#6c5dd3] focus:ring-[#6c5dd3] cursor-pointer accent-[#6c5dd3]"
+                        className="w-[18px] h-[18px] rounded border-slate-300 dark:border-border text-[#6347f9] focus:ring-[#6347f9] cursor-pointer accent-[#6347f9]"
                       />
-                      <span className="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">Ghi nhớ tài khoản</span>
+                      <span className="text-[14px] text-slate-600 dark:text-muted-foreground font-bold group-hover:text-slate-800 dark:group-hover:text-foreground transition-colors">Ghi nhớ tài khoản</span>
                     </label>
 
                     <button
                       type="button"
                       onClick={() => navigate('/forgot-password')}
-                      className="text-sm font-semibold text-[#6c5dd3] hover:text-[#5b4ec2] transition-colors"
+                      className="text-[14px] font-bold text-[#6347f9] hover:text-[#5136db] transition-colors"
                     >
-                      Quên mật khẩu?
+                      Quên mật khẩu
                     </button>
                   </div>
                 )}
 
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="w-full h-[58px] rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-extrabold text-lg shadow-lg shadow-purple-200 dark:shadow-none transition-all duration-300 mt-4 active:scale-[0.98]"
                 >
                   {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                 </Button>
               </form>
 
-              <div className="text-center pt-2">
-                <p className="text-slate-500 font-medium text-sm">
+              <div className="pt-4 text-center">
+                <p className="text-slate-600 dark:text-muted-foreground font-bold text-[15px]">
                   {mode === 'login' ? 'Bạn không có tài khoản? ' : 'Bạn đã có tài khoản? '}
                   <button
                     onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                    className="text-[#6c5dd3] font-bold hover:underline"
+                    className="text-[#6347f9] font-black hover:underline underline-offset-4"
                   >
                     {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
                   </button>
@@ -245,7 +285,6 @@ const AuthPage = () => {
               </div>
             </div>
           </div>
-
         </Card>
       </AnimatedTransition>
     </div>

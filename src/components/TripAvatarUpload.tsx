@@ -9,6 +9,7 @@ interface TripAvatarUploadProps {
   currentAvatar?: string;
   onAvatarChange?: (avatarUrl: string) => void;
   onAvatarDelete?: () => void;
+  onSuccess?: () => void;
   tripTitle?: string;
   size?: 'sm' | 'md' | 'lg';
   showDeleteButton?: boolean;
@@ -20,6 +21,7 @@ export const TripAvatarUpload: React.FC<TripAvatarUploadProps> = ({
   currentAvatar,
   onAvatarChange,
   onAvatarDelete,
+  onSuccess,
   tripTitle,
   size = 'md',
   showDeleteButton = true,
@@ -68,9 +70,12 @@ export const TripAvatarUpload: React.FC<TripAvatarUploadProps> = ({
       setIsUploading(true);
       const response = await api.trips.uploadAvatar(tripId, file);
       
-      if (response.success && onAvatarChange) {
-        onAvatarChange(response.data.url);
+      if (response.success) {
+        if (onAvatarChange) {
+          onAvatarChange(response.data.url);
+        }
         toast.success('Cập nhật ảnh đại diện chuyến đi thành công');
+        onSuccess?.();
       }
     } catch (error: any) {
       toast.error(error.message || 'Có lỗi xảy ra khi cập nhật ảnh đại diện');
@@ -94,6 +99,7 @@ export const TripAvatarUpload: React.FC<TripAvatarUploadProps> = ({
       if (response.success) {
         onAvatarDelete();
         toast.success('Xóa ảnh đại diện chuyến đi thành công');
+        onSuccess?.();
       }
     } catch (error: any) {
       toast.error(error.message || 'Có lỗi xảy ra khi xóa ảnh đại diện');

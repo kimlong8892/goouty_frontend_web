@@ -55,7 +55,6 @@ export interface Trip {
   provinceId?: string;
   province?: Province;
   startDate?: string;
-  endDate?: string;
   description?: string;
   avatar?: string;
   userId: string;
@@ -69,7 +68,13 @@ export interface CreateTripRequest {
   title: string;
   provinceId?: string;
   startDate?: string;
-  endDate?: string;
+  description?: string;
+}
+
+export interface UpdateTripRequest {
+  title?: string;
+  provinceId?: string;
+  startDate?: string;
   description?: string;
 }
 
@@ -126,7 +131,7 @@ export interface TripMember {
   id: string;
   userId: string;
   tripId: string;
-  role?: never;
+  role?: string;
   status?: 'pending' | 'accepted';
   joinedAt: string;
   user: {
@@ -141,7 +146,6 @@ export interface TripMember {
     provinceId?: string;
     province?: Province;
     startDate?: string;
-    endDate?: string;
   };
 }
 

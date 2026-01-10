@@ -14,11 +14,16 @@ import { usePWA } from "@/pwa/hooks/usePWA";
 import { PWANotificationToast } from "@/pwa/components/PWANotificationToast.tsx";
 import { PWAAlertNotification } from "@/pwa/components/PWAAlertNotification.tsx";
 import { PWANotificationProvider, usePWANotificationContext } from "@/pwa/contexts/PWANotificationContext.tsx";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt.tsx";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton.tsx";
 import Index from "./pages/Index.tsx";
 import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
-import TemplatesPage from "./pages/TemplatesPage.tsx";
-import TripTemplateDetailPage from "./pages/TripTemplateDetailPage.tsx";
+import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
+import TemplateDetailsPage from "./pages/TemplateDetailsPage.tsx";
+import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
+
+
 import MyTripsPage from "./pages/MyTripsPage.tsx";
 import PWATripListPage from "@/pwa/pages/PWATripListPage.tsx";
 import TripDetailsPage from "./pages/TripDetailsPage.tsx";
@@ -37,8 +42,11 @@ import ChromePWATestPage from "@/pwa/pages/ChromePWATestPage.tsx";
 import InviteAcceptPage from "./pages/InviteAcceptPage.tsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
+import AboutPage from "./pages/AboutPage.tsx";
+import BlogPage from "./pages/BlogPage.tsx";
+import TermsPage from "./pages/TermsPage.tsx";
 
-const queryClient = new QueryClient();
+import { queryClient } from "@/lib/queryClient";
 
 // Page transition wrapper
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
@@ -55,28 +63,27 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// PWA Authentication Guard Component
-const PWAAuthGuard = ({ children }: { children: React.ReactNode }) => {
+// Authentication Guard Component
+const AuthGuard = ({ children, forceWebAuth = false }: { children: React.ReactNode; forceWebAuth?: boolean }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const { isPWA } = usePWA();
   const location = useLocation();
 
-  // If not PWA, render children normally
-  if (!isPWA) {
-    return <>{children}</>;
-  }
-
-  // If PWA and still loading auth, show loading
+  // Still loading auth, show loading
   if (isLoading) {
     return <PWASimpleLoading />;
   }
 
-  // If PWA and not authenticated, redirect to auth
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+  // If (it's PWA) OR (it's web but we explicitly want to force auth)
+  if (isPWA || forceWebAuth) {
+    if (!isAuthenticated) {
+      // Encode the current location including search params to redirect back after login
+      const from = location.pathname + location.search;
+      return <Navigate to="/auth" state={{ from }} replace />;
+    }
   }
 
-  // If PWA and authenticated, render children
+  // If not PWA and not forced, or if authenticated, render children
   return <>{children}</>;
 };
 
@@ -86,81 +93,73 @@ const AppRoutes = () => {
       <Route
         path="/"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
               <Index />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/create-trip"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <CreateTripPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/pwa-create-trip"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
               <PWACreateTripPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
-        path="/templates"
+        path="/pwa-edit-trip/:id"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
-              <TemplatesPage />
+              <PWAEditTripPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
-      <Route
-        path="/template/:id"
-        element={
-          <PWAAuthGuard>
-            <PageTransition>
-              <TripTemplateDetailPage />
-            </PageTransition>
-          </PWAAuthGuard>
-        }
-      />
+
+
       <Route
         path="/my-trips"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <MyTripsPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/pwa-trips"
         element={
-          <PWAAuthGuard>
+          <AuthGuard>
             <PageTransition>
               <PWATripListPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/trip/:id"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <TripDetailsPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
@@ -214,41 +213,41 @@ const AppRoutes = () => {
       <Route
         path="/profile"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <Profile />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/profile/edit"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <EditProfile />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/notifications"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <NotificationsPage />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
         path="/settings"
         element={
-          <PWAAuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
               <Settings />
             </PageTransition>
-          </PWAAuthGuard>
+          </AuthGuard>
         }
       />
       <Route
@@ -256,6 +255,50 @@ const AppRoutes = () => {
         element={
           <PageTransition>
             <ChromePWATestPage />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/template/:id"
+        element={
+          <AuthGuard forceWebAuth>
+            <PageTransition>
+              <TemplateDetailsPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-template-details/:id"
+        element={
+          <AuthGuard>
+            <PageTransition>
+              <PWATemplateDetailsPage />
+            </PageTransition>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/blog"
+        element={
+          <PageTransition>
+            <BlogPage />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <PageTransition>
+            <TermsPage />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <PageTransition>
+            <AboutPage />
           </PageTransition>
         }
       />
@@ -301,7 +344,7 @@ const AppContentWithRouter = ({ isPWAMode }: { isPWAMode: boolean }) => {
 
   return (
     <div className={cn(
-      "min-h-screen flex flex-col animate-fade-in",
+      "min-h-screen flex flex-col animate-fade-in bg-background",
       isMobileView ? "pb-24 min-h-dvh" : "" // Add bottom padding and dynamic viewport height for Mobile/PWA
     )}>
       {/* PWA Alert Notification - positioned above navbar */}
@@ -311,7 +354,12 @@ const AppContentWithRouter = ({ isPWAMode }: { isPWAMode: boolean }) => {
         <AppRoutes />
       </main>
       {/* Only show Footer if not in Mobile/PWA mode */}
-      {!isMobileView && <Footer />}
+      {!isMobileView && (
+        <>
+          <Footer />
+          <ScrollToTopButton />
+        </>
+      )}
     </div>
   );
 };
@@ -322,10 +370,11 @@ const App = () => (
       <AuthProvider>
         <NotificationCountProvider>
           <PWANotificationProvider>
-            <TooltipProvider>
+            <TooltipProvider delayDuration={100}>
               <Toaster />
               <Sonner />
               <AppContent />
+              <PWAInstallPrompt />
             </TooltipProvider>
           </PWANotificationProvider>
         </NotificationCountProvider>

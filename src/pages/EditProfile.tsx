@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
 import { useAnimateIn } from '@/lib/animations.ts';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
-import { BankSearch } from '@/components/BankSearch.tsx';
+
+import { BankSearch, BANKS } from '@/components/BankSearch.tsx';
+
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { api } from '@/integrations/api/client.ts';
 import { toast } from 'sonner';
 import { usePWA } from '@/pwa/hooks/usePWA';
 import { ProfilePictureUpload } from '@/components/ProfilePictureUpload.tsx';
+import { ChevronLeft, Pencil } from 'lucide-react';
 
 interface UserProfile {
   id: number;
@@ -24,14 +27,19 @@ interface UserProfile {
   updatedAt: string;
 }
 
+const VIETQR_TEMPLATE = 'compact';
+
 const EditProfile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const showContent = useAnimateIn(false, 300);
   const { user } = useAuth();
   const { isPWA } = usePWA();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(location.state?.mode === 'edit');
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -39,11 +47,11 @@ const EditProfile = () => {
     bankId: '',
     bankNumber: ''
   });
-  
+
   // Set page title
   useEffect(() => {
-    document.title = 'Chỉnh sửa thông tin - Goouty';
-  }, []);
+    document.title = isEditing ? 'Chỉnh sửa thông tin - Goouty' : 'Thông tin cá nhân - Goouty';
+  }, [isEditing]);
 
   // Fetch user profile
   useEffect(() => {
@@ -85,7 +93,8 @@ const EditProfile = () => {
       console.log('Updating profile with data:', updateData);
       const updatedProfile = await api.put<UserProfile>('/users/profile', updateData);
       setProfile(updatedProfile);
-      navigate('/profile');
+      setIsEditing(false);
+      toast.success('Cập nhật thông tin thành công');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Không thể cập nhật hồ sơ');
       console.error('Error updating profile:', error);
@@ -98,7 +107,7 @@ const EditProfile = () => {
     try {
       // Upload the file using new API
       const response = await api.users.uploadAvatar(file);
-      
+
       // Update local profile state
       setProfile(prev => prev ? { ...prev, profilePicture: response.data.user.profilePicture } : null);
       toast.success('Cập nhật ảnh đại diện thành công');
@@ -112,7 +121,7 @@ const EditProfile = () => {
     try {
       // Delete avatar using new API
       const response = await api.users.deleteAvatar();
-      
+
       // Update local profile state
       setProfile(prev => prev ? { ...prev, profilePicture: null } : null);
       toast.success('Xóa ảnh đại diện thành công');
@@ -121,7 +130,25 @@ const EditProfile = () => {
       console.error('Error deleting avatar:', error);
     }
   };
-  
+
+  const handleBack = () => {
+    if (isEditing) {
+      // Reset form data to profile data
+      if (profile) {
+        setFormData({
+          fullName: profile.fullName || '',
+          email: profile.email || '',
+          phoneNumber: profile.phoneNumber || '',
+          bankId: profile.bankId || '',
+          bankNumber: profile.bankNumber || ''
+        });
+      }
+      setIsEditing(false);
+    } else {
+      navigate('/profile');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -148,214 +175,374 @@ const EditProfile = () => {
   // PWA Layout
   if (isPWA) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background transition-colors duration-300">
         <AnimatedTransition show={showContent} animation="slide-up">
-          {/* Header */}
-          <div className="fixed top-0 left-0 right-0 z-10 bg-white">
-            <div className="flex items-center justify-between px-4 py-3">
-              <button 
-                onClick={() => navigate('/profile')}
-                className="text-gray-600 font-medium hover:text-gray-800 transition-colors"
-              >
-                Hủy
-              </button>
-              <h1 className="text-lg font-semibold text-black">Chỉnh sửa thông tin</h1>
-              <button 
-                onClick={handleSaveProfile}
-                disabled={saving || !formData.fullName.trim()}
-                className="text-blue-600 font-medium hover:text-blue-800 transition-colors disabled:opacity-50"
-              >
-                Xong
-              </button>
-            </div>
-          </div>
+          {/* Content */}
+          <div>
+            {isEditing ? (
+              // EDIT MODE
+              <>
+                <div className="sticky top-0 z-50 flex-shrink-0 bg-card border-b border-border px-4 py-4 shadow-md">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={handleBack}
+                      disabled={saving}
+                      className="flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
+                    >
+                      Hủy
+                    </button>
 
-          {/* Profile Content */}
-          <div className="px-4 py-6 pt-20">
-            {/* Profile Picture */}
-            <div className="text-center mb-8">
-              <ProfilePictureUpload
-                currentImage={profile.profilePicture}
-                onImageChange={handleProfilePictureChange}
-                onImageDelete={handleDeleteAvatar}
-                userName={profile.fullName}
-                size="lg"
-              />
-            </div>
+                    <h2 className="text-lg font-bold text-foreground">Chỉnh sửa thông tin</h2>
 
-            {/* Form Fields */}
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-black font-semibold">Tên</Label>
-                <Input 
-                  id="fullName" 
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                  className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
-                  placeholder="Nhập tên của bạn"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-black font-semibold">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email"
-                  value={formData.email}
-                  disabled
-                  className="bg-gray-100 border-gray-300 rounded-lg h-12 text-gray-500"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber" className="text-black font-semibold">Số điện thoại</Label>
-                <Input 
-                  id="phoneNumber" 
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) => {
-                    // Chỉ cho phép nhập số
-                    const value = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({...formData, phoneNumber: value});
-                  }}
-                  className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
-                  placeholder="Nhập số điện thoại"
-                />
-              </div>
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={saving || !formData.fullName.trim()}
+                      className="flex items-center text-primary hover:text-primary/80 disabled:text-muted-foreground transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
+                    >
+                      {saving ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                      ) : null}
+                      Xong
+                    </button>
+                  </div>
+                </div>
 
-              <div className="space-y-2">
-                <Label className="text-black font-semibold">Ngân hàng</Label>
-                <BankSearch
-                  value={formData.bankId}
-                  onChange={(value) => setFormData({ ...formData, bankId: value })}
-                  placeholder="Tìm kiếm ngân hàng..."
-                />
-              </div>
+                <div className="px-4 py-6 pb-24">
+                  <div className="text-center mb-8">
+                    <ProfilePictureUpload
+                      currentImage={profile.profilePicture}
+                      onImageChange={handleProfilePictureChange}
+                      onImageDelete={handleDeleteAvatar}
+                      userName={profile.fullName}
+                      size="lg"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bankNumber" className="text-black font-semibold">Số tài khoản</Label>
-                <Input
-                  id="bankNumber"
-                  type="tel"
-                  value={formData.bankNumber}
-                  onChange={(e) => {
-                    // Chỉ cho phép nhập số
-                    const value = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({...formData, bankNumber: value});
-                  }}
-                  className="bg-gray-100 border-gray-300 rounded-lg h-12 text-black"
-                  placeholder="Nhập số tài khoản"
-                />
+                  <div className="bg-card rounded-2xl p-6 shadow-2xl border border-border space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName" className="text-sm font-semibold text-muted-foreground">Tên</Label>
+                      <Input
+                        id="fullName"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
+                        placeholder="Nhập tên của bạn"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-semibold text-muted-foreground">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        disabled
+                        className="bg-secondary border-border rounded-xl h-12 text-muted-foreground opacity-70 border-dashed focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phoneNumber" className="text-sm font-semibold text-muted-foreground">Số điện thoại</Label>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        value={formData.phoneNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          setFormData({ ...formData, phoneNumber: value });
+                        }}
+                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
+                        placeholder="Nhập số điện thoại"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-muted-foreground">Ngân hàng</Label>
+                      <BankSearch
+                        value={formData.bankId}
+                        onChange={(value) => setFormData({ ...formData, bankId: value })}
+                        placeholder="Tìm kiếm ngân hàng..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bankNumber" className="text-sm font-semibold text-muted-foreground">Số tài khoản</Label>
+                      <Input
+                        id="bankNumber"
+                        type="tel"
+                        value={formData.bankNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          setFormData({ ...formData, bankNumber: value });
+                        }}
+                        className="bg-secondary border-border rounded-xl h-12 text-foreground focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none"
+                        placeholder="Nhập số tài khoản"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              // VIEW MODE
+              <div className="space-y-4 px-4 py-6 pb-24">
+                <div className="flex flex-col items-center mb-6">
+                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-border shadow-sm">
+                    {profile.profilePicture ? (
+                      <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-3xl font-bold text-[#6347f9]">
+                        {profile.fullName.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <h2 className="text-xl font-bold text-foreground">{profile.fullName}</h2>
+
+                  {/* Edit Button below Name */}
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    variant="outline"
+                    className="mt-4 px-8 h-10 rounded-full border-gray-200 dark:border-white/10 text-gray-700 dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-white/10 bg-white dark:bg-white/5 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    Chỉnh sửa thông tin
+                  </Button>
+                </div>
+
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden text-sm">
+                  <div className="p-4 border-b border-border last:border-0 flex justify-between items-center bg-secondary/30 transition-colors">
+                    <span className="text-muted-foreground font-medium">Email</span>
+                    <span className="text-foreground font-medium max-w-[200px] truncate" title={profile.email}>{profile.email}</span>
+                  </div>
+
+                  <div className="p-4 border-b border-border last:border-0 flex justify-between items-center">
+                    <span className="text-muted-foreground font-medium">Số điện thoại</span>
+                    <span className="text-foreground font-medium">{profile.phoneNumber || '---'}</span>
+                  </div>
+                  <div className="p-4 border-b border-border last:border-0 flex justify-between items-center">
+                    <span className="text-muted-foreground font-medium">Ngân hàng</span>
+                    <span className="text-foreground font-medium">
+                      {BANKS.find(b => b.code === profile.bankId)?.name || profile.bankId || '---'}
+                    </span>
+                  </div>
+                  <div className="p-4 border-b border-border last:border-0 flex justify-between items-center">
+                    <span className="text-muted-foreground font-medium">Số tài khoản</span>
+                    <span className="text-foreground font-medium">{profile.bankNumber || '---'}</span>
+                  </div>
+                </div>
+
+                {profile.bankId && profile.bankNumber && (
+                  <div className="bg-card rounded-2xl border border-border shadow-sm p-6 flex flex-col items-center mt-4">
+                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Mã QR Chuyển khoản</p>
+                    <div className="bg-white p-2 rounded-xl border border-border shadow-sm">
+                      <img
+                        src={`https://img.vietqr.io/image/${profile.bankId}-${profile.bankNumber}-${VIETQR_TEMPLATE}.png`}
+                        alt="QR Chuyển khoản"
+                        className="w-full max-w-[280px] h-auto rounded-lg"
+                      />
+                    </div>
+                    <p className="text-xs text-center text-muted-foreground mt-4">
+                      {BANKS.find(b => b.code === profile.bankId)?.name} - {profile.bankNumber}
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
         </AnimatedTransition>
       </div>
     );
   }
 
-  // WEB Layout (original design)
+  // WEB Layout
   return (
     <div className="max-w-4xl mx-auto px-4 pt-4 pb-16">
       <AnimatedTransition show={showContent} animation="slide-up">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-8">Chỉnh sửa thông tin</h1>
-          
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            {/* Profile Picture */}
-            <div className="text-center mb-8">
-              <ProfilePictureUpload
-                currentImage={profile.profilePicture}
-                onImageChange={handleProfilePictureChange}
-                onImageDelete={handleDeleteAvatar}
-                userName={profile.fullName}
-                size="lg"
-              />
-            </div>
-
-            {/* Form Fields */}
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-gray-700 font-medium">Tên</Label>
-                <Input 
-                  id="fullName" 
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                  className="h-12"
-                  placeholder="Nhập tên của bạn"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email"
-                  value={formData.email}
-                  disabled
-                  className="h-12 bg-gray-50"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber" className="text-gray-700 font-medium">Số điện thoại</Label>
-                <Input 
-                  id="phoneNumber" 
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) => {
-                    // Chỉ cho phép nhập số
-                    const value = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({...formData, phoneNumber: value});
-                  }}
-                  className="h-12"
-                  placeholder="Nhập số điện thoại"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-gray-700 font-medium">Ngân hàng</Label>
-                <BankSearch
-                  value={formData.bankId}
-                  onChange={(value) => setFormData({ ...formData, bankId: value })}
-                  placeholder="Tìm kiếm ngân hàng..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bankNumber" className="text-gray-700 font-medium">Số tài khoản</Label>
-                <Input
-                  id="bankNumber"
-                  type="tel"
-                  value={formData.bankNumber}
-                  onChange={(e) => {
-                    // Chỉ cho phép nhập số
-                    const value = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({...formData, bankNumber: value});
-                  }}
-                  className="h-12"
-                  placeholder="Nhập số tài khoản"
-                />
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-3 mt-8">
-              <Button 
-                variant="outline"
-                onClick={() => navigate('/profile')}
-                className="px-6"
-              >
-                Hủy
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
+                <ChevronLeft className="w-6 h-6" />
               </Button>
-              <Button 
-                onClick={handleSaveProfile}
-                disabled={saving || !formData.fullName.trim()}
-                className="px-6"
-              >
-                {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-              </Button>
+              <h1 className="text-3xl font-bold">{isEditing ? 'Chỉnh sửa thông tin' : 'Thông tin cá nhân'}</h1>
             </div>
+            {!isEditing && (
+              <Button onClick={() => setIsEditing(true)} className="gap-2">
+                <Pencil className="w-4 h-4" /> Chỉnh sửa
+              </Button>
+            )}
+          </div>
+
+          <div className="bg-white rounded-[24px] shadow-sm border p-8">
+            {isEditing ? (
+              // WEB EDIT MODE
+              <>
+                <div className="text-center mb-8">
+                  <ProfilePictureUpload
+                    currentImage={profile.profilePicture}
+                    onImageChange={handleProfilePictureChange}
+                    onImageDelete={handleDeleteAvatar}
+                    userName={profile.fullName}
+                    size="lg"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName" className="text-gray-700 font-medium">Tên</Label>
+                      <Input
+                        id="fullName"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        className="h-12 bg-slate-50 border-gray-200 rounded-xl text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
+                        placeholder="Nhập tên của bạn"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        disabled
+                        className="h-12 bg-slate-50 border-gray-200 rounded-xl text-gray-500 focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phoneNumber" className="text-gray-700 font-medium">Số điện thoại</Label>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        value={formData.phoneNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          setFormData({ ...formData, phoneNumber: value });
+                        }}
+                        className="h-12 bg-slate-50 border-gray-200 rounded-xl text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
+                        placeholder="Nhập số điện thoại"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label className="text-gray-700 font-medium">Ngân hàng</Label>
+                      <BankSearch
+                        value={formData.bankId}
+                        onChange={(value) => setFormData({ ...formData, bankId: value })}
+                        placeholder="Tìm kiếm ngân hàng..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bankNumber" className="text-gray-700 font-medium">Số tài khoản</Label>
+                      <Input
+                        id="bankNumber"
+                        type="tel"
+                        value={formData.bankNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          setFormData({ ...formData, bankNumber: value });
+                        }}
+                        className="h-12 bg-slate-50 border-gray-200 rounded-xl text-black focus:border-[#d2cdfe] hover:border-[#d2cdfe] focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors duration-200"
+                        placeholder="Nhập số tài khoản"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-6 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={handleBack}
+                    className="h-11 rounded-xl border-border dark:border-gray-700 bg-transparent text-muted-foreground dark:text-slate-400 hover:bg-secondary dark:hover:bg-gray-800 hover:text-foreground dark:hover:text-white transition-all px-6"
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    onClick={handleSaveProfile}
+                    disabled={saving || !formData.fullName.trim()}
+                    className="px-6 h-11 bg-[#6347f9] hover:bg-[#5136db]"
+                  >
+                    {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              // WEB VIEW MODE
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div className="col-span-1 flex flex-col items-center border-b lg:border-b-0 lg:border-r border-gray-100 pb-8 lg:pb-0 lg:pr-12">
+                  <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-slate-50 shadow-lg">
+                    {profile.profilePicture ? (
+                      <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-4xl font-bold text-[#6347f9]">
+                        {profile.fullName.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 text-center">{profile.fullName}</h2>
+                  <p className="text-gray-500 text-center mt-1">{profile.email}</p>
+                </div>
+
+                <div className="col-span-1 lg:col-span-2 space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div>
+                      <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Email</p>
+                      <p className="text-lg font-medium text-gray-900 truncate" title={profile.email}>{profile.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Số điện thoại</p>
+                      <p className="text-lg font-medium text-gray-900">{profile.phoneNumber || '---'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Thành viên từ</p>
+                      <p className="text-lg font-medium text-gray-900">{new Date(profile.createdAt).toLocaleDateString('vi-VN')}</p>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-100 pt-8">
+                    <h3 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
+                      Thông tin thanh toán
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                      <div>
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Ngân hàng</p>
+                        <p className="text-lg font-medium text-gray-900">
+                          {BANKS.find(b => b.code === profile.bankId)?.name || profile.bankId || '---'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Số tài khoản</p>
+                        <p className="text-lg font-medium text-gray-900">{profile.bankNumber || '---'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {profile.bankId && profile.bankNumber && (
+                    <div className="mt-4 bg-slate-50 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-8">
+                      <div className="p-2 bg-white rounded-xl shadow-sm">
+                        <img
+                          src={`https://img.vietqr.io/image/${profile.bankId}-${profile.bankNumber}-${VIETQR_TEMPLATE}.png`}
+                          alt="QR Chuyển khoản"
+                          className="w-48 h-auto"
+                        />
+                      </div>
+                      <div className="text-center md:text-left">
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">QR Chuyển khoản nhanh</h3>
+                        <p className="text-gray-500 text-sm max-w-xs mb-2">
+                          Sử dụng ứng dụng ngân hàng của bạn để quét mã QR này và thực hiện chuyển khoản một cách nhanh chóng.
+                        </p>
+                        <p className="text-sm font-medium text-primary">
+                          {BANKS.find(b => b.code === profile.bankId)?.name} - {profile.bankNumber}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </AnimatedTransition>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Plane, LogIn, Search, Upload, User, Settings, LogOut, Map, Plus, List, Users, MapPin, Home, Bell } from 'lucide-react';
+import { Plane, LogIn, Search, Upload, User, Settings, LogOut, Map, Plus, List, Users, MapPin, Home, Bell, CloudOff, Info } from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations.ts';
 import { cn } from '@/lib/utils.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
@@ -9,6 +9,8 @@ import AuthModal from '@/components/AuthModal.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { SyncStatus } from '@/components/SyncStatus.tsx';
+import { useOfflineStatus } from '@/lib/offline/OfflineManager';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -19,6 +21,8 @@ import {
 } from "@/components/ui/navigation-menu.tsx";
 import { TooltipProvider } from '@/components/ui/tooltip.tsx';
 import { useIsMobile } from '@/hooks/use-mobile.tsx';
+import { PWAInstallButton } from '@/pwa/components/PWAInstallButton';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface NavItemProps {
   to: string;
@@ -42,8 +46,8 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
           <NavigationMenuItem>
             <NavigationMenuTrigger
               className={cn(
-                "relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300",
-                "hover:bg-primary/10 hover:text-primary",
+                "relative flex items-center gap-3 px-5 py-3 rounded-lg transition-all duration-300",
+                "hover:bg-primary/10 hover:text-primary text-base",
                 active ? "bg-primary/10 text-primary" : "text-foreground/80"
               )}
             >
@@ -53,7 +57,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
               )}>
                 {icon}
               </span>
-              <span className="font-medium">{label}</span>
+              <span className="font-semibold">{label}</span>
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[200px] gap-1 p-2">
@@ -74,10 +78,10 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
           <Link
             to={to}
             className={cn(
-              "relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300",
-              "bg-primary hover:bg-primary/90",
-              "text-white font-medium shadow-md hover:shadow-lg",
-              "overflow-hidden flex-shrink-0"
+              "relative flex items-center gap-2.5 px-6 py-2.5 rounded-full transition-all duration-300",
+              "bg-[#6347f9] hover:bg-[#5136db]",
+              "text-white font-bold shadow-md hover:shadow-lg",
+              "overflow-hidden flex-shrink-0 text-base"
             )}
             onClick={(e) => {
               handleRipple(e);
@@ -87,7 +91,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
             <span className="text-white">
               {icon}
             </span>
-            <span className="font-medium">{label}</span>
+            <span>{label}</span>
           </Link>
         </TooltipTrigger>
         <TooltipContent>
@@ -103,20 +107,20 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
         <Link
           to={to}
           className={cn(
-            "relative flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300",
-            "hover:bg-gray-100",
+            "relative flex items-center gap-2.5 px-5 py-2.5 rounded-lg transition-all duration-300 group",
+            "hover:bg-primary/10 dark:hover:bg-white/10",
             "overflow-hidden flex-shrink-0",
-            active ? "bg-gray-100" : "bg-transparent"
+            active ? "bg-primary/10 dark:bg-white/10" : "bg-transparent text-base"
           )}
           onClick={(e) => {
             handleRipple(e);
             onClick();
           }}
         >
-          <span className="transition-all duration-300 text-gray-600">
+          <span className="transition-all duration-300 text-gray-500 group-hover:text-primary dark:text-slate-400 dark:group-hover:text-white">
             {icon}
           </span>
-          <span className="font-medium text-gray-700 text-sm">{label}</span>
+          <span className="font-semibold text-gray-700 group-hover:text-primary dark:text-slate-300 dark:group-hover:text-white transition-colors">{label}</span>
         </Link>
       </TooltipTrigger>
       <TooltipContent>
@@ -144,16 +148,16 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
             "relative flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-300",
             "hover:bg-primary/10 hover:text-primary",
             "overflow-hidden flex-shrink-0 min-w-0",
-            active ? "bg-primary/10 text-primary" : "text-foreground/80",
-            isHighlighted && "bg-primary text-primary-foreground shadow-lg scale-105",
+            active ? "bg-primary text-primary-foreground" : "text-foreground/80",
+            isHighlighted && "shadow-lg scale-105",
             disabled && "opacity-50 cursor-not-allowed"
           )}
           onClick={handleClick}
         >
           <span className={cn(
             "transition-all duration-300 text-xl flex items-center justify-center",
-            active ? "text-primary" : "text-foreground/60",
-            isHighlighted && "text-primary-foreground"
+            active ? "text-primary-foreground" : "text-foreground/60",
+            isHighlighted && active && "text-primary-foreground"
           )}>
             {icon}
           </span>
@@ -200,7 +204,10 @@ const ProfileNavItem = ({ user, active, onClick, isPWAMode }: { user: any, activ
             )}
             onClick={onClick}
           >
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+            <div className={cn(
+              "w-6 h-6 rounded-full flex items-center justify-center overflow-hidden",
+              active ? "bg-white/20" : "bg-primary/10"
+            )}>
               {user?.profilePicture ? (
                 <img
                   src={user.profilePicture}
@@ -208,7 +215,10 @@ const ProfileNavItem = ({ user, active, onClick, isPWAMode }: { user: any, activ
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-xs font-medium text-primary">
+                <span className={cn(
+                  "text-xs font-medium",
+                  active ? "text-white" : "text-primary"
+                )}>
                   {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                 </span>
               )}
@@ -233,7 +243,10 @@ const ProfileNavItem = ({ user, active, onClick, isPWAMode }: { user: any, activ
       onClick={onClick}
     >
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+        <div className={cn(
+          "w-6 h-6 rounded-full flex items-center justify-center overflow-hidden",
+          active ? "bg-white/20" : "bg-primary/10"
+        )}>
           {user?.profilePicture ? (
             <img
               src={user.profilePicture}
@@ -241,7 +254,10 @@ const ProfileNavItem = ({ user, active, onClick, isPWAMode }: { user: any, activ
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-xs font-medium text-primary">
+            <span className={cn(
+              "text-xs font-medium",
+              active ? "text-white" : "text-primary"
+            )}>
               {user?.fullName?.charAt(0).toUpperCase() || 'U'}
             </span>
           )}
@@ -260,6 +276,7 @@ export const Navbar = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout, user, isLoading } = useAuth();
+  const { isOnline, pendingCount } = useOfflineStatus();
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
   const isMobileView = isPWA || isMobile;
@@ -270,19 +287,18 @@ export const Navbar = () => {
       case '/my-trips':
         return 'Chuyến đi của tôi';
       case '/pwa-trips':
-        return 'Chuyến đi';
+        return 'Chuyến đi của tôi';
       case '/create-trip':
         return 'Tạo chuyến đi';
       case '/notifications':
         return 'Thông báo';
       case '/profile':
-        return '';
+        return 'Trang cá nhân';
       case '/profile/edit':
         return '';
       case '/settings':
         return 'Cài đặt';
-      case '/templates':
-        return 'Mẫu chuyến đi';
+
       default:
         return '';
     }
@@ -317,10 +333,9 @@ export const Navbar = () => {
       setActive('profile');
     } else if (path === '/settings') {
       setActive('settings');
-    } else if (path === '/create-trip') {
+    } else if (path === '/create-trip' || path === '/pwa-create-trip') {
       setActive('create-trip');
-    } else if (path === '/templates') {
-      setActive('templates');
+
     } else if (path === '/auth') {
       setActive('login');
     }
@@ -347,6 +362,9 @@ export const Navbar = () => {
 
   const handleNavItemClick = (id: string) => {
     setActive(id);
+    if (id === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const GooutySubmenu = [
@@ -356,17 +374,17 @@ export const Navbar = () => {
       label: 'Trang chủ',
       id: 'home',
     },
-    { to: '/create-trip', icon: <Plus size={18} />, label: 'Tạo chuyến đi', id: 'create-trip' },
+    ...(isAuthenticated ? [{ to: '/create-trip', icon: <Plus size={18} />, label: 'Tạo chuyến đi', id: 'create-trip' }] : []),
   ];
 
   const authNavItems = [
-    { to: '/my-trips', icon: <List size={20} />, label: 'Chuyến đi', id: 'my-trips' },
+    { to: '/my-trips', icon: <List size={20} />, label: 'Chuyến đi của tôi', id: 'my-trips' },
   ];
 
   // PWA Navigation Items
   const pwaNavItems = [
     { to: '/', icon: <Home size={24} />, label: 'Trang chủ', id: 'home' },
-    { to: '/pwa-trips', icon: <List size={24} />, label: 'Chuyến đi', id: 'pwa-trips' },
+    { to: '/pwa-trips', icon: <List size={24} />, label: 'Chuyến đi của tôi', id: 'pwa-trips' },
     { to: '/pwa-create-trip', icon: <Plus size={24} />, label: 'Tạo', id: 'create-trip', isHighlighted: true },
     { to: '/notifications', icon: <Bell size={24} />, label: 'Thông báo', id: 'notifications' },
     { to: '/profile', icon: user?.profilePicture ? <img src={user.profilePicture} alt="Avatar" className="w-6 h-6 rounded-full" /> : <User size={24} />, label: 'Hồ sơ', id: 'profile' },
@@ -379,48 +397,24 @@ export const Navbar = () => {
     return (
       <>
         <TooltipProvider>
-          {/* Top header for Mobile/PWA - minimal with logo and actions */}
-          <header className="sticky top-0 z-50 w-full px-4 py-2 bg-white border-b border-gray-100 mb-2">
-            <nav className="flex items-center justify-between max-w-6xl mx-auto h-12">
-              <div className="flex items-center gap-2">
-                <Link to="/" className="flex items-center gap-2">
-                  <img src="/footer_badge_mascot.png" alt="Goouty" className="w-10 h-10 object-contain" />
-                  {pageTitle && !isHomePage && (
-                    <h1 className="text-lg font-bold text-gray-900 truncate max-w-[180px]">
-                      {pageTitle}
-                    </h1>
-                  )}
-                </Link>
-              </div>
+          {/* Top header for Mobile/PWA - removed for cleaner UI */}
 
-              <div className="flex items-center gap-2">
-                {isAuthenticated ? (
-                  <>
-                    <button
-                      onClick={() => navigate('/profile')}
-                      className="w-8 h-8 rounded-full overflow-hidden border border-gray-200"
-                    >
-                      {user?.profilePicture ? (
-                        <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
-                          {user?.fullName?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                      )}
-                    </button>
-                  </>
-                ) : (
-                  <Button variant="ghost" size="sm" onClick={handleGoToAuth} className="text-primary font-semibold">
-                    Đăng nhập
-                  </Button>
-                )}
-              </div>
-            </nav>
-          </header>
+          {/* Top banner for offline status on mobile */}
+          {!isOnline && (
+            <div className="fixed top-0 left-0 right-0 z-[60] bg-destructive text-destructive-foreground text-[10px] py-1 text-center font-bold shadow-md animate-in fade-in slide-in-from-top duration-300">
+              Bạn đang ngoại tuyến
+            </div>
+          )}
+
 
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (
-            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg px-4 py-2 pb-8 border-t border-gray-100">
+            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg px-4 py-2 pb-8 border-t border-border/50">
+              <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
+                <div className="pointer-events-auto">
+                  {/* Removed SyncStatus icon from PWA nav as requested */}
+                </div>
+              </div>
               <div className="flex items-center justify-around max-w-6xl mx-auto">
                 {pwaNavItems.map((item) => (
                   <PWANavItem
@@ -447,11 +441,11 @@ export const Navbar = () => {
   return (
     <>
       <TooltipProvider>
-        <header className="sticky top-0 z-50 w-full py-4 bg-gradient-to-b from-primary/5 to-transparent backdrop-blur-sm">
+        <header className="sticky top-0 z-50 w-full py-4 bg-transparent">
           <div className="max-w-7xl mx-auto px-4">
             <nav className={cn(
               "flex items-center justify-between px-6 py-3 rounded-full transition-all duration-300",
-              "bg-white shadow-lg border border-gray-100"
+              "bg-card/80 backdrop-blur-md shadow-lg border border-border/50"
             )}>
               {/* Left side - Logo and main nav */}
               <div className="flex items-center gap-3">
@@ -484,10 +478,16 @@ export const Navbar = () => {
 
               {/* Right side - User actions */}
               <div className="flex items-center gap-3">
+                {/* PWA Install Button */}
+                <PWAInstallButton
+                  variant="outline"
+                  className="hidden md:flex rounded-full border-primary/20 hover:bg-primary/5 text-primary"
+                />
+
                 {/* Profile item with user info */}
                 {isAuthenticated && user && (
                   <div
-                    className="flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-[#f3f4f6] hover:bg-gray-200 transition-colors cursor-pointer"
+                    className="flex items-center gap-3 pl-1 pr-4 py-1 rounded-full bg-secondary hover:bg-secondary/80 transition-colors cursor-pointer"
                     onClick={() => {
                       handleNavItemClick('profile');
                       navigate('/profile');
@@ -502,17 +502,20 @@ export const Navbar = () => {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span className="text-sm font-semibold text-white">
+                          <span className="text-sm font-semibold text-primary-foreground">
                             {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                           </span>
                         )}
                       </div>
-                      <span className="text-sm font-semibold text-gray-900 hidden md:inline">
+                      <span className="text-sm font-semibold text-foreground hidden md:inline">
                         {user?.fullName || 'User'}
                       </span>
                     </div>
                   </div>
                 )}
+
+                {/* Sync Status - Removed as requested to use the offline banner instead */}
+                {/* {isAuthenticated && <SyncStatus />} */}
 
                 {/* Notification Bell */}
                 {isAuthenticated && (
@@ -521,16 +524,21 @@ export const Navbar = () => {
                   </div>
                 )}
 
+                <ThemeToggle />
+
                 {isAuthenticated ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="w-9 h-9 rounded-lg hover:bg-gray-100 transition-colors"
-                        onClick={logout}
+                        className="w-9 h-9 rounded-lg hover:bg-primary hover:text-primary-foreground group transition-colors"
+                        onClick={() => {
+                          logout();
+                          navigate('/auth');
+                        }}
                       >
-                        <LogOut size={18} className="text-gray-600" />
+                        <LogOut size={18} className="text-gray-600 group-hover:text-primary-foreground" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -555,6 +563,14 @@ export const Navbar = () => {
                 )}
               </div>
             </nav>
+
+            {/* Offline Banner for Web View */}
+            {!isOnline && (
+              <div className="mt-4 mx-auto max-w-fit px-6 py-1.5 rounded-full bg-destructive/90 backdrop-blur-sm text-destructive-foreground text-xs font-bold shadow-lg animate-in slide-in-from-top duration-300 flex items-center gap-2">
+                <CloudOff size={14} />
+                Bạn đang ngoại tuyến. Các thay đổi sẽ được đồng bộ khi có mạng.
+              </div>
+            )}
           </div>
         </header>
       </TooltipProvider>

@@ -1,22 +1,21 @@
-FROM node:18-slim
+FROM node:20-slim
 
-# Đặt thư mục làm việc
+# Enable pnpm
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 WORKDIR /usr/src/app
 
-# Copy package.json và package-lock.json
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
-# Cài dependencies (cả dev để chạy build)
-RUN apt-get update && apt-get install -y curl && npm install
+RUN pnpm install
 
-# Copy toàn bộ source code
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y curl
+
 COPY . .
 
-# Build app cho production
-RUN npm run build
-
-# Expose port (Vite mặc định 5173)
 EXPOSE 8080
 
-# Command mặc định: chạy dev server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["pnpm", "dev", "--host", "0.0.0.0", "--port", "8080"]

@@ -14,8 +14,8 @@ export namespace DATABASE_TYPES {
       phoneCode: number;
     };
     startDate?: string;
-    endDate?: string;
     description?: string;
+    avatar?: string;
     userId: string;
     isPublic?: boolean;
     shareToken?: string;
@@ -64,9 +64,17 @@ export namespace DATABASE_TYPES {
     images?: activity_images[];
   }
 
+  export interface activity_images {
+    id: string;
+    url: string;
+    activityId: string;
+    createdAt: string;
+  }
+
   export interface members {
     id: string;
     role: string;
+    status?: string;
     joinedAt: string;
     createdAt: string;
     updatedAt: string;

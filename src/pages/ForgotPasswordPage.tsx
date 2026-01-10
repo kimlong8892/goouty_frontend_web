@@ -40,21 +40,21 @@ const ForgotPasswordPage = () => {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-4 flex items-start md:items-center justify-center bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
+        <div className="min-h-screen pt-24 pb-12 px-4 flex items-start md:items-center justify-center">
             <AnimatedTransition show={show} animation="slide-up" className="w-full">
-                <Card className="max-w-md mx-auto w-full p-8 md:p-12 rounded-[32px] overflow-hidden shadow-2xl border-none bg-white">
+                <Card className="max-w-md mx-auto w-full p-8 md:p-12 rounded-[32px] overflow-hidden shadow-2xl border-none bg-white dark:bg-card">
                     <div className="mb-6 text-center">
-                        <h1 className="text-3xl font-black text-[#6c5dd3] mb-2 uppercase">Quên mật khẩu</h1>
-                        <p className="text-slate-500 font-medium">Nhập email để nhận link đặt lại mật khẩu</p>
+                        <h1 className="text-3xl font-black text-[#6347f9] mb-2 uppercase">Quên mật khẩu</h1>
+                        <p className="text-slate-500 dark:text-muted-foreground font-medium">Nhập email để nhận link đặt lại mật khẩu</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="email" className="text-slate-600 font-medium">Email Address</Label>
+                            <Label htmlFor="email" className="text-slate-600 dark:text-muted-foreground font-medium">Địa chỉ email</Label>
                             <Input
                                 id="email"
                                 type="email"
-                                className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6c5dd3] focus:bg-white transition-all px-4"
+                                className="h-12 rounded-xl bg-slate-50 dark:bg-secondary border-transparent focus:border-[#6347f9] focus:bg-white dark:focus:bg-card dark:text-foreground outline-none transition-colors duration-200 px-4 placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
                                 placeholder="Nhập email của bạn"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -64,13 +64,13 @@ const ForgotPasswordPage = () => {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full h-12 rounded-xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="w-full h-12 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                         >
                             {isLoading ? 'Đang gửi...' : 'Gửi link'}
                         </Button>
 
                         <div className="text-center">
-                            <Button type="button" variant="link" onClick={() => navigate('/auth')} className="text-[#6c5dd3]">Quay lại đăng nhập</Button>
+                            <Button type="button" variant="link" onClick={() => navigate('/auth')} className="text-[#6347f9]">Quay lại đăng nhập</Button>
                         </div>
                     </form>
                 </Card>

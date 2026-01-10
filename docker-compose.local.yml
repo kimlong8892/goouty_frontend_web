@@ -14,5 +14,7 @@ services:
       - /usr/src/app/node_modules
     env_file:
       - .env.local
-    command: npm run dev -- --host 0.0.0.0
+    environment:
+      - VITE_BASIC_AUTH_USER=goouty
+      - VITE_BASIC_AUTH_PASS=minh_long_hoang
     restart: unless-stopped

@@ -3,7 +3,7 @@ name: Deploy Frontend Dev
 on:
   push:
     branches:
-      - dev
+      - abc
 
 jobs:
   deploy:
@@ -45,28 +45,41 @@ jobs:
 
       - name: Run Deploy Script
         run: |
-          # Use Environment-level secrets (prioritize specific first, then generic)
+          # Use Environment-level secrets (prioritize FE specific, then generic backend specific, then fallback)
           SSH_PASS="${{ secrets.FE_SSH_PASSWORD_DEV }}"
+          [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.SSH_PASSWORD_DEV }}"
           [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.FE_SSH_PASSWORD }}"
+          [ -z "$SSH_PASS" ] && SSH_PASS="${{ secrets.SSH_PASSWORD }}"
           
           SSH_USER="${{ secrets.FE_SSH_USER_DEV }}"
+          [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.SSH_USER_DEV }}"
           [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.FE_SSH_USER }}"
+          [ -z "$SSH_USER" ] && SSH_USER="${{ secrets.SSH_USER }}"
           
           SSH_HOST="${{ secrets.FE_SSH_HOST_DEV }}"
+          [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.SSH_HOST_DEV }}"
           [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.FE_SSH_HOST }}"
+          [ -z "$SSH_HOST" ] && SSH_HOST="${{ secrets.SSH_HOST }}"
           
           DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH_DEV }}"
+          [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.DEPLOY_PATH_DEV }}"
           [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.FE_DEPLOY_PATH }}"
+          [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+
+          if [ -z "$SSH_HOST" ] || [ -z "$SSH_USER" ] || [ -z "$SSH_PASS" ]; then
+            echo "Error: SSH credentials (HOST, USER, or PASS) are missing. Please check your GitHub Secrets."
+            exit 1
+          fi
 
           USE_CLOUDFLARE_SSH=$(grep USE_CLOUDFLARE_SSH .github/env-config/dev/env.json | awk -F'"' '{print $4}')
           
           if [ "$USE_CLOUDFLARE_SSH" = "true" ]; then
-             SSH_OPTS="-o StrictHostKeyChecking=no -o 'ProxyCommand=cloudflared access ssh --hostname %h'"
+             SSH_OPTS="-o StrictHostKeyChecking=no -o ProxyCommand='cloudflared access ssh --hostname %h'"
           else
              SSH_OPTS="-o StrictHostKeyChecking=no"
           fi
 
-          echo "Connecting to $SSH_HOST..."
+          echo "Connecting to $SSH_HOST as $SSH_USER..."
           
           sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST "
             # Robust Docker & Docker Compose Installation/Check
@@ -110,12 +123,12 @@ jobs:
             git reset --hard origin/dev
           "
           
-          # Upload .env.dev using pipe for reliability
-          echo \"Uploading .env.dev...\"
-          cat .env.dev | sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST \"cat > $DEPLOY_PATH/.env.dev\"
+          # Upload .env.dev
+          echo "Uploading .env.dev..."
+          sshpass -p "$SSH_PASS" scp $SSH_OPTS .env.dev $SSH_USER@$SSH_HOST:$DEPLOY_PATH/.env.dev
           
           # Run the deploy script
-          sshpass -p \"$SSH_PASS\" ssh $SSH_OPTS $SSH_USER@$SSH_HOST \"
+          sshpass -p "$SSH_PASS" ssh $SSH_OPTS $SSH_USER@$SSH_HOST "
             cd $DEPLOY_PATH
             echo 'Deploying Frontend Dev...'
             chmod +x deploy_cicd_dev.sh
@@ -126,5 +139,5 @@ jobs:
             
             echo '--- Container Logs ---'
             docker compose -p goouty-frontend-dev logs --tail=50
-          \"
+          "
 

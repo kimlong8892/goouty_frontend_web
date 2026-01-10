@@ -59,12 +59,17 @@ const Index = () => {
   }, [isMobileView]);
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
+    const hasVisited = sessionStorage.getItem('has_visited_index');
+    if (hasVisited) {
       setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    } else {
+      // Simulate loading only on first visit
+      const timer = setTimeout(() => {
+        setLoading(false);
+        sessionStorage.setItem('has_visited_index', 'true');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   if (loading) {
@@ -72,7 +77,7 @@ const Index = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-purple-50 via-blue-50/30 to-purple-50/50">
+    <div className="relative min-h-screen bg-background text-foreground">
       {isMobileView ? (
         // Mobile/PWA Mode: Show trip templates list
         <PWATripTemplatesList

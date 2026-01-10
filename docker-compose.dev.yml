@@ -9,12 +9,11 @@ services:
     working_dir: /usr/src/app
     ports:
       - "8081:8080"
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     env_file:
       - .env.dev
-    command: npm run dev -- --host 0.0.0.0
+    environment:
+      - VITE_BASIC_AUTH_USER=goouty
+      - VITE_BASIC_AUTH_PASS=minh_long_hoang
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]

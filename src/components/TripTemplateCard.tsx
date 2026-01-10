@@ -4,6 +4,7 @@ import { DATABASE_TYPES } from '@/integrations/api/types';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { usePWA } from '@/pwa/hooks/usePWA';
 import { api } from '@/integrations/api/client';
 
 interface TripTemplateCardProps {
@@ -17,9 +18,14 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isPWA } = usePWA();
 
   const handleViewDetails = () => {
-    navigate(`/template/${template.id}`);
+    if (isPWA) {
+      navigate(`/pwa-template-details/${template.id}`);
+    } else {
+      navigate(`/template/${template.id}`);
+    }
   };
 
   const handleUseTemplate = async (e: React.MouseEvent) => {
@@ -36,8 +42,8 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
         title: "Trip created successfully!",
         description: "Your trip has been created from the template.",
       });
-      // Navigate to the new trip's detail page
-      navigate(`/trip/${newTrip.id}`);
+      // Navigate to home page
+      navigate('/');
     } catch (error) {
       console.error('Error creating trip from template:', error);
       toast({
@@ -53,10 +59,13 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
   // Dummy data for design match since API might not return these yet
   const rating = 5.0;
   const reviewCount = "6k";
-  const price = "$1200";
+  const price = "1.200.000 VNĐ";
 
   return (
-    <div className="group relative rounded-[32px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-white h-[420px] w-full max-w-sm mx-auto flex flex-col">
+    <div
+      className="group relative rounded-[32px] overflow-hidden border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-card h-[420px] w-full flex flex-col cursor-pointer"
+      onClick={handleViewDetails}
+    >
       {/* Background Image - Full Cover */}
       <div className="relative h-1/2 overflow-hidden">
         <img
@@ -86,46 +95,50 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate }: Tri
       </div>
 
       {/* Content Card */}
-      <div className="flex-1 bg-white p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
+      <div className="flex-1 bg-card p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
         <div>
           {/* Header: Title & Price */}
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-extrabold text-xl text-slate-900 line-clamp-1 pr-2 flex-1" title={template.title}>
+            <h3 className="font-bold text-base text-foreground pr-2 flex-1 leading-snug" title={template.title}>
               {template.title}
             </h3>
             <div className="flex flex-col items-end">
-              <span className="text-[#6c5dd3] font-black text-lg">{price}</span>
-              <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">/person</span>
+              <span className="text-primary font-black text-lg">{price}</span>
+              <span className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">/ người</span>
             </div>
           </div>
 
           {/* Location & Rating row */}
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center text-slate-500 font-medium text-sm">
-              <MapPin size={16} className="mr-1.5 text-[#6c5dd3]" />
+            <div className="flex items-center text-muted-foreground font-medium text-sm">
+              <MapPin size={16} className="mr-1.5 text-red-500" />
               <span className="truncate max-w-[120px]">{template.province?.name || "Vietnam"}</span>
             </div>
 
-            <div className="flex items-center bg-yellow-50 px-2 py-0.5 rounded-full">
+            <div className="flex items-center bg-secondary/50 px-2 py-0.5 rounded-full">
               <Star size={14} className="fill-yellow-400 text-yellow-400 mr-1" />
-              <span className="font-bold text-yellow-700 text-xs">{rating}</span>
+              <span className="font-bold text-muted-foreground text-xs">{rating}</span>
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
+        <div className="pt-2 flex gap-3">
           <Button
             variant="outline"
             size="lg"
-            className="w-full rounded-2xl border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 text-sm font-bold h-12 transition-all"
-            onClick={handleViewDetails}
+            className="flex-1 rounded-2xl border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-secondary text-sm font-bold h-12 transition-all active:scale-[0.98] bg-card"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewDetails();
+            }}
           >
             Xem chi tiết
           </Button>
+
           <Button
             size="lg"
-            className="w-full rounded-2xl bg-[#6c5dd3] hover:bg-[#5b4ec2] text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
+            className="flex-1 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
             onClick={handleUseTemplate}
             disabled={isLoading || usingTemplate}
           >

@@ -92,17 +92,17 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6c5dd3]"></div>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Đang chuẩn bị dữ liệu chi phí...</p>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9]"></div>
+        <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px]">Đang chuẩn bị dữ liệu chi phí...</p>
       </div>
     );
   }
 
   if (!calculation) {
     return (
-      <div className="text-center py-20 bg-red-50 rounded-[32px] border border-red-100">
+      <div className="text-center py-20 bg-red-50 dark:bg-red-500/10 rounded-[32px] border border-red-100 dark:border-red-500/20">
         <p className="text-red-500 font-bold">Không thể kết nối với dữ liệu chi phí</p>
-        <button onClick={() => window.location.reload()} className="mt-4 text-xs font-bold text-red-600 underline">Thử lại ngay</button>
+        <button onClick={() => window.location.reload()} className="mt-4 text-xs font-bold text-red-600 dark:text-red-400 underline">Thử lại ngay</button>
       </div>
     );
   }
@@ -130,17 +130,17 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
 
         {/* All Balanced Status - Only show if truly balanced */}
         {calculation.isBalanced && settlements.length === 0 && (
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
-              <Sparkles className="w-16 h-16 text-green-600" />
+              <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
             </div>
             <div className="flex items-center gap-4 relative z-10">
-              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200 dark:shadow-green-900/40">
                 <CheckCircle2 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-black text-green-800 text-lg">Tất cả đã cân bằng!</h3>
-                <p className="text-sm text-green-700/80 font-medium">
+                <h3 className="font-black text-green-800 dark:text-green-400 text-lg">Tất cả đã cân bằng!</h3>
+                <p className="text-sm text-green-700/80 dark:text-green-500/70 font-medium">
                   Tuyệt vời! Mọi chi phí đã được thanh toán và chia đều cho tất cả mọi người.
                 </p>
               </div>
@@ -154,7 +154,7 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
         )}
 
         {/* Chi tiết chi phí - Expense Details */}
-        <div className="pt-6 border-t border-slate-100">
+        <div className="pt-6 border-t border-slate-100 dark:border-white/10">
           <ExpenseList
             key={expenseListKey}
             tripId={tripId}

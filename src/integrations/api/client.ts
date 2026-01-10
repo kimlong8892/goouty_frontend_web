@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { DATABASE_TYPES } from './types';
 import { envUtils } from '../../lib/env';
+import { offlineManager } from '../../lib/offline/OfflineManager';
 
 const API_URL = envUtils.getApiBaseUrl();
 
 type QueryParams = Record<string, string | number | boolean | null | undefined>;
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -29,6 +30,35 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+// Add response interceptor to handle errors properly
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Extract error message from backend response
+    if (error.response?.data?.message) {
+      // Create a new error with the backend message
+      const backendError = new Error(error.response.data.message);
+      // Preserve validation errors if present
+      if (error.response.data.errors) {
+        (backendError as any).errors = error.response.data.errors;
+      }
+      return Promise.reject(backendError);
+    }
+
+    // Check for network errors (no response)
+    if (!error.response && error.config) {
+      // Don't queue login/register requests
+      const isAuthRequest = error.config.url?.includes('/auth/login') || error.config.url?.includes('/auth/register');
+
+      if (!isAuthRequest) {
+        offlineManager.queueRequest(error.config);
+      }
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 export const api = {
@@ -99,6 +129,18 @@ export const api = {
     },
     removeFromTrip: async (tripId: string, memberId: string) => {
       return await api.delete(`/trips/${tripId}/members/${memberId}`);
+    },
+    getInvitationByToken: async (token: string) => {
+      return await api.get<any>(`/trips/invites/${token}`);
+    },
+    acceptInvite: async (token: string) => {
+      return await api.post<any>('/trips/invites/accept', { token });
+    },
+    acceptInviteByMemberId: async (tripId: string, memberId: string) => {
+      return await api.post<any>(`/trips/${tripId}/members/${memberId}/accept`);
+    },
+    resendInvitation: async (tripId: string, memberId: string) => {
+      return await api.post<any>(`/trips/${tripId}/members/${memberId}/resend`);
     },
   },
 
@@ -211,17 +253,17 @@ export const api = {
   // Auth methods
   auth: {
     login: async (email: string, password: string) => {
-      const response = await api.post<{ user: any; token: string }>('/auth/login', { email, password });
-      localStorage.setItem('auth_token', response.token);
+      const response = await api.post<{ user: any; accessToken: string }>('/auth/login', { email, password });
+      localStorage.setItem('accessToken', response.accessToken);
       return response;
     },
     register: async (email: string, password: string) => {
-      const response = await api.post<{ user: any; token: string }>('/auth/register', { email, password });
-      localStorage.setItem('auth_token', response.token);
+      const response = await api.post<{ user: any; accessToken: string }>('/auth/register', { email, password });
+      localStorage.setItem('accessToken', response.accessToken);
       return response;
     },
     logout: async () => {
-      localStorage.removeItem('auth_token');
+      localStorage.removeItem('accessToken');
       return await api.post('/auth/logout');
     },
     getUser: async () => {
@@ -255,6 +297,9 @@ export const api = {
     },
     deleteAvatar: async () => {
       return await api.delete<any>('/users/avatar');
+    },
+    changePassword: async (passwordData: any) => {
+      return await api.post<any>('/users/change-password', passwordData);
     },
   },
 
@@ -304,8 +349,14 @@ export const api = {
   // Province-specific API methods
   provinces: {
     getAll: async () => {
-      const response = await api.get<{ data: DATABASE_TYPES.provinces[]; total: number }>('/provinces');
-      return response.data; // Extract the data array from the response
+      const response = await api.get<any>('/provinces', { limit: 100 });
+      // If the response is already an array, return it directly
+      if (Array.isArray(response)) return response;
+      // Handle the case where it's wrapped in a .data property 
+      if (response && Array.isArray(response.data)) return response.data;
+      // Handle the case where it's wrapped in a .provinces property
+      if (response && Array.isArray(response.provinces)) return response.provinces;
+      return [];
     },
     getById: async (id: string) => {
       return await api.get<DATABASE_TYPES.provinces>(`/provinces/${id}`);

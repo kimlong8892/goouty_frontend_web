@@ -5,7 +5,6 @@ import { usePWA } from '@/pwa/hooks/usePWA';
 import { api } from '@/lib/api.ts';
 import { useGlobalToast } from '@/utils/globalToast';
 import { CreateTripRequest, Trip } from '@/lib/types.ts';
-import { DateRange } from 'react-day-picker';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
 import { Calendar } from '@/components/ui/calendar.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
@@ -16,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea.tsx';
 import { CalendarIcon, ArrowLeft, Check, Upload, Image as ImageIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { cn } from '@/lib/utils.ts';
 
 const PWACreateTripPage = () => {
   const { showToast } = useGlobalToast();
@@ -26,7 +26,7 @@ const PWACreateTripPage = () => {
   const [tripName, setTripName] = useState('');
   const [destination, setDestination] = useState('');
   const [description, setDescription] = useState('');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [startDate, setStartDate] = useState<Date | undefined>();
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,9 +62,6 @@ const PWACreateTripPage = () => {
       newErrors.destination = 'Vui lòng nhập điểm đến';
     }
 
-    if (dateRange?.from && dateRange?.to && dateRange.from > dateRange.to) {
-      newErrors.dateRange = 'Ngày bắt đầu phải trước ngày kết thúc';
-    }
 
     // If there are errors, set them and focus on first error
     if (Object.keys(newErrors).length > 0) {
@@ -87,8 +84,7 @@ const PWACreateTripPage = () => {
         title: tripName.trim(),
         provinceId: destination.trim() || undefined,
         description: description.trim() || undefined,
-        ...(dateRange?.from && { startDate: dateRange.from.toISOString() }),
-        ...(dateRange?.to && { endDate: dateRange.to.toISOString() })
+        ...(startDate && { startDate: startDate.toISOString() })
       };
 
       const trip = await api.post<Trip>('/trips', tripData);
@@ -150,10 +146,10 @@ const PWACreateTripPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang kiểm tra đăng nhập...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Đang kiểm tra đăng nhập...</p>
         </div>
       </div>
     );
@@ -161,37 +157,31 @@ const PWACreateTripPage = () => {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 flex flex-col"
+      className="min-h-screen flex flex-col bg-background transition-colors duration-300"
       style={{
-        minHeight: '100dvh', // Dynamic viewport height for mobile
-        overflowY: 'auto',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100%',
-        paddingTop: 'env(safe-area-inset-top)' // Account for status bar
+        minHeight: '100dvh',
+        paddingTop: 'env(safe-area-inset-top)'
       }}
     >
       {/* Header */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-200/50 px-4 py-4 shadow-sm">
+      <div className="sticky top-0 z-50 flex-shrink-0 bg-card border-b border-border px-4 py-4 shadow-md">
         <div className="flex items-center justify-between">
           <button
             onClick={handleCancel}
-            className="flex items-center text-muted-foreground hover:text-gray-900 transition-colors text-lg font-medium"
+            disabled={loading}
+            className="flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             Hủy
           </button>
 
-          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Tạo chuyến đi
-          </h1>
+          <h2 className="text-lg font-bold text-foreground">Tạo chuyến đi</h2>
 
           <button
             onClick={handleCreateTrip}
             disabled={loading}
-            className="flex items-center text-primary hover:text-primary/80 disabled:text-gray-400 transition-colors font-bold text-lg"
+            className="flex items-center text-primary hover:text-primary/80 disabled:text-muted-foreground transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             {loading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
@@ -202,12 +192,12 @@ const PWACreateTripPage = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 py-4">
+      <div className="flex-1 overflow-y-auto px-4 py-6">
         {/* Form Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-gray-200/50 space-y-4">
+        <div className="bg-card rounded-2xl p-6 shadow-2xl border border-border space-y-5">
           {/* Trip Name Section */}
           <div className="space-y-2">
-            <Label htmlFor="tripName" className="text-sm font-semibold text-gray-700">
+            <Label htmlFor="tripName" className="text-sm font-semibold text-muted-foreground">
               Tên chuyến đi <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -220,7 +210,10 @@ const PWACreateTripPage = () => {
                   setErrors(prev => ({ ...prev, tripName: '' }));
                 }
               }}
-              className={`w-full text-base transition-all duration-200 ${errors.tripName ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-primary focus:ring-primary/20'}`}
+              className={cn(
+                "w-full h-12 text-base bg-secondary border-border text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200 outline-none",
+                errors.tripName && "border-red-500 focus:border-red-500 focus-visible:ring-red-500/20"
+              )}
             />
             {errors.tripName && (
               <p className="text-sm text-red-500 animate-fade-in">{errors.tripName}</p>
@@ -229,7 +222,7 @@ const PWACreateTripPage = () => {
 
           {/* Destination Section */}
           <div className="space-y-2">
-            <Label htmlFor="destination" className="text-sm font-semibold text-gray-700">
+            <Label htmlFor="destination" className="text-sm font-semibold text-muted-foreground">
               Điểm đến <span className="text-red-500">*</span>
             </Label>
             <ProvinceSelector
@@ -242,71 +235,59 @@ const PWACreateTripPage = () => {
               }}
               placeholder="Ví dụ: Đà Lạt, Lâm Đồng"
               error={!!errors.destination}
+              className="w-full h-12 bg-secondary text-foreground border-border placeholder:text-muted-foreground/60 focus:border-primary/50"
             />
             {errors.destination && (
               <p className="text-sm text-red-500 animate-fade-in">{errors.destination}</p>
             )}
           </div>
 
-          {/* Date Range Section */}
+          {/* Start Date Section */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-gray-700">
-              Thời gian chuyến đi
+            <Label className="text-sm font-semibold text-muted-foreground">
+              Ngày đi
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-full justify-start text-left font-normal h-12 text-base transition-all duration-200 ${errors.dateRange ? 'border-red-500 focus:border-red-500' : 'border-gray-200 hover:border-primary/50 focus:border-primary'}`}
+                  className={cn(
+                    "w-full justify-start text-left font-normal h-12 text-base bg-secondary border-border hover:bg-secondary/80 transition-all duration-200",
+                    startDate ? "text-foreground hover:text-foreground" : "text-muted-foreground/60 hover:text-muted-foreground/60"
+                  )}
                 >
-                  <CalendarIcon className="mr-3 h-5 w-5 text-gray-400" />
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>
-                        {format(dateRange.from, "dd/MM/yyyy", { locale: vi })} -{" "}
-                        {format(dateRange.to, "dd/MM/yyyy", { locale: vi })}
-                      </>
-                    ) : (
-                      format(dateRange.from, "dd/MM/yyyy", { locale: vi })
-                    )
+                  <CalendarIcon className="mr-3 h-5 w-5 text-muted-foreground" />
+                  {startDate ? (
+                    format(startDate, "dd/MM/yyyy", { locale: vi })
                   ) : (
-                    <span className="text-gray-500">Chọn thời gian chuyến đi</span>
+                    <span>Chọn ngày đi</span>
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0 max-h-[80vh] overflow-y-auto"
+                className="w-auto p-0 bg-card border-border shadow-xl"
                 align="start"
                 side="bottom"
                 sideOffset={4}
-                avoidCollisions={true}
-                collisionPadding={16}
               >
                 <Calendar
                   initialFocus
-                  mode="range"
-                  defaultMonth={dateRange?.from}
-                  selected={dateRange}
-                  onSelect={(range) => {
-                    setDateRange(range);
-                    if (errors.dateRange) {
-                      setErrors(prev => ({ ...prev, dateRange: '' }));
-                    }
+                  mode="single"
+                  defaultMonth={startDate}
+                  selected={startDate}
+                  onSelect={(date) => {
+                    setStartDate(date);
                   }}
-                  numberOfMonths={1}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  className="rounded-md"
+                  className="bg-card text-foreground"
                 />
               </PopoverContent>
             </Popover>
-            {errors.dateRange && (
-              <p className="text-sm text-red-500 animate-fade-in">{errors.dateRange}</p>
-            )}
           </div>
 
           {/* Description Section */}
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-sm font-semibold text-gray-700">
+            <Label htmlFor="description" className="text-sm font-semibold text-muted-foreground">
               Mô tả chuyến đi
             </Label>
             <Textarea
@@ -315,13 +296,13 @@ const PWACreateTripPage = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full text-base border-gray-200 focus:border-primary focus:ring-primary/20 resize-none transition-all duration-200"
+              className="w-full text-base bg-secondary text-foreground border-border placeholder:text-muted-foreground/60 focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 resize-none outline-none transition-all duration-200"
             />
           </div>
 
           {/* Cover Image Section */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-gray-700">
+            <Label className="text-sm font-semibold text-muted-foreground">
               Ảnh đại diện chuyến đi
             </Label>
 
@@ -330,17 +311,20 @@ const PWACreateTripPage = () => {
                 <img
                   src={imagePreview}
                   alt="Trip cover preview"
-                  className="w-full h-32 object-cover rounded-xl border border-gray-200 shadow-sm"
+                  className="w-full h-40 object-cover rounded-xl border border-border shadow-lg"
                 />
                 <button
                   onClick={removeImage}
-                  className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-200 shadow-lg hover:scale-110"
+                  className="absolute top-2 right-2 p-2 bg-destructive/90 text-destructive-foreground rounded-full hover:bg-destructive outline-none transition-all duration-200 shadow-xl active:scale-90"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 cursor-pointer">
+              <div
+                className="border-2 border-dashed border-border rounded-xl p-8 text-center bg-secondary hover:bg-secondary/80 hover:border-primary/50 outline-none transition-all duration-300 cursor-pointer group shadow-inner"
+                onClick={() => document.getElementById('cover-image-upload')?.click()}
+              >
                 <input
                   type="file"
                   accept="image/*"
@@ -348,18 +332,15 @@ const PWACreateTripPage = () => {
                   className="hidden"
                   id="cover-image-upload"
                 />
-                <label
-                  htmlFor="cover-image-upload"
-                  className="cursor-pointer flex flex-col items-center space-y-2"
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center">
-                    <ImageIcon className="w-6 h-6 text-primary" />
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-12 h-12 bg-card rounded-full flex items-center justify-center shadow-lg text-muted-foreground group-hover:text-primary transition-colors">
+                    <ImageIcon className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-700">Tải lên ảnh đại diện</p>
-                    <p className="text-xs text-gray-500">PNG, JPG tối đa 5MB</p>
+                    <p className="text-sm font-semibold text-muted-foreground">Tải lên ảnh đại diện</p>
+                    <p className="text-xs text-muted-foreground/60">PNG, JPG tối đa 5MB</p>
                   </div>
-                </label>
+                </div>
               </div>
             )}
           </div>
