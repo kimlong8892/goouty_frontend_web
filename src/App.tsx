@@ -23,6 +23,7 @@ import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
 import TemplateDetailsPage from "./pages/TemplateDetailsPage.tsx";
 import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
 import PWAWishlistPage from "@/pwa/pages/PWAWishlistPage.tsx";
+import WishlistPage from "./pages/WishlistPage.tsx";
 
 
 import MyTripsPage from "./pages/MyTripsPage.tsx";
@@ -86,6 +87,11 @@ const AuthGuard = ({ children, forceWebAuth = false }: { children: React.ReactNo
 
   // If not PWA and not forced, or if authenticated, render children
   return <>{children}</>;
+};
+
+const WishlistRoute = () => {
+  const { isPWA } = usePWA();
+  return isPWA ? <PWAWishlistPage /> : <WishlistPage />;
 };
 
 const AppRoutes = () => {
@@ -244,9 +250,9 @@ const AppRoutes = () => {
       <Route
         path="/wishlist"
         element={
-          <AuthGuard>
+          <AuthGuard forceWebAuth>
             <PageTransition>
-              <PWAWishlistPage />
+              <WishlistRoute />
             </PageTransition>
           </AuthGuard>
         }
