@@ -82,7 +82,7 @@ const WishlistPage = () => {
                             </Button>
                             <div>
                                 <h1 className="text-2xl md:text-4xl font-black text-primary uppercase tracking-tight flex items-center gap-3">
-                                    MẪU ĐÃ LƯU
+                                    DANH SÁCH YÊU THÍCH
                                 </h1>
                                 <p className="text-muted-foreground font-medium mt-1">
                                     Khám phá lại các hành trình bạn đã yêu thích

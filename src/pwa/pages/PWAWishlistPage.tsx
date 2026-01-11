@@ -52,7 +52,7 @@ const PWAWishlistPage = () => {
                 >
                     <ChevronLeft className="w-6 h-6" />
                 </Button>
-                <h1 className="text-lg font-bold ml-2">Mẫu đã lưu</h1>
+                <h1 className="text-lg font-bold ml-2">Danh sách yêu thích</h1>
             </div>
 
             {/* Content */}
