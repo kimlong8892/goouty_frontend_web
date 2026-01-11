@@ -208,7 +208,7 @@ const PWAAddActivityPage = () => {
                     <div className="fixed bottom-[80px] left-0 right-0 px-5 py-4 bg-background/80 backdrop-blur-md border-t border-border/50 z-40">
                         <Button
                             onClick={handleSubmit}
-                            disabled={loading || !formData.title.trim()}
+                            disabled={loading}
                             className="w-full h-14 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
                         >
                             {loading ? (

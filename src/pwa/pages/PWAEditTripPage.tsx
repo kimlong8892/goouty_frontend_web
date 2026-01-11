@@ -74,13 +74,9 @@ const PWAEditTripPage = () => {
         if (!tripName.trim()) {
             newErrors.tripName = 'Vui lòng nhập tên chuyến đi';
         }
-        if (!destination.trim()) {
-            newErrors.destination = 'Vui lòng chọn tỉnh thành';
-        }
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-            showToast('Vui lòng kiểm tra lại thông tin', 'error');
             return;
         }
 
@@ -207,7 +203,7 @@ const PWAEditTripPage = () => {
                         {/* Trip Name */}
                         <div className="space-y-2">
                             <Label htmlFor="tripName" className="text-muted-foreground text-sm font-medium ml-1">
-                                Tên chuyến đi
+                                Tên chuyến đi <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="tripName"
@@ -230,7 +226,7 @@ const PWAEditTripPage = () => {
                         {/* Destination */}
                         <div className="space-y-2">
                             <Label htmlFor="destination" className="text-muted-foreground text-sm font-medium ml-1">
-                                Điểm đến
+                                Điểm đến (tùy chọn)
                             </Label>
                             <ProvinceSelector
                                 value={destination}

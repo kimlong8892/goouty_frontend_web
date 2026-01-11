@@ -171,7 +171,6 @@ const PWAAddExpensePage = () => {
 
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) {
-            showToast('Vui lòng kiểm tra lại thông tin', 'error');
             return;
         }
 
@@ -314,7 +313,7 @@ const PWAAddExpensePage = () => {
                                     </SelectTrigger>
                                     <SelectContent className="rounded-xl border-border bg-popover shadow-xl z-50">
                                         {members.map((m) => (
-                                            <SelectItem key={m.user.id} value={m.user.id.toString()} className="rounded-xl py-3 px-3 m-1 focus:bg-primary/5">
+                                            <SelectItem key={m.user.id} value={m.user.id.toString()} className="rounded-xl py-3 px-3 m-1">
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="w-8 h-8 shrink-0 ring-2 ring-primary/10">
                                                         <AvatarImage src={m.user.profilePicture} />
@@ -425,7 +424,7 @@ const PWAAddExpensePage = () => {
                 <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/50 pb-safe z-40">
                     <Button
                         onClick={handleSubmit}
-                        disabled={loading || !formData.title.trim() || !formData.amount}
+                        disabled={loading}
                         className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold text-lg shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
                     >
                         {loading ? (
