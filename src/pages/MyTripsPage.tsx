@@ -301,7 +301,7 @@ const MyTripsPage = () => {
                 <img
                   src="/my_trips_mascot.png"
                   alt="My Trips Mascot"
-                  className="w-full h-full object-contain drop-shadow-xl transform hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-contain drop-shadow-xl animate-mascot-ride"
                 />
               </div>
               <h1 className="text-3xl md:text-5xl font-black mb-3 text-primary uppercase tracking-wide">
