@@ -346,7 +346,7 @@ const PWATripListPage = () => {
         <img
           src="/my_trips_mascot.png"
           alt="My Trips Mascot"
-          className="w-32 h-32 object-contain mb-2 drop-shadow-sm"
+          className="w-32 h-32 object-contain mb-2 drop-shadow-sm animate-mascot-ride"
           onError={(e) => {
             e.currentTarget.style.display = 'none';
           }}
