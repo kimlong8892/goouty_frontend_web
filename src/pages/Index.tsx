@@ -12,6 +12,7 @@ import { DATABASE_TYPES } from '@/integrations/api/types';
 import { api } from '@/integrations/api/client';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { useGlobalToast } from '@/utils/globalToast.ts';
+import { PWALandingScreen } from '@/pwa/components/PWALandingScreen.tsx';
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
@@ -79,11 +80,15 @@ const Index = () => {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       {isMobileView ? (
-        // Mobile/PWA Mode: Show trip templates list
-        <PWATripTemplatesList
-          onUseTemplate={handleUseTemplate}
-          usingTemplate={usingTemplate}
-        />
+        // Mobile/PWA Mode
+        !isAuthenticated ? (
+          <PWALandingScreen />
+        ) : (
+          <PWATripTemplatesList
+            onUseTemplate={handleUseTemplate}
+            usingTemplate={usingTemplate}
+          />
+        )
       ) : (
         // Web Mode: Show hero + trip templates section
         <>

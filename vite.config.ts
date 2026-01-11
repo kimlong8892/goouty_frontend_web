@@ -46,56 +46,6 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
-      {
-        name: 'basic-auth',
-        configureServer(server) {
-          server.middlewares.use((req, res, next) => {
-            const authUser = process.env.VITE_BASIC_AUTH_USER || env.VITE_BASIC_AUTH_USER;
-            const authPass = process.env.VITE_BASIC_AUTH_PASS || env.VITE_BASIC_AUTH_PASS;
-
-            if (!authUser || !authPass) {
-              next();
-              return;
-            }
-
-            // Skip auth for PWA manifest, service worker and assets
-            const isPWAFile = req.url?.includes('manifest') ||
-              req.url?.includes('sw.js') ||
-              req.url?.includes('registerSW.js') ||
-              req.url?.match(/\.(png|svg|ico|webmanifest)$/);
-
-            // Skip auth for PWA mode (standalone)
-            const isPWAMode = req.url?.includes('source=pwa');
-            const hasPWACookie = req.headers.cookie?.includes('pwa_auth=true');
-
-            if (isPWAMode) {
-              // Set a cookie to remember PWA mode for subsequent requests during the session
-              res.setHeader('Set-Cookie', 'pwa_auth=true; Path=/; SameSite=Lax');
-              next();
-              return;
-            }
-
-            if (hasPWACookie || isPWAFile) {
-              next();
-              return;
-            }
-
-            // Apply only to main document request if possible, or all.
-            // Construct expected Basic Auth header value (Base64)
-            const expectedAuth = Buffer.from(`${authUser}:${authPass}`).toString('base64');
-            const authHeader = req.headers.authorization || '';
-            const b64auth = authHeader.split(' ')[1] || '';
-
-            if (b64auth !== expectedAuth) {
-              res.statusCode = 401;
-              res.setHeader('WWW-Authenticate', 'Basic realm="Goouty Dev"');
-              res.end('Access denied');
-              return;
-            }
-            next();
-          });
-        }
-      },
       react(),
       VitePWA({
         registerType: 'autoUpdate',

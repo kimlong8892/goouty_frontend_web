@@ -32,6 +32,9 @@ import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
 import PWAWishlistPage from "@/pwa/pages/PWAWishlistPage.tsx";
 import WishlistPage from "./pages/WishlistPage.tsx";
 import PWAForgotPasswordPage from "@/pwa/pages/PWAForgotPasswordPage.tsx";
+import PWATermsPage from "@/pwa/pages/PWATermsPage.tsx";
+import PWAPrivacyPage from "@/pwa/pages/PWAPrivacyPage.tsx";
+import PWAAboutPage from "@/pwa/pages/PWAAboutPage.tsx";
 
 
 
@@ -86,7 +89,8 @@ const AuthGuard = ({ children, forceWebAuth = false }: { children: React.ReactNo
   }
 
   // If (it's PWA) OR (it's web but we explicitly want to force auth)
-  if (isPWA || forceWebAuth) {
+  // But allow the root path ('/') in PWA mode so users can see the Landing Screen
+  if ((isPWA && location.pathname !== '/') || forceWebAuth) {
     if (!isAuthenticated) {
       // Encode the current location including search params to redirect back after login
       const from = location.pathname + location.search;
@@ -220,6 +224,30 @@ const AppRoutes = () => {
               <PWAChangePasswordPage />
             </PageTransition>
           </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-terms"
+        element={
+          <PageTransition>
+            <PWATermsPage />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/pwa-privacy"
+        element={
+          <PageTransition>
+            <PWAPrivacyPage />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/pwa-about"
+        element={
+          <PageTransition>
+            <PWAAboutPage />
+          </PageTransition>
         }
       />
 
