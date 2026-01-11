@@ -364,9 +364,23 @@ const PWATemplateDetailsPage = () => {
                                                                     </div>
                                                                     <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-zinc-400 mb-2">
                                                                         {act.location && (
-                                                                            <span className="flex items-center gap-1">
-                                                                                <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-red-500" /> <span className="truncate max-w-[150px]">{act.location}</span>
-                                                                            </span>
+                                                                            <div
+                                                                                className="flex flex-col gap-0.5 group/loc cursor-pointer"
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    window.location.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.location!)}`;
+                                                                                }}
+                                                                            >
+                                                                                <span className="flex items-center gap-1 text-slate-500 dark:text-zinc-400 group-hover/loc:text-primary transition-colors">
+                                                                                    <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-red-500" /> <span className="truncate max-w-[150px]">{act.location}</span>
+                                                                                </span>
+                                                                                <div className="flex items-center gap-1 ml-4 overflow-hidden">
+                                                                                    <span className="text-[10px] text-primary font-bold hover:underline underline-offset-2 transition-all">
+                                                                                        Xem trong bản đồ
+                                                                                    </span>
+                                                                                    <ChevronRight className="w-3 h-3 text-primary animate-pulse" />
+                                                                                </div>
+                                                                            </div>
                                                                         )}
                                                                         {act.durationMin && (
                                                                             <span className="flex items-center gap-1 flex-shrink-0">
@@ -469,7 +483,7 @@ const PWATemplateDetailsPage = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="h-4 safe-area-bottom" />
+                    <div className="h-8 safe-area-bottom" />
                 </SheetContent>
             </Sheet>
         </div>

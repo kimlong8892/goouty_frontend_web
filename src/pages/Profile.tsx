@@ -274,7 +274,7 @@ const Profile = () => {
                   {profile.profilePicture ? (
                     <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#6347f9] to-[#8c7df0] flex items-center justify-center text-xl font-bold text-white uppercase">
+                    <div className="w-full h-full bg-primary flex items-center justify-center text-xl font-bold text-primary-foreground uppercase">
                       {profile.fullName.charAt(0)}
                     </div>
                   )}
@@ -575,12 +575,12 @@ const Profile = () => {
                     {profile.profilePicture ? (
                       <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-4xl font-bold text-[#6347f9]">
+                      <div className="w-full h-full bg-secondary flex items-center justify-center text-4xl font-bold text-primary">
                         {profile.fullName.charAt(0)}
                       </div>
                     )}
                   </div>
-                  <label className="absolute bottom-1 right-1 bg-[#6347f9] text-white p-2 rounded-full cursor-pointer hover:bg-[#5136db] shadow-md transition-all">
+                  <label className="absolute bottom-1 right-1 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer hover:bg-primary/90 shadow-md transition-all">
                     <Camera className="w-4 h-4" />
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
                   </label>
@@ -755,7 +755,7 @@ const Profile = () => {
                     <Button
                       variant="ghost"
                       onClick={() => navigate('/wishlist')}
-                      className="group w-full justify-start h-16 rounded-[24px] bg-[#eff1f5] hover:bg-[#e2e5eb] dark:bg-secondary dark:hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6"
+                      className="group w-full justify-start h-16 rounded-[24px] bg-secondary hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6"
                     >
                       <Heart className="w-5 h-5 mr-4 text-red-500 group-hover:scale-110 transition-transform" /> Danh sách yêu thích
                     </Button>
@@ -777,7 +777,7 @@ const Profile = () => {
                       }}
                     >
                       <DialogTrigger asChild>
-                        <Button variant="ghost" className="group w-full justify-start h-16 rounded-[24px] bg-[#eff1f5] hover:bg-[#e2e5eb] dark:bg-secondary dark:hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6">
+                        <Button variant="ghost" className="group w-full justify-start h-16 rounded-[24px] bg-secondary hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6">
                           <Lock className="w-5 h-5 mr-4 text-gray-500 group-hover:text-primary transition-colors" /> Đổi mật khẩu
                         </Button>
                       </DialogTrigger>
