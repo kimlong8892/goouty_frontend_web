@@ -109,7 +109,7 @@ const PWAAddDayPage = () => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 px-5 pt-6 pb-32 overflow-y-auto">
+            <div className="flex-1 px-5 pt-6 pb-44 overflow-y-auto">
                 <div className="space-y-6">
 
                     {/* Title Input */}
@@ -191,7 +191,7 @@ const PWAAddDayPage = () => {
             </div>
 
             {/* Sticky Bottom Button */}
-            <div className="sticky bottom-20 mt-10 z-10 w-full">
+            <div className="fixed bottom-[80px] left-0 right-0 px-5 py-4 bg-background/80 backdrop-blur-md border-t border-border/50 z-40">
                 <Button
                     onClick={handleSubmit}
                     disabled={loading}
