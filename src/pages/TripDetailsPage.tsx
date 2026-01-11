@@ -717,66 +717,70 @@ const TripDetailsPage = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className={cn(
-              "z-30 mb-8 w-full -mx-4 px-4 py-2 transition-[top] duration-300",
+              "z-30 mb-8 transition-[top] duration-300",
               isMobileView
-                ? cn("sticky", isTabsVisible ? "top-[60px]" : "top-[-100px]")
-                : "relative top-0 mx-0 px-0 bg-transparent z-0"
+                ? cn("sticky -mx-4 w-[calc(100%+2rem)]", isTabsVisible ? "top-[60px]" : "top-[-100px]")
+                : "relative top-0 mx-0 bg-transparent z-0",
+              isPWA ? "bg-background/95 backdrop-blur-md border-b border-border/10" : ""
             )}>
-              <TabsList className={cn(
-                "bg-transparent h-auto p-0 gap-3 flex w-full overflow-x-auto scrollbar-hide pb-2",
-                isMobileView ? "justify-start" : "justify-between"
-              )}>
-                <TabsTrigger
-                  value="itinerary"
-                  className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
-                    isMobileView
-                      ? "whitespace-nowrap px-6 py-3.5 text-base"
-                      : "flex-1 px-8 py-4 text-base"
-                  )}
-                >
-                  <Clock className="mr-2 w-5 h-5" />
-                  Lịch trình
-                </TabsTrigger>
-                <TabsTrigger
-                  value="expenses"
-                  className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
-                    isMobileView
-                      ? "whitespace-nowrap px-6 py-3.5 text-base"
-                      : "flex-1 px-8 py-4 text-base"
-                  )}
-                >
-                  <DollarSign className="mr-2 w-5 h-5" />
-                  Chi phí
-                </TabsTrigger>
-                <TabsTrigger
-                  value="members"
-                  className={cn(
-                    "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
-                    isMobileView
-                      ? "whitespace-nowrap px-6 py-3.5 text-base"
-                      : "flex-1 px-8 py-4 text-base"
-                  )}
-                >
-                  <Users className="mr-2 w-5 h-5" />
-                  Thành viên ({trip.memberCount || 1})
-                </TabsTrigger>
-                {trip.userRole === 'owner' && (
+              <div className={cn("overflow-x-auto scrollbar-hide px-4", isPWA ? "py-4" : "py-2")}>
+                <TabsList className={cn(
+                  "h-auto p-0 flex flex-nowrap items-center",
+                  isMobileView ? "justify-start gap-2 w-max min-w-full" : "justify-between gap-3 w-full",
+                  isPWA ? "bg-secondary/40 dark:bg-secondary/35 p-1.5 rounded-full" : "bg-transparent pb-2"
+                )}>
                   <TabsTrigger
-                    value="share"
+                    value="itinerary"
                     className={cn(
                       "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
                       isMobileView
-                        ? "whitespace-nowrap px-6 py-3.5 text-base"
+                        ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                         : "flex-1 px-8 py-4 text-base"
                     )}
                   >
-                    <Share2 className="mr-2 w-5 h-5" />
-                    Chia sẻ
+                    <Clock className="mr-2 w-5 h-5" />
+                    Lịch trình
                   </TabsTrigger>
-                )}
-              </TabsList>
+                  <TabsTrigger
+                    value="expenses"
+                    className={cn(
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                      isMobileView
+                        ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
+                        : "flex-1 px-8 py-4 text-base"
+                    )}
+                  >
+                    <DollarSign className="mr-2 w-5 h-5" />
+                    Chi phí
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="members"
+                    className={cn(
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                      isMobileView
+                        ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
+                        : "flex-1 px-8 py-4 text-base"
+                    )}
+                  >
+                    <Users className="mr-2 w-5 h-5" />
+                    Thành viên ({trip.memberCount || 1})
+                  </TabsTrigger>
+                  {trip.userRole === 'owner' && (
+                    <TabsTrigger
+                      value="share"
+                      className={cn(
+                        "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                        isMobileView
+                          ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
+                          : "flex-1 px-8 py-4 text-base"
+                      )}
+                    >
+                      <Share2 className="mr-2 w-5 h-5" />
+                      Chia sẻ
+                    </TabsTrigger>
+                  )}
+                </TabsList>
+              </div>
             </div>
 
             <TabsContent value="itinerary" className="mt-0">
@@ -1122,10 +1126,10 @@ const TripDetailsPage = () => {
           </Tabs>
 
         </div>
-      </AnimatedTransition>
+      </AnimatedTransition >
 
       {/* Delete Activity Dialog */}
-      <Dialog open={deleteActivityDialogOpen} onOpenChange={setDeleteActivityDialogOpen}>
+      < Dialog open={deleteActivityDialogOpen} onOpenChange={setDeleteActivityDialogOpen} >
         <DialogContent className="rounded-2xl bg-white dark:bg-[#1a1a2e] border-none shadow-2xl max-w-[90vw] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Xác nhận xóa hoạt động</DialogTitle>
@@ -1149,7 +1153,7 @@ const TripDetailsPage = () => {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       <AddDayDialog
         open={showAddDay}
@@ -1163,34 +1167,38 @@ const TripDetailsPage = () => {
         dayId={selectedDayId}
         onSuccess={fetchDaysAndActivities}
       />
-      {editingDay && (
-        <EditDayDialog
-          open={showEditDay}
-          onOpenChange={(open) => {
-            setShowEditDay(open);
-            if (!open) setEditingDay(null);
-          }}
-          day={{
-            id: editingDay.id,
-            title: editingDay.title,
-            date: editingDay.date,
-            description: editingDay.description,
-          }}
-          onSuccess={fetchDaysAndActivities}
-        />
-      )}
-      {editingActivity && (
-        <EditActivityDialog
-          open={showEditActivity}
-          onOpenChange={(open) => {
-            setShowEditActivity(open);
-            if (!open) setEditingActivity(null);
-          }}
-          onSuccess={fetchDaysAndActivities}
-          activity={editingActivity}
-        />
-      )}
-    </div>
+      {
+        editingDay && (
+          <EditDayDialog
+            open={showEditDay}
+            onOpenChange={(open) => {
+              setShowEditDay(open);
+              if (!open) setEditingDay(null);
+            }}
+            day={{
+              id: editingDay.id,
+              title: editingDay.title,
+              date: editingDay.date,
+              description: editingDay.description,
+            }}
+            onSuccess={fetchDaysAndActivities}
+          />
+        )
+      }
+      {
+        editingActivity && (
+          <EditActivityDialog
+            open={showEditActivity}
+            onOpenChange={(open) => {
+              setShowEditActivity(open);
+              if (!open) setEditingActivity(null);
+            }}
+            onSuccess={fetchDaysAndActivities}
+            activity={editingActivity}
+          />
+        )
+      }
+    </div >
   );
 };
 
