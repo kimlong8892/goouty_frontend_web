@@ -149,7 +149,7 @@ const PWAEditActivityPage = () => {
                 </div>
 
                 {/* Content */}
-                <div className="px-5 py-6 flex flex-col min-h-[calc(100vh-80px)]">
+                <div className="px-5 pt-6 pb-44 flex flex-col min-h-[calc(100vh-80px)]">
                     <div className="flex-1 space-y-6">
                         {/* Title Input */}
                         <div className="space-y-2">
@@ -254,7 +254,7 @@ const PWAEditActivityPage = () => {
                     </div>
 
                     {/* Sticky Bottom Button */}
-                    <div className="sticky bottom-20 mt-10 z-10 w-full">
+                    <div className="fixed bottom-[80px] left-0 right-0 px-5 py-4 bg-background/80 backdrop-blur-md border-t border-border/50 z-40">
                         <Button
                             onClick={handleSubmit}
                             disabled={saving || !formData.title.trim()}
