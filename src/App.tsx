@@ -32,6 +32,9 @@ import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
 import PWAWishlistPage from "@/pwa/pages/PWAWishlistPage.tsx";
 import WishlistPage from "./pages/WishlistPage.tsx";
 import PWAForgotPasswordPage from "@/pwa/pages/PWAForgotPasswordPage.tsx";
+import PWATermsPage from "@/pwa/pages/PWATermsPage.tsx";
+import PWAPrivacyPage from "@/pwa/pages/PWAPrivacyPage.tsx";
+import PWAAboutPage from "@/pwa/pages/PWAAboutPage.tsx";
 
 
 
@@ -221,6 +224,30 @@ const AppRoutes = () => {
               <PWAChangePasswordPage />
             </PageTransition>
           </AuthGuard>
+        }
+      />
+      <Route
+        path="/pwa-terms"
+        element={
+          <PageTransition>
+            <PWATermsPage />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/pwa-privacy"
+        element={
+          <PageTransition>
+            <PWAPrivacyPage />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/pwa-about"
+        element={
+          <PageTransition>
+            <PWAAboutPage />
+          </PageTransition>
         }
       />
 
