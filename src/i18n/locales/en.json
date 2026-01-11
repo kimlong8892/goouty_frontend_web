@@ -36,7 +36,6 @@
         "password": "Password",
         "confirmPassword": "Confirm Password",
         "forgotPassword": "Forgot Password?",
-        "rememberMe": "Remember Me",
         "loginWithGoogle": "Login with Google",
         "alreadyHaveAccount": "Already have an account?",
         "dontHaveAccount": "Don't have an account?",
