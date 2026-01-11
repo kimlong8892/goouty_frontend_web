@@ -732,7 +732,7 @@ const TripDetailsPage = () => {
                   <TabsTrigger
                     value="itinerary"
                     className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                       isMobileView
                         ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                         : "flex-1 px-8 py-4 text-base"
@@ -744,7 +744,7 @@ const TripDetailsPage = () => {
                   <TabsTrigger
                     value="expenses"
                     className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                       isMobileView
                         ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                         : "flex-1 px-8 py-4 text-base"
@@ -756,7 +756,7 @@ const TripDetailsPage = () => {
                   <TabsTrigger
                     value="members"
                     className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                       isMobileView
                         ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                         : "flex-1 px-8 py-4 text-base"
@@ -769,7 +769,7 @@ const TripDetailsPage = () => {
                     <TabsTrigger
                       value="share"
                       className={cn(
-                        "rounded-full h-auto font-semibold data-[state=active]:bg-[#6347f9] data-[state=active]:text-white data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 dark:hover:text-[#6347f9] dark:data-[state=active]:bg-[#6347f9] dark:data-[state=active]:hover:text-white transition-all active:scale-95",
+                        "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                         isMobileView
                           ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                           : "flex-1 px-8 py-4 text-base"
@@ -820,7 +820,7 @@ const TripDetailsPage = () => {
                   isMobileView ? "px-5" : "px-8"
                 )}>
                   {days.length === 0 ? (
-                    <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl bg-secondary/50">
+                    <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl bg-secondary/30">
                       <div className="flex justify-center mb-4">
                         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                           <Calendar className="w-8 h-8 text-primary/40" />
@@ -848,7 +848,7 @@ const TripDetailsPage = () => {
                               <div className={cn(
                                 "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
                                 isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
-                                isExpanded ? "bg-[#6347f9] text-white dark:shadow-[0_0_15px_rgba(99,71,249,0.7)]" : "bg-secondary text-muted-foreground"
+                                isExpanded ? "bg-primary text-primary-foreground dark:shadow-[0_0_15px_rgba(99,71,249,0.7)]" : "bg-secondary text-muted-foreground"
                               )}>
                                 {index + 1}
                               </div>
@@ -899,11 +899,11 @@ const TripDetailsPage = () => {
 
                             {isExpanded && (
                               <div className={cn(
-                                "border-l-2 border-slate-100 space-y-4 pb-8 animate-in slide-in-from-top-2 duration-300",
+                                "border-l-2 border-border/50 space-y-4 pb-8 animate-in slide-in-from-top-2 duration-300",
                                 isMobileView ? "pl-3 ml-3" : "pl-5 ml-5"
                               )}>
                                 {(!activitiesByDay[day.id] || activitiesByDay[day.id].length === 0) ? (
-                                  <div className="p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 text-slate-400 text-sm italic">
+                                  <div className="p-4 rounded-2xl border border-dashed border-border bg-secondary/20 text-muted-foreground text-sm italic text-center">
                                     Chưa có hoạt động nào cho ngày này
                                   </div>
                                 ) : (
@@ -1160,7 +1160,7 @@ const TripDetailsPage = () => {
             <Button
               variant="outline"
               onClick={() => setDeleteActivityDialogOpen(false)}
-              className="flex-1 sm:flex-none rounded-xl bg-white text-[#6347f9] hover:bg-purple-50 border-slate-200 hover:border-purple-200 font-bold transition-all h-11"
+              className="flex-1 sm:flex-none rounded-xl bg-background text-primary hover:bg-secondary border-border font-bold transition-all h-11"
             >
               Hủy
             </Button>
