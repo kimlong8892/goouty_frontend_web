@@ -70,11 +70,11 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate, onWis
   // Dummy data for design match since API might not return these yet
   const rating = 5.0;
   const reviewCount = "6k";
-  const displayPrice = template.fee === "0" || !template.fee
-    ? "Miễn phí"
-    : template.fee.includes('VNĐ')
+  const displayPrice = template.fee && template.fee !== "0"
+    ? template.fee.includes('VNĐ')
       ? template.fee
-      : `${Number(template.fee).toLocaleString('vi-VN')} VNĐ`;
+      : `${Number(template.fee).toLocaleString('vi-VN')} VNĐ`
+    : "Chi phí linh hoạt";
 
   return (
     <div
@@ -164,13 +164,20 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate, onWis
       <div className="flex-1 bg-card p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
         <div>
           {/* Header: Title & Price */}
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="font-bold text-base text-foreground pr-2 flex-1 leading-snug" title={template.title}>
+          <div className="flex justify-between items-start gap-4 mb-4">
+            <h3 className="font-bold text-base text-foreground flex-1 leading-snug line-clamp-2" title={template.title}>
               {template.title}
             </h3>
-            <div className="flex flex-col items-end">
-              <span className="text-primary font-black text-lg">{displayPrice}</span>
-              <span className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">/ người</span>
+            <div className="flex flex-col items-end shrink-0">
+              <div className="bg-primary/10 dark:bg-primary/20 px-3 py-2 rounded-2xl border border-primary/10 flex flex-col items-end shadow-sm backdrop-blur-sm">
+                <span className={cn(
+                  "text-primary font-black leading-none",
+                  displayPrice === "Chi phí linh hoạt" ? "text-[10px] uppercase tracking-wider text-center" : "text-base"
+                )}>
+                  {displayPrice}
+                </span>
+                <span className="text-primary/60 text-[9px] font-extrabold uppercase tracking-widest mt-1">/ người</span>
+              </div>
             </div>
           </div>
 
