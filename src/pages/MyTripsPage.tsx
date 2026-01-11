@@ -297,12 +297,27 @@ const MyTripsPage = () => {
           <div className="max-w-6xl mx-auto">
             {/* Header Section with Mascot */}
             <div className="text-center mb-10 relative">
-              <div className="w-48 h-48 mx-auto mb-4">
-                <img
-                  src="/my_trips_mascot.png"
-                  alt="My Trips Mascot"
-                  className="w-full h-full object-contain drop-shadow-xl animate-mascot-ride"
-                />
+              <div className="w-full h-48 relative mb-4 flex items-center justify-center overflow-hidden">
+                {/* Speed Lines */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="speed-streak w-24 top-[35%] right-0" style={{ animationDelay: '0s' }}></div>
+                  <div className="speed-streak w-32 top-[50%] right-0" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="speed-streak w-20 top-[65%] right-0" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+
+                <div className="w-48 h-48 relative z-10 animate-mascot-run">
+                  <img
+                    src="/my_trips_mascot.png"
+                    alt="My Trips Mascot"
+                    className="w-full h-full object-contain drop-shadow-xl"
+                  />
+                  {/* Exhaust Smoke */}
+                  <div className="absolute bottom-10 left-6 pointer-events-none">
+                    <div className="smoke-particle" style={{ animationDelay: '0s' }}></div>
+                    <div className="smoke-particle" style={{ animationDelay: '0.3s' }}></div>
+                    <div className="smoke-particle" style={{ animationDelay: '0.6s' }}></div>
+                  </div>
+                </div>
               </div>
               <h1 className="text-3xl md:text-5xl font-black mb-3 text-primary uppercase tracking-wide">
                 CHUYẾN ĐI CỦA TÔI
