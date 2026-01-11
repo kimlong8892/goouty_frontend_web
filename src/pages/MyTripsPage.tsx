@@ -430,7 +430,7 @@ const MyTripsPage = () => {
                       onClick={() => handleTripAction('view', trip)}
                     >
                       {/* Background Image - Full Cover */}
-                      <div className="relative h-1/2 overflow-hidden bg-gray-100">
+                      <div className="relative h-1/2 overflow-hidden bg-secondary">
                         {trip.avatar ? (
                           <img
                             src={trip.avatar}
@@ -441,8 +441,8 @@ const MyTripsPage = () => {
                             }}
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                            <Plane className="w-16 h-16 text-gray-300" />
+                          <div className="w-full h-full flex items-center justify-center bg-secondary">
+                            <Plane className="w-16 h-16 text-muted-foreground/30" />
                           </div>
                         )}
                         {/* Gradient Overlay */}
@@ -453,7 +453,7 @@ const MyTripsPage = () => {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md hover:bg-white/40 transition-all border border-white/20 active:scale-95 text-white"
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 transition-all border border-white/20 dark:border-white/10 active:scale-95 text-white"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <MoreVertical size={20} />
@@ -575,8 +575,8 @@ const MyTripsPage = () => {
             {/* Empty State */}
             {trips.length === 0 && !loading && !searchLoading && (
               <div className="text-center py-20">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6 shadow-md">
-                  <MapPin className="w-10 h-10 text-[#6347f9]/30" />
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-card rounded-full mb-6 shadow-md border border-border">
+                  <MapPin className="w-10 h-10 text-primary/30" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-slate-800">
                   {searchQuery ? 'Không tìm thấy chuyến đi' : 'Chưa có chuyến đi nào'}

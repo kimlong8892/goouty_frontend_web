@@ -158,14 +158,14 @@ const AuthPage = () => {
 
   if (isPWAView) {
     return (
-      <div className="min-h-screen bg-white p-6 flex flex-col">
+      <div className="min-h-screen bg-background p-6 flex flex-col">
         <AnimatedTransition show={show} animation="slide-up">
           <div className="flex flex-col items-center mt-8 mb-10">
             <GooutyLogo />
           </div>
 
           <div className="mb-8 text-center">
-            <h1 className="text-[28px] font-extrabold text-[#111] mb-2">
+            <h1 className="text-[28px] font-extrabold text-foreground mb-2">
               {mode === 'login' ? "Đăng nhập ngay!" : "Bắt đầu ngay!"}
             </h1>
             <p className="text-slate-400 text-base font-medium">
@@ -176,7 +176,7 @@ const AuthPage = () => {
           <div className="mb-8">
             <Button
               variant="outline"
-              className="w-full h-14 rounded-xl border border-[#EEE] flex items-center justify-center gap-3 text-base font-semibold hover:bg-slate-50 transition-colors"
+              className="w-full h-14 rounded-xl border border-border flex items-center justify-center gap-3 text-base font-semibold hover:bg-secondary transition-colors bg-card"
               onClick={handleGoogleLogin}
             >
               <GoogleIcon size={22} />
@@ -186,9 +186,9 @@ const AuthPage = () => {
 
           <div className="relative flex items-center justify-center mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#EEE]"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
-            <span className="relative bg-white px-4 text-slate-400 text-sm font-medium">
+            <span className="relative bg-background px-4 text-muted-foreground text-sm font-medium">
               Hoặc đăng nhập bằng
             </span>
           </div>
@@ -196,9 +196,9 @@ const AuthPage = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1">
             {mode === 'signup' && (
               <div className="flex flex-col gap-2">
-                <Label className="text-slate-400 text-sm font-medium px-1">Họ và tên</Label>
+                <Label className="text-muted-foreground text-sm font-medium px-1">Họ và tên</Label>
                 <Input
-                  className="h-14 rounded-xl border border-[#EEE] px-4 text-base focus-visible:ring-0 focus-visible:border-[#6347f9] bg-white transition-all placeholder:text-slate-300"
+                  className="h-14 rounded-xl border border-border px-4 text-base focus-visible:ring-0 focus-visible:border-primary bg-card transition-all placeholder:text-muted-foreground/50"
                   placeholder="Nhập họ tên của bạn"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -207,10 +207,10 @@ const AuthPage = () => {
             )}
 
             <div className="flex flex-col gap-2">
-              <Label className="text-slate-400 text-sm font-medium px-1">Địa chỉ Email</Label>
+              <Label className="text-muted-foreground text-sm font-medium px-1">Địa chỉ Email</Label>
               <Input
                 type="email"
-                className="h-14 rounded-xl border border-[#EEE] px-4 text-base focus-visible:ring-0 focus-visible:border-[#6347f9] bg-white transition-all placeholder:text-slate-300"
+                className="h-14 rounded-xl border border-border px-4 text-base focus-visible:ring-0 focus-visible:border-primary bg-card transition-all placeholder:text-muted-foreground/50"
                 placeholder="Nhập địa chỉ email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -218,11 +218,11 @@ const AuthPage = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label className="text-slate-400 text-sm font-medium px-1">Mật khẩu</Label>
+              <Label className="text-muted-foreground text-sm font-medium px-1">Mật khẩu</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
-                  className="h-14 rounded-xl border border-[#EEE] px-4 pr-12 text-base focus-visible:ring-0 focus-visible:border-[#6347f9] bg-white transition-all placeholder:text-slate-300 w-full"
+                  className="h-14 rounded-xl border border-border px-4 pr-12 text-base focus-visible:ring-0 focus-visible:border-primary bg-card transition-all placeholder:text-muted-foreground/50 w-full"
                   placeholder="Nhập mật khẩu"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -230,7 +230,7 @@ const AuthPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
                 >
                   {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                 </button>
@@ -244,14 +244,14 @@ const AuthPage = () => {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-[18px] h-[18px] rounded border-[#EEE] text-[#6347f9] focus:ring-[#6347f9] cursor-pointer"
+                    className="w-[18px] h-[18px] rounded border-border text-primary focus:ring-primary cursor-pointer accent-primary"
                   />
-                  <span className="text-sm font-medium text-slate-900">Ghi nhớ tài khoản</span>
+                  <span className="text-sm font-medium text-foreground">Ghi nhớ tài khoản</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => navigate('/forgot-password')}
-                  className="text-sm font-medium text-[#6347f9]"
+                  className="text-sm font-medium text-primary"
                 >
                   Quên mật khẩu?
                 </button>
@@ -262,20 +262,20 @@ const AuthPage = () => {
               type="submit"
               disabled={!email || !password}
               className={`h-14 rounded-xl font-bold text-lg border-none mt-4 transition-all duration-300 ${!email || !password
-                ? 'bg-[#EAEAEA] text-[#999] opacity-100'
-                : 'bg-[#6347f9] text-white shadow-lg shadow-purple-100'
+                ? 'bg-secondary text-muted-foreground opacity-100'
+                : 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
                 }`}
             >
               {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
             </Button>
 
             <div className="mt-auto py-8 text-center">
-              <p className="text-slate-900 font-medium text-sm">
+              <p className="text-foreground font-medium text-sm">
                 {mode === 'login' ? "Bạn chưa có tài khoản? " : "Bạn đã có tài khoản? "}
                 <button
                   type="button"
                   onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                  className="text-[#6347f9] font-bold"
+                  className="text-primary font-bold"
                 >
                   {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
                 </button>

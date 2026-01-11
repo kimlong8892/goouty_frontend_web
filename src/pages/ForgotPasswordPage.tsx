@@ -145,8 +145,8 @@ const ForgotPasswordPage = () => {
                 return (
                     <div className="space-y-6">
                         <div className="text-center mb-8">
-                            <h1 className="text-3xl font-black text-slate-900 mb-3">Quên mật khẩu?</h1>
-                            <p className="text-slate-500 font-medium leading-relaxed">
+                            <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-3">Quên mật khẩu?</h1>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
                                 Nhập email của bạn để chúng tôi gửi hướng dẫn đặt lại mật khẩu
                             </p>
                         </div>
@@ -157,15 +157,15 @@ const ForgotPasswordPage = () => {
 
                         <div className="space-y-4">
                             <div className="relative group">
-                                <Label className="text-sm font-bold text-slate-700 mb-1.5 block ml-1">Địa chỉ Email</Label>
-                                <div className="flex items-center bg-slate-50 border-2 border-transparent focus-within:border-[#6347f9] focus-within:bg-white rounded-2xl p-3.5 transition-all">
-                                    <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center shrink-0 mr-3">
+                                <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5 block ml-1">Địa chỉ Email</Label>
+                                <div className="flex items-center bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus-within:border-[#6347f9] focus-within:bg-white dark:focus-within:bg-slate-800 rounded-2xl p-3.5 transition-all">
+                                    <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-[#6347f9]/10 flex items-center justify-center shrink-0 mr-3">
                                         <Mail size={18} className="text-[#6347f9]" />
                                     </div>
                                     <input
                                         type="email"
                                         placeholder="name@example.com"
-                                        className="w-full bg-transparent border-none outline-none text-slate-900 font-semibold placeholder:text-slate-300"
+                                        className="w-full bg-transparent border-none outline-none text-slate-900 dark:text-white font-semibold placeholder:text-slate-300 dark:placeholder:text-slate-600"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
@@ -176,7 +176,7 @@ const ForgotPasswordPage = () => {
                         <Button
                             onClick={handleSendEmail}
                             disabled={isLoading || !email}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 transition-all active:scale-[0.98]"
+                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 dark:shadow-none transition-all active:scale-[0.98]"
                         >
                             {isLoading ? 'Đang gửi...' : 'Tiếp tục'}
                         </Button>
@@ -192,9 +192,9 @@ const ForgotPasswordPage = () => {
                 return (
                     <div className="space-y-6">
                         <div className="text-center mb-8">
-                            <h1 className="text-3xl font-black text-slate-900 mb-3">Nhập mã OTP</h1>
-                            <p className="text-slate-500 font-medium leading-relaxed">
-                                Mã xác thực đã được gửi đến <span className="text-slate-900 font-bold">{email}</span>
+                            <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-3">Nhập mã OTP</h1>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                                Mã xác thực đã được gửi đến <span className="text-slate-900 dark:text-white font-bold">{email}</span>
                             </p>
                         </div>
 
@@ -212,7 +212,7 @@ const ForgotPasswordPage = () => {
                                         value={digit}
                                         onChange={(e) => handleOtpChange(index, e.target.value)}
                                         onKeyDown={(e) => handleKeyDown(index, e)}
-                                        className="w-full h-16 bg-slate-50 border-2 border-transparent focus:border-[#6347f9] focus:bg-white rounded-2xl text-center text-2xl font-black text-slate-900 outline-none transition-all shadow-sm"
+                                        className="w-full h-16 bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-[#6347f9] focus:bg-white dark:focus:bg-slate-800 rounded-2xl text-center text-2xl font-black text-slate-900 dark:text-white outline-none transition-all shadow-sm"
                                     />
                                 ))}
                             </div>
@@ -234,7 +234,7 @@ const ForgotPasswordPage = () => {
                         <Button
                             onClick={handleVerifyOtp}
                             disabled={isLoading || otp.join('').length < 4}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 transition-all active:scale-[0.98]"
+                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 dark:shadow-none transition-all active:scale-[0.98]"
                         >
                             {isLoading ? 'Đang xác thực...' : 'Xác thực'}
                         </Button>
@@ -250,8 +250,8 @@ const ForgotPasswordPage = () => {
                 return (
                     <div className="space-y-6">
                         <div className="text-center mb-8">
-                            <h1 className="text-3xl font-black text-slate-900 mb-3">Mật khẩu mới</h1>
-                            <p className="text-slate-500 font-medium leading-relaxed">
+                            <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-3">Mật khẩu mới</h1>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
                                 Vui lòng thiết lập mật khẩu mới cho tài khoản của bạn
                             </p>
                         </div>
@@ -262,14 +262,14 @@ const ForgotPasswordPage = () => {
 
                         <div className="space-y-5">
                             <div className="space-y-2">
-                                <Label className="text-sm font-bold text-slate-700 ml-1">Mật khẩu mới</Label>
+                                <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Mật khẩu mới</Label>
                                 <div className="relative">
                                     <Input
                                         type={showPassword ? "text" : "password"}
                                         placeholder="••••••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="h-14 rounded-2xl border-slate-100 bg-slate-50 focus-visible:ring-[#6347f9] px-5 font-semibold text-lg"
+                                        className="h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus-visible:ring-[#6347f9] px-5 font-semibold text-lg text-slate-900 dark:text-white"
                                     />
                                     <button
                                         type="button"
@@ -282,14 +282,14 @@ const ForgotPasswordPage = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-sm font-bold text-slate-700 ml-1">Xác nhận mật khẩu</Label>
+                                <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Xác nhận mật khẩu</Label>
                                 <div className="relative">
                                     <Input
                                         type={showConfirmPassword ? "text" : "password"}
                                         placeholder="••••••••••••"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="h-14 rounded-2xl border-slate-100 bg-slate-50 focus-visible:ring-[#6347f9] px-5 font-semibold text-lg"
+                                        className="h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus-visible:ring-[#6347f9] px-5 font-semibold text-lg text-slate-900 dark:text-white"
                                     />
                                     <button
                                         type="button"
@@ -305,7 +305,7 @@ const ForgotPasswordPage = () => {
                         <Button
                             onClick={handleResetPassword}
                             disabled={isLoading || !password || !confirmPassword || password.length < 6}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 transition-all active:scale-[0.98]"
+                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 dark:shadow-none transition-all active:scale-[0.98]"
                         >
                             {isLoading ? 'Đang cập nhật...' : 'Xác nhận thay đổi'}
                         </Button>
@@ -315,11 +315,11 @@ const ForgotPasswordPage = () => {
     };
 
     return (
-        <div className="min-h-screen pt-12 pb-12 px-4 flex items-center justify-center bg-slate-50/50">
+        <div className="min-h-screen pt-12 pb-12 px-4 flex items-center justify-center bg-background">
             <AnimatedTransition show={show} animation="slide-up" className="w-full max-w-[480px]">
-                <Card className="p-8 md:p-10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(99,71,249,0.15)] border-none bg-white relative overflow-hidden">
+                <Card className="p-8 md:p-10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(99,71,249,0.15)] dark:shadow-none border-none bg-white dark:bg-card relative overflow-hidden">
                     {/* Progress indicator */}
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-50 flex">
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-50 dark:bg-slate-800 flex">
                         <div
                             className="h-full bg-[#6347f9] transition-all duration-500 rounded-r-full"
                             style={{ width: step === 'email' ? '33.33%' : step === 'otp' ? '66.66%' : '100%' }}
@@ -333,26 +333,26 @@ const ForgotPasswordPage = () => {
             {/* Success Overly/Modal */}
             {showSuccess && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300" />
+                    <div className="absolute inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-300" />
 
-                    <Card className="relative w-full max-w-[440px] bg-white rounded-[40px] p-10 text-center animate-in zoom-in-95 duration-500 shadow-2xl">
+                    <Card className="relative w-full max-w-[440px] bg-white dark:bg-card rounded-[40px] p-10 text-center animate-in zoom-in-95 duration-500 shadow-2xl">
                         <div className="flex justify-center mb-8">
-                            <div className="w-24 h-24 rounded-full bg-purple-50 flex items-center justify-center relative">
+                            <div className="w-24 h-24 rounded-full bg-purple-50 dark:bg-[#6347f9]/10 flex items-center justify-center relative">
                                 <div className="absolute inset-0 bg-[#6347f9] opacity-10 rounded-full animate-ping" />
-                                <div className="w-16 h-16 rounded-full bg-[#6347f9] flex items-center justify-center shadow-lg shadow-purple-200 relative z-10">
+                                <div className="w-16 h-16 rounded-full bg-[#6347f9] flex items-center justify-center shadow-lg shadow-purple-200 dark:shadow-none relative z-10">
                                     <CheckCircle2 size={36} className="text-white" />
                                 </div>
                             </div>
                         </div>
 
-                        <h2 className="text-3xl font-black text-slate-900 mb-4">Hoàn tất!</h2>
-                        <p className="text-slate-500 text-lg mb-10 leading-relaxed">
+                        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4">Hoàn tất!</h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-lg mb-10 leading-relaxed">
                             Mật khẩu của bạn đã được cập nhật thành công. Bây giờ bạn có thể đăng nhập bằng mật khẩu mới.
                         </p>
 
                         <Button
                             onClick={() => navigate('/auth')}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 transition-all active:scale-95"
+                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 dark:shadow-none transition-all active:scale-95"
                         >
                             Đăng nhập ngay
                         </Button>
