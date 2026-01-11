@@ -732,7 +732,7 @@ const TripDetailsPage = () => {
                   <TabsTrigger
                     value="itinerary"
                     className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                       isMobileView
                         ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                         : "flex-1 px-8 py-4 text-base"
@@ -744,7 +744,7 @@ const TripDetailsPage = () => {
                   <TabsTrigger
                     value="expenses"
                     className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                       isMobileView
                         ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                         : "flex-1 px-8 py-4 text-base"
@@ -756,7 +756,7 @@ const TripDetailsPage = () => {
                   <TabsTrigger
                     value="members"
                     className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
+                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                       isMobileView
                         ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                         : "flex-1 px-8 py-4 text-base"
@@ -769,7 +769,7 @@ const TripDetailsPage = () => {
                     <TabsTrigger
                       value="share"
                       className={cn(
-                        "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
+                        "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                         isMobileView
                           ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
                           : "flex-1 px-8 py-4 text-base"
