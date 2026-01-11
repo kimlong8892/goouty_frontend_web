@@ -31,7 +31,8 @@ import {
   ChevronRight,
   ChevronLeft,
   FileText,
-  Layout
+  Layout,
+  Info
 } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import NotificationSettings from '@/components/NotificationSettings';
@@ -326,7 +327,7 @@ const Profile = () => {
                 {/* Group 3 */}
                 <div className="space-y-2">
                   <div
-                    onClick={() => toast.info('Tính năng đang phát triển')}
+                    onClick={() => navigate('/pwa-privacy')}
                     className="flex items-center justify-between py-2 cursor-pointer active:opacity-70 transition-opacity"
                   >
                     <div className="flex items-center gap-4">
@@ -339,7 +340,7 @@ const Profile = () => {
                   </div>
 
                   <div
-                    onClick={() => toast.info('Tính năng đang phát triển')}
+                    onClick={() => navigate('/pwa-terms')}
                     className="flex items-center justify-between py-2 cursor-pointer active:opacity-70 transition-opacity"
                   >
                     <div className="flex items-center gap-4">
@@ -347,6 +348,19 @@ const Profile = () => {
                         <Layout className="w-5 h-5" />
                       </div>
                       <span className="text-base font-medium text-foreground">Điều khoản sử dụng</span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
+
+                  <div
+                    onClick={() => navigate('/pwa-about')}
+                    className="flex items-center justify-between py-2 cursor-pointer active:opacity-70 transition-opacity"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                        <Info className="w-5 h-5" />
+                      </div>
+                      <span className="text-base font-medium text-foreground">Giới thiệu về Goouty</span>
                     </div>
                     <ChevronRight className="w-5 h-5 text-gray-400" />
                   </div>
