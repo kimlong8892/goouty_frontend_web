@@ -297,7 +297,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
             </Avatar>
             <div className="flex flex-col">
               <span className="text-muted-foreground text-sm font-medium flex items-center gap-1">
-                {t('common.greeting', { defaultValue: 'Hello' })}, {user?.fullName.split(' ')[0] || 'Shane'} <span className="animate-wave">👋</span>
+                {t('common.greeting', { defaultValue: 'Xin chào' })}, {user?.fullName?.split(' ')[0] || t('common.guest', { defaultValue: 'Bạn' })} <span className="animate-wave">👋</span>
               </span>
               <h1 className="text-xl font-bold text-foreground leading-tight">
                 {t('template.whereToGo', { defaultValue: 'Where do you want to go?' })}

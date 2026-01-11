@@ -86,7 +86,8 @@ const AuthGuard = ({ children, forceWebAuth = false }: { children: React.ReactNo
   }
 
   // If (it's PWA) OR (it's web but we explicitly want to force auth)
-  if (isPWA || forceWebAuth) {
+  // But allow the root path ('/') in PWA mode so users can see the Landing Screen
+  if ((isPWA && location.pathname !== '/') || forceWebAuth) {
     if (!isAuthenticated) {
       // Encode the current location including search params to redirect back after login
       const from = location.pathname + location.search;

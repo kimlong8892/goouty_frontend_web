@@ -27,7 +27,8 @@
         "success": "Thành công",
         "warning": "Cảnh báo",
         "info": "Thông tin",
-        "greeting": "Xin chào"
+        "greeting": "Xin chào",
+        "guest": "Bạn"
     },
     "auth": {
         "login": "Đăng nhập",
