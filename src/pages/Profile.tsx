@@ -757,7 +757,7 @@ const Profile = () => {
                       onClick={() => navigate('/wishlist')}
                       className="group w-full justify-start h-16 rounded-[24px] bg-[#eff1f5] hover:bg-[#e2e5eb] dark:bg-secondary dark:hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6"
                     >
-                      <Heart className="w-5 h-5 mr-4 text-red-500 group-hover:scale-110 transition-transform" /> Mẫu đã lưu
+                      <Heart className="w-5 h-5 mr-4 text-red-500 group-hover:scale-110 transition-transform" /> Danh sách yêu thích
                     </Button>
                   </div>
                 </CardContent>
