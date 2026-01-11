@@ -23,7 +23,7 @@ import {
   Trash2,
   ChevronDown,
   ChevronRight,
-  MoreVertical
+  GripVertical
 } from 'lucide-react';
 import { cn } from '@/lib/utils.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
@@ -189,6 +189,9 @@ const TripDetailsPage = () => {
 
   // State for collapsible days (default empty = all collapsed)
   const [expandedDayIds, setExpandedDayIds] = useState<string[]>([]);
+  const [draggedActivity, setDraggedActivity] = useState<{ id: string, dayId: string } | null>(null);
+  const [dragOverActivityId, setDragOverActivityId] = useState<string | null>(null);
+  const [justDroppedId, setJustDroppedId] = useState<string | null>(null);
   const [showAddDay, setShowAddDay] = useState(false);
 
   const toggleDay = (dayId: string) => {
@@ -397,10 +400,10 @@ const TripDetailsPage = () => {
 
       if (apiError.status === 404) {
         showToast('Chuyến đi không tồn tại', 'error');
-        navigate('/my-trips');
+        navigate('/');
       } else if (apiError.status === 403) {
         showToast('Bạn không có quyền truy cập chuyến đi này', 'error');
-        navigate('/my-trips');
+        navigate('/');
       } else if (apiError.status === 401) {
         showToast('Phiên đăng nhập đã hết hạn', 'error');
         navigate('/auth');
@@ -443,6 +446,75 @@ const TripDetailsPage = () => {
       setActivityToDelete(null);
     } catch (error: unknown) {
       showToast('Không thể xóa hoạt động', 'error');
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, activityId: string, dayId: string) => {
+    setDraggedActivity({ id: activityId, dayId });
+    e.dataTransfer.setData('activityId', activityId);
+    e.dataTransfer.setData('dayId', dayId);
+    e.dataTransfer.effectAllowed = 'move';
+
+    // Add a visual cue
+    const target = e.currentTarget as HTMLElement;
+    setTimeout(() => {
+      target.style.opacity = '0.4';
+    }, 0);
+  };
+
+  const handleDragOver = (e: React.DragEvent, activityId: string, dayId: string) => {
+    e.preventDefault();
+    if (draggedActivity && draggedActivity.dayId === dayId) {
+      setDragOverActivityId(activityId);
+      e.dataTransfer.dropEffect = 'move';
+    }
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    const target = e.currentTarget as HTMLElement;
+    target.style.opacity = '1';
+    setDraggedActivity(null);
+    setDragOverActivityId(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetActivityId: string, targetDayId: string) => {
+    e.preventDefault();
+    if (!draggedActivity || draggedActivity.dayId !== targetDayId || draggedActivity.id === targetActivityId) {
+      return;
+    }
+
+    const dayActivities = [...activitiesByDay[targetDayId]];
+    const draggedIndex = dayActivities.findIndex(a => a.id === draggedActivity.id);
+    const targetIndex = dayActivities.findIndex(a => a.id === targetActivityId);
+
+    if (draggedIndex !== -1 && targetIndex !== -1) {
+      // Reorder locally
+      const [removed] = dayActivities.splice(draggedIndex, 1);
+      dayActivities.splice(targetIndex, 0, removed);
+
+      // Update local state immediately for snappy feel
+      setActivitiesByDay(prev => ({
+        ...prev,
+        [targetDayId]: dayActivities
+      }));
+
+      // Highlight the moved item
+      setJustDroppedId(draggedActivity.id);
+      setTimeout(() => setJustDroppedId(null), 2500);
+
+      // Prepare API call
+      try {
+        const reorderData = dayActivities.map((activity, index) => ({
+          id: activity.id,
+          sortOrder: index
+        }));
+
+        await api.activities.reorder(reorderData);
+      } catch (error) {
+        showToast('Không thể sắp xếp lại hoạt động', 'error');
+        // Optionally revert state if API fails
+        fetchDaysAndActivities();
+      }
     }
   };
 
@@ -724,7 +796,13 @@ const TripDetailsPage = () => {
                     {!isMobileView && <p className="text-muted-foreground font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
                   </div>
                   <Button
-                    onClick={() => setShowAddDay(true)}
+                    onClick={() => {
+                      if (isMobileView && id) {
+                        navigate(`/pwa-add-day/${id}`);
+                      } else {
+                        setShowAddDay(true);
+                      }
+                    }}
                     size={isMobileView ? "sm" : "default"}
                     className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg"
                   >
@@ -784,18 +862,24 @@ const TripDetailsPage = () => {
                                     {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
 
                                     <div onClick={(e) => e.stopPropagation()}>
-                                      <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-secondary text-muted-foreground/70 opacity-0 group-hover/header:opacity-100 transition-opacity">
-                                            <MoreVertical className="w-4 h-4" />
-                                          </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="start">
-                                          <DropdownMenuItem onClick={() => { setEditingDay(day); setShowEditDay(true); }}>
-                                            <Edit className="w-4 h-4 mr-2" /> Chỉnh sửa ngày
-                                          </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                      </DropdownMenu>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className={cn(
+                                          "h-8 w-8 p-0 rounded-full hover:bg-secondary text-[#6347f9] bg-[#6347f9]/10",
+                                          isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
+                                        )}
+                                        onClick={() => {
+                                          if (isMobileView) {
+                                            navigate(`/pwa-edit-day/${day.id}`);
+                                          } else {
+                                            setEditingDay(day);
+                                            setShowEditDay(true);
+                                          }
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                      </Button>
                                     </div>
                                   </div>
 
@@ -822,14 +906,27 @@ const TripDetailsPage = () => {
                                   activitiesByDay[day.id].map((activity) => (
                                     <div
                                       key={activity.id}
+                                      draggable={trip.userRole === 'owner'}
+                                      onDragStart={(e) => handleDragStart(e, activity.id, day.id)}
+                                      onDragOver={(e) => handleDragOver(e, activity.id, day.id)}
+                                      onDragEnd={handleDragEnd}
+                                      onDrop={(e) => handleDrop(e, activity.id, day.id)}
                                       className={cn(
-                                        "group bg-card border rounded-2xl transition-all duration-200",
+                                        "group bg-card border border-border rounded-2xl transition-all duration-300 relative select-none hover:border-primary/30",
                                         isMobileView ? "p-4" : "p-5",
-                                        activity.pinned ? "border-primary/50 shadow-sm ring-1 ring-primary/20" : "border-border hover:border-primary/30",
-                                        !isMobileView && "hover:shadow-md"
+                                        !isMobileView && "hover:shadow-md",
+                                        draggedActivity?.id === activity.id && "opacity-40",
+                                        dragOverActivityId === activity.id && "border-primary border-t-4",
+                                        justDroppedId === activity.id && "ring-2 ring-primary/40 bg-primary/[0.03] border-primary/50 scale-[1.01] shadow-lg z-20",
+                                        trip.userRole === 'owner' && "cursor-grab active:cursor-grabbing"
                                       )}
                                     >
-                                      <div className="flex justify-between items-start gap-2">
+                                      <div className="flex justify-between items-start gap-3">
+                                        {trip.userRole === 'owner' && (
+                                          <div className="pt-1.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0">
+                                            <GripVertical className="w-5 h-5" />
+                                          </div>
+                                        )}
                                         <div className="space-y-2 flex-1 min-w-0">
                                           <div className="flex items-start justify-between">
                                             <h4 className={cn(
@@ -838,24 +935,28 @@ const TripDetailsPage = () => {
                                             )}>{activity.title}</h4>
 
                                             {isMobileView && (
-                                              <div className="flex items-center -mt-1 ml-1">
+                                              <div className="flex items-center -mt-1 ml-1" onClick={(e) => e.stopPropagation()}>
                                                 <Button
                                                   variant="ghost"
                                                   size="icon"
                                                   className="h-8 w-8 text-slate-400 hover:text-purple-600 active:bg-purple-50 rounded-full"
                                                   onClick={() => {
-                                                    setEditingActivity({
-                                                      id: activity.id,
-                                                      title: activity.title,
-                                                      startTime: activity.timeStart || undefined,
-                                                      durationMin: activity.durationMin,
-                                                      location: activity.location,
-                                                      notes: activity.notes,
-                                                      important: activity.pinned || false,
-                                                      dayId: activity.dayId,
-                                                      images: activity.images
-                                                    } as any);
-                                                    setShowEditActivity(true);
+                                                    if (isMobileView) {
+                                                      navigate(`/pwa-edit-activity/${activity.id}`);
+                                                    } else {
+                                                      setEditingActivity({
+                                                        id: activity.id,
+                                                        title: activity.title,
+                                                        startTime: activity.timeStart || undefined,
+                                                        durationMin: activity.durationMin,
+                                                        location: activity.location,
+                                                        notes: activity.notes,
+                                                        important: activity.pinned || false,
+                                                        dayId: activity.dayId,
+                                                        images: activity.images
+                                                      } as any);
+                                                      setShowEditActivity(true);
+                                                    }
                                                   }}
                                                 >
                                                   <Edit className="w-4 h-4" />
@@ -904,7 +1005,7 @@ const TripDetailsPage = () => {
                                         </div>
 
                                         {!isMobileView && (
-                                          <div className="flex items-center gap-1">
+                                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                             <Button
                                               variant="ghost"
                                               size="sm"
@@ -943,7 +1044,15 @@ const TripDetailsPage = () => {
 
                                 <Button
                                   variant="outline"
-                                  onClick={() => { setSelectedDayId(day.id); setShowAddActivity(true); }}
+                                  onClick={() => {
+                                    if (isMobileView) {
+                                      navigate(`/pwa-add-activity/${day.id}`);
+                                    } else {
+                                      setSelectedDayId(day.id);
+                                      setShowAddActivity(true);
+                                    }
+                                  }}
+
                                   className="w-full border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-12 rounded-2xl font-medium transition-all"
                                 >
                                   <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động

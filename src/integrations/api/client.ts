@@ -117,6 +117,19 @@ export const api = {
     delete: async (id: string) => {
       return await api.delete(`/trips/${id}`);
     },
+    uploadAvatar: async (id: string, file: File) => {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      return await apiClient.post(`/trips/${id}/avatar`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
+    deleteAvatar: async (id: string) => {
+      return await api.delete(`/trips/${id}/avatar`);
+    },
   },
 
   // Member-specific API methods
@@ -174,6 +187,9 @@ export const api = {
     },
     delete: async (id: string) => {
       return await api.delete(`/activities/${id}`);
+    },
+    reorder: async (activities: { id: string; sortOrder: number }[]) => {
+      return await api.post('/activities/reorder', { activities });
     },
     uploadImage: async (activityId: string, file: File) => {
       const formData = new FormData();
@@ -343,6 +359,21 @@ export const api = {
     },
     createTripFromTemplate: async (id: string, tripTitle?: string) => {
       return await api.post<{ template: DATABASE_TYPES.tripTemplates; suggestedTripData: any }>(`/trip-templates/${id}/create-trip`, { title: tripTitle });
+    },
+    getWishlist: async (params?: { page?: number; limit?: number }) => {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+      const queryString = queryParams.toString();
+      const endpoint = queryString ? `/trip-templates/wishlist?${queryString}` : '/trip-templates/wishlist';
+      return await api.get<{ templates: DATABASE_TYPES.tripTemplates[]; pagination: any }>(endpoint);
+    },
+    addToWishlist: async (id: string) => {
+      return await api.post(`/trip-templates/${id}/wishlist`);
+    },
+    removeFromWishlist: async (id: string) => {
+      return await api.delete(`/trip-templates/${id}/wishlist`);
     },
   },
 

@@ -196,6 +196,9 @@ export const api = {
     delete: async (id: string) => {
       return await api.delete(`/activities/${id}`);
     },
+    reorder: async (activities: { id: string; sortOrder: number }[]) => {
+      return await api.post('/activities/reorder', { activities });
+    },
   },
 
   // Expense-specific API methods

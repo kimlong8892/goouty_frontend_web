@@ -5,12 +5,28 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetDescription,
+} from '@/components/ui/sheet';
+import { toast } from 'sonner';
+import {
     ArrowLeft,
     MapPin,
     Calendar,
     Clock,
     Users,
     ChevronRight,
+    ChevronLeft,
+    Heart,
+    Share2,
+    Copy,
+    Facebook,
+    MessageCircle,
+    MoreHorizontal,
+    Check,
     Loader2,
     Utensils,
     Plane,
@@ -39,6 +55,9 @@ const PWATemplateDetailsPage = () => {
     const [usingTemplate, setUsingTemplate] = useState(false);
     const [activeTab, setActiveTab] = useState('itinerary');
     const [expandedDayIds, setExpandedDayIds] = useState<string[]>([]);
+    const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
+    const [isCopied, setIsCopied] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -52,6 +71,9 @@ const PWATemplateDetailsPage = () => {
             setLoading(true);
             const response = await api.tripTemplates.getById(id!);
             setTemplate(response);
+            if ((response as any).isWishlisted !== undefined) {
+                setIsFavorite((response as any).isWishlisted);
+            }
             if (response.days) {
                 setExpandedDayIds(response.days.map(d => d.id.toString()));
             }
@@ -122,6 +144,30 @@ const PWATemplateDetailsPage = () => {
         return timeString;
     };
 
+    const handleCopyLink = () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url);
+        setIsCopied(true);
+        toast.success("Đã sao chép liên kết!");
+        setTimeout(() => setIsCopied(false), 2000);
+    };
+
+    const handleNativeShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: template?.title || 'Goouty Template',
+                    text: template?.description || 'Khám phá lịch trình chuyến đi tuyệt vời này trên Goouty!',
+                    url: window.location.href,
+                });
+            } catch (error) {
+                console.log('Error sharing:', error);
+            }
+        } else {
+            handleCopyLink();
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0a0a0a]">
@@ -136,71 +182,115 @@ const PWATemplateDetailsPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-[#edeeff] dark:bg-[#0a0a0a] pb-[200px]">
-            {/* HERO SECTION */}
-            <div className="relative w-full h-[45vh] min-h-[360px]">
-                {template.avatar ? (
-                    <img
-                        src={template.avatar}
-                        alt={template.title}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="w-full h-full bg-slate-200 dark:bg-zinc-800 flex items-center justify-center">
-                        <Camera className="w-12 h-12 text-slate-300 dark:text-zinc-700" />
-                    </div>
-                )}
-
-                {/* Gradient Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/20 to-transparent opacity-90" />
-
-                {/* Back Button */}
-                <div className="absolute top-4 left-4 z-50">
+        <div className="min-h-screen bg-white dark:bg-[#0a0a0a] pb-[200px]">
+            {/* STICKY HEADER */}
+            <div className="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md px-5 py-3 flex items-center justify-between">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="w-10 h-10 flex items-center justify-center rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform"
+                >
+                    <ChevronLeft className="w-7 h-7" />
+                </button>
+                <div className="flex items-center gap-1">
                     <button
-                        onClick={() => navigate(-1)}
-                        className="w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full text-white transition-all border border-white/10 active:scale-95"
+                        onClick={async () => {
+                            if (!isAuthenticated) {
+                                showToast("Vui lòng đăng nhập để lưu mẫu yêu thích.", "warning");
+                                navigate('/auth');
+                                return;
+                            }
+                            if (!template) return;
+                            try {
+                                if (isFavorite) {
+                                    await api.tripTemplates.removeFromWishlist(template.id);
+                                    showToast("Đã xóa khỏi yêu thích", "success");
+                                } else {
+                                    await api.tripTemplates.addToWishlist(template.id);
+                                    showToast("Đã thêm vào yêu thích", "success");
+                                }
+                                setIsFavorite(!isFavorite);
+                            } catch (e) {
+                                showToast("Không thể cập nhật danh sách yêu thích", "error");
+                            }
+                        }}
+                        className={cn(
+                            "w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-all",
+                            isFavorite ? "text-red-500" : "text-slate-900 dark:text-white"
+                        )}
                     >
-                        <ArrowLeft className="w-5 h-5" />
+                        <Heart className={cn("w-6 h-6", isFavorite && "fill-current")} />
+                    </button>
+                    <button
+                        onClick={() => setIsShareSheetOpen(true)}
+                        className="w-10 h-10 flex items-center justify-center rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform"
+                    >
+                        <Share2 className="w-6 h-6" />
                     </button>
                 </div>
+            </div>
 
-                {/* Content Overlay */}
-                <div className="absolute bottom-12 left-0 w-full px-5">
-                    {/* Badges */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        {template.province && (
-                            <Badge className="bg-[#6347f9] text-white border-none px-2.5 py-1 text-xs rounded-lg shadow-lg shadow-indigo-900/10">
-                                <MapPin className="w-3 h-3 mr-1" /> {template.province.name}
-                            </Badge>
-                        )}
-                        <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-2.5 py-1 text-xs rounded-lg">
-                            {getTotalDays()} Days
-                        </Badge>
-                        <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-2.5 py-1 text-xs rounded-lg">
-                            {getTotalActivities()} Activities
-                        </Badge>
-                    </div>
-
-                    <h1 className="text-3xl font-black text-white mb-2.5 leading-[1.2] drop-shadow-sm">
-                        {template.title}
-                    </h1>
-
-                    <div className="flex items-center gap-2 text-white/90 text-sm font-medium">
-                        <div className="w-6 h-6 rounded-full bg-indigo-500/30 backdrop-blur-sm flex items-center justify-center border border-white/20">
-                            <Users className="w-3 h-3 text-white" />
+            {/* HERO IMAGE */}
+            <div className="px-5 pt-2">
+                <div className="relative w-full aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-500/10">
+                    {template.avatar ? (
+                        <img
+                            src={template.avatar}
+                            alt={template.title}
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center">
+                            <Camera className="w-12 h-12 text-slate-300 dark:text-zinc-700" />
                         </div>
-                        Created by <span className="text-white font-bold">{template.user?.fullName || "Goouty"}</span>
+                    )}
+                </div>
+            </div>
+
+            {/* CONTENT HEADER */}
+            <div className="px-6 py-6">
+                <div className="flex flex-wrap gap-2 mb-4">
+                    {template.province && (
+                        <Badge className="bg-[#6347f9]/10 text-[#6347f9] dark:bg-primary/20 dark:text-primary border-none px-3 py-1.5 text-xs font-bold rounded-xl">
+                            <MapPin className="w-3.5 h-3.5 mr-1" /> {template.province.name}
+                        </Badge>
+                    )}
+                    <Badge className="bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border-none px-3 py-1.5 text-xs font-bold rounded-xl">
+                        {getTotalDays()} Days
+                    </Badge>
+                    <Badge className="bg-indigo-500 text-white border-none px-3 py-1.5 text-xs font-bold rounded-xl shadow-sm">
+                        {template.fee === "0" || !template.fee
+                            ? "Miễn phí"
+                            : template.fee.includes('VNĐ')
+                                ? template.fee
+                                : `${Number(template.fee).toLocaleString('vi-VN')} VNĐ`}
+                    </Badge>
+                </div>
+
+                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
+                    {template.title}
+                </h1>
+
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
+                        {template.user?.avatar ? (
+                            <img src={template.user.avatar} className="w-full h-full object-cover" />
+                        ) : (
+                            <Users className="w-5 h-5 text-slate-400" />
+                        )}
+                    </div>
+                    <div>
+                        <p className="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-zinc-500 leading-none mb-1">Created by</p>
+                        <p className="text-sm font-bold text-slate-700 dark:text-zinc-300">{template.user?.fullName || "Goouty"}</p>
                     </div>
                 </div>
             </div>
 
             <AnimatedTransition show={showContent} animation="fade">
-                <div className="px-4 -mt-6 relative z-10">
+                <div className="px-5 relative z-10">
                     {/* Description Card */}
-                    <div className="bg-white dark:bg-zinc-900 rounded-[1.5rem] p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-zinc-800 mb-6">
-                        <h2 className="text-[#6347f9] dark:text-primary text-lg font-bold mb-3 flex items-center gap-2">
-                            Giới thiệu chuyến đi
+                    <div className="bg-slate-50 dark:bg-zinc-900/50 rounded-[2rem] p-6 border border-slate-100 dark:border-zinc-800 mb-8">
+                        <h2 className="text-[#6347f9] dark:text-primary text-sm font-black uppercase tracking-widest mb-3">
+                            Giới thiệu
                         </h2>
                         <p className="text-slate-600 dark:text-zinc-400 text-[15px] leading-relaxed whitespace-pre-line font-medium">
                             {template.description || "Chưa có mô tả chi tiết cho mẫu chuyến đi này."}
@@ -216,27 +306,37 @@ const PWATemplateDetailsPage = () => {
                                 return (
                                     <div key={day.id} className="relative">
                                         <div
-                                            className="flex items-start gap-4 mb-3 cursor-pointer select-none active:scale-[0.99] transition-transform bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-zinc-800"
+                                            className={cn(
+                                                "flex items-start gap-4 mb-3 cursor-pointer select-none active:scale-[0.98] transition-all rounded-3xl p-5 border",
+                                                isExpanded
+                                                    ? "bg-white dark:bg-zinc-900 border-indigo-100 dark:border-indigo-900/30 shadow-xl shadow-indigo-500/5"
+                                                    : "bg-white dark:bg-zinc-900 border-gray-100 dark:border-zinc-800 shadow-sm"
+                                            )}
                                             onClick={() => toggleDay(day.id.toString())}
                                         >
                                             <div className={cn(
-                                                "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all w-9 h-9 text-sm",
-                                                isExpanded ? "bg-[#6347f9] text-white shadow-indigo-200/50 dark:shadow-none" : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400"
+                                                "flex-shrink-0 rounded-2xl flex items-center justify-center font-black shadow-sm transition-all w-11 h-11 text-base",
+                                                isExpanded ? "bg-[#6347f9] text-white" : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400"
                                             )}>
                                                 {index + 1}
                                             </div>
-                                            <div className="flex-1 pt-0.5">
+                                            <div className="flex-1 pt-1">
                                                 <div className="flex items-center justify-between gap-2">
                                                     <h3 className={cn(
-                                                        "font-bold leading-tight text-[17px] transition-colors",
-                                                        isExpanded ? "text-slate-900 dark:text-zinc-100" : "text-slate-600 dark:text-zinc-400"
+                                                        "font-bold leading-tight text-[18px] transition-colors",
+                                                        isExpanded ? "text-slate-900 dark:text-zinc-100" : "text-slate-700 dark:text-zinc-400"
                                                     )}>
                                                         {day.title}
                                                     </h3>
-                                                    {isExpanded ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
+                                                    <div className={cn(
+                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                                                        isExpanded ? "bg-indigo-50 dark:bg-indigo-900/30 text-[#6347f9]" : "text-slate-300"
+                                                    )}>
+                                                        {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                                                    </div>
                                                 </div>
                                                 {day.description && (
-                                                    <p className="text-slate-500 dark:text-zinc-500 mt-1 text-xs line-clamp-2 leading-relaxed">{day.description}</p>
+                                                    <p className="text-slate-500 dark:text-zinc-500 mt-1.5 text-xs line-clamp-2 md:line-clamp-none leading-relaxed font-medium">{day.description}</p>
                                                 )}
                                             </div>
                                         </div>
@@ -319,6 +419,59 @@ const PWATemplateDetailsPage = () => {
                     </Button>
                 </div>
             </AnimatedTransition>
+
+            {/* SHARE SHEET */}
+            <Sheet open={isShareSheetOpen} onOpenChange={setIsShareSheetOpen}>
+                <SheetContent side="bottom" className="rounded-t-[2.5rem] p-0 border-none bg-white dark:bg-zinc-900 overflow-hidden">
+                    <div className="w-12 h-1.5 bg-slate-200 dark:bg-zinc-800 rounded-full mx-auto mt-3 mb-2" />
+                    <SheetHeader className="px-6 py-4 border-b border-slate-50 dark:border-zinc-800">
+                        <SheetTitle className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2 justify-center">
+                            Chia sẻ Template
+                        </SheetTitle>
+                        <SheetDescription className="text-center font-medium">
+                            Chia sẻ lịch trình tuyệt vời này tới mọi người
+                        </SheetDescription>
+                    </SheetHeader>
+
+                    <div className="p-8">
+                        <div className="grid grid-cols-2 gap-8 mb-8 max-w-[280px] mx-auto">
+                            <button
+                                onClick={handleCopyLink}
+                                className="flex flex-col items-center gap-3 active:scale-90 transition-transform"
+                            >
+                                <div className="w-16 h-16 bg-slate-100 dark:bg-zinc-800 rounded-[1.25rem] flex items-center justify-center text-slate-600 dark:text-zinc-300 shadow-sm border border-slate-50 dark:border-zinc-700/50">
+                                    {isCopied ? <Check className="w-7 h-7 text-green-500" /> : <Copy className="w-7 h-7" />}
+                                </div>
+                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Sao chép</span>
+                            </button>
+
+                            <button
+                                onClick={handleNativeShare}
+                                className="flex flex-col items-center gap-3 active:scale-90 transition-transform"
+                            >
+                                <div className="w-16 h-16 bg-slate-100 dark:bg-zinc-800 rounded-[1.25rem] flex items-center justify-center text-slate-600 dark:text-zinc-300 shadow-sm border border-slate-50 dark:border-zinc-700/50">
+                                    <MoreHorizontal className="w-7 h-7" />
+                                </div>
+                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Khác</span>
+                            </button>
+                        </div>
+
+                        <div className="bg-slate-50 dark:bg-zinc-950/50 p-5 rounded-[1.5rem] border border-slate-100 dark:border-zinc-800 flex items-center justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1 leading-none">Template Link</p>
+                                <p className="text-sm font-bold text-slate-700 dark:text-zinc-300 truncate">{window.location.href}</p>
+                            </div>
+                            <button
+                                onClick={handleCopyLink}
+                                className="p-2.5 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-slate-100 dark:border-zinc-700 text-[#6347f9] active:scale-90 transition-transform"
+                            >
+                                <Copy className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="h-4 safe-area-bottom" />
+                </SheetContent>
+            </Sheet>
         </div>
     );
 };

@@ -95,7 +95,7 @@ const InviteAcceptPage: React.FC = () => {
       toast.success('Bạn đã tham gia chuyến đi thành công!');
       const tripId = res?.trip?.id;
       if (tripId) navigate(`/trip/${tripId}`);
-      else navigate('/my-trips');
+      else navigate('/');
     } catch (err: any) {
       const msg = err?.message || 'Không thể chấp nhận lời mời';
       toast.error(msg);
@@ -126,7 +126,7 @@ const InviteAcceptPage: React.FC = () => {
         toast.success('Đăng ký thành công! Đang tham gia chuyến đi...');
         await acceptInvitation(token);
       } else {
-        navigate('/my-trips');
+        navigate('/');
       }
     } catch (err: any) {
       toast.error(err?.message || 'Đăng ký thất bại');

@@ -12,7 +12,8 @@ import {
   Plus,
   MoreVertical,
   CheckCircle2,
-  Trash2
+  Trash2,
+  ChevronLeft
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile.tsx';
 import {
@@ -257,21 +258,39 @@ function NotificationsPage() {
 
       {/* Mobile Special Header */}
       {isMobileView && (
-        <div className="px-4 pt-6 pb-2 flex items-center justify-between bg-white dark:bg-card sticky top-0 z-40 border-b border-transparent dark:border-border transition-colors">
-          <h1 className="text-3xl font-bold text-[#1A1D1F] dark:text-foreground">Thông báo</h1>
+        <div className="px-4 py-4 flex items-center bg-white dark:bg-card sticky top-0 z-40 border-b border-gray-100 dark:border-border transition-colors">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={() => window.history.back()}
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-foreground" />
+          </Button>
+          <h1 className="flex-1 text-center text-xl font-bold text-[#1A1D1F] dark:text-foreground">Thông báo</h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="bg-gray-50 dark:bg-secondary rounded-full h-10 w-10">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
                 <MoreVertical className="w-5 h-5 text-gray-600 dark:text-secondary-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 rounded-xl dark:bg-popover dark:border-border">
-              <DropdownMenuItem onClick={handleMarkAllAsRead} className="dark:focus:bg-secondary">
-                <CheckCircle2 className="w-4 h-4 mr-2" />
+              <DropdownMenuItem
+                onClick={handleMarkAllAsRead}
+                className="focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-gray-100 cursor-pointer"
+              >
+                <CheckCircle2 className="w-4 h-4 mr-2 text-gray-500" />
                 Đánh dấu tất cả đã đọc
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleRefresh} className="dark:focus:bg-secondary">
-                <RefreshCw className="w-4 h-4 mr-2" />
+              <DropdownMenuItem
+                onClick={handleRefresh}
+                className="focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-gray-900 dark:focus:text-gray-100 cursor-pointer"
+              >
+                <RefreshCw className="w-4 h-4 mr-2 text-gray-500" />
                 Làm mới
               </DropdownMenuItem>
             </DropdownMenuContent>

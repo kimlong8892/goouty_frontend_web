@@ -74,7 +74,7 @@ export function JoinTripPage() {
   };
 
   const handleGoBack = () => {
-    navigate('/my-trips');
+    navigate('/');
   };
 
   const handleGoToTrip = () => {

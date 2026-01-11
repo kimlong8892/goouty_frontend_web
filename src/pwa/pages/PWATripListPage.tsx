@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
-import { api } from '@/lib/api.ts';
-import { useGlobalToast } from '@/utils/globalToast';
+import { api } from '@/integrations/api/client.ts';
+import { useGlobalToast } from '@/utils/globalToast.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   Search,

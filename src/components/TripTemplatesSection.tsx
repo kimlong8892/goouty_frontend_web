@@ -256,9 +256,9 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
             {/* Search */}
             <div className="flex-[2]">
               <div className="relative group">
-                <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 transition-colors group-focus-within:text-[#6347f9]" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
-                  className="pl-14 pr-4 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 h-14 rounded-2xl text-foreground transition-all duration-200 placeholder:font-normal"
+                  className="pl-14 pr-10 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 h-12 rounded-xl text-foreground transition-all duration-200 placeholder:font-normal"
                   placeholder="Tìm kiếm mẫu chuyến đi..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -275,14 +275,16 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="h-14 px-6 rounded-2xl border-border bg-secondary hover:bg-secondary/80 hover:border-primary/50 text-foreground transition-all duration-200 active:scale-95 flex items-center gap-2"
+                    className="w-full h-12 bg-secondary border-border rounded-xl focus:ring-2 focus:ring-primary/20 shadow-none text-base justify-between font-normal hover:bg-secondary hover:border-primary/50 text-muted-foreground hover:text-muted-foreground transition-all duration-200"
                   >
-                    <MapPin className="w-5 h-5 text-muted-foreground mr-1" />
-                    <span className="font-normal">
-                      {selectedProvince === 'all'
-                        ? "Tất cả địa điểm"
-                        : provinces.find((p) => p.id === selectedProvince)?.name}
-                    </span>
+                    <div className="flex items-center truncate">
+                      <MapPin className="w-5 h-5 mr-3 text-muted-foreground shrink-0" />
+                      <span className={cn(selectedProvince === 'all' ? "" : "text-foreground font-normal")}>
+                        {selectedProvince === 'all'
+                          ? "Tất cả địa điểm"
+                          : provinces.find((p) => p.id === selectedProvince)?.name}
+                      </span>
+                    </div>
                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>

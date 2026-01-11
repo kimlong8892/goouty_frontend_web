@@ -112,8 +112,12 @@ export function NotificationList({
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
     const categories: { [key: string]: Notification[] } = {
       'Hôm nay': [],
+      'Hôm qua': [],
       'Trước đó': []
     };
 
@@ -123,6 +127,8 @@ export function NotificationList({
 
       if (date.getTime() === today.getTime()) {
         categories['Hôm nay'].push(notification);
+      } else if (date.getTime() === yesterday.getTime()) {
+        categories['Hôm qua'].push(notification);
       } else {
         categories['Trước đó'].push(notification);
       }
@@ -134,12 +140,12 @@ export function NotificationList({
   const categories = groupNotifications();
 
   return (
-    <div className="bg-white dark:bg-card rounded-xl overflow-hidden shadow-sm dark:shadow-none border dark:border-gray-800">
+    <div className="bg-white dark:bg-card overflow-hidden">
       {Object.entries(categories).map(([category, items]) => (
         items.length > 0 && (
-          <div key={category}>
-            <div className="px-4 py-3 bg-[#F8F9FA] dark:bg-gray-900/50 border-y border-gray-100 dark:border-gray-800 first:border-t-0">
-              <h3 className="text-[17px] font-bold text-[#1A1D1F] dark:text-gray-100">{category}</h3>
+          <div key={category} className="mb-2">
+            <div className="px-5 pt-8 pb-3 bg-transparent border-0">
+              <h3 className="text-[18px] font-bold text-[#1A1D1F] dark:text-gray-100">{category}</h3>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {items.map((notification) => (

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Plane, LogIn, Search, Upload, User, Settings, LogOut, Map, Plus, List, Users, MapPin, Home, Bell, CloudOff, Info } from 'lucide-react';
+import { Plane, LogIn, Search, Upload, User, Settings, LogOut, Map, Plus, List, Users, MapPin, Home, Bell, CloudOff, Info, Heart } from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations.ts';
 import { cn } from '@/lib/utils.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
@@ -338,6 +338,8 @@ export const Navbar = () => {
 
     } else if (path === '/auth') {
       setActive('login');
+    } else if (path === '/wishlist') {
+      setActive('wishlist');
     }
     else {
       // For trip details pages, keep current active or default to home
@@ -386,7 +388,7 @@ export const Navbar = () => {
     { to: '/', icon: <Home size={24} />, label: 'Trang chủ', id: 'home' },
     { to: '/pwa-trips', icon: <List size={24} />, label: 'Chuyến đi của tôi', id: 'pwa-trips' },
     { to: '/pwa-create-trip', icon: <Plus size={24} />, label: 'Tạo', id: 'create-trip', isHighlighted: true },
-    { to: '/notifications', icon: <Bell size={24} />, label: 'Thông báo', id: 'notifications' },
+    { to: '/wishlist', icon: <Heart size={24} />, label: 'Yêu thích', id: 'wishlist' }, // Changed from Notifications to Wishlist
     { to: '/profile', icon: user?.profilePicture ? <img src={user.profilePicture} alt="Avatar" className="w-6 h-6 rounded-full" /> : <User size={24} />, label: 'Hồ sơ', id: 'profile' },
   ];
 
@@ -409,7 +411,7 @@ export const Navbar = () => {
 
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (
-            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg px-4 py-2 pb-8 border-t border-border/50">
+            <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-background/90 backdrop-blur-lg px-4 py-2 pb-8 border-t border-border/50">
               <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
                 <div className="pointer-events-auto">
                   {/* Removed SyncStatus icon from PWA nav as requested */}
