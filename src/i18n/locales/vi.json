@@ -92,7 +92,8 @@
         "templatesFound": "Tìm thấy {{count}} mẫu chuyến đi",
         "loadingTemplates": "Đang tải mẫu chuyến đi...",
         "whereToGo": "Bạn muốn đi đâu?",
-        "exploreTemplates": "Khám phá mẫu"
+        "exploreTemplates": "Khám phá mẫu",
+        "createdBy": "Tạo bởi"
     },
     "profile": {
         "title": "Hồ sơ",

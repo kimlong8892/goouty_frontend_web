@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +41,7 @@ const TripTemplateDetailPage = () => {
     const isMobileView = isPWA || isMobile;
 
     const [template, setTemplate] = useState<DATABASE_TYPES.tripTemplates | null>(null);
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [usingTemplate, setUsingTemplate] = useState(false);
     const [activeTab, setActiveTab] = useState('itinerary');
@@ -187,10 +189,10 @@ const TripTemplateDetailPage = () => {
                                 </Badge>
                             )}
                             <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 hover:bg-white/20 px-3 py-1.5 text-sm rounded-lg">
-                                {getTotalDays()} Days
+                                {getTotalDays()} {t('date.days', 'Ngày')}
                             </Badge>
                             <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 hover:bg-white/20 px-3 py-1.5 text-sm rounded-lg">
-                                {getTotalActivities()} Activities
+                                {getTotalActivities()} {t('trip.activities', 'Hoạt động')}
                             </Badge>
                         </div>
 
@@ -204,7 +206,7 @@ const TripTemplateDetailPage = () => {
                             <div className="w-8 h-8 rounded-full bg-indigo-500/20 backdrop-blur-sm flex items-center justify-center border border-white/10">
                                 <Users className="w-4 h-4 text-white" />
                             </div>
-                            Created by <span className="text-white font-bold">{template.user?.fullName || "Goouty Official"}</span>
+                            {t('template.createdBy', 'Tạo bởi')} <span className="text-white font-bold">{template.user?.fullName || "Goouty Official"}</span>
                         </div>
                     </div>
                 </div>

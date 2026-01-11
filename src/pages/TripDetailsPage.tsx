@@ -652,11 +652,6 @@ const TripDetailsPage = () => {
                 )}>
                   {statusLabels[status as keyof typeof statusLabels]}
                 </Badge>
-                <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-3 py-1.5 text-sm rounded-lg">
-                  {trip.userRole === 'owner'
-                    ? `Chủ chuyến đi (${trip.memberCount || 1})`
-                    : `Thành viên (${trip.memberCount || 1})`}
-                </Badge>
               </div>
 
               {/* Title */}
