@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +50,7 @@ const PWATemplateDetailsPage = () => {
     const { showToast } = useGlobalToast();
     const showContent = useAnimateIn(false, 300);
     const { isAuthenticated } = useAuth();
+    const { t } = useTranslation();
 
     const [template, setTemplate] = useState<DATABASE_TYPES.tripTemplates | null>(null);
     const [loading, setLoading] = useState(true);
@@ -144,6 +146,12 @@ const PWATemplateDetailsPage = () => {
         return timeString;
     };
 
+    const displayPrice = template?.fee && template?.fee !== "0"
+        ? template.fee.includes('VNĐ')
+            ? template.fee
+            : `${Number(template.fee).toLocaleString('vi-VN')} VNĐ`
+        : "Chi phí linh hoạt";
+
     const handleCopyLink = () => {
         const url = window.location.href;
         navigator.clipboard.writeText(url);
@@ -231,18 +239,31 @@ const PWATemplateDetailsPage = () => {
 
             {/* HERO IMAGE */}
             <div className="px-5 pt-2">
-                <div className="relative w-full aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-500/10">
+                <div className="relative w-full aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-500/10 group">
                     {template.avatar ? (
                         <img
                             src={template.avatar}
                             alt={template.title}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                     ) : (
                         <div className="w-full h-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center">
                             <Camera className="w-12 h-12 text-slate-300 dark:text-zinc-700" />
                         </div>
                     )}
+
+                    {/* Dark Overlay Layer */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+                    {/* Badges Overlay */}
+                    <div className="absolute bottom-6 left-6 flex flex-wrap gap-2 z-10">
+                        <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-3 py-1.5 text-sm font-bold rounded-xl">
+                            {getTotalDays()} {t('date.days', 'Ngày')}
+                        </Badge>
+                        <Badge className="bg-white/10 text-white backdrop-blur-md border border-white/20 px-3 py-1.5 text-sm font-bold rounded-xl">
+                            {getTotalActivities()} {t('trip.activities', 'Hoạt động')}
+                        </Badge>
+                    </div>
                 </div>
             </div>
 
@@ -254,21 +275,26 @@ const PWATemplateDetailsPage = () => {
                             <MapPin className="w-3.5 h-3.5 mr-1" /> {template.province.name}
                         </Badge>
                     )}
-                    <Badge className="bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border-none px-3 py-1.5 text-xs font-bold rounded-xl">
-                        {getTotalDays()} Days
-                    </Badge>
-                    <Badge className="bg-indigo-500 text-white border-none px-3 py-1.5 text-xs font-bold rounded-xl shadow-sm">
-                        {template.fee === "0" || !template.fee
-                            ? "Miễn phí"
-                            : template.fee.includes('VNĐ')
-                                ? template.fee
-                                : `${Number(template.fee).toLocaleString('vi-VN')} VNĐ`}
-                    </Badge>
                 </div>
 
-                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
-                    {template.title}
-                </h1>
+                <div className="flex flex-col gap-4 mb-6">
+                    <div className="flex justify-between items-start gap-4">
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white leading-tight flex-1">
+                            {template.title}
+                        </h1>
+                        <div className="flex flex-col items-end shrink-0 mt-1">
+                            <div className="bg-[#6347f9]/10 dark:bg-primary/20 px-4 py-2.5 rounded-[1.25rem] border border-[#6347f9]/20 dark:border-primary/20 flex flex-col items-end shadow-sm">
+                                <span className={cn(
+                                    "text-[#6347f9] dark:text-primary font-black leading-none",
+                                    displayPrice === "Chi phí linh hoạt" ? "text-xs uppercase tracking-widest text-center" : "text-lg"
+                                )}>
+                                    {displayPrice}
+                                </span>
+                                <span className="text-[#6347f9]/60 dark:text-primary/60 text-[9px] font-black uppercase tracking-widest mt-1">/ người</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
@@ -279,7 +305,7 @@ const PWATemplateDetailsPage = () => {
                         )}
                     </div>
                     <div>
-                        <p className="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-zinc-500 leading-none mb-1">Created by</p>
+                        <p className="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-zinc-500 leading-none mb-1">{t('template.createdBy', 'Tạo bởi')}</p>
                         <p className="text-sm font-bold text-slate-700 dark:text-zinc-300">{template.user?.fullName || "Goouty"}</p>
                     </div>
                 </div>

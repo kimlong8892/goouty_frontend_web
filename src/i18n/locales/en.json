@@ -88,7 +88,8 @@
         "noTemplatesDescription": "Try adjusting your search or filter criteria",
         "noTemplatesAvailable": "No trip templates are available at the moment",
         "templatesFound": "{{count}} template(s) found",
-        "loadingTemplates": "Loading templates..."
+        "loadingTemplates": "Loading templates...",
+        "createdBy": "Created by"
     },
     "profile": {
         "title": "Profile",
