@@ -299,9 +299,28 @@ const TripTemplateDetailPage = () => {
                                                                         </div>
                                                                         <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-500 dark:text-zinc-400">
                                                                             {act.location && (
-                                                                                <span className="flex items-center gap-1.5">
-                                                                                    <MapPin className="w-3.5 h-3.5 text-red-500" /> {act.location}
-                                                                                </span>
+                                                                                <div
+                                                                                    className="flex flex-col gap-0.5 group/loc cursor-pointer"
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.location!)}`;
+                                                                                        if (isPWA) {
+                                                                                            window.location.href = url;
+                                                                                        } else {
+                                                                                            window.open(url, '_blank');
+                                                                                        }
+                                                                                    }}
+                                                                                >
+                                                                                    <span className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400 group-hover/loc:text-primary transition-colors">
+                                                                                        <MapPin className="w-3.5 h-3.5 text-red-500" /> {act.location}
+                                                                                    </span>
+                                                                                    <div className="flex items-center gap-1 ml-5 overflow-hidden">
+                                                                                        <span className="text-[10px] text-primary font-bold hover:underline underline-offset-2 transition-all">
+                                                                                            Xem trong bản đồ
+                                                                                        </span>
+                                                                                        <ChevronRight className="w-3 h-3 text-primary animate-pulse" />
+                                                                                    </div>
+                                                                                </div>
                                                                             )}
                                                                             {act.durationMin && (
                                                                                 <span className="flex items-center gap-1.5">

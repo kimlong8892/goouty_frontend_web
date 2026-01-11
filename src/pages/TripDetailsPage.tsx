@@ -994,9 +994,28 @@ const TripDetailsPage = () => {
                                             )}
 
                                             {activity.location && (
-                                              <div className="flex items-start">
-                                                <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C] mt-0.5 flex-shrink-0" />
-                                                <span>{activity.location}</span>
+                                              <div
+                                                className="flex flex-col gap-0.5 group/loc cursor-pointer"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location!)}`;
+                                                  if (isPWA) {
+                                                    window.location.href = url;
+                                                  } else {
+                                                    window.open(url, '_blank');
+                                                  }
+                                                }}
+                                              >
+                                                <div className="flex items-start">
+                                                  <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C] mt-0.5 flex-shrink-0" />
+                                                  <span className="text-slate-600 dark:text-slate-400 group-hover/loc:text-primary transition-colors">{activity.location}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1 ml-4 overflow-hidden">
+                                                  <span className="text-[10px] text-primary font-bold hover:underline underline-offset-2 transition-all">
+                                                    Xem trong bản đồ
+                                                  </span>
+                                                  <ChevronRight className="w-3 h-3 text-primary animate-pulse" />
+                                                </div>
                                               </div>
                                             )}
                                           </div>
