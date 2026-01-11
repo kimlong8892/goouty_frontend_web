@@ -8,7 +8,9 @@ import { useAnimateIn } from '@/lib/animations.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useGlobalToast } from '../utils/globalToast';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Apple } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile.tsx';
+import { usePWA } from '@/pwa/hooks/usePWA';
 
 // Google Icon Component
 const GoogleIcon = ({ size = 20 }: { size?: number }) => (
@@ -32,10 +34,27 @@ const GoogleIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
+const GooutyLogo = () => (
+  <div className="flex flex-col items-center">
+    <div className="w-32 h-32 relative">
+      <div className="absolute inset-0 bg-[#6347f9]/10 blur-2xl rounded-full"></div>
+      <img
+        src="https://pupil-sleep-11345349.figma.site/_assets/v11/8da9e20de4331dfe75eaaed992ce1fa360377f01.png"
+        alt="Goouty Logo"
+        className="w-full h-full object-contain relative z-10 animate-float"
+      />
+    </div>
+  </div>
+);
+
 const AuthPage = () => {
   const { showToast } = useGlobalToast();
   const show = useAnimateIn(false, 250);
   const { isAuthenticated, login, signup, loginWithGoogle } = useAuth();
+  const isMobile = useIsMobile();
+  const { isPWA } = usePWA();
+  const isPWAView = isPWA || isMobile;
+
   const [mode, setMode] = useState<'login' | 'signup'>('login');
 
   // States
@@ -136,6 +155,137 @@ const AuthPage = () => {
     const { error } = await loginWithGoogle();
     if (error) showToast(`Đăng nhập Google thất bại: ${error}`, 'error');
   };
+
+  if (isPWAView) {
+    return (
+      <div className="min-h-screen bg-white p-6 flex flex-col">
+        <AnimatedTransition show={show} animation="slide-up">
+          <div className="flex flex-col items-center mt-8 mb-10">
+            <GooutyLogo />
+          </div>
+
+          <div className="mb-8 text-center">
+            <h1 className="text-[28px] font-extrabold text-[#111] mb-2">
+              {mode === 'login' ? "Đăng nhập ngay!" : "Bắt đầu ngay!"}
+            </h1>
+            <p className="text-slate-400 text-base font-medium">
+              Nhập thông tin bên dưới để tiếp tục
+            </p>
+          </div>
+
+          <div className="mb-8">
+            <Button
+              variant="outline"
+              className="w-full h-14 rounded-xl border border-[#EEE] flex items-center justify-center gap-3 text-base font-semibold hover:bg-slate-50 transition-colors"
+              onClick={handleGoogleLogin}
+            >
+              <GoogleIcon size={22} />
+              Đăng nhập với Google
+            </Button>
+          </div>
+
+          <div className="relative flex items-center justify-center mb-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#EEE]"></div>
+            </div>
+            <span className="relative bg-white px-4 text-slate-400 text-sm font-medium">
+              Hoặc đăng nhập bằng
+            </span>
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1">
+            {mode === 'signup' && (
+              <div className="flex flex-col gap-2">
+                <Label className="text-slate-400 text-sm font-medium px-1">Họ và tên</Label>
+                <Input
+                  className="h-14 rounded-xl border border-[#EEE] px-4 text-base focus-visible:ring-0 focus-visible:border-[#6347f9] bg-white transition-all placeholder:text-slate-300"
+                  placeholder="Nhập họ tên của bạn"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2">
+              <Label className="text-slate-400 text-sm font-medium px-1">Địa chỉ Email</Label>
+              <Input
+                type="email"
+                className="h-14 rounded-xl border border-[#EEE] px-4 text-base focus-visible:ring-0 focus-visible:border-[#6347f9] bg-white transition-all placeholder:text-slate-300"
+                placeholder="Nhập địa chỉ email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label className="text-slate-400 text-sm font-medium px-1">Mật khẩu</Label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  className="h-14 rounded-xl border border-[#EEE] px-4 pr-12 text-base focus-visible:ring-0 focus-visible:border-[#6347f9] bg-white transition-all placeholder:text-slate-300 w-full"
+                  placeholder="Nhập mật khẩu"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300"
+                >
+                  {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                </button>
+              </div>
+            </div>
+
+            {mode === 'login' && (
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-[18px] h-[18px] rounded border-[#EEE] text-[#6347f9] focus:ring-[#6347f9] cursor-pointer"
+                  />
+                  <span className="text-sm font-medium text-slate-900">Ghi nhớ tài khoản</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  className="text-sm font-medium text-[#6347f9]"
+                >
+                  Quên mật khẩu?
+                </button>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={!email || !password}
+              className={`h-14 rounded-xl font-bold text-lg border-none mt-4 transition-all duration-300 ${!email || !password
+                ? 'bg-[#EAEAEA] text-[#999] opacity-100'
+                : 'bg-[#6347f9] text-white shadow-lg shadow-purple-100'
+                }`}
+            >
+              {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
+            </Button>
+
+            <div className="mt-auto py-8 text-center">
+              <p className="text-slate-900 font-medium text-sm">
+                {mode === 'login' ? "Bạn chưa có tài khoản? " : "Bạn đã có tài khoản? "}
+                <button
+                  type="button"
+                  onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                  className="text-[#6347f9] font-bold"
+                >
+                  {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
+                </button>
+              </p>
+            </div>
+          </form>
+        </AnimatedTransition>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-8 pb-12 px-4 flex flex-col items-center justify-center">
