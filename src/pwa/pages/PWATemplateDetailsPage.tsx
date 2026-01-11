@@ -483,7 +483,7 @@ const PWATemplateDetailsPage = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="h-4 safe-area-bottom" />
+                    <div className="h-8 safe-area-bottom" />
                 </SheetContent>
             </Sheet>
         </div>
