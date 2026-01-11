@@ -62,7 +62,7 @@ const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+
   const [showResendConfirmation, setShowResendConfirmation] = useState(false);
 
   const navigate = useNavigate();
@@ -238,16 +238,7 @@ const AuthPage = () => {
             </div>
 
             {mode === 'login' && (
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-[18px] h-[18px] rounded border-border text-primary focus:ring-primary cursor-pointer accent-primary"
-                  />
-                  <span className="text-sm font-medium text-foreground">Ghi nhớ tài khoản</span>
-                </label>
+              <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={() => navigate('/forgot-password')}
@@ -393,17 +384,7 @@ const AuthPage = () => {
                 </div>
 
                 {mode === 'login' && (
-                  <div className="flex items-center justify-between pt-1">
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-[18px] h-[18px] rounded border-slate-300 dark:border-border text-[#6347f9] focus:ring-[#6347f9] cursor-pointer accent-[#6347f9]"
-                      />
-                      <span className="text-[14px] text-slate-600 dark:text-muted-foreground font-bold group-hover:text-slate-800 dark:group-hover:text-foreground transition-colors">Ghi nhớ tài khoản</span>
-                    </label>
-
+                  <div className="flex justify-end pt-1">
                     <button
                       type="button"
                       onClick={() => navigate('/forgot-password')}
