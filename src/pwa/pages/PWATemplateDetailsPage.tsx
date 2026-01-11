@@ -146,6 +146,12 @@ const PWATemplateDetailsPage = () => {
         return timeString;
     };
 
+    const displayPrice = template?.fee && template?.fee !== "0"
+        ? template.fee.includes('VNĐ')
+            ? template.fee
+            : `${Number(template.fee).toLocaleString('vi-VN')} VNĐ`
+        : "Chi phí linh hoạt";
+
     const handleCopyLink = () => {
         const url = window.location.href;
         navigator.clipboard.writeText(url);
@@ -271,9 +277,24 @@ const PWATemplateDetailsPage = () => {
                     )}
                 </div>
 
-                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
-                    {template.title}
-                </h1>
+                <div className="flex flex-col gap-4 mb-6">
+                    <div className="flex justify-between items-start gap-4">
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white leading-tight flex-1">
+                            {template.title}
+                        </h1>
+                        <div className="flex flex-col items-end shrink-0 mt-1">
+                            <div className="bg-[#6347f9]/10 dark:bg-primary/20 px-4 py-2.5 rounded-[1.25rem] border border-[#6347f9]/20 dark:border-primary/20 flex flex-col items-end shadow-sm">
+                                <span className={cn(
+                                    "text-[#6347f9] dark:text-primary font-black leading-none",
+                                    displayPrice === "Chi phí linh hoạt" ? "text-xs uppercase tracking-widest text-center" : "text-lg"
+                                )}>
+                                    {displayPrice}
+                                </span>
+                                <span className="text-[#6347f9]/60 dark:text-primary/60 text-[9px] font-black uppercase tracking-widest mt-1">/ người</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
