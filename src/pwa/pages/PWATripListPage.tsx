@@ -343,14 +343,31 @@ const PWATripListPage = () => {
 
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center pt-2 pb-6 text-center px-4">
-        <img
-          src="/my_trips_mascot.png"
-          alt="My Trips Mascot"
-          className="w-32 h-32 object-contain mb-2 drop-shadow-sm animate-mascot-ride"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
-        />
+        <div className="w-full h-32 relative mb-2 flex items-center justify-center overflow-hidden">
+          {/* Speed Lines */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="speed-streak w-16 top-[35%] right-0" style={{ animationDelay: '0s' }}></div>
+            <div className="speed-streak w-20 top-[50%] right-0" style={{ animationDelay: '0.2s' }}></div>
+            <div className="speed-streak w-14 top-[65%] right-0" style={{ animationDelay: '0.4s' }}></div>
+          </div>
+
+          <div className="w-32 h-32 relative z-10 animate-mascot-run">
+            <img
+              src="/my_trips_mascot.png"
+              alt="My Trips Mascot"
+              className="w-full h-full object-contain drop-shadow-sm"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            {/* Exhaust Smoke */}
+            <div className="absolute bottom-6 left-4 pointer-events-none">
+              <div className="smoke-particle" style={{ animationDelay: '0s', width: '8px', height: '8px' }}></div>
+              <div className="smoke-particle" style={{ animationDelay: '0.3s', width: '8px', height: '8px' }}></div>
+              <div className="smoke-particle" style={{ animationDelay: '0.6s', width: '8px', height: '8px' }}></div>
+            </div>
+          </div>
+        </div>
         <h1 className="text-2xl font-black text-primary uppercase tracking-wide mb-2 drop-shadow-sm text-center w-full">
           CHUYẾN ĐI CỦA TÔI
         </h1>
