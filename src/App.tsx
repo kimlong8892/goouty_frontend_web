@@ -31,6 +31,8 @@ import TemplateDetailsPage from "./pages/TemplateDetailsPage.tsx";
 import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
 import PWAWishlistPage from "@/pwa/pages/PWAWishlistPage.tsx";
 import WishlistPage from "./pages/WishlistPage.tsx";
+import PWAForgotPasswordPage from "@/pwa/pages/PWAForgotPasswordPage.tsx";
+
 
 
 import MyTripsPage from "./pages/MyTripsPage.tsx";
@@ -100,6 +102,12 @@ const WishlistRoute = () => {
   const { isPWA } = usePWA();
   return isPWA ? <PWAWishlistPage /> : <WishlistPage />;
 };
+
+const ForgotPasswordRoute = () => {
+  const { isPWA } = usePWA();
+  return isPWA ? <PWAForgotPasswordPage /> : <ForgotPasswordPage />;
+};
+
 
 const AppRoutes = () => {
   return (
@@ -274,10 +282,11 @@ const AppRoutes = () => {
         path="/forgot-password"
         element={
           <PageTransition>
-            <ForgotPasswordPage />
+            <ForgotPasswordRoute />
           </PageTransition>
         }
       />
+
       <Route
         path="/reset-password"
         element={
