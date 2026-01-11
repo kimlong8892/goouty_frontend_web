@@ -407,16 +407,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
         <h2 className="text-[20px] font-black text-[#7c66fd] uppercase tracking-tighter">
           KHÁM PHÁ TEMPLATES
         </h2>
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearFilters}
-            className="absolute right-2 text-primary hover:bg-primary/10 font-bold"
-          >
-            {t('common.clearFilters')}
-          </Button>
-        )}
+        {/* hasActiveFilters check removed as requested */}
       </div>
 
       {/* Results summary if filtering */}
