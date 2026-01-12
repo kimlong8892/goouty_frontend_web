@@ -52,11 +52,12 @@ export const PWAInstallPrompt = () => {
         <div className="fixed bottom-6 left-4 right-4 z-[100] animate-in fade-in slide-in-from-bottom-5 duration-500 md:left-auto md:right-6 md:max-w-sm">
             <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-5 border border-primary/20 relative overflow-hidden">
                 {/* Decorative background element */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
                 <button
                     onClick={close}
-                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1"
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-2 z-50 cursor-pointer"
+                    aria-label="Close"
                 >
                     <X className="w-5 h-5" />
                 </button>
