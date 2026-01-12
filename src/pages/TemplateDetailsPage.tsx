@@ -46,6 +46,7 @@ const TripTemplateDetailPage = () => {
     const [usingTemplate, setUsingTemplate] = useState(false);
     const [activeTab, setActiveTab] = useState('itinerary');
     const [expandedDayIds, setExpandedDayIds] = useState<string[]>([]);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -231,9 +232,26 @@ const TripTemplateDetailPage = () => {
                             <h2 className="text-[#6347f9] dark:text-primary text-xl font-bold mb-4 flex items-center gap-2">
                                 Giới thiệu chuyến đi
                             </h2>
-                            <p className="text-slate-600 dark:text-zinc-400 leading-relaxed font-medium text-lg whitespace-pre-line">
-                                {template.description || "Chưa có mô tả chi tiết cho mẫu chuyến đi này."}
-                            </p>
+                            <div className="relative">
+                                <p className={cn(
+                                    "text-slate-600 dark:text-zinc-400 leading-relaxed font-medium text-lg whitespace-pre-line transition-all duration-300",
+                                    !isDescriptionExpanded && "line-clamp-3"
+                                )}>
+                                    {template.description || "Chưa có mô tả chi tiết cho mẫu chuyến đi này."}
+                                </p>
+                                {template.description && (template.description.split('\n').length > 3 || template.description.length > 150) ? (
+                                    <button
+                                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                        className="mt-2 text-[#6347f9] font-bold text-sm hover:underline flex items-center gap-1"
+                                    >
+                                        {isDescriptionExpanded ? (
+                                            <>Thu gọn <ChevronDown className="w-4 h-4 rotate-180" /></>
+                                        ) : (
+                                            <>Xem thêm <ChevronDown className="w-4 h-4" /></>
+                                        )}
+                                    </button>
+                                ) : null}
+                            </div>
                         </div>
 
                         {/* Itinerary Section */}
