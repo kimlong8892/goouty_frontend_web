@@ -401,12 +401,6 @@ export const Navbar = () => {
         <TooltipProvider>
           {/* Top header for Mobile/PWA - removed for cleaner UI */}
 
-          {/* Top banner for offline status on mobile */}
-          {!isOnline && (
-            <div className="fixed top-0 left-0 right-0 z-[60] bg-destructive text-destructive-foreground text-[10px] py-1 text-center font-bold shadow-md animate-in fade-in slide-in-from-top duration-300">
-              Bạn đang ngoại tuyến
-            </div>
-          )}
 
 
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
@@ -566,13 +560,6 @@ export const Navbar = () => {
               </div>
             </nav>
 
-            {/* Offline Banner for Web View */}
-            {!isOnline && (
-              <div className="mt-4 mx-auto max-w-fit px-6 py-1.5 rounded-full bg-destructive/90 backdrop-blur-sm text-destructive-foreground text-xs font-bold shadow-lg animate-in slide-in-from-top duration-300 flex items-center gap-2">
-                <CloudOff size={14} />
-                Bạn đang ngoại tuyến. Các thay đổi sẽ được đồng bộ khi có mạng.
-              </div>
-            )}
           </div>
         </header>
       </TooltipProvider>
