@@ -282,17 +282,7 @@ const PWATemplateDetailsPage = () => {
                         <h1 className="text-2xl font-black text-slate-900 dark:text-white leading-tight flex-1">
                             {template.title}
                         </h1>
-                        <div className="flex flex-col items-end shrink-0 mt-1">
-                            <div className="bg-[#6347f9]/10 dark:bg-primary/20 px-4 py-2.5 rounded-[1.25rem] border border-[#6347f9]/20 dark:border-primary/20 flex flex-col items-end shadow-sm">
-                                <span className={cn(
-                                    "text-[#6347f9] dark:text-primary font-black leading-none",
-                                    displayPrice === "Chi phí linh hoạt" ? "text-xs uppercase tracking-widest text-center" : "text-lg"
-                                )}>
-                                    {displayPrice}
-                                </span>
-                                <span className="text-[#6347f9]/60 dark:text-primary/60 text-[9px] font-black uppercase tracking-widest mt-1">/ người</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 

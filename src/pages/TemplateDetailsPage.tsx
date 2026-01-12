@@ -207,15 +207,7 @@ const TripTemplateDetailPage = () => {
                             <h1 className="text-3xl md:text-5xl lg:text-[4rem] font-black text-white leading-[1.1] tracking-tight drop-shadow-md max-w-4xl">
                                 {template.title}
                             </h1>
-                            <div className="flex flex-col items-start md:items-end shrink-0 bg-white/10 backdrop-blur-xl rounded-[2.5rem] px-10 py-6 border border-white/20 shadow-2xl ring-1 ring-white/10 transition-all duration-300">
-                                <span className={cn(
-                                    "text-white font-black leading-none",
-                                    displayPrice === "Chi phí linh hoạt" ? "text-lg md:text-xl uppercase tracking-[0.2em] text-center" : "text-2xl md:text-4xl"
-                                )}>
-                                    {displayPrice}
-                                </span>
-                                <span className="text-white/70 text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mt-3">/ người</span>
-                            </div>
+
                         </div>
 
                         {/* Creator */}
