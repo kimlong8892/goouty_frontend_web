@@ -72,8 +72,6 @@ const PWATripListPage = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [tripToDelete, setTripToDelete] = useState<TripWithMember | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Manual search trigger
@@ -270,32 +268,10 @@ const PWATripListPage = () => {
   };
 
   const handleTripAction = async (action: string, trip: TripWithMember) => {
-    if (!trip.id) return;
-
-    if (action === 'delete') {
-      setTripToDelete(trip);
-      setDeleteDialogOpen(true);
-    }
+    // No actions for now as delete is removed
   };
 
-  const handleDeleteTrip = async () => {
-    if (!tripToDelete?.id) return;
 
-    try {
-      await api.trips.delete(tripToDelete.id);
-      showToast('Đã xóa chuyến đi thành công!', 'success');
-
-      // Remove trip from local state
-      setTrips(prev => prev.filter(trip => trip.id !== tripToDelete.id));
-
-      // Close dialog
-      setDeleteDialogOpen(false);
-      setTripToDelete(null);
-    } catch (error: any) {
-      console.error('Delete trip error:', error);
-      showToast(error.message || 'Không thể xóa chuyến đi', 'error');
-    }
-  };
 
   if (isLoading) {
     return (
@@ -423,32 +399,6 @@ const PWATripListPage = () => {
                     )}
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-60" />
-
-                    {/* Action Menu (Three Dots) - Top Right */}
-                    <div className="absolute top-4 right-4 z-10 flex gap-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md hover:bg-white/40 transition-all border border-white/20 active:scale-95 text-white"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <MoreVertical size={20} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="rounded-xl">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleTripAction('delete', trip);
-                            }}
-                            className="text-red-600 focus:text-red-600 focus:bg-red-50 rounded-lg"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Xóa chuyến đi
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
                   </div>
 
                   {/* Content Card */}
@@ -561,33 +511,6 @@ const PWATripListPage = () => {
         </>
       )}
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>Xác nhận xóa chuyến đi</DialogTitle>
-            <DialogDescription>
-              Bạn có chắc chắn muốn xóa chuyến đi "{tripToDelete?.title}"?
-              Hành động này không thể hoàn tác và sẽ xóa tất cả dữ liệu liên quan bao gồm:
-              <br />
-              • Tất cả ngày và hoạt động
-              <br />
-              • Tất cả chi phí và thanh toán
-              <br />
-              • Danh sách thành viên
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
-            <Button
-              onClick={handleDeleteTrip}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 text-white"
-            >
-              Xóa chuyến đi
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

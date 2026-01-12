@@ -75,13 +75,9 @@ const MyTripsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalTrips, setTotalTrips] = useState(0);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  // Province filter state
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
   const [openProvinceFilter, setOpenProvinceFilter] = useState(false);
-  const [tripToDelete, setTripToDelete] = useState<TripWithMember | null>(null);
   const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -250,38 +246,10 @@ const MyTripsPage = () => {
 
     if (action === 'view') {
       navigate(`/trip/${trip.id}`);
-
-    } else if (action === 'delete') {
-      openDeleteDialog(trip);
     }
   };
 
-  const handleDeleteTrip = async () => {
-    if (!tripToDelete?.id) return;
 
-    try {
-      await api.trips.delete(tripToDelete.id);
-      showToast('Đã xóa chuyến đi thành công!', 'success');
-
-      // Remove trip from local state
-      setTrips(prev => prev.filter(trip => trip.id !== tripToDelete.id));
-
-      // Update total count
-      setTotalTrips(prev => prev - 1);
-
-      // Close dialog
-      setDeleteDialogOpen(false);
-      setTripToDelete(null);
-    } catch (error: any) {
-      console.error('Delete trip error:', error);
-      showToast(error.message || 'Không thể xóa chuyến đi', 'error');
-    }
-  };
-
-  const openDeleteDialog = (trip: TripWithMember) => {
-    setTripToDelete(trip);
-    setDeleteDialogOpen(true);
-  };
 
   return (
     <div className="min-h-screen pt-4 pb-12 px-4 bg-background">
@@ -462,32 +430,6 @@ const MyTripsPage = () => {
                         )}
                         {/* Gradient Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-60" />
-
-                        {/* Action Menu (Three Dots) - Top Right */}
-                        <div className="absolute top-4 right-4 z-10 flex gap-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 transition-all border border-white/20 dark:border-white/10 active:scale-95 text-white"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MoreVertical size={20} />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="rounded-xl">
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleTripAction('delete', trip);
-                                }}
-                                className="text-red-600 focus:text-red-600 focus:bg-red-50 rounded-lg"
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Xóa chuyến đi
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
                       </div>
 
                       {/* Content Card */}
@@ -614,33 +556,7 @@ const MyTripsPage = () => {
         </AnimatedTransition>
       )}
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>Xác nhận xóa chuyến đi</DialogTitle>
-            <DialogDescription>
-              Bạn có chắc chắn muốn xóa chuyến đi "{tripToDelete?.title}"?
-              Hành động này không thể hoàn tác.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-              className="rounded-xl hover:bg-transparent hover:text-primary hover:border-primary border-border bg-card text-foreground"
-            >
-              Hủy
-            </Button>
-            <Button
-              onClick={handleDeleteTrip}
-              className="bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white"
-            >
-              Xóa chuyến đi
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 };

@@ -60,7 +60,6 @@ class OfflineManager {
                     timestamp: Date.now(),
                 });
                 this.notifyListeners();
-                toast.info('Bạn đang ngoại tuyến. Thay đổi sẽ được lưu và đồng bộ khi có mạng.');
             } catch (error) {
                 console.error('Failed to queue request:', error);
             }
