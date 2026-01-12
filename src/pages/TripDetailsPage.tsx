@@ -162,6 +162,7 @@ const TripDetailsPage = () => {
   const [activitiesByDay, setActivitiesByDay] = useState<Record<string, Activity[]>>({});
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [apiData, setApiData] = useState<ApiTrip | null>(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // Scroll direction logic for hiding/showing tabs
   const [isTabsVisible, setIsTabsVisible] = useState(true);
@@ -704,9 +705,26 @@ const TripDetailsPage = () => {
             <h2 className="text-[#6347f9] text-xl font-bold mb-4 flex items-center gap-2">
               Giới thiệu chuyến đi
             </h2>
-            <p className="text-muted-foreground leading-relaxed font-medium text-lg whitespace-pre-line">
-              {trip.description || "Chưa có mô tả chi tiết cho chuyến đi này."}
-            </p>
+            <div className="relative">
+              <p className={cn(
+                "text-muted-foreground leading-relaxed font-medium text-lg whitespace-pre-line transition-all duration-300",
+                !isDescriptionExpanded && "line-clamp-3"
+              )}>
+                {trip.description || "Chưa có mô tả chi tiết cho chuyến đi này."}
+              </p>
+              {trip.description && trip.description.split('\n').length > 3 || (trip.description?.length || 0) > 150 ? (
+                <button
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  className="mt-2 text-[#6347f9] font-bold text-sm hover:underline flex items-center gap-1"
+                >
+                  {isDescriptionExpanded ? (
+                    <>Thu gọn <ChevronDown className="w-4 h-4 rotate-180" /></>
+                  ) : (
+                    <>Xem thêm <ChevronDown className="w-4 h-4" /></>
+                  )}
+                </button>
+              ) : null}
+            </div>
           </div>
 
 
