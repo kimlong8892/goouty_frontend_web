@@ -88,7 +88,7 @@ export const PWAInstallPrompt = () => {
                                 <div className="space-y-1.5 ml-1">
                                     <div className="flex items-start gap-2">
                                         <span className="flex-shrink-0 w-5 h-5 bg-primary/10 text-primary text-[10px] font-bold rounded-full flex items-center justify-center mt-0.5">1</span>
-                                        <p>Nhấn vào nút <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mx-0.5"><Share className="w-3.5 h-3.5" /></span> trên thanh menu Safari.</p>
+                                        <p>Nhấn vào nút <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 mx-0.5"><Share className="w-3.5 h-3.5" /></span> trên thanh menu Safari/Chrome.</p>
                                     </div>
                                     <div className="flex items-start gap-2">
                                         <span className="flex-shrink-0 w-5 h-5 bg-primary/10 text-primary text-[10px] font-bold rounded-full flex items-center justify-center mt-0.5">2</span>
