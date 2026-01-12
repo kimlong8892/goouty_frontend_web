@@ -39,7 +39,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
   const [open, setOpen] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 12,
+    limit: 6,
     total: 0,
     totalPages: 0
   });
@@ -135,16 +135,8 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
       const savedPaginationStr = sessionStorage.getItem('web_templates_pagination');
       const savedScrollYStr = sessionStorage.getItem('web_templates_scroll_y');
 
-      let initialLimit = pagination.limit;
+      let initialLimit = 6;
       let initialPage = 1;
-
-      if (savedPaginationStr) {
-        const savedPagination = JSON.parse(savedPaginationStr);
-        if (savedPagination.page > 1) {
-          initialPage = savedPagination.page;
-          initialLimit = savedPagination.page * savedPagination.limit;
-        }
-      }
 
       // Load templates
       const templatesResponse = await api.tripTemplates.getPublic({
@@ -154,9 +146,9 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
       setTemplates(Array.isArray(templatesResponse.templates) ? templatesResponse.templates : []);
 
       setPagination({
-        ...templatesResponse.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 },
+        ...templatesResponse.pagination || { page: 1, limit: 6, total: 0, totalPages: 0 },
         page: initialPage,
-        limit: pagination.limit
+        limit: 6
       });
 
       // Restore Scroll
@@ -184,7 +176,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
       });
 
       setTemplates(Array.isArray(response.templates) ? response.templates : []);
-      setPagination(response.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 });
+      setPagination(response.pagination || { page: 1, limit: 6, total: 0, totalPages: 0 });
     } catch (error) {
       console.error('Error searching templates:', error);
       setTemplates([]);
@@ -358,7 +350,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
         {/* Templates Grid */}
         {templates.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               {templates.map((template) => (
                 <TripTemplateCard
                   key={template.id}
