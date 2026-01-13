@@ -45,6 +45,7 @@ import { ExpenseSection } from '@/components/expenses/ExpenseSection.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { EditTripDialog } from '@/components/dialogs/EditTripDialog.tsx';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { PWATripItinerary } from '@/pwa/components/PWATripItinerary.tsx';
 
 // ... (Type definitions)
 type ApiError = {
@@ -575,7 +576,7 @@ const TripDetailsPage = () => {
   if (loading || authLoading) {
     return (
       <div className="min-h-screen pt-20 px-4 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6347f9]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -690,7 +691,7 @@ const TripDetailsPage = () => {
                   </div>
                 )}
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-[#6347f9]" />
+                  <Users className="w-5 h-5 text-primary" />
                   <span>{trip.memberCount || 1} người</span>
                 </div>
               </div>
@@ -702,7 +703,7 @@ const TripDetailsPage = () => {
         <div className="max-w-6xl mx-auto px-4 lg:px-0 -mt-8 relative z-10 pb-20">
           {/* Description Card */}
           <div className="bg-card rounded-[2rem] p-8 shadow-sm border border-border mb-8">
-            <h2 className="text-[#6347f9] text-xl font-bold mb-4 flex items-center gap-2">
+            <h2 className="text-primary text-xl font-bold mb-4 flex items-center gap-2">
               Giới thiệu chuyến đi
             </h2>
             <div className="relative">
@@ -715,7 +716,7 @@ const TripDetailsPage = () => {
               {trip.description && trip.description.split('\n').length > 3 || (trip.description?.length || 0) > 150 ? (
                 <button
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="mt-2 text-[#6347f9] font-bold text-sm hover:underline flex items-center gap-1"
+                  className="mt-2 text-primary font-bold text-sm hover:underline flex items-center gap-1"
                 >
                   {isDescriptionExpanded ? (
                     <>Thu gọn <ChevronDown className="w-4 h-4 rotate-180" /></>
@@ -797,311 +798,335 @@ const TripDetailsPage = () => {
             </div>
 
             <TabsContent value="itinerary" className="mt-0">
-              <Card className={cn(
-                "border-none shadow-xl bg-card overflow-hidden text-card-foreground",
-                isMobileView ? "rounded-3xl" : "rounded-[32px]"
-              )}>
-                <CardHeader className={cn(
-                  "flex flex-row items-center justify-between",
-                  isMobileView ? "px-5 pt-6 pb-2" : "px-8 pt-8 pb-4"
+              {isPWA ? (
+                <PWATripItinerary
+                  days={days}
+                  activitiesByDay={activitiesByDay}
+                  isTabsVisible={isTabsVisible}
+                  onAddDay={() => {
+                    if (id) navigate(`/pwa-add-day/${id}`);
+                    else setShowAddDay(true);
+                  }}
+                  onEditDay={(dayId) => navigate(`/pwa-edit-day/${dayId}`)}
+                  onAddActivity={(dayId) => navigate(`/pwa-add-activity/${dayId}`)}
+                  onEditActivity={(activityId) => navigate(`/pwa-edit-activity/${activityId}`)}
+                  onDeleteActivity={openDeleteActivityDialog}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDragEnd={handleDragEnd}
+                  onDrop={handleDrop}
+                  draggedActivity={draggedActivity}
+                  dragOverActivityId={dragOverActivityId}
+                  justDroppedId={justDroppedId}
+                  isOwner={trip.userRole === 'owner'}
+                />
+              ) : (
+                <Card className={cn(
+                  "border-none shadow-xl bg-card overflow-hidden text-card-foreground",
+                  isMobileView ? "rounded-3xl" : "rounded-[32px]"
                 )}>
-                  <div>
-                    <h2 className={cn(
-                      "font-bold text-foreground mb-1",
-                      isMobileView ? "text-xl" : "text-2xl"
-                    )}>Lịch trình</h2>
-                    {!isMobileView && <p className="text-muted-foreground font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
-                  </div>
-                  <Button
-                    onClick={() => {
-                      if (isMobileView && id) {
-                        navigate(`/pwa-add-day/${id}`);
-                      } else {
-                        setShowAddDay(true);
-                      }
-                    }}
-                    size={isMobileView ? "sm" : "default"}
-                    className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg"
-                  >
-                    <Plus className="w-4 h-4 mr-1.5" />
-                    Thêm ngày
-                  </Button>
-                </CardHeader>
-
-                <CardContent className={cn(
-                  "pb-12",
-                  isMobileView ? "px-5" : "px-8"
-                )}>
-                  {days.length === 0 ? (
-                    <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl bg-secondary/30">
-                      <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Calendar className="w-8 h-8 text-primary/40" />
-                        </div>
-                      </div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">Chưa có lịch trình</h3>
-                      <p className="text-muted-foreground mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
-                      <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-[#6347f9] hover:bg-[#5136db]">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Thêm ngày đầu tiên
-                      </Button>
+                  <CardHeader className={cn(
+                    "flex flex-row items-center justify-between",
+                    isMobileView ? "px-5 pt-6 pb-2" : "px-8 pt-8 pb-4"
+                  )}>
+                    <div>
+                      <h2 className={cn(
+                        "font-bold text-foreground mb-1",
+                        isMobileView ? "text-xl" : "text-2xl"
+                      )}>Lịch trình</h2>
+                      {!isMobileView && <p className="text-muted-foreground font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
                     </div>
-                  ) : (
-                    <div className="space-y-10 relative">
-                      {days.map((day, index) => {
-                        const isExpanded = expandedDayIds.includes(day.id);
-                        return (
-                          <div key={day.id} className="relative">
-                            <div className={cn(
-                              "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-secondary rounded-xl transition-colors",
-                              isMobileView ? "p-1 -mx-1" : "p-2 -mx-2"
-                            )}
-                              onClick={() => toggleDay(day.id)}
-                            >
+                    <Button
+                      onClick={() => {
+                        if (isMobileView && id) {
+                          navigate(`/pwa-add-day/${id}`);
+                        } else {
+                          setShowAddDay(true);
+                        }
+                      }}
+                      size={isMobileView ? "sm" : "default"}
+                      className="rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg"
+                    >
+                      <Plus className="w-4 h-4 mr-1.5" />
+                      Thêm ngày
+                    </Button>
+                  </CardHeader>
+
+                  <CardContent className={cn(
+                    "pb-12",
+                    isMobileView ? "px-5" : "px-8"
+                  )}>
+                    {days.length === 0 ? (
+                      <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl bg-secondary/30">
+                        <div className="flex justify-center mb-4">
+                          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Calendar className="w-8 h-8 text-primary/40" />
+                          </div>
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">Chưa có lịch trình</h3>
+                        <p className="text-muted-foreground mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
+                        <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-primary hover:bg-primary/90">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Thêm ngày đầu tiên
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-10 relative">
+                        {days.map((day, index) => {
+                          const isExpanded = expandedDayIds.includes(day.id);
+                          return (
+                            <div key={day.id} className="relative">
                               <div className={cn(
-                                "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
-                                isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
-                                isExpanded ? "bg-primary text-primary-foreground dark:shadow-[0_0_15px_rgba(99,71,249,0.7)]" : "bg-secondary text-muted-foreground"
-                              )}>
-                                {index + 1}
-                              </div>
-                              <div className="flex-1 pt-0.5">
-                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                  <h3 className={cn(
-                                    "font-bold leading-tight transition-colors",
-                                    isExpanded ? "text-foreground" : "text-muted-foreground",
-                                    isMobileView ? "text-lg" : "text-xl"
-                                  )}>
-                                    {day.title}
-                                  </h3>
-
-                                  <div className="flex items-center gap-1">
-                                    {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
-
-                                    <div onClick={(e) => e.stopPropagation()}>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className={cn(
-                                          "h-8 w-8 p-0 rounded-full hover:bg-secondary text-[#6347f9] bg-[#6347f9]/10",
-                                          isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
-                                        )}
-                                        onClick={() => {
-                                          if (isMobileView) {
-                                            navigate(`/pwa-edit-day/${day.id}`);
-                                          } else {
-                                            setEditingDay(day);
-                                            setShowEditDay(true);
-                                          }
-                                        }}
-                                      >
-                                        <Edit className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-
-                                  <Badge variant="outline" className="text-primary font-normal bg-secondary border-border ml-auto md:ml-0">
-                                    {formatDate(day.date)}
-                                  </Badge>
+                                "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-secondary rounded-xl transition-colors",
+                                isMobileView ? "p-1 -mx-1" : "p-2 -mx-2"
+                              )}
+                                onClick={() => toggleDay(day.id)}
+                              >
+                                <div className={cn(
+                                  "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
+                                  isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
+                                  isExpanded ? "bg-primary text-primary-foreground dark:shadow-[0_0_15px_rgba(99,71,249,0.7)]" : "bg-secondary text-muted-foreground"
+                                )}>
+                                  {index + 1}
                                 </div>
-                                {day.description && (
-                                  <p className="text-muted-foreground mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>
-                                )}
-                              </div>
-                            </div>
+                                <div className="flex-1 pt-0.5">
+                                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                    <h3 className={cn(
+                                      "font-bold leading-tight transition-colors",
+                                      isExpanded ? "text-foreground" : "text-muted-foreground",
+                                      isMobileView ? "text-lg" : "text-xl"
+                                    )}>
+                                      {day.title}
+                                    </h3>
 
-                            {isExpanded && (
-                              <div className={cn(
-                                "border-l-2 border-border/50 space-y-4 pb-8 animate-in slide-in-from-top-2 duration-300",
-                                isMobileView ? "pl-3 ml-3" : "pl-5 ml-5"
-                              )}>
-                                {(!activitiesByDay[day.id] || activitiesByDay[day.id].length === 0) ? (
-                                  <div className="p-4 rounded-2xl border border-dashed border-border bg-secondary/20 text-muted-foreground text-sm italic text-center">
-                                    Chưa có hoạt động nào cho ngày này
+                                    <div className="flex items-center gap-1">
+                                      {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
+
+                                      <div onClick={(e) => e.stopPropagation()}>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className={cn(
+                                            "h-8 w-8 p-0 rounded-full hover:bg-secondary text-primary bg-primary/10",
+                                            isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
+                                          )}
+                                          onClick={() => {
+                                            if (isMobileView) {
+                                              navigate(`/pwa-edit-day/${day.id}`);
+                                            } else {
+                                              setEditingDay(day);
+                                              setShowEditDay(true);
+                                            }
+                                          }}
+                                        >
+                                          <Edit className="w-4 h-4" />
+                                        </Button>
+                                      </div>
+                                    </div>
+
+                                    <Badge variant="outline" className="text-primary font-normal bg-secondary border-border ml-auto md:ml-0">
+                                      {formatDate(day.date)}
+                                    </Badge>
                                   </div>
-                                ) : (
-                                  activitiesByDay[day.id].map((activity) => (
-                                    <div
-                                      key={activity.id}
-                                      draggable={trip.userRole === 'owner'}
-                                      onDragStart={(e) => handleDragStart(e, activity.id, day.id)}
-                                      onDragOver={(e) => handleDragOver(e, activity.id, day.id)}
-                                      onDragEnd={handleDragEnd}
-                                      onDrop={(e) => handleDrop(e, activity.id, day.id)}
-                                      className={cn(
-                                        "group bg-card border border-border rounded-2xl transition-all duration-300 relative select-none hover:border-primary/30",
-                                        isMobileView ? "p-4" : "p-5",
-                                        !isMobileView && "hover:shadow-md",
-                                        draggedActivity?.id === activity.id && "opacity-40",
-                                        dragOverActivityId === activity.id && "border-primary border-t-4",
-                                        justDroppedId === activity.id && "ring-2 ring-primary/40 bg-primary/[0.03] border-primary/50 scale-[1.01] shadow-lg z-20",
-                                        trip.userRole === 'owner' && "cursor-grab active:cursor-grabbing"
-                                      )}
-                                    >
-                                      <div className="flex justify-between items-start gap-3">
-                                        {trip.userRole === 'owner' && (
-                                          <div className="pt-1.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0">
-                                            <GripVertical className="w-5 h-5" />
-                                          </div>
-                                        )}
-                                        <div className="space-y-2 flex-1 min-w-0">
-                                          <div className="flex items-start justify-between">
-                                            <h4 className={cn(
-                                              "font-bold text-foreground break-words",
-                                              isMobileView ? "text-base" : "text-lg"
-                                            )}>{activity.title}</h4>
+                                  {day.description && (
+                                    <p className="text-muted-foreground mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>
+                                  )}
+                                </div>
+                              </div>
 
-                                            {isMobileView && (
-                                              <div className="flex items-center -mt-1 ml-1" onClick={(e) => e.stopPropagation()}>
-                                                <Button
-                                                  variant="ghost"
-                                                  size="icon"
-                                                  className="h-8 w-8 text-slate-400 hover:text-purple-600 active:bg-purple-50 rounded-full"
-                                                  onClick={() => {
-                                                    if (isMobileView) {
-                                                      navigate(`/pwa-edit-activity/${activity.id}`);
+                              {isExpanded && (
+                                <div className={cn(
+                                  "border-l-2 border-border/50 space-y-4 pb-8 animate-in slide-in-from-top-2 duration-300",
+                                  isMobileView ? "pl-3 ml-3" : "pl-5 ml-5"
+                                )}>
+                                  {(!activitiesByDay[day.id] || activitiesByDay[day.id].length === 0) ? (
+                                    <div className="p-4 rounded-2xl border border-dashed border-border bg-secondary/20 text-muted-foreground text-sm italic text-center">
+                                      Chưa có hoạt động nào cho ngày này
+                                    </div>
+                                  ) : (
+                                    activitiesByDay[day.id].map((activity) => (
+                                      <div
+                                        key={activity.id}
+                                        draggable={trip.userRole === 'owner'}
+                                        onDragStart={(e) => handleDragStart(e, activity.id, day.id)}
+                                        onDragOver={(e) => handleDragOver(e, activity.id, day.id)}
+                                        onDragEnd={handleDragEnd}
+                                        onDrop={(e) => handleDrop(e, activity.id, day.id)}
+                                        className={cn(
+                                          "group bg-card border border-border rounded-2xl transition-all duration-300 relative select-none hover:border-primary/30",
+                                          isMobileView ? "p-4" : "p-5",
+                                          !isMobileView && "hover:shadow-md",
+                                          draggedActivity?.id === activity.id && "opacity-40",
+                                          dragOverActivityId === activity.id && "border-primary border-t-4",
+                                          justDroppedId === activity.id && "ring-2 ring-primary/40 bg-primary/[0.03] border-primary/50 scale-[1.01] shadow-lg z-20",
+                                          trip.userRole === 'owner' && "cursor-grab active:cursor-grabbing"
+                                        )}
+                                      >
+                                        <div className="flex justify-between items-start gap-3">
+                                          {trip.userRole === 'owner' && (
+                                            <div className="pt-1.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0">
+                                              <GripVertical className="w-5 h-5" />
+                                            </div>
+                                          )}
+                                          <div className="space-y-2 flex-1 min-w-0">
+                                            <div className="flex items-start justify-between">
+                                              <h4 className={cn(
+                                                "font-bold text-foreground break-words",
+                                                isMobileView ? "text-base" : "text-lg"
+                                              )}>{activity.title}</h4>
+
+                                              {isMobileView && (
+                                                <div className="flex items-center -mt-1 ml-1" onClick={(e) => e.stopPropagation()}>
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-slate-400 hover:text-purple-600 active:bg-purple-50 rounded-full"
+                                                    onClick={() => {
+                                                      if (isMobileView) {
+                                                        navigate(`/pwa-edit-activity/${activity.id}`);
+                                                      } else {
+                                                        setEditingActivity({
+                                                          id: activity.id,
+                                                          title: activity.title,
+                                                          startTime: activity.timeStart || undefined,
+                                                          durationMin: activity.durationMin,
+                                                          location: activity.location,
+                                                          notes: activity.notes,
+                                                          important: activity.pinned || false,
+                                                          dayId: activity.dayId,
+                                                          images: activity.images
+                                                        } as any);
+                                                        setShowEditActivity(true);
+                                                      }
+                                                    }}
+                                                  >
+                                                    <Edit className="w-4 h-4" />
+                                                  </Button>
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-slate-400 hover:text-red-500 active:bg-red-50 rounded-full"
+                                                    onClick={() => openDeleteActivityDialog(activity)}
+                                                  >
+                                                    <Trash2 className="w-4 h-4" />
+                                                  </Button>
+                                                </div>
+                                              )}
+                                            </div>
+
+                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-slate-500">
+                                              {activity.pinned && (
+                                                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-2 py-0.5 border-0">
+                                                  Quan trọng
+                                                </Badge>
+                                              )}
+
+                                              {activity.timeStart && (
+                                                <div className="flex items-center text-foreground bg-secondary px-2 py-1 rounded-md">
+                                                  <Clock className="w-3 h-3 mr-1 text-primary" />
+                                                  {formatTime(activity.timeStart)}
+                                                  {activity.durationMin && <span className="text-muted-foreground/50 mx-1">|</span>}
+                                                  {activity.durationMin && <span>{activity.durationMin}p</span>}
+                                                </div>
+                                              )}
+
+                                              {activity.location && (
+                                                <div
+                                                  className="flex flex-col gap-0.5 group/loc cursor-pointer"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location!)}`;
+                                                    if (isPWA) {
+                                                      window.location.href = url;
                                                     } else {
-                                                      setEditingActivity({
-                                                        id: activity.id,
-                                                        title: activity.title,
-                                                        startTime: activity.timeStart || undefined,
-                                                        durationMin: activity.durationMin,
-                                                        location: activity.location,
-                                                        notes: activity.notes,
-                                                        important: activity.pinned || false,
-                                                        dayId: activity.dayId,
-                                                        images: activity.images
-                                                      } as any);
-                                                      setShowEditActivity(true);
+                                                      window.open(url, '_blank');
                                                     }
                                                   }}
                                                 >
-                                                  <Edit className="w-4 h-4" />
-                                                </Button>
-                                                <Button
-                                                  variant="ghost"
-                                                  size="icon"
-                                                  className="h-8 w-8 text-slate-400 hover:text-red-500 active:bg-red-50 rounded-full"
-                                                  onClick={() => openDeleteActivityDialog(activity)}
-                                                >
-                                                  <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                                  <div className="flex items-start">
+                                                    <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C] mt-0.5 flex-shrink-0" />
+                                                    <span className="text-slate-600 dark:text-slate-400 group-hover/loc:text-primary transition-colors">{activity.location}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1 ml-4 overflow-hidden">
+                                                    <span className="text-[10px] text-primary font-bold hover:underline underline-offset-2 transition-all">
+                                                      Xem trong bản đồ
+                                                    </span>
+                                                    <ChevronRight className="w-3 h-3 text-primary animate-pulse" />
+                                                  </div>
+                                                </div>
+                                              )}
+                                            </div>
+
+                                            {activity.notes && (
+                                              <div className="pt-2 text-muted-foreground text-[13px] leading-relaxed bg-secondary/50 p-2.5 rounded-xl mt-2 border border-border/50">
+                                                {activity.notes}
                                               </div>
                                             )}
                                           </div>
 
-                                          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-slate-500">
-                                            {activity.pinned && (
-                                              <Badge className="bg-[#6347f9] text-white hover:bg-[#5136db] rounded-md px-2 py-0.5 border-0">
-                                                Quan trọng
-                                              </Badge>
-                                            )}
-
-                                            {activity.timeStart && (
-                                              <div className="flex items-center text-foreground bg-secondary px-2 py-1 rounded-md">
-                                                <Clock className="w-3 h-3 mr-1 text-primary" />
-                                                {formatTime(activity.timeStart)}
-                                                {activity.durationMin && <span className="text-muted-foreground/50 mx-1">|</span>}
-                                                {activity.durationMin && <span>{activity.durationMin}p</span>}
-                                              </div>
-                                            )}
-
-                                            {activity.location && (
-                                              <div
-                                                className="flex flex-col gap-0.5 group/loc cursor-pointer"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location!)}`;
-                                                  if (isPWA) {
-                                                    window.location.href = url;
-                                                  } else {
-                                                    window.open(url, '_blank');
-                                                  }
+                                          {!isMobileView && (
+                                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-full transition-colors"
+                                                onClick={() => {
+                                                  setEditingActivity({
+                                                    id: activity.id,
+                                                    title: activity.title,
+                                                    startTime: activity.timeStart || undefined,
+                                                    durationMin: activity.durationMin,
+                                                    location: activity.location,
+                                                    notes: activity.notes,
+                                                    important: activity.pinned || false,
+                                                    dayId: activity.dayId,
+                                                    images: activity.images
+                                                  } as any);
+                                                  setShowEditActivity(true);
                                                 }}
                                               >
-                                                <div className="flex items-start">
-                                                  <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C] mt-0.5 flex-shrink-0" />
-                                                  <span className="text-slate-600 dark:text-slate-400 group-hover/loc:text-primary transition-colors">{activity.location}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1 ml-4 overflow-hidden">
-                                                  <span className="text-[10px] text-primary font-bold hover:underline underline-offset-2 transition-all">
-                                                    Xem trong bản đồ
-                                                  </span>
-                                                  <ChevronRight className="w-3 h-3 text-primary animate-pulse" />
-                                                </div>
-                                              </div>
-                                            )}
-                                          </div>
-
-                                          {activity.notes && (
-                                            <div className="pt-2 text-muted-foreground text-[13px] leading-relaxed bg-secondary/50 p-2.5 rounded-xl mt-2 border border-border/50">
-                                              {activity.notes}
+                                                <Edit className="w-4 h-4" />
+                                              </Button>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 rounded-full transition-colors"
+                                                onClick={() => openDeleteActivityDialog(activity)}
+                                              >
+                                                <Trash2 className="w-4 h-4" />
+                                              </Button>
                                             </div>
                                           )}
                                         </div>
-
-                                        {!isMobileView && (
-                                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                            <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-full transition-colors"
-                                              onClick={() => {
-                                                setEditingActivity({
-                                                  id: activity.id,
-                                                  title: activity.title,
-                                                  startTime: activity.timeStart || undefined,
-                                                  durationMin: activity.durationMin,
-                                                  location: activity.location,
-                                                  notes: activity.notes,
-                                                  important: activity.pinned || false,
-                                                  dayId: activity.dayId,
-                                                  images: activity.images
-                                                } as any);
-                                                setShowEditActivity(true);
-                                              }}
-                                            >
-                                              <Edit className="w-4 h-4" />
-                                            </Button>
-                                            <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 rounded-full transition-colors"
-                                              onClick={() => openDeleteActivityDialog(activity)}
-                                            >
-                                              <Trash2 className="w-4 h-4" />
-                                            </Button>
-                                          </div>
-                                        )}
                                       </div>
-                                    </div>
-                                  ))
-                                )}
+                                    ))
+                                  )}
 
-                                <Button
-                                  variant="outline"
-                                  onClick={() => {
-                                    if (isMobileView) {
-                                      navigate(`/pwa-add-activity/${day.id}`);
-                                    } else {
-                                      setSelectedDayId(day.id);
-                                      setShowAddActivity(true);
-                                    }
-                                  }}
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      if (isMobileView) {
+                                        navigate(`/pwa-add-activity/${day.id}`);
+                                      } else {
+                                        setSelectedDayId(day.id);
+                                        setShowAddActivity(true);
+                                      }
+                                    }}
 
-                                  className="w-full border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-12 rounded-2xl font-medium transition-all"
-                                >
-                                  <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                                    className="w-full border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-12 rounded-2xl font-medium transition-all"
+                                  >
+                                    <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
             <TabsContent value="expenses" className="mt-0">
@@ -1179,7 +1204,7 @@ const TripDetailsPage = () => {
             </Button>
             <Button
               onClick={handleConfirmDeleteActivity}
-              className="flex-1 sm:flex-none bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-purple-500/20 h-11"
+              className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-primary/20 h-11"
             >
               Xóa hoạt động
             </Button>

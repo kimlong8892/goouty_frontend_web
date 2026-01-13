@@ -160,11 +160,11 @@ const PWAForgotPasswordPage = () => {
                 <div
                     className={cn(
                         "flex items-center gap-3 p-3.5 rounded-[24px] border-2 transition-all duration-300",
-                        "border-[#6347f9] bg-white shadow-[0_10px_25px_-5px_rgba(99,71,249,0.1)]"
+                        "border-primary bg-white shadow-[0_10px_25px_-5px_rgba(var(--primary),0.1)]"
                     )}
                 >
                     <div className={cn(
-                        "w-11 h-11 rounded-full flex items-center justify-center border transition-colors duration-300 bg-[#6347f9] border-transparent shrink-0"
+                        "w-11 h-11 rounded-full flex items-center justify-center border transition-colors duration-300 bg-primary border-transparent shrink-0"
                     )}>
                         <Mail
                             size={18}
@@ -189,7 +189,7 @@ const PWAForgotPasswordPage = () => {
                 <Button
                     onClick={handleSendEmail}
                     disabled={isLoading || !email}
-                    className="w-full h-[60px] rounded-[20px] bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-[0_10px_20px_-5px_rgba(99,71,249,0.3)] transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:shadow-none"
+                    className="w-full h-[60px] rounded-[20px] bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:shadow-none"
                 >
                     {isLoading ? 'Đang gửi...' : 'Tiếp tục'}
                 </Button>
@@ -218,7 +218,7 @@ const PWAForgotPasswordPage = () => {
                             value={digit}
                             onChange={(e) => handleOtpChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
-                            className="w-full h-[70px] bg-white border-2 border-[#F1F5F9] rounded-[16px] text-center text-3xl font-bold text-slate-900 focus:border-[#6347f9] focus:outline-none transition-all"
+                            className="w-full h-[70px] bg-white border-2 border-[#F1F5F9] rounded-[16px] text-center text-3xl font-bold text-slate-900 focus:border-primary focus:outline-none transition-all"
                         />
                     ))}
                 </div>
@@ -228,10 +228,10 @@ const PWAForgotPasswordPage = () => {
                         disabled={timer > 0}
                         className={cn(
                             "text-sm font-medium transition-colors",
-                            timer > 0 ? "text-slate-300 pointer-events-none" : "text-[#6347f9]"
+                            timer > 0 ? "text-slate-300 pointer-events-none" : "text-primary"
                         )}
                     >
-                        Gửi lại mã <span className="text-[#6347f9]">{timer > 0 ? formatTimer(timer) : ''}</span>
+                        Gửi lại mã <span className="text-primary">{timer > 0 ? formatTimer(timer) : ''}</span>
                     </button>
                 </div>
             </div>
@@ -252,7 +252,7 @@ const PWAForgotPasswordPage = () => {
                 <Button
                     onClick={handleVerifyOtp}
                     disabled={isLoading || otp.join('').length < 4}
-                    className="w-full h-[60px] rounded-[20px] bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-[0_10px_20px_-5px_rgba(99,71,249,0.3)] transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:shadow-none"
+                    className="w-full h-[60px] rounded-[20px] bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:shadow-none"
                 >
                     {isLoading ? 'Đang xác thực...' : 'Gửi'}
                 </Button>
@@ -280,7 +280,7 @@ const PWAForgotPasswordPage = () => {
                             placeholder="••••••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="h-14 rounded-2xl border-slate-100 bg-white pr-12 focus-visible:ring-[#6347f9]"
+                            className="h-14 rounded-2xl border-slate-100 bg-white pr-12 focus-visible:ring-primary"
                         />
                         <button
                             type="button"
@@ -300,7 +300,7 @@ const PWAForgotPasswordPage = () => {
                             placeholder="••••••••••••"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="h-14 rounded-2xl border-slate-100 bg-white pr-12 focus-visible:ring-[#6347f9]"
+                            className="h-14 rounded-2xl border-slate-100 bg-white pr-12 focus-visible:ring-primary"
                         />
                         <button
                             type="button"
@@ -329,7 +329,7 @@ const PWAForgotPasswordPage = () => {
                 <Button
                     onClick={handleResetPassword}
                     disabled={isLoading || !password || !confirmPassword}
-                    className="w-full h-[60px] rounded-[20px] bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-[0_10px_20px_-5px_rgba(99,71,249,0.3)] transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:shadow-none"
+                    className="w-full h-[60px] rounded-[20px] bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:shadow-none"
                 >
                     {isLoading ? 'Đang cập nhật...' : 'Xác nhận'}
                 </Button>
@@ -373,7 +373,7 @@ const PWAForgotPasswordPage = () => {
                                 {/* Outer circles */}
                                 <div className="absolute inset-0 -m-4 bg-purple-50 rounded-full blur-xl opacity-50 animate-pulse" />
                                 <div className="w-24 h-24 rounded-full bg-purple-50 flex items-center justify-center relative">
-                                    <div className="w-16 h-16 rounded-full bg-[#6347f9] flex items-center justify-center shadow-lg shadow-purple-200">
+                                    <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
                                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M20 6L9 17L4 12" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
@@ -389,7 +389,7 @@ const PWAForgotPasswordPage = () => {
 
                         <Button
                             onClick={() => navigate('/auth')}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-base shadow-lg shadow-purple-100"
+                            className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-base shadow-lg shadow-primary/10"
                         >
                             Quay lại đăng nhập
                         </Button>

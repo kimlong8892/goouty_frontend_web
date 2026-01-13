@@ -138,7 +138,7 @@ const InviteAcceptPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
           <p>Đang tải thông tin lời mời...</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ const InviteAcceptPage: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-[#6347f9]">
+            <CardTitle className="text-2xl font-bold text-primary">
               Tham gia chuyến đi
             </CardTitle>
             <CardDescription>
@@ -189,7 +189,7 @@ const InviteAcceptPage: React.FC = () => {
                     placeholder="Nhập họ và tên"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 rounded-xl border-slate-200 focus-visible:ring-[#6347f9]"
+                    className="pl-10 rounded-xl border-slate-200 focus-visible:ring-primary"
                     required
                   />
                 </div>
@@ -205,7 +205,7 @@ const InviteAcceptPage: React.FC = () => {
                     placeholder="your@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 rounded-xl border-slate-200 focus-visible:ring-[#6347f9]"
+                    className="pl-10 rounded-xl border-slate-200 focus-visible:ring-primary"
                     required
                     disabled
                   />
@@ -223,7 +223,7 @@ const InviteAcceptPage: React.FC = () => {
                     placeholder="Nhập mật khẩu"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 rounded-xl border-slate-200 focus-visible:ring-[#6347f9]"
+                    className="pl-10 pr-10 rounded-xl border-slate-200 focus-visible:ring-primary"
                     required
                     minLength={6}
                   />
@@ -241,7 +241,7 @@ const InviteAcceptPage: React.FC = () => {
               <Button
                 type="submit"
                 disabled={processing}
-                className="w-full rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white h-11"
+                className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white h-11"
               >
                 {processing ? 'Đang xử lý...' : 'Đăng ký và tham gia chuyến đi'}
               </Button>
@@ -252,7 +252,7 @@ const InviteAcceptPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/auth', { state: { inviteToken: searchParams.get('token') } })}
-                    className="text-[#6347f9] hover:underline font-medium"
+                    className="text-primary hover:underline font-medium"
                   >
                     Đăng nhập
                   </button>
@@ -269,7 +269,7 @@ const InviteAcceptPage: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
         <p>Đang xử lý lời mời...</p>
       </div>
     </div>

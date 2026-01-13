@@ -74,6 +74,12 @@ const PWATemplateDetailsPage = () => {
         try {
             setLoading(true);
             const response = await api.tripTemplates.getById(id!);
+
+            // Sort days by dayOrder
+            if (response && response.days) {
+                response.days.sort((a, b) => (a.dayOrder || 0) - (b.dayOrder || 0));
+            }
+
             setTemplate(response);
             if ((response as any).isWishlisted !== undefined) {
                 setIsFavorite((response as any).isWishlisted);
@@ -182,7 +188,7 @@ const PWATemplateDetailsPage = () => {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0a0a0a]">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9]"></div>
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
                     <p className="text-slate-500 dark:text-zinc-400 font-medium">Đang tải template...</p>
                 </div>
             </div>
@@ -273,7 +279,7 @@ const PWATemplateDetailsPage = () => {
             <div className="px-6 py-6">
                 <div className="flex flex-wrap gap-2 mb-4">
                     {template.province && (
-                        <Badge className="bg-[#6347f9]/10 text-[#6347f9] dark:bg-primary/20 dark:text-primary border-none px-3 py-1.5 text-xs font-bold rounded-xl">
+                        <Badge className="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary border-none px-3 py-1.5 text-xs font-bold rounded-xl">
                             <MapPin className="w-3.5 h-3.5 mr-1" /> {template.province.name}
                         </Badge>
                     )}
@@ -307,7 +313,7 @@ const PWATemplateDetailsPage = () => {
                 <div className="px-5 relative z-10">
                     {/* Description Card */}
                     <div className="bg-slate-50 dark:bg-zinc-900/50 rounded-[2rem] p-6 border border-slate-100 dark:border-zinc-800 mb-8">
-                        <h2 className="text-[#6347f9] dark:text-primary text-sm font-black uppercase tracking-widest mb-3">
+                        <h2 className="text-primary dark:text-primary-foreground/80 text-sm font-black uppercase tracking-widest mb-3">
                             Giới thiệu
                         </h2>
                         <div className="relative">
@@ -338,16 +344,16 @@ const PWATemplateDetailsPage = () => {
 
                         {/* Day Selector */}
                         {(template.days || []).length > 1 && (
-                            <div className="overflow-x-auto no-scrollbar mb-8 sticky top-[64px] bg-white dark:bg-[#0a0a0a] z-30 py-2 -mx-5 px-2 border-b border-slate-100 dark:border-zinc-800">
+                            <div className="overflow-x-auto no-scrollbar mb-4 sticky top-[64px] bg-white dark:bg-[#0a0a0a] z-30 py-2 -mx-5 px-2 border-b border-slate-100 dark:border-zinc-800">
                                 <div className="flex gap-8 justify-center min-w-full px-5">
-                                    {(template.days || []).sort((a, b) => (a.dayOrder || 0) - (b.dayOrder || 0)).map((day, idx) => (
+                                    {(template.days || []).map((day, idx) => (
                                         <button
                                             key={day.id}
                                             onClick={() => setSelectedDayIndex(idx)}
                                             className={cn(
                                                 "flex flex-col items-center min-w-[90px] py-3 px-3 rounded-2xl transition-all duration-300",
                                                 selectedDayIndex === idx
-                                                    ? "bg-[#f5f3ff] text-[#6347f9] dark:bg-[#1e1b4b] dark:text-[#a5b4fc] ring-1 ring-[#6347f9]/20"
+                                                    ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary ring-1 ring-primary/20"
                                                     : "text-slate-400 dark:text-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-900"
                                             )}
                                         >
@@ -355,6 +361,15 @@ const PWATemplateDetailsPage = () => {
                                         </button>
                                     ))}
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Selected Day Title */}
+                        {template.days?.[selectedDayIndex] && (
+                            <div className="mb-5 px-1">
+                                <h4 className="text-xl font-black text-slate-900 dark:text-white leading-tight text-center">
+                                    {template.days[selectedDayIndex].title || `Ngày ${selectedDayIndex + 1}`}
+                                </h4>
                             </div>
                         )}
 
@@ -371,7 +386,7 @@ const PWATemplateDetailsPage = () => {
                                             )}
 
                                             {/* Timeline Node - Sequence Number */}
-                                            <div className="absolute left-[-36px] top-0 w-8 h-8 rounded-full bg-[#6347f9] text-white flex items-center justify-center font-black text-xs z-10 shadow-sm">
+                                            <div className="absolute left-[-36px] top-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-black text-xs z-10 shadow-sm">
                                                 {idx + 1}
                                             </div>
 
@@ -406,10 +421,10 @@ const PWATemplateDetailsPage = () => {
                                                                         </span>
                                                                     </span>
                                                                     <div className="flex items-center gap-1 ml-4 overflow-hidden">
-                                                                        <span className="text-[10px] text-[#6347f9] dark:text-primary font-bold hover:underline underline-offset-2 transition-all">
+                                                                        <span className="text-[10px] text-primary dark:text-primary font-bold hover:underline underline-offset-2 transition-all">
                                                                             Xem trong bản đồ
                                                                         </span>
-                                                                        <ChevronRight className="w-3 h-3 text-[#6347f9] dark:text-primary animate-pulse" />
+                                                                        <ChevronRight className="w-3 h-3 text-primary dark:text-primary animate-pulse" />
                                                                     </div>
                                                                 </div>
                                                             )}
@@ -456,7 +471,7 @@ const PWATemplateDetailsPage = () => {
                 )}>
                     <Button
                         size="lg"
-                        className="w-full h-12 text-base font-bold bg-[#6347f9] hover:bg-[#5136db] shadow-lg shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"
+                        className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"
                         onClick={handleUseTemplate}
                         disabled={usingTemplate}
                     >
@@ -516,7 +531,7 @@ const PWATemplateDetailsPage = () => {
                             </div>
                             <button
                                 onClick={handleCopyLink}
-                                className="p-2.5 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-slate-100 dark:border-zinc-700 text-[#6347f9] active:scale-90 transition-transform"
+                                className="p-2.5 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-slate-100 dark:border-zinc-700 text-primary active:scale-90 transition-transform"
                             >
                                 <Copy className="w-5 h-5" />
                             </button>

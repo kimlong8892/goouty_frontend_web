@@ -150,7 +150,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
       <div className="space-y-6">
         <h2 className="text-xl font-bold text-slate-900 dark:text-foreground">Chi tiết chi phí</h2>
         <div className="text-center py-20 bg-slate-50/50 dark:bg-card/50 rounded-[32px] border-2 border-dashed border-slate-100 dark:border-border">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9] mx-auto"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-slate-500 dark:text-muted-foreground font-medium tracking-wide font-bold uppercase text-[10px]">Đang tải dữ liệu...</p>
         </div>
       </div>
@@ -169,8 +169,8 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
       {expenses.length === 0 ? (
         <Card className="rounded-[32px] border-2 border-dashed border-slate-100 dark:border-border shadow-none bg-slate-50/50 dark:bg-card/50">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-[#6347f9]/20 flex items-center justify-center mb-6">
-              <ReceiptText className="w-8 h-8 text-indigo-200 dark:text-[#6347f9]/50" />
+            <div className="w-16 h-16 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-6">
+              <ReceiptText className="w-8 h-8 text-primary/40 dark:text-primary/50" />
             </div>
             <h3 className="text-lg font-bold text-slate-800 dark:text-foreground mb-2">Chưa có chi phí nào</h3>
             <p className="text-slate-500 dark:text-muted-foreground text-sm max-w-xs mb-8">
@@ -179,7 +179,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
             {(isOwner || isMember) && (
               <Button
                 onClick={() => setShowAddDialog(true)}
-                className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white"
+                className="rounded-xl bg-primary hover:bg-primary/90 text-white"
               >
                 <Handshake className="w-4 h-4 mr-2" />
                 Ghi chú chi phí ngay
@@ -196,14 +196,14 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
             return (
               <div
                 key={expense.id}
-                className={`group rounded-[24px] border transition-all duration-300 relative overflow-hidden ${expense.isLocked ? 'bg-slate-50/80 dark:bg-slate-900/40 border-slate-100 dark:border-border opacity-90' : 'bg-white dark:bg-secondary/40 border-slate-100 dark:border-border hover:border-[#6347f9]/30 dark:hover:border-[#6347f9]/50 hover:shadow-xl hover:shadow-purple-500/5'
+                className={`group rounded-[24px] border transition-all duration-300 relative overflow-hidden ${expense.isLocked ? 'bg-slate-50/80 dark:bg-slate-900/40 border-slate-100 dark:border-border opacity-90' : 'bg-white dark:bg-secondary/40 border-slate-100 dark:border-border hover:border-primary/30 dark:hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5'
                   }`}
               >
                 <div className="p-5 md:p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <h3 className={`text-lg font-bold ${expense.isLocked ? 'text-slate-500 dark:text-muted-foreground' : 'text-slate-900 dark:text-foreground group-hover:text-[#6347f9] transition-colors'}`}>
+                        <h3 className={`text-lg font-bold ${expense.isLocked ? 'text-slate-500 dark:text-muted-foreground' : 'text-slate-900 dark:text-foreground group-hover:text-primary transition-colors'}`}>
                           {expense.title}
                         </h3>
                         {expense.isLocked && <Lock className="w-3 h-3 text-slate-400 dark:text-muted-foreground" />}
@@ -251,7 +251,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                         <div className="flex items-center gap-2">
                           <Avatar className="w-8 h-8 border border-white dark:border-border shadow-sm font-bold">
                             {payerInfo.profilePicture && <AvatarImage src={payerInfo.profilePicture} />}
-                            <AvatarFallback className="text-xs bg-slate-100 dark:bg-secondary text-[#6347f9]">
+                            <AvatarFallback className="text-xs bg-slate-100 dark:bg-secondary text-primary">
                               {payerInfo.name.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
@@ -280,9 +280,9 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="bg-indigo-50 dark:bg-[#6347f9]/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm border border-indigo-100/50 dark:border-[#6347f9]/20">
-                        <Users className="w-3 h-3 text-[#6347f9]" />
-                        <span className="text-[10px] font-bold text-[#6347f9]">{expense.participants.length} người</span>
+                      <div className="bg-primary/10 dark:bg-primary/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm border border-primary/10 dark:border-primary/20">
+                        <Users className="w-3 h-3 text-primary" />
+                        <span className="text-[10px] font-bold text-primary">{expense.participants.length} người</span>
                       </div>
                     </div>
                   </div>
@@ -326,13 +326,13 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
             <Button
               variant="outline"
               onClick={() => setShowDeleteDialog(false)}
-              className="flex-1 sm:flex-none rounded-xl bg-white text-[#6347f9] hover:bg-purple-50 border-slate-200 hover:border-purple-200 font-bold transition-all h-11"
+              className="flex-1 sm:flex-none rounded-xl bg-white text-primary hover:bg-primary/5 border-slate-200 hover:border-primary/20 font-bold transition-all h-11"
             >
               Hủy
             </Button>
             <Button
               onClick={handleConfirmDelete}
-              className="flex-1 sm:flex-none bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-purple-500/20 h-11"
+              className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-primary/20 h-11"
             >
               Xóa chi phí
             </Button>

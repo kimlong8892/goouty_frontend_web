@@ -145,7 +145,7 @@ const CreateTripPage = () => {
                   className="w-full h-full object-contain drop-shadow-xl transform hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-3 text-[#6347f9] uppercase tracking-wide">
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-3 text-primary uppercase tracking-wide">
                 TẠO CHUYẾN ĐI MỚI
               </h1>
               <p className="text-slate-400 font-medium">
@@ -319,7 +319,7 @@ const CreateTripPage = () => {
                   <Button
                     onClick={handleCreateTrip}
 
-                    className="flex-1 h-12 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold"
+                    className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-primary/20 transition-all font-bold"
                     disabled={loading}
                   >
                     {loading ? (

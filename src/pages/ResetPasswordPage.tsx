@@ -53,7 +53,7 @@ const ResetPasswordPage = () => {
             <AnimatedTransition show={show} animation="slide-up" className="w-full">
                 <Card className="max-w-md mx-auto w-full p-8 md:p-12 rounded-[32px] overflow-hidden shadow-2xl border-none bg-white">
                     <div className="mb-6 text-center">
-                        <h1 className="text-3xl font-black text-[#6347f9] mb-2 uppercase">Đặt lại mật khẩu</h1>
+                        <h1 className="text-3xl font-black text-primary mb-2 uppercase">Đặt lại mật khẩu</h1>
                         <p className="text-slate-500 font-medium">Nhập mật khẩu mới của bạn</p>
                     </div>
 
@@ -64,7 +64,7 @@ const ResetPasswordPage = () => {
                                 <Input
                                     id="password"
                                     type={showPassword ? "text" : "password"}
-                                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-[#6347f9] focus:bg-white outline-none transition-colors duration-200 px-4 pr-12"
+                                    className="h-12 rounded-xl bg-slate-50 border-transparent focus:border-primary focus:bg-white outline-none transition-colors duration-200 px-4 pr-12"
                                     placeholder="Nhập mật khẩu mới"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -72,7 +72,7 @@ const ResetPasswordPage = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#6347f9] transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
                                 >
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </button>
@@ -82,13 +82,13 @@ const ResetPasswordPage = () => {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full h-12 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                         >
                             {isLoading ? 'Đang xử lý...' : 'Đặt lại mật khẩu'}
                         </Button>
 
                         <div className="text-center">
-                            <Button type="button" variant="link" onClick={() => navigate('/auth')} className="text-[#6347f9]">Quay lại đăng nhập</Button>
+                            <Button type="button" variant="link" onClick={() => navigate('/auth')} className="text-primary">Quay lại đăng nhập</Button>
                         </div>
                     </form>
                 </Card>
