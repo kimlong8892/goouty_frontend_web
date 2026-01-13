@@ -104,6 +104,7 @@ export interface Activity {
   notes?: string;
   important: boolean;
   dayId: string;
+  avatar?: string;
 }
 
 export interface CreateActivityRequest {
@@ -114,6 +115,7 @@ export interface CreateActivityRequest {
   notes?: string;
   important?: boolean;
   dayId: string;
+  avatar?: string;
 }
 
 export interface UpdateActivityRequest {
@@ -124,6 +126,7 @@ export interface UpdateActivityRequest {
   notes?: string;
   important?: boolean;
   dayId?: string;
+  avatar?: string;
 }
 
 // Trip Members types

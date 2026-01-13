@@ -14,8 +14,10 @@ interface Activity {
     location?: string;
     notes?: string;
     pinned?: boolean;
+
     orderIndex?: number;
     images?: { id: string; url: string; filename: string }[];
+    avatar?: string;
 }
 
 interface Day {
@@ -244,10 +246,10 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                 </div>
                                             )}
 
-                                            {/* Image - Hardcoded as requested */}
+                                            {/* Image - Hardcoded as requested -> Now using dynamic image */}
                                             <div className="w-[85px] h-[85px] rounded-xl overflow-hidden flex-shrink-0 shadow-sm border border-border">
                                                 <img
-                                                    src={DEFAULT_ACTIVITY_IMAGE}
+                                                    src={activity.avatar || DEFAULT_ACTIVITY_IMAGE}
                                                     alt={activity.title}
                                                     className="w-full h-full object-cover"
                                                 />

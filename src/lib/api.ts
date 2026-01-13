@@ -199,6 +199,22 @@ export const api = {
     reorder: async (activities: { id: string; sortOrder: number }[]) => {
       return await api.post('/activities/reorder', { activities });
     },
+    uploadImage: async (id: string, file: File) => {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      return await api.request<{
+        success: boolean;
+        message: string;
+        data: {
+          url: string;
+        };
+        activity: DATABASE_TYPES.activities;
+      }>(`/activities/${id}/avatar`, {
+        method: 'POST',
+        body: formData,
+      });
+    },
   },
 
   // Expense-specific API methods

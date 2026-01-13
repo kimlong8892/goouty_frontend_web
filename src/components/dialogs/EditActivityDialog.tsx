@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils.ts';
 import { X } from 'lucide-react';
 
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
+import { ActivityAvatarUpload } from '@/components/ActivityAvatarUpload.tsx';
 
 interface EditActivityDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
 }) => {
   const { isPWA } = usePWA();
   const [loading, setLoading] = useState(false);
+  const [newAvatarFile, setNewAvatarFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     startTime: '',
@@ -104,7 +106,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
     setLoading(true);
     try {
       // Create update data according to backend DTO
-      const updateData: UpdateActivityRequest = {
+      const updateData: any = {
         title: formData.title.trim(),
         startTime: formData.startTime ? `2025-09-15T${formData.startTime}:00.000Z` : undefined,
         durationMin: formData.durationMin,
@@ -115,10 +117,21 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
 
       // Remove undefined values
       Object.keys(updateData).forEach(key =>
-        updateData[key as keyof UpdateActivityRequest] === undefined && delete updateData[key as keyof UpdateActivityRequest]
+        updateData[key] === undefined && delete updateData[key]
       );
 
-      await api.patch<Activity>(`/activities/${activity.id}`, updateData);
+      let payload: any = updateData;
+
+      if (newAvatarFile) {
+        const formDataObj = new FormData();
+        Object.entries(updateData).forEach(([key, value]) => {
+          formDataObj.append(key, String(value));
+        });
+        formDataObj.append('avatar', newAvatarFile);
+        payload = formDataObj;
+      }
+
+      await api.activities.update(activity.id, payload);
 
       toast.success('Đã cập nhật hoạt động thành công');
       onOpenChange(false);
@@ -148,23 +161,32 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
               Hủy
             </Button>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-foreground dark:text-white">
-              <Edit className="w-5 h-5 text-primary" />
+              <Edit className="w-5 h-5 text-[#6347f9]" />
               <span>Chỉnh sửa hoạt động</span>
             </DialogTitle>
             <Button
               type="submit"
               variant="ghost"
               disabled={loading}
-              className="p-0 h-auto font-bold text-primary hover:text-primary/90 hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
+              className="p-0 h-auto font-bold text-[#6347f9] hover:text-[#5136db] hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
             >
               {loading && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6347f9] mr-2" />
               )}
               Xong
             </Button>
           </DialogHeader>
 
           <div className="p-6 space-y-6 bg-card dark:bg-[#1c1e26]">
+            {/* Avatar Upload */}
+            <div className="flex justify-center mb-2">
+              <ActivityAvatarUpload
+                currentImage={activity.avatar}
+                onImageSelected={setNewAvatarFile}
+                size="lg"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="title" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
                 Tên hoạt động <span className="text-red-500">*</span>
@@ -174,7 +196,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="VD: Tham quan bảo tàng"
-                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 required
               />
             </div>
@@ -186,7 +208,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
               <div className="space-y-2">
@@ -198,7 +220,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                   max="1440"
                   value={formData.durationMin}
                   onChange={(e) => setFormData({ ...formData, durationMin: parseInt(e.target.value) || 0 })}
-                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             </div>
@@ -209,7 +231,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 placeholder="VD: Thành phố Hồ Chí Minh"
-                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <div className="space-y-2">
@@ -220,7 +242,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Ghi chú thêm về hoạt động..."
                 rows={3}
-                className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+                className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
               />
             </div>
             <div className="flex items-center space-x-2 pt-2">
@@ -228,7 +250,7 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
                 id="important"
                 checked={formData.important}
                 onCheckedChange={(checked) => setFormData({ ...formData, important: !!checked })}
-                className="rounded-md border-border dark:data-[state=checked]:bg-primary dark:data-[state=checked]:border-primary"
+                className="rounded-md border-border dark:data-[state=checked]:bg-[#6347f9] dark:data-[state=checked]:border-[#6347f9]"
               />
               <Label htmlFor="important" className="text-sm font-medium text-foreground dark:text-white cursor-pointer">Đánh dấu là hoạt động quan trọng</Label>
             </div>
@@ -245,12 +267,12 @@ export const EditActivityDialog: React.FC<EditActivityDialogProps> = ({
             </Button>
             <Button
               type="submit"
-              className="h-11 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-primary/20 transition-all font-bold px-6"
+              className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold px-6"
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6347f9] mr-2" />
                   Đang cập nhật...
                 </>
               ) : (

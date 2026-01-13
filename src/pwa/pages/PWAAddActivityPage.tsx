@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils.ts';
 import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
 import { useAnimateIn } from '@/lib/animations.ts';
 
+import { ActivityAvatarUpload } from '@/components/ActivityAvatarUpload.tsx';
+
 const PWAAddActivityPage = () => {
     const { dayId } = useParams<{ dayId: string }>();
     const navigate = useNavigate();
@@ -21,6 +23,7 @@ const PWAAddActivityPage = () => {
     const showContent = useAnimateIn(false, 300);
 
     const [loading, setLoading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [formData, setFormData] = useState({
         title: '',
         startTime: '',
@@ -53,7 +56,7 @@ const PWAAddActivityPage = () => {
 
         setLoading(true);
         try {
-            const activityData: any = {
+            const commonData = {
                 title: formData.title.trim(),
                 startTime: formData.startTime ? `2025-09-15T${formData.startTime}:00.000Z` : undefined,
                 durationMin: formData.durationMin,
@@ -63,7 +66,23 @@ const PWAAddActivityPage = () => {
                 dayId: dayId
             };
 
-            await api.activities.create(activityData);
+            // Remove undefined values
+            Object.keys(commonData).forEach(key =>
+                (commonData as any)[key] === undefined && delete (commonData as any)[key]
+            );
+
+            let payload: any = commonData;
+
+            if (selectedFile) {
+                const formDataObj = new FormData();
+                Object.entries(commonData).forEach(([key, value]) => {
+                    formDataObj.append(key, String(value));
+                });
+                formDataObj.append('avatar', selectedFile);
+                payload = formDataObj;
+            }
+
+            await api.activities.create(payload);
 
             showToast('Đã thêm hoạt động thành công', 'success');
             navigate(-1);
@@ -102,6 +121,14 @@ const PWAAddActivityPage = () => {
                 {/* Content */}
                 <div className="px-5 pt-6 pb-44 flex flex-col min-h-[calc(100vh-80px)]">
                     <div className="flex-1 space-y-6">
+                        {/* Avatar Upload */}
+                        <div className="flex justify-center mb-2">
+                            <ActivityAvatarUpload
+                                onImageSelected={setSelectedFile}
+                                size="lg"
+                            />
+                        </div>
+
                         {/* Title Input */}
                         <div className="space-y-2">
                             <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
@@ -195,7 +222,7 @@ const PWAAddActivityPage = () => {
                                 id="important"
                                 checked={formData.important}
                                 onCheckedChange={(checked) => setFormData({ ...formData, important: !!checked })}
-                                className="w-5 h-5 rounded-md border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                className="w-5 h-5 rounded-md border-primary/20 data-[state=checked]:bg-[#6347f9] data-[state=checked]:border-[#6347f9]"
                             />
                             <div className="flex items-center gap-2 flex-1 cursor-pointer" onClick={() => setFormData({ ...formData, important: !formData.important })}>
                                 <Star className={cn("w-4 h-4 transition-colors", formData.important ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground")} />
@@ -209,7 +236,7 @@ const PWAAddActivityPage = () => {
                         <Button
                             onClick={handleSubmit}
                             disabled={loading}
-                            className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
+                            className="w-full h-14 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
                         >
                             {loading ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />

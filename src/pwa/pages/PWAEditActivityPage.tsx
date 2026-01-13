@@ -15,6 +15,8 @@ import { cn } from '@/lib/utils.ts';
 import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
 import { useAnimateIn } from '@/lib/animations.ts';
 
+import { ActivityAvatarUpload } from '@/components/ActivityAvatarUpload.tsx';
+
 const PWAEditActivityPage = () => {
     const { activityId } = useParams<{ activityId: string }>();
     const navigate = useNavigate();
@@ -24,6 +26,7 @@ const PWAEditActivityPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [currentImage, setCurrentImage] = useState<string>('');
     const [formData, setFormData] = useState({
         title: '',
         startTime: '',
@@ -72,6 +75,10 @@ const PWAEditActivityPage = () => {
                     notes: data.notes || '',
                     important: data.important || data.pinned || false
                 });
+
+                if (data.avatar) {
+                    setCurrentImage(data.avatar);
+                }
             } catch (error: any) {
                 console.error('Fetch activity error:', error);
                 showToast('Không thể tải thông tin hoạt động', 'error');
@@ -85,6 +92,8 @@ const PWAEditActivityPage = () => {
             fetchActivityData();
         }
     }, [activityId, isAuthenticated, navigate]);
+
+    const [newAvatarFile, setNewAvatarFile] = useState<File | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -112,7 +121,18 @@ const PWAEditActivityPage = () => {
                 updateData[key] === undefined && delete updateData[key]
             );
 
-            await api.activities.update(activityId, updateData);
+            let payload: any = updateData;
+
+            if (newAvatarFile) {
+                const formDataObj = new FormData();
+                Object.entries(updateData).forEach(([key, value]) => {
+                    formDataObj.append(key, String(value));
+                });
+                formDataObj.append('avatar', newAvatarFile);
+                payload = formDataObj;
+            }
+
+            await api.activities.update(activityId, payload);
 
             showToast('Đã cập nhật hoạt động thành công', 'success');
             navigate(-1);
@@ -151,6 +171,18 @@ const PWAEditActivityPage = () => {
                 {/* Content */}
                 <div className="px-5 pt-6 pb-44 flex flex-col min-h-[calc(100vh-80px)]">
                     <div className="flex-1 space-y-6">
+                        {/* Avatar Upload */}
+                        <div className="flex justify-center mb-2">
+                            <ActivityAvatarUpload
+                                currentImage={currentImage}
+                                onImageSelected={(file) => {
+                                    setNewAvatarFile(file);
+                                    // Preview is handled by the component
+                                }}
+                                size="lg"
+                            />
+                        </div>
+
                         {/* Title Input */}
                         <div className="space-y-2">
                             <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
@@ -244,7 +276,7 @@ const PWAEditActivityPage = () => {
                                 id="important"
                                 checked={formData.important}
                                 onCheckedChange={(checked) => setFormData({ ...formData, important: !!checked })}
-                                className="w-5 h-5 rounded-md border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                className="w-5 h-5 rounded-md border-primary/20 data-[state=checked]:bg-[#6347f9] data-[state=checked]:border-[#6347f9]"
                             />
                             <div className="flex items-center gap-2 flex-1 cursor-pointer" onClick={() => setFormData({ ...formData, important: !formData.important })}>
                                 <Star className={cn("w-4 h-4 transition-colors", formData.important ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground")} />
@@ -258,7 +290,7 @@ const PWAEditActivityPage = () => {
                         <Button
                             onClick={handleSubmit}
                             disabled={saving}
-                            className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
+                            className="w-full h-14 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
                         >
                             {saving ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />

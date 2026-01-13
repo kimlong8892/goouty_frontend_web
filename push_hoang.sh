@@ -21,4 +21,4 @@ git add .
 git commit -m "$MESSAGE"
 
 # Push lên branch dev
-git push origin hoang-dev
+git push origin dev

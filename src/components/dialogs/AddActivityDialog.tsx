@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils.ts';
 import { X } from 'lucide-react';
 
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
+import { ActivityAvatarUpload } from '@/components/ActivityAvatarUpload.tsx';
 
 interface AddActivityDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
 }) => {
   const { isPWA } = usePWA();
   const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     startTime: '',
@@ -39,6 +41,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
   });
 
   const resetForm = () => {
+    setSelectedFile(null);
     setFormData({
       title: '',
       startTime: '',
@@ -74,9 +77,9 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
     setLoading(true);
     try {
       // Create activity data according to backend DTO
-      const activityData: CreateActivityRequest = {
+      const commonData = {
         title: formData.title.trim(),
-        startTime: formData.startTime ? `2025-09-15T${formData.startTime}:00.000Z` : undefined,
+        startTime: formData.startTime ? `2025-09-15T${formData.startTime}:00.000Z` : undefined, // Note: This date hardcoding is preserved from original
         durationMin: formData.durationMin,
         location: formData.location.trim() || undefined,
         notes: formData.notes.trim() || undefined,
@@ -84,7 +87,23 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
         dayId: dayId
       };
 
-      const newActivity = await api.post<Activity>('/activities', activityData);
+      // Remove undefined values
+      Object.keys(commonData).forEach(key =>
+        (commonData as any)[key] === undefined && delete (commonData as any)[key]
+      );
+
+      let payload: any = commonData;
+
+      if (selectedFile) {
+        const formDataObj = new FormData();
+        Object.entries(commonData).forEach(([key, value]) => {
+          formDataObj.append(key, String(value));
+        });
+        formDataObj.append('avatar', selectedFile);
+        payload = formDataObj;
+      }
+
+      await api.activities.create(payload);
 
       toast.success('Đã thêm hoạt động thành công');
       resetForm();
@@ -115,23 +134,31 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
               Hủy
             </Button>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-foreground dark:text-white">
-              <Plus className="w-5 h-5 text-primary" />
+              <Plus className="w-5 h-5 text-[#6347f9]" />
               <span>Thêm hoạt động</span>
             </DialogTitle>
             <Button
               type="submit"
               variant="ghost"
               disabled={loading}
-              className="p-0 h-auto font-bold text-primary hover:text-primary/90 hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
+              className="p-0 h-auto font-bold text-[#6347f9] hover:text-[#5136db] hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
             >
               {loading && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6347f9] mr-2" />
               )}
               Xong
             </Button>
           </DialogHeader>
 
           <div className="p-6 space-y-6 bg-card dark:bg-[#1c1e26]">
+            {/* Avatar Upload */}
+            <div className="flex justify-center mb-2">
+              <ActivityAvatarUpload
+                onImageSelected={setSelectedFile}
+                size="lg"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="title" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
                 Tên hoạt động <span className="text-red-500">*</span>
@@ -141,7 +168,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="VD: Tham quan bảo tàng"
-                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 required
               />
             </div>
@@ -153,7 +180,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
               <div className="space-y-2">
@@ -165,7 +192,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
                   max="1440"
                   value={formData.durationMin}
                   onChange={(e) => setFormData({ ...formData, durationMin: parseInt(e.target.value) || 0 })}
-                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             </div>
@@ -176,7 +203,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 placeholder="VD: Thành phố Hồ Chí Minh"
-                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <div className="space-y-2">
@@ -187,7 +214,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Ghi chú thêm về hoạt động..."
                 rows={3}
-                className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+                className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
               />
             </div>
             <div className="flex items-center space-x-2 pt-2">
@@ -195,7 +222,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
                 id="important"
                 checked={formData.important}
                 onCheckedChange={(checked) => setFormData({ ...formData, important: !!checked })}
-                className="rounded-md border-border dark:data-[state=checked]:bg-primary dark:data-[state=checked]:border-primary"
+                className="rounded-md border-border dark:data-[state=checked]:bg-[#6347f9] dark:data-[state=checked]:border-[#6347f9]"
               />
               <Label htmlFor="important" className="text-sm font-medium text-foreground dark:text-white cursor-pointer">Đánh dấu là hoạt động quan trọng</Label>
             </div>
@@ -212,7 +239,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
             </Button>
             <Button
               type="submit"
-              className="h-11 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-primary/20 transition-all font-bold px-6"
+              className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold px-6"
               disabled={loading}
             >
               {loading ? (

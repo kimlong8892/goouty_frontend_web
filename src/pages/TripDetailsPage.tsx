@@ -65,6 +65,7 @@ type ApiActivity = {
   dayId: number;
   pinned?: boolean;
   images?: any[];
+  avatar?: string | null;
 };
 
 type ApiDay = {
@@ -131,6 +132,7 @@ type Activity = {
   pinned?: boolean;
   orderIndex?: number;
   images?: { id: string; url: string; filename: string }[];
+  avatar?: string;
 };
 
 type Expense = {
@@ -305,7 +307,8 @@ const TripDetailsPage = () => {
             id: image.id.toString(),
             url: image.url,
             filename: image.filename
-          }))
+          })),
+          avatar: (activity as any).avatar || undefined
         }));
       });
 
@@ -387,7 +390,8 @@ const TripDetailsPage = () => {
               id: image.id.toString(),
               url: image.url,
               filename: image.filename
-            }))
+            })),
+            avatar: (activity as any).avatar || undefined
           }));
         });
 
@@ -968,6 +972,16 @@ const TripDetailsPage = () => {
                                               <GripVertical className="w-5 h-5" />
                                             </div>
                                           )}
+
+                                          {/* Activity Image */}
+                                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-sm border border-border">
+                                            <img
+                                              src={activity.avatar || "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=400&auto=format&fit=crop"}
+                                              alt={activity.title}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          </div>
+
                                           <div className="space-y-2 flex-1 min-w-0">
                                             <div className="flex items-start justify-between">
                                               <h4 className={cn(
