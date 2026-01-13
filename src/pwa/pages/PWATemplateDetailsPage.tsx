@@ -63,44 +63,7 @@ const PWATemplateDetailsPage = () => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
-    // Swipe handling
-    const touchStart = useRef<{ x: number, y: number } | null>(null);
-    const touchEnd = useRef<{ x: number, y: number } | null>(null);
-    const minSwipeDistance = 50;
 
-    const onTouchStart = (e: React.TouchEvent) => {
-        touchEnd.current = null;
-        touchStart.current = {
-            x: e.targetTouches[0].clientX,
-            y: e.targetTouches[0].clientY
-        };
-    };
-
-    const onTouchMove = (e: React.TouchEvent) => {
-        touchEnd.current = {
-            x: e.targetTouches[0].clientX,
-            y: e.targetTouches[0].clientY
-        };
-    };
-
-    const onTouchEnd = () => {
-        if (!touchStart.current || !touchEnd.current || !template) return;
-
-        const distanceX = touchStart.current.x - touchEnd.current.x;
-        const distanceY = touchStart.current.y - touchEnd.current.y;
-        const isLeftSwipe = distanceX > minSwipeDistance;
-        const isRightSwipe = distanceX < -minSwipeDistance;
-
-        // Ensure horizontal swipe is dominant
-        if (Math.abs(distanceX) > Math.abs(distanceY)) {
-            if (isLeftSwipe && template.next) {
-                navigate(`/pwa-template-details/${template.next.id}`);
-            }
-            if (isRightSwipe && template.previous) {
-                navigate(`/pwa-template-details/${template.previous.id}`);
-            }
-        }
-    };
 
     useEffect(() => {
         if (id) {
@@ -239,9 +202,6 @@ const PWATemplateDetailsPage = () => {
     return (
         <div
             className="min-h-screen bg-white dark:bg-[#0a0a0a] pb-[200px]"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
         >
             {/* STICKY HEADER */}
             <div className="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md px-5 py-3 flex items-center justify-between">
