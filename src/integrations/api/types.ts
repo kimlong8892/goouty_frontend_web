@@ -166,6 +166,18 @@ export namespace DATABASE_TYPES {
         dayId: string;
       }[];
     }[];
+    next?: {
+      id: string;
+      title: string;
+      avatar: string;
+      createdAt: string;
+    };
+    previous?: {
+      id: string;
+      title: string;
+      avatar: string;
+      createdAt: string;
+    };
   }
 
   export interface provinces {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
@@ -62,6 +62,45 @@ const PWATemplateDetailsPage = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+
+    // Swipe handling
+    const touchStart = useRef<{ x: number, y: number } | null>(null);
+    const touchEnd = useRef<{ x: number, y: number } | null>(null);
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchEnd.current = null;
+        touchStart.current = {
+            x: e.targetTouches[0].clientX,
+            y: e.targetTouches[0].clientY
+        };
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        touchEnd.current = {
+            x: e.targetTouches[0].clientX,
+            y: e.targetTouches[0].clientY
+        };
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart.current || !touchEnd.current || !template) return;
+
+        const distanceX = touchStart.current.x - touchEnd.current.x;
+        const distanceY = touchStart.current.y - touchEnd.current.y;
+        const isLeftSwipe = distanceX > minSwipeDistance;
+        const isRightSwipe = distanceX < -minSwipeDistance;
+
+        // Ensure horizontal swipe is dominant
+        if (Math.abs(distanceX) > Math.abs(distanceY)) {
+            if (isLeftSwipe && template.next) {
+                navigate(`/pwa-template-details/${template.next.id}`);
+            }
+            if (isRightSwipe && template.previous) {
+                navigate(`/pwa-template-details/${template.previous.id}`);
+            }
+        }
+    };
 
     useEffect(() => {
         if (id) {
@@ -198,7 +237,12 @@ const PWATemplateDetailsPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0a0a0a] pb-[200px]">
+        <div
+            className="min-h-screen bg-white dark:bg-[#0a0a0a] pb-[200px]"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+        >
             {/* STICKY HEADER */}
             <div className="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md px-5 py-3 flex items-center justify-between">
                 <button
@@ -274,6 +318,25 @@ const PWATemplateDetailsPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Navigation Arrows Overlay */}
+            {template.previous && (
+                <button
+                    onClick={() => navigate(`/pwa-template-details/${template.previous!.id}`)}
+                    className="fixed left-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all"
+                >
+                    <ChevronLeft className="w-6 h-6" />
+                </button>
+            )}
+
+            {template.next && (
+                <button
+                    onClick={() => navigate(`/pwa-template-details/${template.next!.id}`)}
+                    className="fixed right-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all"
+                >
+                    <ChevronRight className="w-6 h-6" />
+                </button>
+            )}
 
             {/* CONTENT HEADER */}
             <div className="px-6 py-6">
