@@ -59,6 +59,9 @@ const CreateTripPage = () => {
     if (!provinceId.trim()) {
       newErrors.provinceId = 'Vui lòng chọn tỉnh thành';
     }
+    if (!startDate) {
+      newErrors.startDate = 'Vui lòng chọn ngày đi';
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -198,7 +201,7 @@ const CreateTripPage = () => {
 
                 <div className="space-y-2">
                   <Label className="text-muted-foreground font-medium text-sm">
-                    Ngày đi
+                    Ngày đi <span className="text-red-500">*</span>
                   </Label>
                   <Popover>
                     <PopoverTrigger asChild>

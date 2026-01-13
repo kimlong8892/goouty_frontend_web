@@ -144,6 +144,10 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
       newErrors.provinceId = 'Vui lòng chọn tỉnh thành';
     }
 
+    if (!startDate) {
+      newErrors.startDate = 'Vui lòng chọn ngày đi';
+    }
+
 
     // If there are errors, set them and focus on first error
     if (Object.keys(newErrors).length > 0) {
@@ -313,7 +317,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
           {/* Start Date Picker */}
           <div className="space-y-2">
             <Label className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
-              Ngày đi
+              Ngày đi <span className="text-red-500">*</span>
             </Label>
             <Popover>
               <PopoverTrigger asChild>

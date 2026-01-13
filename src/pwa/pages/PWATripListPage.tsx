@@ -324,10 +324,10 @@ const PWATripListPage = () => {
             <DrawerTrigger asChild>
               <Button
                 className={cn(
-                  "h-12 w-12 rounded-full p-0 flex items-center justify-center shrink-0 shadow-lg transition-all",
+                  "h-12 w-12 rounded-full p-0 flex items-center justify-center shrink-0 transition-all",
                   hasActiveFilters
                     ? "bg-primary text-white hover:bg-primary/90 shadow-primary/20"
-                    : "bg-secondary text-primary hover:bg-secondary/80"
+                    : "bg-secondary/50 text-foreground hover:bg-secondary/80"
                 )}
               >
                 <SlidersHorizontal className="w-5 h-5" />

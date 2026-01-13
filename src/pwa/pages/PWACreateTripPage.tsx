@@ -58,6 +58,14 @@ const PWACreateTripPage = () => {
       newErrors.tripName = 'Vui lòng nhập tên chuyến đi';
     }
 
+    if (!destination.trim()) {
+      newErrors.destination = 'Vui lòng chọn điểm đến';
+    }
+
+    if (!startDate) {
+      newErrors.startDate = 'Vui lòng chọn ngày đi';
+    }
+
 
 
     // If there are errors, set them and focus on first error
@@ -227,7 +235,7 @@ const PWACreateTripPage = () => {
             {/* Destination */}
             <div className="space-y-2">
               <Label htmlFor="destination" className="text-muted-foreground text-sm font-medium ml-1">
-                Điểm đến (tùy chọn)
+                Điểm đến <span className="text-red-500">*</span>
               </Label>
               <ProvinceSelector
                 value={destination}
@@ -247,7 +255,7 @@ const PWACreateTripPage = () => {
             {/* Start Date */}
             <div className="space-y-2">
               <Label className="text-muted-foreground text-sm font-medium ml-1">
-                Ngày đi
+                Ngày đi <span className="text-red-500">*</span>
               </Label>
               <Popover>
                 <PopoverTrigger asChild>
