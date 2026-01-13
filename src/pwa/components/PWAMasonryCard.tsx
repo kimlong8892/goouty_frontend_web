@@ -1,5 +1,5 @@
 import { DATABASE_TYPES } from '@/integrations/api/types';
-import { MapPin, Star, Heart, Loader2 } from 'lucide-react';
+import { Navigation, Star, Heart, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -83,10 +83,10 @@ export const PWAMasonryCard = ({ template, index }: PWAMasonryCardProps) => {
                     loading="lazy"
                 />
 
-                {/* Distance Overlay */}
-                <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full text-white text-[10px] font-medium">
-                    <MapPin size={10} className="fill-white" />
-                    <span>{(template.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 100 / 10).toFixed(1)}km</span>
+                {/* Province Overlay */}
+                <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-full text-white text-[10px] font-bold">
+                    <Navigation size={10} className="fill-white" />
+                    <span>{template.province?.name || "Việt Nam"}</span>
                 </div>
 
                 {/* Favorite Button */}
