@@ -331,15 +331,73 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
 
       {/* Sticky Top Search Bar */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg px-4 pt-4 pb-2">
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 w-5 h-5" />
-          <Input
-            placeholder="Tìm kiếm..."
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="pl-12 pr-4 h-12 bg-secondary/50 border-none rounded-full text-base placeholder:text-muted-foreground/40 focus-visible:ring-1 focus-visible:ring-primary/20 transition-all font-medium"
-          />
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 w-5 h-5" />
+            <Input
+              placeholder="Tìm kiếm..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="pl-12 pr-4 h-12 bg-secondary/50 border-none rounded-full text-base placeholder:text-muted-foreground/40 focus-visible:ring-1 focus-visible:ring-primary/20 transition-all font-medium w-full"
+            />
+          </div>
+          <Drawer open={isProvinceDrawerOpen} onOpenChange={setIsProvinceDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 rounded-full border-none bg-secondary/50 hover:bg-secondary/80 transition-colors shrink-0"
+              >
+                <SlidersHorizontal className="w-5 h-5 text-foreground" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="max-h-[85vh] p-0 rounded-t-[32px]">
+              <div className="mx-auto w-12 h-1.5 bg-muted rounded-full my-4" />
+              <DrawerHeader className="px-6">
+                <DrawerTitle className="text-2xl font-bold">{t('template.selectProvince')}</DrawerTitle>
+                <div className="relative mt-4">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder={t('Chọn tỉnh thành')}
+                    className="pl-10 h-11 bg-muted/50 border-none rounded-xl"
+                    value={provinceSearchQuery}
+                    onChange={(e) => setProvinceSearchQuery(e.target.value)}
+                  />
+                </div>
+              </DrawerHeader>
+
+              <div className="px-4 pb-8 overflow-y-auto max-h-[50vh] no-scrollbar">
+                <div className="grid grid-cols-1 gap-1">
+                  <button
+                    onClick={() => handleProvinceChange('all')}
+                    className={cn(
+                      "flex items-center justify-between px-4 py-4 rounded-2xl transition-all",
+                      selectedProvince === 'all' ? "bg-primary/10 text-primary font-bold" : "hover:bg-muted/50 text-foreground font-medium"
+                    )}
+                  >
+                    <span>{t('template.allProvinces')}</span>
+                    {selectedProvince === 'all' && <Check className="w-5 h-5" />}
+                  </button>
+                  {provinces
+                    .filter(p => p.name.toLowerCase().includes(provinceSearchQuery.toLowerCase()))
+                    .map((province) => (
+                      <button
+                        key={province.id}
+                        onClick={() => handleProvinceChange(province.id)}
+                        className={cn(
+                          "flex items-center justify-between px-4 py-4 rounded-2xl transition-all",
+                          selectedProvince === province.id ? "bg-primary/10 text-primary font-bold" : "hover:bg-muted/50 text-foreground font-medium"
+                        )}
+                      >
+                        <span>{province.name}</span>
+                        {selectedProvince === province.id && <Check className="w-5 h-5" />}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
       </div>
 
