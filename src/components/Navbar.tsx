@@ -323,29 +323,47 @@ export const Navbar = () => {
   useEffect(() => {
     const path = location.pathname;
 
-    if (path === '/') {
+    if (path === '/' || path.startsWith('/template/') || path.startsWith('/pwa-template-details/')) {
       setActive('home');
-    } else if (path === '/my-trips') {
+    }
+    else if (path.startsWith('/trip/')) {
+      setActive(isPWA ? 'pwa-trips' : 'my-trips');
+    }
+    else if (path === '/my-trips') {
       setActive('my-trips');
-    } else if (path === '/pwa-trips') {
+    }
+    else if (
+      path === '/pwa-trips' ||
+      path.startsWith('/pwa-edit-trip/') ||
+      path.startsWith('/pwa-add-day/') ||
+      path.startsWith('/pwa-edit-day/') ||
+      path.startsWith('/pwa-add-activity/') ||
+      path.startsWith('/pwa-edit-activity/') ||
+      path.startsWith('/pwa-add-expense/') ||
+      path.startsWith('/pwa-invite-member/')
+    ) {
       setActive('pwa-trips');
-    } else if (path === '/profile') {
+    }
+    else if (path === '/profile' || path.startsWith('/profile/') || path === '/pwa-change-password' || path === '/pwa-terms' || path === '/pwa-privacy' || path === '/pwa-about') {
       setActive('profile');
-    } else if (path === '/settings') {
+    }
+    else if (path === '/settings') {
       setActive('settings');
-    } else if (path === '/create-trip' || path === '/pwa-create-trip') {
+    }
+    else if (path === '/create-trip' || path === '/pwa-create-trip') {
       setActive('create-trip');
-
-    } else if (path === '/auth') {
+    }
+    else if (path === '/auth') {
       setActive('login');
-    } else if (path === '/wishlist') {
+    }
+    else if (path === '/wishlist') {
       setActive('wishlist');
     }
     else {
-      // For trip details pages, keep current active or default to home
+      // For any other unexpected paths, fallback based on PWA mode or default to home
       setActive(prev => prev || 'home');
     }
-  }, [location.pathname]);
+  }, [location.pathname, isPWA]);
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -364,7 +382,7 @@ export const Navbar = () => {
 
   const handleNavItemClick = (id: string) => {
     setActive(id);
-    if (id === 'home') {
+    if (id === 'home' || id === 'pwa-trips' || id === 'my-trips') { // Scroll to top for main tabs
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
