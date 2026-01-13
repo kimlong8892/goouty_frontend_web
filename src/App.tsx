@@ -475,14 +475,14 @@ const AppContentWithRouter = ({ isPWAMode }: { isPWAMode: boolean }) => {
   const isHomePage = location.pathname === '/';
 
   return (
-    <PWAPullToRefresh>
-      <div className={cn(
-        "min-h-screen flex flex-col animate-fade-in bg-background",
-        isMobileView ? "pb-24 min-h-dvh" : "" // Add bottom padding and dynamic viewport height for Mobile/PWA
-      )}>
-        {/* PWA Alert Notification - positioned above navbar */}
-        <PWAAlertNotification />
-        <Navbar />
+    <div className={cn(
+      "min-h-screen flex flex-col animate-fade-in bg-background",
+      isMobileView ? "pb-24 min-h-dvh" : "" // Add bottom padding and dynamic viewport height for Mobile/PWA
+    )}>
+      {/* PWA Alert Notification - positioned above navbar */}
+      <PWAAlertNotification />
+      <Navbar />
+      <PWAPullToRefresh>
         <main className="flex-1">
           <AppRoutes />
         </main>
@@ -493,8 +493,8 @@ const AppContentWithRouter = ({ isPWAMode }: { isPWAMode: boolean }) => {
             <ScrollToTopButton />
           </>
         )}
-      </div>
-    </PWAPullToRefresh>
+      </PWAPullToRefresh>
+    </div>
   );
 };
 
