@@ -563,7 +563,7 @@ const TripMasonryCard: React.FC<{ trip: TripWithMember; index: number; onClick: 
       </div>
 
       <div className="flex flex-col gap-1.5 p-3 bg-[#EBE8FF] dark:bg-[#1A1825] rounded-b-[24px] -mt-1 pt-4 flex-1">
-        <h3 className="text-foreground font-bold text-sm leading-tight line-clamp-2">
+        <h3 className="text-foreground font-bold text-sm leading-tight">
           {trip.title}
         </h3>
 
