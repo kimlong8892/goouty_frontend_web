@@ -63,6 +63,37 @@ const PWATemplateDetailsPage = () => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
+    // Auto-hide navigation controls
+    const [controlsVisible, setControlsVisible] = useState(true);
+    const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const resetControlsTimeout = () => {
+        setControlsVisible(true);
+        if (controlsTimeoutRef.current) {
+            clearTimeout(controlsTimeoutRef.current);
+        }
+        controlsTimeoutRef.current = setTimeout(() => {
+            setControlsVisible(false);
+        }, 500); // Fade out after 0.5 seconds of inactivity
+    };
+
+    useEffect(() => {
+        resetControlsTimeout();
+
+        const handleActivity = () => resetControlsTimeout();
+
+        window.addEventListener('scroll', handleActivity);
+        window.addEventListener('touchstart', handleActivity);
+        window.addEventListener('click', handleActivity);
+
+        return () => {
+            if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+            window.removeEventListener('scroll', handleActivity);
+            window.removeEventListener('touchstart', handleActivity);
+            window.removeEventListener('click', handleActivity);
+        };
+    }, []);
+
 
 
     useEffect(() => {
@@ -283,7 +314,10 @@ const PWATemplateDetailsPage = () => {
             {template.previous && (
                 <button
                     onClick={() => navigate(`/pwa-template-details/${template.previous!.id}`)}
-                    className="fixed left-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all"
+                    className={cn(
+                        "fixed left-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all duration-500",
+                        controlsVisible ? "opacity-100 translate-x-0" : "opacity-30 -translate-x-1/2 hover:opacity-100 hover:translate-x-0"
+                    )}
                 >
                     <ChevronLeft className="w-6 h-6" />
                 </button>
@@ -292,7 +326,10 @@ const PWATemplateDetailsPage = () => {
             {template.next && (
                 <button
                     onClick={() => navigate(`/pwa-template-details/${template.next!.id}`)}
-                    className="fixed right-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all"
+                    className={cn(
+                        "fixed right-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all duration-500",
+                        controlsVisible ? "opacity-100 translate-x-0" : "opacity-30 translate-x-1/2 hover:opacity-100 hover:translate-x-0"
+                    )}
                 >
                     <ChevronRight className="w-6 h-6" />
                 </button>
