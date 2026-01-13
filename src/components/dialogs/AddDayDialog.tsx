@@ -159,7 +159,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
                   Hủy
                 </Button>
                 <DialogTitle className="flex items-center gap-2 text-lg font-bold text-foreground dark:text-white">
-                  <Plus className="w-5 h-5 text-[#6347f9]" />
+                  <Plus className="w-5 h-5 text-primary" />
                   <span>Thêm ngày mới</span>
                 </DialogTitle>
                 <div className="sm:hidden w-8"></div>
@@ -283,7 +283,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
               </Button>
               <Button
                 type="submit"
-                className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg px-6"
+                className="h-11 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg px-6"
                 disabled={loading}
               >
                 {loading ? (

@@ -215,7 +215,7 @@ const PWAEditDayPage = () => {
                         <Button
                             onClick={handleSubmit}
                             disabled={saving}
-                            className="w-full h-14 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
+                            className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
                         >
                             {saving ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />

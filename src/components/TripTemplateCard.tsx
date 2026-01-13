@@ -211,7 +211,7 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate, onWis
 
           <Button
             size="lg"
-            className="flex-1 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
+            className="flex-1 rounded-2xl bg-primary hover:bg-primary/90 text-white text-sm font-bold h-12 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
             onClick={handleUseTemplate}
             disabled={isLoading || usingTemplate}
           >

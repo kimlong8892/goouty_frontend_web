@@ -154,7 +154,7 @@ const EditProfile = () => {
       <div className="min-h-screen bg-white">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
             <p className="text-gray-500">Đang tải hồ sơ...</p>
           </div>
         </div>
@@ -333,7 +333,7 @@ const EditProfile = () => {
                     {profile.profilePicture ? (
                       <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-3xl font-bold text-[#6347f9]">
+                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-3xl font-bold text-primary">
                         {profile.fullName.charAt(0)}
                       </div>
                     )}
@@ -504,7 +504,7 @@ const EditProfile = () => {
                   <Button
                     onClick={handleSaveProfile}
                     disabled={saving || !formData.fullName.trim()}
-                    className="px-6 h-11 bg-[#6347f9] hover:bg-[#5136db]"
+                    className="px-6 h-11 bg-primary hover:bg-primary/90"
                   >
                     {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
                   </Button>
@@ -518,7 +518,7 @@ const EditProfile = () => {
                     {profile.profilePicture ? (
                       <img src={profile.profilePicture} alt={profile.fullName} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-4xl font-bold text-[#6347f9]">
+                      <div className="w-full h-full bg-[#f0f9ff] flex items-center justify-center text-4xl font-bold text-primary">
                         {profile.fullName.charAt(0)}
                       </div>
                     )}

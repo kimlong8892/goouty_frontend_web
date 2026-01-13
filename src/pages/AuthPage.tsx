@@ -37,7 +37,7 @@ const GoogleIcon = ({ size = 20 }: { size?: number }) => (
 const GooutyLogo = () => (
   <div className="flex flex-col items-center">
     <div className="w-32 h-32 relative">
-      <div className="absolute inset-0 bg-[#6347f9]/10 blur-2xl rounded-full"></div>
+      <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full"></div>
       <img
         src="https://pupil-sleep-11345349.figma.site/_assets/v11/8da9e20de4331dfe75eaaed992ce1fa360377f01.png"
         alt="Goouty Logo"
@@ -297,7 +297,7 @@ const AuthPage = () => {
           {/* Form Content */}
           <div className={`p-6 md:p-8 lg:p-10 flex flex-col justify-center ${mode === 'signup' ? 'md:order-1' : 'md:order-2'}`}>
             <div className={`mb-10 ${mode === 'login' ? 'md:text-left' : ''}`}>
-              <h1 className="text-[44px] font-black text-[#6347f9] mb-3 uppercase tracking-tight leading-tight font-sans">
+              <h1 className="text-[44px] font-black text-primary mb-3 uppercase tracking-tight leading-tight font-sans">
                 {mode === 'login' ? 'Đăng nhập' : 'ĐĂNG KÝ'}
               </h1>
               <p className="text-slate-600 dark:text-muted-foreground font-semibold text-lg">
@@ -338,7 +338,7 @@ const AuthPage = () => {
                     <Input
                       id="fullname"
                       type="text"
-                      className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-primary/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
                       placeholder="Nguyễn Văn A"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -353,7 +353,7 @@ const AuthPage = () => {
                   <Input
                     id="email"
                     type="email"
-                    className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
+                    className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-primary/20 transition-all px-5 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
                     placeholder={mode === 'signup' ? "nguyenvan.a@example.com" : "Nhập địa chỉ email của bạn"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -368,7 +368,7 @@ const AuthPage = () => {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-[#6347f9]/20 outline-none transition-colors duration-200 px-5 pr-12 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
+                      className="h-[56px] rounded-2xl bg-[#f3f4f6] dark:bg-secondary dark:text-foreground border-none focus:ring-2 focus:ring-primary/20 outline-none transition-colors duration-200 px-5 pr-12 text-base font-medium placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
                       placeholder={mode === 'signup' ? "••••••••" : "Nhập mật khẩu"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -376,7 +376,7 @@ const AuthPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground hover:text-[#6347f9] transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground hover:text-primary transition-colors"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -388,7 +388,7 @@ const AuthPage = () => {
                     <button
                       type="button"
                       onClick={() => navigate('/forgot-password')}
-                      className="text-[14px] font-bold text-[#6347f9] hover:text-[#5136db] transition-colors"
+                      className="text-[14px] font-bold text-primary hover:text-primary/90 transition-colors"
                     >
                       Quên mật khẩu
                     </button>
@@ -397,7 +397,7 @@ const AuthPage = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-[58px] rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-extrabold text-lg shadow-lg shadow-purple-200 dark:shadow-none transition-all duration-300 mt-4 active:scale-[0.98]"
+                  className="w-full h-[58px] rounded-2xl bg-primary hover:bg-primary/90 text-white font-extrabold text-lg shadow-lg shadow-primary/20 dark:shadow-none transition-all duration-300 mt-4 active:scale-[0.98]"
                 >
                   {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
                 </Button>
@@ -408,7 +408,7 @@ const AuthPage = () => {
                   {mode === 'login' ? 'Bạn không có tài khoản? ' : 'Bạn đã có tài khoản? '}
                   <button
                     onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                    className="text-[#6347f9] font-black hover:underline underline-offset-4"
+                    className="text-primary font-black hover:underline underline-offset-4"
                   >
                     {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
                   </button>

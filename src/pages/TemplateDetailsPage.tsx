@@ -140,7 +140,7 @@ const TripTemplateDetailPage = () => {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0a0a0a]">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6347f9]"></div>
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
                     <p className="text-slate-500 dark:text-zinc-400 font-medium">Đang tải template...</p>
                 </div>
             </div>
@@ -191,7 +191,7 @@ const TripTemplateDetailPage = () => {
                         {/* Badges */}
                         <div className="flex flex-wrap gap-2 mb-6">
                             {template.province && (
-                                <Badge className="bg-[#6347f9] hover:bg-[#5136db] text-white border-none px-3 py-1.5 text-sm rounded-lg shadow-lg shadow-indigo-900/20">
+                                <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground border-none px-3 py-1.5 text-sm rounded-lg shadow-lg shadow-indigo-900/20">
                                     <MapPin className="w-3.5 h-3.5 mr-1.5" /> {template.province.name}
                                 </Badge>
                             )}
@@ -229,7 +229,7 @@ const TripTemplateDetailPage = () => {
                     <div className="lg:col-span-2 space-y-8">
                         {/* Description Card */}
                         <div className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 shadow-sm border border-gray-100 dark:border-zinc-800">
-                            <h2 className="text-[#6347f9] dark:text-primary text-xl font-bold mb-4 flex items-center gap-2">
+                            <h2 className="text-primary text-xl font-bold mb-4 flex items-center gap-2">
                                 Giới thiệu chuyến đi
                             </h2>
                             <div className="relative">
@@ -242,7 +242,7 @@ const TripTemplateDetailPage = () => {
                                 {template.description && (template.description.split('\n').length > 3 || template.description.length > 150) ? (
                                     <button
                                         onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                                        className="mt-2 text-[#6347f9] font-bold text-sm hover:underline flex items-center gap-1"
+                                        className="mt-2 text-primary font-bold text-sm hover:underline flex items-center gap-1"
                                     >
                                         {isDescriptionExpanded ? (
                                             <>Thu gọn <ChevronDown className="w-4 h-4 rotate-180" /></>
@@ -271,7 +271,7 @@ const TripTemplateDetailPage = () => {
                                             <div
                                                 className={cn(
                                                     "group/day relative bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl overflow-hidden transition-all duration-300",
-                                                    isExpanded ? "shadow-md ring-1 ring-[#6347f9]/10" : "hover:shadow-sm"
+                                                    isExpanded ? "shadow-md ring-1 ring-primary/10" : "hover:shadow-sm"
                                                 )}
                                             >
                                                 {/* Day Header */}
@@ -281,7 +281,7 @@ const TripTemplateDetailPage = () => {
                                                 >
                                                     <div className={cn(
                                                         "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-all z-10",
-                                                        isExpanded ? "bg-[#6347f9] text-white shadow-lg shadow-indigo-200/50 dark:shadow-none" : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 group-hover/day:bg-slate-200 dark:group-hover/day:bg-zinc-700"
+                                                        isExpanded ? "bg-primary text-white shadow-lg shadow-indigo-200/50 dark:shadow-none" : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 group-hover/day:bg-slate-200 dark:group-hover/day:bg-zinc-700"
                                                     )}>
                                                         {index + 1}
                                                     </div>
@@ -314,14 +314,14 @@ const TripTemplateDetailPage = () => {
                                                                     key={act.id}
                                                                     className="flex gap-4 p-4 rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border border-slate-100 dark:border-zinc-800 hover:border-indigo-100 dark:hover:border-indigo-900/50 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors group/act"
                                                                 >
-                                                                    <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 text-[#6347f9] dark:text-primary shadow-sm flex items-center justify-center border border-indigo-100 dark:border-zinc-700">
+                                                                    <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 text-primary shadow-sm flex items-center justify-center border border-indigo-100 dark:border-zinc-700">
                                                                         {getActivityIcon(act.title)}
                                                                     </div>
                                                                     <div className="flex-1">
                                                                         <div className="flex items-start justify-between">
                                                                             <h4 className="font-semibold text-slate-900 dark:text-zinc-100">{act.title}</h4>
                                                                             {act.startTime && (
-                                                                                <span className="text-xs font-bold text-[#6347f9] dark:text-primary bg-white dark:bg-zinc-800 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-zinc-700">
+                                                                                <span className="text-xs font-bold text-primary bg-white dark:bg-zinc-800 px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-zinc-700">
                                                                                     {formatTime(act.startTime)}
                                                                                 </span>
                                                                             )}
@@ -385,7 +385,7 @@ const TripTemplateDetailPage = () => {
                         <div className="sticky top-24">
                             <div className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-zinc-800 relative overflow-hidden">
                                 {/* Decorative bg blob */}
-                                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#6347f9]/10 rounded-full blur-2xl" />
+                                <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
 
                                 <h3 className="text-2xl font-black text-slate-900 dark:text-zinc-100 mb-2 relative z-10">Bạn đã sẵn sàng chưa?</h3>
                                 <p className="text-slate-500 dark:text-zinc-400 mb-8 leading-relaxed relative z-10">
@@ -395,7 +395,7 @@ const TripTemplateDetailPage = () => {
                                 <Button
                                     onClick={handleUseTemplate}
                                     disabled={usingTemplate}
-                                    className="w-full h-14 text-lg rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all hover:-translate-y-0.5"
+                                    className="w-full h-14 text-lg rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all hover:-translate-y-0.5"
                                 >
                                     {usingTemplate ? (
                                         <>
@@ -424,7 +424,7 @@ const TripTemplateDetailPage = () => {
                         <Button
                             onClick={handleUseTemplate}
                             disabled={usingTemplate}
-                            className="w-full h-12 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-base shadow-lg"
+                            className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-base shadow-lg"
                         >
                             {usingTemplate ? (
                                 <>

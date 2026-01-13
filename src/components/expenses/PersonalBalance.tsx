@@ -54,7 +54,7 @@ export const PersonalBalance: React.FC<PersonalBalanceProps> = ({ userBalances }
   return (
     <div className={cn("space-y-4", isMobileView && "space-y-3")}>
       <div className="flex items-center gap-2 px-1">
-        <Wallet className="w-5 h-5 text-[#6347f9]" />
+        <Wallet className="w-5 h-5 text-primary" />
         <h3 className={cn("font-bold text-slate-900 dark:text-white", isMobileView ? "text-base" : "text-lg")}>Cá nhân</h3>
       </div>
       <div className={cn("grid gap-3", isMobileView ? "grid-cols-1" : "grid-cols-2")}>
@@ -67,7 +67,7 @@ export const PersonalBalance: React.FC<PersonalBalanceProps> = ({ userBalances }
               className={cn(
                 "p-4 rounded-[20px] border transition-all duration-200 flex flex-col gap-4",
                 isCurrentUser
-                  ? "border-[#6347f9]/20 bg-[#6347f9]/5 dark:bg-[#6347f9]/10 shadow-sm dark:border-[#6347f9]/30"
+                  ? "border-primary/20 bg-primary/5 dark:bg-primary/10 shadow-sm dark:border-primary/30"
                   : "border-slate-100 bg-white dark:bg-card/50 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10"
               )}
             >
@@ -78,12 +78,12 @@ export const PersonalBalance: React.FC<PersonalBalanceProps> = ({ userBalances }
                       {userBalance.user.profilePicture && (
                         <AvatarImage src={userBalance.user.profilePicture} />
                       )}
-                      <AvatarFallback className={cn("bg-slate-100 dark:bg-slate-800 text-[#6347f9]", isMobileView ? "text-sm" : "text-base")}>
+                      <AvatarFallback className={cn("bg-slate-100 dark:bg-slate-800 text-primary", isMobileView ? "text-sm" : "text-base")}>
                         {(userBalance.user.fullName || userBalance.user.email).charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     {isCurrentUser && (
-                      <div className={cn("absolute -top-1 -right-1 bg-[#6347f9] rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center", isMobileView ? "w-4 h-4" : "w-5 h-5")}>
+                      <div className={cn("absolute -top-1 -right-1 bg-primary rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center", isMobileView ? "w-4 h-4" : "w-5 h-5")}>
                         <UserIcon className={cn("text-white", isMobileView ? "w-2 h-2" : "w-3 h-3")} />
                       </div>
                     )}

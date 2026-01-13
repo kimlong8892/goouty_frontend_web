@@ -234,7 +234,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-5xl font-black mb-4 bg-gradient-to-r from-[#6347f9] to-[#8673f8] bg-clip-text text-transparent uppercase tracking-tight">
+          <h2 className="text-3xl md:text-5xl font-black mb-4 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent uppercase tracking-tight">
             KHÁM PHÁ TEMPLATES
           </h2>
           <p className="text-lg text-muted-foreground font-medium max-w-lg mx-auto leading-relaxed">
@@ -340,7 +340,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
             <p className="text-sm font-semibold text-muted-foreground tracking-wide uppercase">
               Hiển thị {templates.length} template{templates.length !== 1 ? 's' : ''}
               {pagination.total > templates.length && (
-                <span className="ml-1 text-[#6347f9]">/ {pagination.total}</span>
+                <span className="ml-1 text-primary">/ {pagination.total}</span>
               )}
             </p>
             <div className="h-px w-8 bg-border" />
@@ -368,7 +368,7 @@ export const TripTemplatesSection = ({ onUseTemplate, usingTemplate }: TripTempl
                   variant="outline"
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="h-11 px-6 rounded-full border-2 border-[#6347f9] text-[#6347f9] hover:bg-[#6347f9] hover:text-white transition-all font-bold"
+                  className="h-11 px-6 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all font-bold"
                 >
                   {loadingMore ? (
                     <>

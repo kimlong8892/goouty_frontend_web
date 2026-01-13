@@ -226,11 +226,11 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             <button
               onClick={handleSubmit}
               disabled={loading || membersLoading}
-              className="flex items-center text-[#6347f9] hover:text-[#5136db] disabled:text-gray-400 transition-colors font-bold text-lg active:scale-95 touch-manipulation"
+              className="flex items-center text-primary hover:text-primary/90 disabled:text-gray-400 transition-colors font-bold text-lg active:scale-95 touch-manipulation"
               type="button"
             >
               {loading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6347f9] mr-2"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
               ) : null}
               Xong
             </button>
@@ -238,8 +238,8 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
         ) : (
           <DialogHeader className={cn("p-6 pb-2 flex-shrink-0", isMobileView && "px-4 pt-4")}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#6347f9]/10 flex items-center justify-center">
-                <Edit3 className="w-5 h-5 text-[#6347f9]" />
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Edit3 className="w-5 h-5 text-primary" />
               </div>
               <DialogTitle className={cn("font-bold text-slate-900 dark:text-foreground", isMobileView ? "text-lg" : "text-xl")}>
                 Chỉnh sửa chi phí
@@ -257,7 +257,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
               </Label>
               <Input
                 id="title"
-                className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-[#6347f9] font-bold text-slate-900 dark:text-foreground"
+                className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-foreground"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="VD: Khách sạn, Tiền xăng..."
@@ -271,7 +271,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
               </Label>
               <Input
                 id="description"
-                className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-[#6347f9] font-medium text-slate-700 dark:text-foreground/90"
+                className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-medium text-slate-700 dark:text-foreground/90"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Nhập ghi chú thêm..."
@@ -286,7 +286,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                 </Label>
                 <Input
                   id="amount"
-                  className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-[#6347f9] font-black text-slate-900 dark:text-foreground"
+                  className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-black text-slate-900 dark:text-foreground"
                   value={formatCurrencyInput(formData.amount)}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value.replace(/[^0-9]/g, '') })}
                   placeholder="0"
@@ -301,7 +301,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full h-12 justify-start text-left font-bold rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-[#6347f9] hover:bg-transparent hover:text-slate-900 dark:hover:text-foreground px-3",
+                        "w-full h-12 justify-start text-left font-bold rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary hover:bg-transparent hover:text-slate-900 dark:hover:text-foreground px-3",
                         !formData.date && "text-muted-foreground"
                       )}
                     >
@@ -352,7 +352,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between ml-1">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground">Tham gia</Label>
-                <span className="text-[10px] font-black text-[#6347f9] bg-[#6347f9]/5 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                <span className="text-[10px] font-black text-primary bg-primary/5 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                   {formData.participantIds.length} người
                 </span>
               </div>
@@ -362,14 +362,14 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                     <div className="flex items-center gap-3">
                       <Avatar className="w-8 h-8 font-bold border-2 border-white dark:border-border shadow-sm ring-1 ring-slate-100 dark:ring-border">
                         <AvatarImage src={m.user.profilePicture} />
-                        <AvatarFallback className="bg-white dark:bg-secondary text-[#6347f9]">{(m.user.fullName || m.user.email).charAt(0).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback className="bg-white dark:bg-secondary text-primary">{(m.user.fullName || m.user.email).charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <span className="text-xs font-bold text-slate-700 dark:text-foreground group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{m.user.fullName || m.user.email} {user?.id === m.user.id && '(bạn)'}</span>
                     </div>
                     <Checkbox
                       checked={formData.participantIds.includes(m.user.id.toString())}
                       onCheckedChange={() => toggleParticipant(m.user.id.toString())}
-                      className="rounded-full h-5 w-5 border-slate-200 dark:border-border data-[state=checked]:bg-[#6347f9] data-[state=checked]:border-[#6347f9] transition-all"
+                      className="rounded-full h-5 w-5 border-slate-200 dark:border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all"
                     />
                   </label>
                 ))}
@@ -397,7 +397,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                           <input
                             type="text"
                             inputMode="numeric"
-                            className="w-28 h-8 text-right pr-3 text-xs font-black text-[#6347f9] border-none focus:ring-1 focus:ring-purple-200 rounded-lg bg-slate-50/50 dark:bg-secondary/50 dark:placeholder:text-muted-foreground/50"
+                            className="w-28 h-8 text-right pr-3 text-xs font-black text-primary border-none focus:ring-1 focus:ring-primary/20 rounded-lg bg-slate-50/50 dark:bg-secondary/50 dark:placeholder:text-muted-foreground/50"
                             value={(amountByUserId[pid] ?? '').toString()}
                             onChange={(e) => {
                               const digits = e.target.value.replace(/[^0-9]/g, '');
@@ -425,14 +425,14 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
               <Button
                 type="button"
                 variant="ghost"
-                className="flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 dark:text-muted-foreground hover:text-[#6347f9] hover:bg-transparent border border-transparent hover:border-[#6347f9] transition-all"
+                className="flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 dark:text-muted-foreground hover:text-primary hover:bg-transparent border border-transparent hover:border-primary transition-all"
                 onClick={() => onOpenChange(false)}
               >
                 Hủy
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="flex-[2] h-12 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-purple-200 dark:shadow-none transition-all active:scale-[0.98] disabled:opacity-50"
+                className="flex-[2] h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] disabled:opacity-50"
                 disabled={loading || membersLoading}
               >
                 {loading ? (

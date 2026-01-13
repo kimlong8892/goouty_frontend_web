@@ -158,9 +158,9 @@ const ForgotPasswordPage = () => {
                         <div className="space-y-4">
                             <div className="relative group">
                                 <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5 block ml-1">Địa chỉ Email</Label>
-                                <div className="flex items-center bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus-within:border-[#6347f9] focus-within:bg-white dark:focus-within:bg-slate-800 rounded-2xl p-3.5 transition-all">
-                                    <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-[#6347f9]/10 flex items-center justify-center shrink-0 mr-3">
-                                        <Mail size={18} className="text-[#6347f9]" />
+                                <div className="flex items-center bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus-within:border-primary focus-within:bg-white dark:focus-within:bg-slate-800 rounded-2xl p-3.5 transition-all">
+                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mr-3">
+                                        <Mail size={18} className="text-primary" />
                                     </div>
                                     <input
                                         type="email"
@@ -176,13 +176,13 @@ const ForgotPasswordPage = () => {
                         <Button
                             onClick={handleSendEmail}
                             disabled={isLoading || !email}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 dark:shadow-none transition-all active:scale-[0.98]"
+                            className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/10 dark:shadow-none transition-all active:scale-[0.98]"
                         >
                             {isLoading ? 'Đang gửi...' : 'Tiếp tục'}
                         </Button>
 
                         <div className="text-center">
-                            <button onClick={() => navigate('/auth')} className="text-sm font-bold text-[#6347f9] hover:text-[#5136db] transition-colors">
+                            <button onClick={() => navigate('/auth')} className="text-sm font-bold text-primary hover:text-primary/90 transition-colors">
                                 Quay lại đăng nhập
                             </button>
                         </div>
@@ -212,7 +212,7 @@ const ForgotPasswordPage = () => {
                                         value={digit}
                                         onChange={(e) => handleOtpChange(index, e.target.value)}
                                         onKeyDown={(e) => handleKeyDown(index, e)}
-                                        className="w-full h-16 bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-[#6347f9] focus:bg-white dark:focus:bg-slate-800 rounded-2xl text-center text-2xl font-black text-slate-900 dark:text-white outline-none transition-all shadow-sm"
+                                        className="w-full h-16 bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-primary focus:bg-white dark:focus:bg-slate-800 rounded-2xl text-center text-2xl font-black text-slate-900 dark:text-white outline-none transition-all shadow-sm"
                                     />
                                 ))}
                             </div>
@@ -223,10 +223,10 @@ const ForgotPasswordPage = () => {
                                     disabled={timer > 0}
                                     className={cn(
                                         "text-sm font-bold transition-all p-2 rounded-lg",
-                                        timer > 0 ? "text-slate-300 cursor-not-allowed" : "text-[#6347f9] hover:bg-purple-50 active:bg-purple-100"
+                                        timer > 0 ? "text-slate-300 cursor-not-allowed" : "text-primary hover:bg-primary/5 active:bg-primary/10"
                                     )}
                                 >
-                                    Gửi lại mã {timer > 0 && <span className="ml-1 text-[#6347f9] font-mono">{formatTimer(timer)}</span>}
+                                    Gửi lại mã {timer > 0 && <span className="ml-1 text-primary font-mono">{formatTimer(timer)}</span>}
                                 </button>
                             </div>
                         </div>
@@ -234,7 +234,7 @@ const ForgotPasswordPage = () => {
                         <Button
                             onClick={handleVerifyOtp}
                             disabled={isLoading || otp.join('').length < 4}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 dark:shadow-none transition-all active:scale-[0.98]"
+                            className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/10 dark:shadow-none transition-all active:scale-[0.98]"
                         >
                             {isLoading ? 'Đang xác thực...' : 'Xác thực'}
                         </Button>
@@ -269,12 +269,12 @@ const ForgotPasswordPage = () => {
                                         placeholder="••••••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus-visible:ring-[#6347f9] px-5 font-semibold text-lg text-slate-900 dark:text-white"
+                                        className="h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus-visible:ring-primary px-5 font-semibold text-lg text-slate-900 dark:text-white"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#6347f9] transition-colors"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
                                     >
                                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                     </button>
@@ -289,12 +289,12 @@ const ForgotPasswordPage = () => {
                                         placeholder="••••••••••••"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus-visible:ring-[#6347f9] px-5 font-semibold text-lg text-slate-900 dark:text-white"
+                                        className="h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus-visible:ring-primary px-5 font-semibold text-lg text-slate-900 dark:text-white"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#6347f9] transition-colors"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
                                     >
                                         {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                     </button>
@@ -305,7 +305,7 @@ const ForgotPasswordPage = () => {
                         <Button
                             onClick={handleResetPassword}
                             disabled={isLoading || !password || !confirmPassword || password.length < 6}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 dark:shadow-none transition-all active:scale-[0.98]"
+                            className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/10 dark:shadow-none transition-all active:scale-[0.98]"
                         >
                             {isLoading ? 'Đang cập nhật...' : 'Xác nhận thay đổi'}
                         </Button>
@@ -317,11 +317,11 @@ const ForgotPasswordPage = () => {
     return (
         <div className="min-h-screen pt-12 pb-12 px-4 flex items-center justify-center bg-background">
             <AnimatedTransition show={show} animation="slide-up" className="w-full max-w-[480px]">
-                <Card className="p-8 md:p-10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(99,71,249,0.15)] dark:shadow-none border-none bg-white dark:bg-card relative overflow-hidden">
+                <Card className="p-8 md:p-10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(var(--primary),0.15)] dark:shadow-none border-none bg-white dark:bg-card relative overflow-hidden">
                     {/* Progress indicator */}
                     <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-50 dark:bg-slate-800 flex">
                         <div
-                            className="h-full bg-[#6347f9] transition-all duration-500 rounded-r-full"
+                            className="h-full bg-primary transition-all duration-500 rounded-r-full"
                             style={{ width: step === 'email' ? '33.33%' : step === 'otp' ? '66.66%' : '100%' }}
                         />
                     </div>
@@ -337,9 +337,9 @@ const ForgotPasswordPage = () => {
 
                     <Card className="relative w-full max-w-[440px] bg-white dark:bg-card rounded-[40px] p-10 text-center animate-in zoom-in-95 duration-500 shadow-2xl">
                         <div className="flex justify-center mb-8">
-                            <div className="w-24 h-24 rounded-full bg-purple-50 dark:bg-[#6347f9]/10 flex items-center justify-center relative">
-                                <div className="absolute inset-0 bg-[#6347f9] opacity-10 rounded-full animate-ping" />
-                                <div className="w-16 h-16 rounded-full bg-[#6347f9] flex items-center justify-center shadow-lg shadow-purple-200 dark:shadow-none relative z-10">
+                            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center relative">
+                                <div className="absolute inset-0 bg-primary opacity-10 rounded-full animate-ping" />
+                                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20 dark:shadow-none relative z-10">
                                     <CheckCircle2 size={36} className="text-white" />
                                 </div>
                             </div>
@@ -352,7 +352,7 @@ const ForgotPasswordPage = () => {
 
                         <Button
                             onClick={() => navigate('/auth')}
-                            className="w-full h-14 rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-purple-100 dark:shadow-none transition-all active:scale-95"
+                            className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/10 dark:shadow-none transition-all active:scale-95"
                         >
                             Đăng nhập ngay
                         </Button>

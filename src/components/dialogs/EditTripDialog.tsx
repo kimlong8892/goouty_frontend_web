@@ -193,7 +193,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-[#1c1e26] border-border dark:border-gray-800 text-foreground dark:text-white shadow-2xl rounded-[24px] sm:rounded-[32px]">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2 text-foreground dark:text-white">
-            <Edit className="h-5 w-5 text-[#6347f9]" />
+            <Edit className="h-5 w-5 text-primary" />
             <span>Chỉnh sửa chuyến đi</span>
           </DialogTitle>
           <DialogDescription className="text-muted-foreground dark:text-slate-400">
@@ -280,7 +280,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                 }
               }}
               className={cn(
-                "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                 errors.tripName ? 'border-red-500 focus:border-red-500' : ''
               )}
             />
@@ -356,7 +356,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+              className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
             />
           </div>
         </div>
@@ -373,7 +373,7 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
           <Button
             onClick={handleSubmit}
             disabled={updateTripMutation.isPending}
-            className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold px-6"
+            className="h-11 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-primary/20 transition-all font-bold px-6"
           >
             {updateTripMutation.isPending ? (
               <>

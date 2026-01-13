@@ -256,7 +256,7 @@ const MyTripsPage = () => {
       {isLoading ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6347f9]" />
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
             <p className="text-muted-foreground">Đang kiểm tra đăng nhập...</p>
           </div>
         </div>
@@ -296,7 +296,7 @@ const MyTripsPage = () => {
 
               <Button
                 onClick={() => navigate('/create-trip')}
-                className="h-12 px-8 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-xl transition-all font-semibold"
+                className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all font-semibold"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Tạo chuyến đi
@@ -395,12 +395,12 @@ const MyTripsPage = () => {
             {/* Trips Grid */}
             {loading ? (
               <div className="text-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6347f9]" />
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
                 <p className="text-muted-foreground">Đang tải...</p>
               </div>
             ) : searchLoading ? (
               <div className="text-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#6347f9]" />
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
                 <p className="text-muted-foreground">Đang tìm kiếm...</p>
               </div>
             ) : (
@@ -409,7 +409,7 @@ const MyTripsPage = () => {
                   {trips.map((trip) => (
                     <div
                       key={trip.id}
-                      className="group relative rounded-[32px] overflow-hidden border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(99,71,249,0.15)] transition-all duration-500 bg-card h-[450px] w-full flex flex-col cursor-pointer"
+                      className="group relative rounded-[32px] overflow-hidden border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(var(--primary),0.15)] transition-all duration-500 bg-card h-[450px] w-full flex flex-col cursor-pointer"
                       onClick={() => handleTripAction('view', trip)}
                     >
                       {/* Background Image - Full Cover */}
@@ -480,7 +480,7 @@ const MyTripsPage = () => {
                         {/* Action Button */}
                         <div className="pt-2">
                           <Button
-                            className="w-full rounded-2xl bg-[#6347f9] hover:bg-[#5136db] text-white text-sm font-bold h-11 shadow-[0_4px_15px_rgba(99,71,249,0.3)] hover:shadow-[0_8px_25px_rgba(99,71,249,0.4)] transition-all active:scale-[0.98]"
+                            className="w-full rounded-2xl bg-primary hover:bg-primary/90 text-white text-sm font-bold h-11 shadow-lg hover:shadow-primary/40 transition-all active:scale-[0.98]"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleTripAction('view', trip);
@@ -502,7 +502,7 @@ const MyTripsPage = () => {
                       variant="outline"
                       onClick={handleLoadMore}
                       disabled={loadingMore}
-                      className="px-8 h-12 rounded-xl border-[#6347f9]/20 text-[#6347f9] hover:bg-[#6347f9]/5 font-medium"
+                      className="px-8 h-12 rounded-xl border-primary/20 text-primary hover:bg-primary/5 font-medium"
                     >
                       {loadingMore ? (
                         <>
@@ -522,7 +522,7 @@ const MyTripsPage = () => {
                 {/* End of results */}
                 {!hasMore && trips.length > 0 && (
                   <div className="text-center py-12">
-                    <div className="w-16 h-1 bg-[#6347f9]/10 mx-auto rounded-full mb-4"></div>
+                    <div className="w-16 h-1 bg-primary/10 mx-auto rounded-full mb-4"></div>
                     <p className="text-slate-400 font-medium">Bạn đã xem hết danh sách</p>
                   </div>
                 )}
@@ -545,7 +545,7 @@ const MyTripsPage = () => {
                   }
                 </p>
                 {!searchQuery && (
-                  <Button onClick={() => navigate('/create-trip')} className="h-12 px-8 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-semibold">
+                  <Button onClick={() => navigate('/create-trip')} className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold">
                     <Plus className="w-5 h-5 mr-2" />
                     Tạo chuyến đi đầu tiên
                   </Button>
