@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DATABASE_TYPES } from './types';
 import { envUtils } from '../../lib/env';
-import { offlineManager } from '../../lib/offline/OfflineManager';
+
 
 const API_URL = envUtils.getApiBaseUrl();
 
@@ -47,15 +47,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(backendError);
     }
 
-    // Check for network errors (no response)
-    if (!error.response && error.config) {
-      // Don't queue login/register requests
-      const isAuthRequest = error.config.url?.includes('/auth/login') || error.config.url?.includes('/auth/register');
 
-      if (!isAuthRequest) {
-        offlineManager.queueRequest(error.config);
-      }
-    }
 
     return Promise.reject(error);
   }

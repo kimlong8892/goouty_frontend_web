@@ -9,8 +9,7 @@ import AuthModal from '@/components/AuthModal.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { SyncStatus } from '@/components/SyncStatus.tsx';
-import { useOfflineStatus } from '@/lib/offline/OfflineManager';
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -280,7 +279,7 @@ export const Navbar = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout, user, isLoading } = useAuth();
-  const { isOnline, pendingCount } = useOfflineStatus();
+
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
   const isMobileView = isPWA || isMobile;
