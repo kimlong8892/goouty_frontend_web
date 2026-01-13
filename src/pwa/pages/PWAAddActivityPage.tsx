@@ -195,7 +195,7 @@ const PWAAddActivityPage = () => {
                                 id="important"
                                 checked={formData.important}
                                 onCheckedChange={(checked) => setFormData({ ...formData, important: !!checked })}
-                                className="w-5 h-5 rounded-md border-primary/20 data-[state=checked]:bg-[#6347f9] data-[state=checked]:border-[#6347f9]"
+                                className="w-5 h-5 rounded-md border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                             <div className="flex items-center gap-2 flex-1 cursor-pointer" onClick={() => setFormData({ ...formData, important: !formData.important })}>
                                 <Star className={cn("w-4 h-4 transition-colors", formData.important ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground")} />
@@ -209,7 +209,7 @@ const PWAAddActivityPage = () => {
                         <Button
                             onClick={handleSubmit}
                             disabled={loading}
-                            className="w-full h-14 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
+                            className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
                         >
                             {loading ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />

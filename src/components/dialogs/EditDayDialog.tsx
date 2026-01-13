@@ -113,17 +113,17 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
               Hủy
             </Button>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-foreground dark:text-white">
-              <CalendarIcon className="w-5 h-5 text-[#6347f9]" />
+              <CalendarIcon className="w-5 h-5 text-primary" />
               <span>Chỉnh sửa ngày</span>
             </DialogTitle>
             <Button
               type="submit"
               variant="ghost"
               disabled={loading}
-              className="p-0 h-auto font-bold text-[#6347f9] hover:text-[#5136db] hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
+              className="p-0 h-auto font-bold text-primary hover:text-primary/90 hover:bg-transparent disabled:text-gray-400 text-base sm:hidden"
             >
               {loading && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6347f9] mr-2" />
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
               )}
               Xong
             </Button>
@@ -141,7 +141,7 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 aria-invalid={!!errors.title}
                 className={cn(
-                  "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                  "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                   errors.title ? 'border-red-500 focus:border-red-500' : ''
                 )}
                 placeholder="VD: Ngày 1 - Khám phá thành phố"
@@ -156,7 +156,7 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+                className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
                 placeholder="Mô tả chi tiết về ngày này..."
               />
             </div>
@@ -204,7 +204,7 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   aria-invalid={!!errors.date}
                   className={cn(
-                    "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 block w-full",
+                    "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 block w-full",
                     errors.date ? 'border-red-500 focus:border-red-500' : ''
                   )}
                 />
@@ -224,7 +224,7 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
             </Button>
             <Button
               type="submit"
-              className="h-11 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white shadow-lg hover:shadow-[#6347f9]/20 transition-all font-bold px-6"
+              className="h-11 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-primary/20 transition-all font-bold px-6"
               disabled={loading}
             >
               {loading ? (

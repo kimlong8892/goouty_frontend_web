@@ -56,11 +56,11 @@
     --popover: 249 18% 7%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 249 94% 63%;
+    --primary: 249 80% 72%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 249 15% 12%;
-    --secondary-foreground: 249 94% 63%;
+    --secondary-foreground: 249 80% 72%;
 
     --muted: 249 10% 12%;
     --muted-foreground: 249 5% 65%;
@@ -73,7 +73,7 @@
 
     --border: 249 12% 14%;
     --input: 249 12% 14%;
-    --ring: 249 94% 63%;
+    --ring: 249 80% 72%;
   }
 }
 
@@ -415,7 +415,7 @@
 .speed-streak {
   position: absolute;
   height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(99, 71, 249, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, hsla(var(--primary), 0.4), transparent);
   border-radius: 99px;
   animation: speed-line 0.6s linear infinite;
   pointer-events: none;
@@ -471,10 +471,14 @@
 .animate-mascot-ride {
   animation: mascot-ride 3s ease-in-out infinite;
 }
+
 @keyframes bounce-subtle {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }

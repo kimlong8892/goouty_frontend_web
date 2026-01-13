@@ -249,7 +249,7 @@ const Profile = () => {
   if (loading) {
     return (
       <div className="min-h-screen pt-20 flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6347f9]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -287,7 +287,7 @@ const Profile = () => {
                 <Button
                   onClick={() => navigate('/profile/edit', { state: { mode: 'edit' } })}
                   size="icon"
-                  className="h-10 w-10 bg-[#6347f9] hover:bg-[#5136db] text-white rounded-[12px] shadow-sm shrink-0 border-none"
+                  className="h-10 w-10 bg-primary hover:bg-primary/90 text-white rounded-[12px] shadow-sm shrink-0 border-none"
                 >
                   <Pencil className="w-5 h-5" />
                 </Button>

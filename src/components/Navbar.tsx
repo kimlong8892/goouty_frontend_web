@@ -79,7 +79,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
             to={to}
             className={cn(
               "relative flex items-center gap-2.5 px-6 py-2.5 rounded-full transition-all duration-300",
-              "bg-[#6347f9] hover:bg-[#5136db]",
+              "bg-primary hover:bg-primary/90",
               "text-white font-bold shadow-md hover:shadow-lg",
               "overflow-hidden flex-shrink-0 text-base"
             )}

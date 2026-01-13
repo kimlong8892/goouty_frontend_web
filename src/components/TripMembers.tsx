@@ -179,7 +179,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6347f9]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -215,7 +215,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                     navigate(`/pwa-invite-member/${tripId}`);
                   }
                 }}
-                className="bg-[#6347f9] hover:bg-[#5136db] text-white rounded-xl shadow-md transition-all hover:shadow-lg h-10 px-4"
+                className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-md transition-all hover:shadow-lg h-10 px-4"
               >
                 {isMobileView ? <UserPlus className="h-5 w-5" /> : <Plus className="h-5 w-5 mr-2" />}
                 {!isMobileView && "Thêm thành viên"}
@@ -223,7 +223,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
             </DialogTrigger>
             <DialogContent className={cn("max-w-md", isMobileView ? "w-[95%] rounded-3xl" : "rounded-2xl")}>
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold text-[#6347f9]">Mời thành viên mới</DialogTitle>
+                <DialogTitle className="text-xl font-bold text-primary">Mời thành viên mới</DialogTitle>
                 <DialogDescription>
                   Nhập email của người bạn muốn mời. Họ sẽ nhận được thông báo và cần chấp nhận lời mời trước khi tham gia.
                 </DialogDescription>
@@ -237,7 +237,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                     placeholder="user@example.com"
                     value={memberEmail}
                     onChange={(e) => setMemberEmail(e.target.value)}
-                    className="rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus-visible:ring-[#6347f9]"
+                    className="rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus-visible:ring-primary"
                   />
                 </div>
               </div>
@@ -246,14 +246,14 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                   variant="outline"
                   onClick={() => setIsAddMemberOpen(false)}
                   disabled={addMemberMutation.isPending}
-                  className="rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-[#6347f9]"
+                  className="rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-primary"
                 >
                   Hủy
                 </Button>
                 <Button
                   onClick={handleAddMember}
                   disabled={addMemberMutation.isPending}
-                  className="rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white"
+                  className="rounded-xl bg-primary hover:bg-primary/90 text-white"
                 >
                   {addMemberMutation.isPending ? 'Đang gửi...' : 'Gửi lời mời'}
                 </Button>
@@ -392,7 +392,7 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
                   <div
                     key={member.id}
                     className={cn(
-                      "flex items-center gap-3 p-4 rounded-2xl border border-slate-100 dark:border-indigo-500/20 bg-white dark:bg-indigo-500/10 hover:border-[#6347f9]/30 dark:hover:border-[#6347f9]/30 hover:shadow-md transition-all duration-300",
+                      "flex items-center gap-3 p-4 rounded-2xl border border-slate-100 dark:border-indigo-500/20 bg-white dark:bg-indigo-500/10 hover:border-primary/30 dark:hover:border-primary/30 hover:shadow-md transition-all duration-300",
                       isMobileView && "p-3 gap-3"
                     )}
                   >
@@ -477,13 +477,13 @@ export function TripMembers({ tripId, tripOwnerId, onCountChange }: TripMembersP
             <Button
               variant="outline"
               onClick={() => setIsDeleteMemberOpen(false)}
-              className="flex-1 sm:flex-none rounded-xl bg-white dark:bg-slate-800 text-[#6347f9] dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 hover:border-purple-200 font-bold transition-all h-11"
+              className="flex-1 sm:flex-none rounded-xl bg-white dark:bg-slate-800 text-primary dark:text-slate-200 hover:bg-primary/5 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 hover:border-primary/20 font-bold transition-all h-11"
             >
               Hủy
             </Button>
             <Button
               onClick={confirmDeleteMember}
-              className="flex-1 sm:flex-none bg-[#6347f9] hover:bg-[#5136db] rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-purple-500/20 h-11"
+              className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-primary/20 h-11"
             >
               Xóa người này
             </Button>

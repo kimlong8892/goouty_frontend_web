@@ -90,11 +90,11 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
     <Card className="rounded-[24px] border-none shadow-sm bg-white dark:bg-card/50 border border-slate-100 dark:border-white/5 overflow-hidden">
       <CardHeader className="pb-4 flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
-          <History className="w-5 h-5 text-[#6347f9]" />
+          <History className="w-5 h-5 text-primary" />
           <CardTitle className="text-lg font-bold text-slate-900 dark:text-white">Giải quyết trả tiền</CardTitle>
         </div>
         <div className="flex gap-2">
-          <Badge variant="secondary" className="bg-[#6347f9]/10 text-[#6347f9] border-transparent rounded-full px-3">
+          <Badge variant="secondary" className="bg-primary/10 text-primary border-transparent rounded-full px-3">
             {settlements.length} giao dịch
           </Badge>
         </div>
