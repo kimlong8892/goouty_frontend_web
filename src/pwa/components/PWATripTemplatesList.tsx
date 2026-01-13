@@ -17,10 +17,22 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Filter, Check, SlidersHorizontal, Bell } from 'lucide-react';
+import { Filter, Check, SlidersHorizontal, Bell, Map as MapIcon, Coffee, Utensils, ShoppingBag, FerrisWheel } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotificationCountContext } from '@/contexts/NotificationCountContext';
+import { PWAMasonryCard } from './PWAMasonryCard';
+
+// Add CSS to hide scrollbar
+const style = `
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+`;
 
 interface PWATripTemplatesListProps {
   onUseTemplate?: (template: DATABASE_TYPES.tripTemplates) => void;
@@ -34,6 +46,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   const { unreadCount } = useNotificationCountContext();
   const [templates, setTemplates] = useState<DATABASE_TYPES.tripTemplates[]>([]);
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -279,14 +292,11 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-background text-foreground">
+    <div className="w-full max-w-7xl mx-auto bg-background text-foreground pb-20">
+      <style>{style}</style>
 
-
-      {/* Search and Filter - Sticky at top */}
-
-      {/* Custom Header Section - Based on requested UI */}
-      <div className="pt-6 pb-4 space-y-6">
-        {/* Top Row: Profile and Notification */}
+      {/* Profile and Notification Header - Restored */}
+      <div className="px-4 pt-6 pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
@@ -317,98 +327,112 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
             )}
           </Button>
         </div>
+      </div>
 
-        {/* Search and Filter Row */}
-        <div className="flex gap-2">
+      {/* Sticky Top Search Bar */}
+      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg px-4 pt-4 pb-2">
+        <div className="flex gap-2 items-center">
           <div className="relative flex-1 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 w-5 h-5 group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 w-5 h-5" />
             <Input
-              placeholder={t('template.searchTemplates')}
+              placeholder="Tìm kiếm..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="pl-12 pr-12 h-14 bg-card shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border-border/50 focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/10 rounded-2xl text-base text-foreground placeholder:text-muted-foreground/40 transition-all font-medium"
+              className="pl-12 pr-4 h-12 bg-secondary/50 border-none rounded-full text-base placeholder:text-muted-foreground/40 focus-visible:ring-1 focus-visible:ring-primary/20 transition-all font-medium w-full"
             />
-            <Drawer open={isProvinceDrawerOpen} onOpenChange={setIsProvinceDrawerOpen}>
-              <DrawerTrigger asChild>
-                <button
-                  className={cn(
-                    "absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all",
-                    selectedProvince !== 'all'
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground/60 hover:text-primary hover:bg-secondary"
-                  )}
-                >
-                  <SlidersHorizontal className="w-5 h-5" />
-                </button>
-              </DrawerTrigger>
-              <DrawerContent className="max-h-[85vh] bg-card border-t border-border">
-                <DrawerHeader className="border-b border-border pb-4">
-                  <DrawerTitle className="text-center text-foreground">Chọn tỉnh thành</DrawerTitle>
-                  <div className="relative mt-4">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    <Input
-                      placeholder="Tìm nhanh tỉnh thành..."
-                      value={provinceSearchQuery}
-                      onChange={(e) => setProvinceSearchQuery(e.target.value)}
-                      className="pl-10 pr-4 bg-secondary border-border focus:border-primary/50 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 h-11 rounded-xl text-foreground transition-all duration-200"
-                    />
-                  </div>
-                </DrawerHeader>
-                <div className="overflow-y-auto py-2 px-2 flex-1">
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-between h-12 rounded-xl px-4 hover:bg-primary/10 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-200",
-                      selectedProvince === 'all' && "bg-primary/10 text-primary font-bold"
-                    )}
+          </div>
+          <Drawer open={isProvinceDrawerOpen} onOpenChange={setIsProvinceDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 rounded-full border-none bg-secondary/50 hover:bg-secondary/80 transition-colors shrink-0"
+              >
+                <SlidersHorizontal className="w-5 h-5 text-foreground" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="max-h-[85vh] p-0 rounded-t-[32px]">
+              <div className="mx-auto w-12 h-1.5 bg-muted rounded-full my-4" />
+              <DrawerHeader className="px-6">
+                <DrawerTitle className="text-2xl font-bold">{t('template.selectProvince')}</DrawerTitle>
+                <div className="relative mt-4">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder={t('Chọn tỉnh thành')}
+                    className="pl-10 h-11 bg-muted/50 border-none rounded-xl"
+                    value={provinceSearchQuery}
+                    onChange={(e) => setProvinceSearchQuery(e.target.value)}
+                  />
+                </div>
+              </DrawerHeader>
+
+              <div className="px-4 pb-8 overflow-y-auto max-h-[50vh] no-scrollbar">
+                <div className="grid grid-cols-1 gap-1">
+                  <button
                     onClick={() => handleProvinceChange('all')}
+                    className={cn(
+                      "flex items-center justify-between px-4 py-4 rounded-2xl transition-all",
+                      selectedProvince === 'all' ? "bg-primary/10 text-primary font-bold" : "hover:bg-muted/50 text-foreground font-medium"
+                    )}
                   >
                     <span>{t('template.allProvinces')}</span>
-                    {selectedProvince === 'all' && <Check className="w-4 h-4" />}
-                  </Button>
-                  <div className="h-px bg-border my-1 mx-4" />
-                  {filteredProvincesList.map((province) => (
-                    <Button
-                      key={province.id}
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-between h-12 rounded-xl px-4 font-normal hover:bg-primary hover:text-primary-foreground",
-                        selectedProvince === province.id && "bg-primary/10 text-primary font-bold"
-                      )}
-                      onClick={() => handleProvinceChange(province.id)}
-                    >
-                      <span>{province.name}</span>
-                      {selectedProvince === province.id && <Check className="w-4 h-4" />}
-                    </Button>
-                  ))}
-                  {filteredProvincesList.length === 0 && (
-                    <div className="py-8 text-center text-gray-500">
-                      Không tìm thấy tỉnh thành nào
-                    </div>
-                  )}
+                    {selectedProvince === 'all' && <Check className="w-5 h-5" />}
+                  </button>
+                  {provinces
+                    .filter(p => p.name.toLowerCase().includes(provinceSearchQuery.toLowerCase()))
+                    .map((province) => (
+                      <button
+                        key={province.id}
+                        onClick={() => handleProvinceChange(province.id)}
+                        className={cn(
+                          "flex items-center justify-between px-4 py-4 rounded-2xl transition-all",
+                          selectedProvince === province.id ? "bg-primary/10 text-primary font-bold" : "hover:bg-muted/50 text-foreground font-medium"
+                        )}
+                      >
+                        <span>{province.name}</span>
+                        {selectedProvince === province.id && <Check className="w-5 h-5" />}
+                      </button>
+                    ))}
                 </div>
-              </DrawerContent>
-            </Drawer>
-          </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
       </div>
 
-      {/* Hero Section - Hidden in new UI but kept logic if needed */}
-      <div className="hidden">
-        <div className="h-[max(calc(env(safe-area-inset-top)+60px),70px)]"></div>
+      <div className="px-4">
+        {/* Near You Header */}
+        <div className="flex items-center justify-between mt-6 mb-4">
+          <h2 className="text-2xl font-bold text-foreground">Mẫu chuyến đi</h2>
+        </div>
+
+        {/* Categories Horizontal Scroll */}
+        <div className="flex gap-2 overflow-x-auto pb-6 scrollbar-hide no-scrollbar -mx-4 px-4">
+          {[
+            { id: 'all', name: 'Tất cả', icon: null },
+            { id: 'food', name: 'Ăn uống', icon: <Utensils size={16} /> },
+            { id: 'coffee', name: 'Cà phê', icon: <Coffee size={16} /> },
+            { id: 'shopping', name: 'Mua sắm', icon: <ShoppingBag size={16} /> },
+            { id: 'attractions', name: 'Tham quan', icon: <FerrisWheel size={16} /> }
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap",
+                selectedCategory === cat.id
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                  : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+              )}
+            >
+              {cat.icon}
+              {cat.name}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Sections separator */}
-      <div className="h-px bg-border/50 mb-8" />
-
-      {/* Services Section - KHÁM PHÁ TEMPLATES */}
-      <div className="px-2 mb-6 flex items-center justify-center relative">
-        <h2 className="text-[20px] font-black text-[#7c66fd] uppercase tracking-tighter">
-          KHÁM PHÁ TEMPLATES
-        </h2>
-        {/* hasActiveFilters check removed as requested */}
-      </div>
 
       {/* Results summary if filtering */}
       {hasActiveFilters && templates.length > 0 && (
@@ -428,7 +452,22 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       )}
 
       {/* Templates Grid */}
-      {templates.length === 0 ? (
+      {selectedCategory !== 'all' ? (
+        <div className="text-center py-20 px-4">
+          <MapPin className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-foreground mb-2">Sắp ra mắt</h3>
+          <p className="text-muted-foreground text-sm max-w-[240px] mx-auto">
+            Chưa có mẫu chuyến đi nào cho danh mục này. Hãy quay lại sau nhé!
+          </p>
+          <Button
+            variant="link"
+            className="mt-4 text-primary font-bold"
+            onClick={() => setSelectedCategory('all')}
+          >
+            Quay lại tất cả
+          </Button>
+        </div>
+      ) : templates.length === 0 ? (
         <div className="text-center py-12">
           <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">{t('template.noTemplates')}</h3>
@@ -446,15 +485,35 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-6 mb-8 px-2">
-            {templates.map((template) => (
-              <TripTemplateCard
-                key={template.id}
-                template={template}
-                onUseTemplate={onUseTemplate}
-                usingTemplate={usingTemplate}
-              />
-            ))}
+          <div className="flex gap-4 px-4">
+            {/* Column 1: Indices 0, 1, 2... but we want to stagger them */}
+            <div className="flex-1 flex flex-col gap-4">
+              {templates.map((template, index) => {
+                // Column 1 gets indices 0, 2, 4...
+                if (index % 2 !== 0) return null;
+                return (
+                  <PWAMasonryCard
+                    key={template.id}
+                    template={template}
+                    index={index}
+                  />
+                );
+              })}
+            </div>
+            {/* Column 2: Indices 1, 3, 5... */}
+            <div className="flex-1 flex flex-col gap-4">
+              {templates.map((template, index) => {
+                // Column 2 gets indices 1, 3, 5...
+                if (index % 2 === 0) return null;
+                return (
+                  <PWAMasonryCard
+                    key={template.id}
+                    template={template}
+                    index={index}
+                  />
+                );
+              })}
+            </div>
           </div>
 
           {/* Infinite Scroll Sentinel */}
