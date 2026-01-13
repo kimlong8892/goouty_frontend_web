@@ -89,9 +89,11 @@ export const api = {
 
   // Trip-specific API methods
   trips: {
-    getAll: async (params?: { search?: string; page?: number; limit?: number }) => {
+    getAll: async (params?: { search?: string; page?: number; limit?: number; provinceId?: string; startDate?: string }) => {
       const queryParams = new URLSearchParams();
       if (params?.search) queryParams.append('search', params.search);
+      if (params?.provinceId && params.provinceId !== 'all') queryParams.append('provinceId', params.provinceId);
+      if (params?.startDate) queryParams.append('startDate', params.startDate);
       if (params?.page) queryParams.append('page', params.page.toString());
       if (params?.limit) queryParams.append('limit', params.limit.toString());
 
