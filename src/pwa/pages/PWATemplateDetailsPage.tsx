@@ -62,12 +62,16 @@ const PWATemplateDetailsPage = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+    const [showTutorial, setShowTutorial] = useState(false);
 
     // Auto-hide navigation controls
     const [controlsVisible, setControlsVisible] = useState(true);
     const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const resetControlsTimeout = () => {
+        // Don't auto-hide if tutorial is showing
+        if (showTutorial) return;
+
         setControlsVisible(true);
         if (controlsTimeoutRef.current) {
             clearTimeout(controlsTimeoutRef.current);
@@ -75,6 +79,24 @@ const PWATemplateDetailsPage = () => {
         controlsTimeoutRef.current = setTimeout(() => {
             setControlsVisible(false);
         }, 500); // Fade out after 0.5 seconds of inactivity
+    };
+
+    // Check for tutorial on mount and template load
+    useEffect(() => {
+        if (template && (template.next || template.previous)) {
+            const hasSeen = localStorage.getItem('pwa_template_nav_tutorial_seen');
+            if (!hasSeen) {
+                setShowTutorial(true);
+                setControlsVisible(true);
+                if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+            }
+        }
+    }, [template]);
+
+    const handleDismissTutorial = () => {
+        localStorage.setItem('pwa_template_nav_tutorial_seen', 'true');
+        setShowTutorial(false);
+        resetControlsTimeout();
     };
 
     useEffect(() => {
@@ -315,8 +337,10 @@ const PWATemplateDetailsPage = () => {
                 <button
                     onClick={() => navigate(`/pwa-template-details/${template.previous!.id}`)}
                     className={cn(
-                        "fixed left-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all duration-500",
-                        controlsVisible ? "opacity-100 translate-x-0" : "opacity-30 -translate-x-1/2 hover:opacity-100 hover:translate-x-0"
+                        "fixed left-3 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all duration-500",
+                        // Ensure clear visibility (high z-index) during tutorial
+                        showTutorial ? "z-[60] opacity-100 translate-x-0 ring-4 ring-primary/50 animate-pulse" : "z-40",
+                        !showTutorial && (controlsVisible ? "opacity-100 translate-x-0" : "opacity-30 -translate-x-1/2 hover:opacity-100 hover:translate-x-0")
                     )}
                 >
                     <ChevronLeft className="w-6 h-6" />
@@ -327,12 +351,37 @@ const PWATemplateDetailsPage = () => {
                 <button
                     onClick={() => navigate(`/pwa-template-details/${template.next!.id}`)}
                     className={cn(
-                        "fixed right-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all duration-500",
-                        controlsVisible ? "opacity-100 translate-x-0" : "opacity-30 translate-x-1/2 hover:opacity-100 hover:translate-x-0"
+                        "fixed right-3 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all duration-500",
+                        // Ensure clear visibility (high z-index) during tutorial
+                        showTutorial ? "z-[60] opacity-100 translate-x-0 ring-4 ring-primary/50 animate-pulse" : "z-40",
+                        !showTutorial && (controlsVisible ? "opacity-100 translate-x-0" : "opacity-30 translate-x-1/2 hover:opacity-100 hover:translate-x-0")
                     )}
                 >
                     <ChevronRight className="w-6 h-6" />
                 </button>
+            )}
+
+            {/* Tutorial Overlay */}
+            {showTutorial && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center px-8 text-center animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] shadow-2xl max-w-sm border border-white/20">
+                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <ArrowLeft className="w-8 h-8 text-primary" />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">
+                            Điều hướng dễ dàng
+                        </h3>
+                        <p className="text-slate-600 dark:text-zinc-400 font-medium mb-6 leading-relaxed">
+                            Sử dụng hai nút mũi tên ở cạnh màn hình để xem các mẫu chuyến đi khác một cách nhanh chóng.
+                        </p>
+                        <Button
+                            onClick={handleDismissTutorial}
+                            className="w-full h-12 rounded-xl text-base font-bold bg-primary hover:bg-primary/90"
+                        >
+                            Đã hiểu
+                        </Button>
+                    </div>
+                </div>
             )}
 
             {/* CONTENT HEADER */}
