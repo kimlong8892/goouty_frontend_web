@@ -130,7 +130,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
   );
 };
 
-const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled }: NavItemProps & { isHighlighted?: boolean, disabled?: boolean }) => {
+const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled, id }: NavItemProps & { isHighlighted?: boolean, disabled?: boolean, id?: string }) => {
   const handleClick = (e: React.MouseEvent) => {
     if (disabled) {
       e.preventDefault();
@@ -138,6 +138,8 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
     }
     onClick();
   };
+
+  const isProfile = id === 'profile';
 
   return (
     <Tooltip>
@@ -148,7 +150,8 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
             "relative flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-300",
             "hover:bg-primary/10 hover:text-primary",
             "overflow-hidden flex-shrink-0 min-w-0",
-            active ? "bg-primary text-primary-foreground" : "text-foreground/80",
+            active && !isProfile ? "bg-primary text-primary-foreground" : "text-foreground/80",
+            active && isProfile ? "text-primary bg-transparent" : "",
             isHighlighted && "shadow-lg scale-105",
             disabled && "opacity-50 cursor-not-allowed"
           )}
@@ -156,7 +159,8 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
         >
           <span className={cn(
             "transition-all duration-300 text-xl flex items-center justify-center",
-            active ? "text-primary-foreground" : "text-foreground/60",
+            active && !isProfile ? "text-primary-foreground" : "text-foreground/60",
+            active && isProfile ? "text-primary" : "",
             isHighlighted && active && "text-primary-foreground"
           )}>
             {icon}
@@ -337,6 +341,7 @@ export const Navbar = () => {
       path.startsWith('/pwa-edit-trip/') ||
       path.startsWith('/pwa-add-day/') ||
       path.startsWith('/pwa-edit-day/') ||
+      path.startsWith('/pwa-edit-day/') ||
       path.startsWith('/pwa-add-activity/') ||
       path.startsWith('/pwa-edit-activity/') ||
       path.startsWith('/pwa-add-expense/') ||
@@ -433,6 +438,7 @@ export const Navbar = () => {
                 {pwaNavItems.map((item) => (
                   <PWANavItem
                     key={item.id}
+                    id={item.id}
                     to={item.to}
                     icon={item.icon}
                     label={item.label}
@@ -442,9 +448,9 @@ export const Navbar = () => {
                   />
                 ))}
               </div>
-            </nav>
+            </nav >
           )}
-        </TooltipProvider>
+        </TooltipProvider >
 
         <AuthModal isOpen={isAuthModalOpen} onClose={handleCloseAuthModal} />
       </>

@@ -260,7 +260,7 @@ const EditProfile = () => {
                         <Label className="text-base text-muted-foreground/80 font-normal pl-1">
                           Ngân hàng
                         </Label>
-                        <div className="bg-card border border-border/60 shadow-sm rounded-xl overflow-hidden focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+                        <div className="bg-card border border-border/60 shadow-sm rounded-xl focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
                           <BankSearch
                             value={formData.bankId}
                             onChange={(value) => setFormData({ ...formData, bankId: value })}
