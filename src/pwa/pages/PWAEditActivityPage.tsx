@@ -35,7 +35,7 @@ const PWAEditActivityPage = () => {
         notes: '',
         important: false
     });
-    const [errors, setErrors] = useState<{ title?: string }>({});
+    const [errors, setErrors] = useState<{ title?: string; startTime?: string }>({});
     const titleRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -101,6 +101,11 @@ const PWAEditActivityPage = () => {
 
         if (!formData.title.trim()) {
             setErrors({ title: 'Vui lòng nhập tên hoạt động' });
+            return;
+        }
+
+        if (!formData.startTime) {
+            setErrors({ startTime: 'Vui lòng chọn giờ bắt đầu' });
             return;
         }
 
@@ -208,7 +213,7 @@ const PWAEditActivityPage = () => {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="startTime" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
-                                    Giờ bắt đầu
+                                    Giờ bắt đầu <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="relative">
                                     <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/60" />
@@ -216,10 +221,19 @@ const PWAEditActivityPage = () => {
                                         id="startTime"
                                         type="time"
                                         value={formData.startTime}
-                                        onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                                        className="bg-card border-input shadow-sm rounded-xl h-14 pl-12 pr-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
+                                        onChange={(e) => {
+                                            setFormData({ ...formData, startTime: e.target.value });
+                                            if (errors.startTime) setErrors({ ...errors, startTime: undefined });
+                                        }}
+                                        className={cn(
+                                            "bg-card border-input shadow-sm rounded-xl h-14 pl-12 pr-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200",
+                                            errors.startTime && "border-destructive focus-visible:ring-destructive/20"
+                                        )}
                                     />
                                 </div>
+                                {errors.startTime && (
+                                    <p className="text-xs text-destructive ml-1">{errors.startTime}</p>
+                                )}
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="durationMin" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">

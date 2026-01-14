@@ -41,6 +41,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
     notes: '',
     important: false
   });
+  const [errors, setErrors] = useState<{ title?: string; startTime?: string }>({});
 
   React.useEffect(() => {
     const extractTime = (timeString: any) => {
@@ -80,6 +81,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen && !loading) {
       resetForm();
+      setErrors({});
     }
     onOpenChange(newOpen);
   };
@@ -87,12 +89,25 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const newErrors: { title?: string; startTime?: string } = {};
 
     // Validation
     if (!formData.title.trim()) {
-      toast.error('Vui lòng nhập tên hoạt động');
+      newErrors.title = 'Vui lòng nhập tên hoạt động';
+    }
+
+    if (!formData.startTime) {
+      newErrors.startTime = 'Vui lòng chọn giờ bắt đầu';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      if (newErrors.title) toast.error(newErrors.title);
+      else if (newErrors.startTime) toast.error(newErrors.startTime);
       return;
     }
+
+    setErrors({});
 
     if (formData.durationMin < 1 || formData.durationMin > 1440) {
       toast.error('Thời lượng phải từ 1 đến 1440 phút');
@@ -193,20 +208,34 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="VD: Tham quan bảo tàng"
-                className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className={cn(
+                  "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                  errors.title && "border-red-500 focus:border-red-500"
+                )}
                 required
               />
+              {errors.title && (
+                <p className="text-xs text-red-500 ml-1">{errors.title}</p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="startTime" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Giờ bắt đầu</Label>
+                <Label htmlFor="startTime" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
+                  Giờ bắt đầu <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="startTime"
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                  className="h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className={cn(
+                    "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white focus:border-[#6347f9] hover:border-[#6347f9] transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                    errors.startTime && "border-red-500 focus:border-red-500"
+                  )}
                 />
+                {errors.startTime && (
+                  <p className="text-xs text-red-500 mt-1 ml-1">{errors.startTime}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="durationMin" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Thời lượng (phút)</Label>
