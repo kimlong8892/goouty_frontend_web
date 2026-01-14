@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Info, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical, Copy, Trash2, MoreHorizontal } from 'lucide-react';
+import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Info, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical, Copy, Trash2, MoreHorizontal, ArrowUp, ArrowDown, Check, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface Activity {
     id: string;
@@ -39,6 +40,9 @@ interface PWATripItineraryProps {
     onAddDay: () => void;
     onEditDay: (dayId: string) => void;
     onDeleteDay?: (day: Day) => void;
+    onReorderDays?: (newOrderIds: string[]) => Promise<void>;
+
+    // Activity Drag
     onDragStart?: (e: React.DragEvent, activityId: string, dayId: string) => void;
     onDragOver?: (e: React.DragEvent, activityId: string, dayId: string) => void;
     onDragEnd?: (e: React.DragEvent) => void;
@@ -46,6 +50,16 @@ interface PWATripItineraryProps {
     draggedActivity?: { id: string, dayId: string } | null;
     dragOverActivityId?: string | null;
     justDroppedId?: string | null;
+
+    // Day Drag
+    onDayDragStart?: (e: React.DragEvent, dayId: string) => void;
+    onDayDragOver?: (e: React.DragEvent, dayId: string) => void;
+    onDayDragEnd?: (e: React.DragEvent) => void;
+    onDayDrop?: (e: React.DragEvent, dayId: string) => void;
+    draggedDayId?: string | null;
+    dragOverDayId?: string | null;
+    justDroppedDayId?: string | null;
+
     isOwner?: boolean;
     isTabsVisible?: boolean;
 }
@@ -62,6 +76,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     onAddDay,
     onEditDay,
     onDeleteDay,
+    onReorderDays,
     onDragStart,
     onDragOver,
     onDragEnd,
@@ -69,6 +84,16 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     draggedActivity,
     dragOverActivityId,
     justDroppedId,
+
+    // Day Drag
+    onDayDragStart,
+    onDayDragOver,
+    onDayDragEnd,
+    onDayDrop,
+    draggedDayId,
+    dragOverDayId,
+    justDroppedDayId,
+
     isOwner,
     isTabsVisible = true
 }) => {
@@ -76,11 +101,29 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     const navigate = useNavigate();
     const dayTabsRef = useRef<HTMLDivElement>(null);
 
+    // NOTE: Removed LongPress Dialog logic in favor of Drag and Drop mechanism as per request.
+
+    // ... existing useState for activity ...
+
     useEffect(() => {
         if (days.length > 0 && !selectedDayId) {
             setSelectedDayId(days[0].id);
         }
     }, [days, selectedDayId]);
+
+    // Scroll selected day into view
+    useEffect(() => {
+        if (dayTabsRef.current && selectedDayId) {
+            const selectedTab = dayTabsRef.current.querySelector(`[data-day-id="${selectedDayId}"]`) as HTMLElement;
+            if (selectedTab) {
+                selectedTab.scrollIntoView({
+                    behavior: 'smooth',
+                    inline: 'center',
+                    block: 'nearest'
+                });
+            }
+        }
+    }, [selectedDayId]);
 
     const activeDayIndex = days.findIndex(d => d.id === selectedDayId);
     const selectedDay = days.find(d => d.id === selectedDayId);
@@ -127,15 +170,26 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                     <div className="flex items-center gap-1 flex-1">
                         {days.map((day, index) => {
                             const isActive = day.id === selectedDayId;
+                            const isDragged = draggedDayId === day.id;
+                            const isDragOver = dragOverDayId === day.id;
+
                             return (
                                 <button
                                     key={day.id}
+                                    data-day-id={day.id} // Added for scrolling
                                     onClick={() => setSelectedDayId(day.id)}
+                                    // Drag Handlers
+                                    draggable={isOwner}
+                                    onDragStart={(e) => isOwner && onDayDragStart?.(e, day.id)}
+                                    onDragOver={(e) => isOwner && onDayDragOver?.(e, day.id)}
+                                    onDragEnd={onDayDragEnd}
+                                    onDrop={(e) => isOwner && onDayDrop?.(e, day.id)}
                                     className={cn(
-                                        "flex flex-col items-center flex-1 min-w-[100px] py-3 px-1 rounded-xl transition-all relative",
-                                        isActive
-                                            ? "bg-primary/10"
-                                            : ""
+                                        "flex flex-col items-center flex-1 min-w-[100px] py-3 px-1 rounded-xl transition-all relative select-none",
+                                        isActive ? "bg-primary/10" : "",
+                                        isDragged && "opacity-50 scale-95 ring-2 ring-primary border-dashed border-2 border-primary/50",
+                                        isDragOver && "scale-105 bg-primary/20 ring-2 ring-primary z-10",
+                                        justDroppedDayId === day.id && "animate-pulse ring-2 ring-green-500"
                                     )}
                                 >
                                     {isActive && (
@@ -176,13 +230,12 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                         </div>
                                     )}
                                     <span className={cn(
-                                        "text-[15px] font-bold",
+                                        "text-[15px] font-bold flex items-center gap-1",
                                         isActive ? "text-primary" : "text-muted-foreground"
-                                    )}>Ngày {index + 1}</span>
-                                    <span className={cn(
-                                        "text-[13px] font-medium",
-                                        isActive ? "text-primary/70" : "text-muted-foreground/60"
-                                    )}>{formatDate(day.date)}</span>
+                                    )}>
+                                        Ngày {index + 1}
+                                        {isOwner && !isActive && <GripVertical className="w-3 h-3 text-muted-foreground/30" />}
+                                    </span>
                                     {isActive && (
                                         <div className="absolute -bottom-[8px] left-0 right-0 h-1 bg-primary rounded-t-full shadow-primary/30" />
                                     )}
@@ -191,7 +244,15 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                         })}
                     </div>
 
-                    {days.length > 0 && (
+                    {days.length === 0 && (
+                        <button
+                            onClick={onAddDay}
+                            className="flex items-center justify-center min-w-[40px] h-[40px] rounded-full bg-secondary text-secondary-foreground ml-2 flex-shrink-0 border border-border transition-all active:scale-95"
+                        >
+                            <Plus className="w-5 h-5 text-primary" />
+                        </button>
+                    )}
+                    {days.length > 0 && isOwner && (
                         <button
                             onClick={onAddDay}
                             className="flex items-center justify-center min-w-[40px] h-[40px] rounded-full bg-secondary text-secondary-foreground ml-2 flex-shrink-0 border border-border transition-all active:scale-95"

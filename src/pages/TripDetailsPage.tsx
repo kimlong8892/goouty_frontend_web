@@ -192,11 +192,17 @@ const TripDetailsPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isMobileView]);
 
-  // State for collapsible days (default empty = all collapsed)
+  // [EXISTING CODE] ...
   const [expandedDayIds, setExpandedDayIds] = useState<string[]>([]);
   const [draggedActivity, setDraggedActivity] = useState<{ id: string, dayId: string } | null>(null);
   const [dragOverActivityId, setDragOverActivityId] = useState<string | null>(null);
   const [justDroppedId, setJustDroppedId] = useState<string | null>(null);
+
+  // Day Drag & Drop State
+  const [draggedDayId, setDraggedDayId] = useState<string | null>(null);
+  const [dragOverDayId, setDragOverDayId] = useState<string | null>(null);
+  const [justDroppedDayId, setJustDroppedDayId] = useState<string | null>(null);
+
   const [showAddDay, setShowAddDay] = useState(false);
 
   const toggleDay = (dayId: string) => {
@@ -206,6 +212,89 @@ const TripDetailsPage = () => {
         : [...prev, dayId]
     );
   };
+
+  // ... [EXISTING CODE] ...
+
+  // Day Drag Handlers
+  const handleDayDragStart = (e: React.DragEvent, dayId: string) => {
+    // Enabled for mobile now as per request for PWA
+    setDraggedDayId(dayId);
+    e.dataTransfer.setData('dayId', dayId);
+    e.dataTransfer.effectAllowed = 'move';
+
+    // Ghost image or style
+    const target = e.currentTarget as HTMLElement;
+    setTimeout(() => {
+      target.style.opacity = '0.5';
+    }, 0);
+  };
+
+  const handleDayDragOver = (e: React.DragEvent, dayId: string) => {
+    e.preventDefault();
+    if (draggedDayId && draggedDayId !== dayId) {
+      setDragOverDayId(dayId);
+      e.dataTransfer.dropEffect = 'move';
+    }
+  };
+
+  const handleDayDragEnd = (e: React.DragEvent) => {
+    const target = e.currentTarget as HTMLElement;
+    target.style.opacity = '1';
+    setDraggedDayId(null);
+    setDragOverDayId(null);
+  };
+
+  const handleDayDrop = async (e: React.DragEvent, targetDayId: string) => {
+    e.preventDefault();
+    if (!draggedDayId || draggedDayId === targetDayId) return;
+
+    const sourceIndex = days.findIndex(d => d.id === draggedDayId);
+    const targetIndex = days.findIndex(d => d.id === targetDayId);
+
+    if (sourceIndex !== -1 && targetIndex !== -1) {
+      // Reorder locally
+      const newDays = [...days];
+      const [removed] = newDays.splice(sourceIndex, 1);
+      newDays.splice(targetIndex, 0, removed);
+
+      setDays(newDays);
+      setJustDroppedDayId(draggedDayId);
+      setTimeout(() => setJustDroppedDayId(null), 2000);
+
+      // Call API
+      try {
+        const dayIds = newDays.map(d => d.id);
+        await api.patch('/days/reorder', { dayIds });
+      } catch (error) {
+        console.error('Failed to reorder days:', error);
+        showToast('Không thể sắp xếp ngày', 'error');
+        // Revert (optional, but good for UX)
+        fetchDaysAndActivities();
+      }
+    }
+
+    setDraggedDayId(null);
+    setDragOverDayId(null);
+  };
+
+  const handlePWAReorderDays = async (newOrderIds: string[]) => {
+    // Optimistic update
+    const newDays = newOrderIds.map(id => days.find(d => d.id === id)!).filter(Boolean);
+    if (newDays.length !== days.length) return;
+
+    setDays(newDays);
+
+    try {
+      await api.patch('/days/reorder', { dayIds: newOrderIds });
+      showToast('Đã cập nhật thứ tự ngày', 'success');
+    } catch (error) {
+      console.error('Failed to reorder days:', error);
+      showToast('Không thể sắp xếp ngày', 'error');
+      fetchDaysAndActivities();
+    }
+  };
+
+
 
   // Dialog states
   const [showAddActivity, setShowAddActivity] = useState(false);
@@ -890,6 +979,15 @@ const TripDetailsPage = () => {
                   justDroppedId={justDroppedId}
                   isOwner={trip.userRole === 'owner'}
                   onDeleteDay={openDeleteDayDialog}
+                  onReorderDays={handlePWAReorderDays}
+                  // Day Drag Props
+                  onDayDragStart={handleDayDragStart}
+                  onDayDragOver={handleDayDragOver}
+                  onDayDragEnd={handleDayDragEnd}
+                  onDayDrop={handleDayDrop}
+                  draggedDayId={draggedDayId}
+                  dragOverDayId={dragOverDayId}
+                  justDroppedDayId={justDroppedDayId}
                 />
               ) : (
                 <Card className={cn(
@@ -946,7 +1044,26 @@ const TripDetailsPage = () => {
                         {days.map((day, index) => {
                           const isExpanded = expandedDayIds.includes(day.id);
                           return (
-                            <div key={day.id} className="relative">
+                            <div
+                              key={day.id}
+                              className={cn(
+                                "relative transition-all duration-300",
+                                draggedDayId === day.id && "opacity-40 border-2 border-dashed border-primary/50 rounded-xl p-4 bg-primary/5",
+                                dragOverDayId === day.id && "translate-y-2 scale-[1.01]",
+                                justDroppedDayId === day.id && "ring-2 ring-primary/40 bg-primary/[0.03] rounded-xl"
+                              )}
+                              draggable={trip.userRole === 'owner' && !isMobileView}
+                              onDragStart={(e) => handleDayDragStart(e, day.id)}
+                              onDragOver={(e) => handleDayDragOver(e, day.id)}
+                              onDragEnd={handleDayDragEnd}
+                              onDrop={(e) => handleDayDrop(e, day.id)}
+                            >
+                              {/* Drag Handle Indicator */}
+                              {trip.userRole === 'owner' && !isMobileView && (
+                                <div className="absolute -left-8 top-6 p-2 cursor-grab active:cursor-grabbing text-muted-foreground/20 hover:text-primary transition-colors opacity-0 hover:opacity-100 hidden lg:block" title="Kéo để sắp xếp ngày">
+                                  <GripVertical className="w-5 h-5" />
+                                </div>
+                              )}
                               <div className={cn(
                                 "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-secondary rounded-xl transition-colors",
                                 isMobileView ? "p-1 -mx-1" : "p-2 -mx-2"
@@ -980,7 +1097,7 @@ const TripDetailsPage = () => {
                                             size="sm"
                                             className={cn(
                                               "h-8 w-8 p-0 rounded-full hover:bg-secondary text-primary",
-                                              isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
+                                              "opacity-100"
                                             )}
                                             onClick={() => {
                                               if (isMobileView) {
@@ -998,7 +1115,7 @@ const TripDetailsPage = () => {
                                             size="sm"
                                             className={cn(
                                               "h-8 w-8 p-0 rounded-full hover:bg-red-100 text-red-500",
-                                              isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
+                                              "opacity-100"
                                             )}
                                             onClick={() => openDeleteDayDialog(day)}
                                           >
@@ -1008,9 +1125,11 @@ const TripDetailsPage = () => {
                                       </div>
                                     </div>
 
-                                    <Badge variant="outline" className="text-primary font-normal bg-secondary border-border ml-auto md:ml-0">
-                                      {formatDate(day.date)}
-                                    </Badge>
+                                    {isMobileView && (
+                                      <Badge variant="outline" className="text-primary font-normal bg-secondary border-border ml-auto md:ml-0">
+                                        {formatDate(day.date)}
+                                      </Badge>
+                                    )}
                                   </div>
                                   {day.description && (
                                     <p className="text-muted-foreground mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>

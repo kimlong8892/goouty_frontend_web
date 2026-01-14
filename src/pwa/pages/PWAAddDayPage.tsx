@@ -45,10 +45,26 @@ const PWAAddDayPage = () => {
             if (!tripId) return;
             try {
                 const tripData = await api.trips.getById(tripId);
-                if (tripData && tripData.startDate && (!tripData.days || tripData.days.length === 0)) {
+                if (tripData) {
+                    let nextDate = '';
+
+                    if (tripData.days && tripData.days.length > 0) {
+                        // Find the latest date
+                        const dates = tripData.days.map(d => new Date(d.date).getTime());
+                        const maxDate = Math.max(...dates);
+                        const nextDay = new Date(maxDate);
+                        nextDay.setDate(nextDay.getDate() + 1);
+                        nextDate = format(nextDay, 'yyyy-MM-dd');
+                    } else if (tripData.startDate) {
+                        nextDate = format(new Date(tripData.startDate), 'yyyy-MM-dd');
+                    } else {
+                        // Fallback to today if no trip start date (though unlikely for a valid trip)
+                        nextDate = format(new Date(), 'yyyy-MM-dd');
+                    }
+
                     setFormData(prev => ({
                         ...prev,
-                        date: format(new Date(tripData.startDate), 'yyyy-MM-dd')
+                        date: nextDate
                     }));
                 }
             } catch (error) {
@@ -71,15 +87,10 @@ const PWAAddDayPage = () => {
             if (!focused) { titleRef.current?.focus(); focused = true; }
         }
 
+        // Auto-calculated date is used, no validation needed for user input
         if (!formData.date) {
-            newErrors.date = 'Vui lòng chọn ngày';
-        } else {
-            const selectedDate = new Date(formData.date);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (selectedDate < today) {
-                newErrors.date = 'Không thể chọn ngày trong quá khứ';
-            }
+            // Should not happen if fetch works, but as fallback set today
+            formData.date = format(new Date(), 'yyyy-MM-dd');
         }
 
         setErrors(newErrors);
@@ -90,7 +101,6 @@ const PWAAddDayPage = () => {
             const dayData: any = {
                 title: formData.title.trim(),
                 description: formData.description.trim() || undefined,
-                date: new Date(`${formData.date}T00:00:00`).toISOString(),
                 tripId: tripId
             };
 
@@ -148,45 +158,6 @@ const PWAAddDayPage = () => {
                         />
                         {errors.title && (
                             <p className="text-xs text-destructive ml-1">{errors.title}</p>
-                        )}
-                    </div>
-
-                    {/* Date Input */}
-                    <div className="space-y-2">
-                        <Label htmlFor="date" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
-                            Ngày <span className="text-red-500">*</span>
-                        </Label>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    id="date"
-                                    variant="outline"
-                                    className={cn(
-                                        "w-full h-14 justify-start text-left font-normal rounded-xl bg-card border-input hover:bg-card/80 transition-all px-4 text-base shadow-sm",
-                                        !formData.date && "text-muted-foreground",
-                                        errors.date && "border-destructive text-destructive"
-                                    )}
-                                >
-                                    <CalendarIcon className="mr-3 h-5 w-5 text-muted-foreground" />
-                                    {formData.date ? (
-                                        format(new Date(formData.date), "dd/MM/yyyy")
-                                    ) : (
-                                        "Chọn ngày"
-                                    )}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={formData.date ? new Date(formData.date) : undefined}
-                                    onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                    initialFocus
-                                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                />
-                            </PopoverContent>
-                        </Popover>
-                        {errors.date && (
-                            <p className="text-xs text-destructive ml-1">{errors.date}</p>
                         )}
                     </div>
 

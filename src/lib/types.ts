@@ -90,7 +90,7 @@ export interface Day {
 export interface CreateDayRequest {
   title: string;
   description?: string;
-  date: string;
+  date?: string;
   startTime?: string;
   tripId: string;
 }

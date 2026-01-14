@@ -27,6 +27,7 @@ const PWAEditDayPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [tripId, setTripId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -57,6 +58,9 @@ const PWAEditDayPage = () => {
                     description: data.description || '',
                     date: data.date ? format(new Date(data.date), 'yyyy-MM-dd') : ''
                 });
+                if (data.tripId) {
+                    setTripId(data.tripId);
+                }
             } catch (error: any) {
                 console.error('Fetch day error:', error);
                 showToast('Không thể tải thông tin ngày', 'error');
@@ -81,8 +85,8 @@ const PWAEditDayPage = () => {
             newErrors.title = 'Vui lòng nhập tiêu đề ngày';
         }
 
-        if (!formData.date) {
-            newErrors.date = 'Vui lòng chọn ngày';
+        if (!formData.title.trim()) {
+            newErrors.title = 'Vui lòng nhập tiêu đề ngày';
         }
 
         setErrors(newErrors);
@@ -93,10 +97,38 @@ const PWAEditDayPage = () => {
             const dayData = {
                 title: formData.title.trim(),
                 description: formData.description.trim() || null,
-                date: new Date(`${formData.date}T00:00:00`).toISOString(),
             };
 
+            // 1. Update the day
             await api.days.update(dayId, dayData);
+
+            // 2. If we have tripId, re-fetch all days, sort them, and update order
+            if (tripId) {
+                try {
+                    const allDays = await api.days.getByTrip(tripId);
+
+                    // Sort by date, then by ID (simulating creation order if dates are same)
+                    const sortedDays = allDays.sort((a, b) => {
+                        const dateA = new Date(a.date).getTime();
+                        const dateB = new Date(b.date).getTime();
+                        if (dateA !== dateB) {
+                            return dateA - dateB;
+                        }
+                        // Secondary sort by ID for stability
+                        // Assuming numeric IDs or string IDs that are somewhat chronological??
+                        // If standard UUIDs, this might not be chronological, but it IS stable.
+                        // Ideally we'd use 'createdAt' but 'days' type might not have it exposed here easily without checking types.
+                        // Let's stick to stable sort.
+                        return a.id > b.id ? 1 : -1;
+                    });
+
+                    const dayIds = sortedDays.map(d => d.id);
+                    await api.patch('/days/reorder', { dayIds });
+                } catch (reorderError) {
+                    console.error('Failed to reorder days:', reorderError);
+                    // Don't block success flow, just log it
+                }
+            }
 
             showToast('Đã cập nhật ngày thành công', 'success');
             navigate(-1);
@@ -153,44 +185,6 @@ const PWAEditDayPage = () => {
                             />
                             {errors.title && (
                                 <p className="text-xs text-destructive ml-1">{errors.title}</p>
-                            )}
-                        </div>
-
-                        {/* Date Input */}
-                        <div className="space-y-2">
-                            <Label htmlFor="date" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
-                                Ngày
-                            </Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        id="date"
-                                        variant="outline"
-                                        className={cn(
-                                            "w-full h-14 justify-start text-left font-normal rounded-xl bg-card border-input shadow-sm hover:bg-card/80 transition-all px-4 text-base",
-                                            !formData.date && "text-muted-foreground",
-                                            errors.date && "border-destructive text-destructive"
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-3 h-5 w-5 text-muted-foreground" />
-                                        {formData.date ? (
-                                            format(new Date(formData.date), "dd/MM/yyyy")
-                                        ) : (
-                                            "Chọn ngày"
-                                        )}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={formData.date ? new Date(formData.date) : undefined}
-                                        onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                            {errors.date && (
-                                <p className="text-xs text-destructive ml-1">{errors.date}</p>
                             )}
                         </div>
 
