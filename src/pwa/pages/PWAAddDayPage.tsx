@@ -45,7 +45,7 @@ const PWAAddDayPage = () => {
             if (!tripId) return;
             try {
                 const tripData = await api.trips.getById(tripId);
-                if (tripData && tripData.startDate) {
+                if (tripData && tripData.startDate && (!tripData.days || tripData.days.length === 0)) {
                     setFormData(prev => ({
                         ...prev,
                         date: format(new Date(tripData.startDate), 'yyyy-MM-dd')

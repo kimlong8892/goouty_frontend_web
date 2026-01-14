@@ -1230,7 +1230,7 @@ const TripDetailsPage = () => {
         open={showAddDay}
         onOpenChange={setShowAddDay}
         tripId={id || ''}
-        startDate={trip.startDate}
+        startDate={days.length === 0 ? trip.startDate : undefined}
         onSuccess={fetchDaysAndActivities}
       />
       <AddActivityDialog
