@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Info, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -159,12 +160,14 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                         })}
                     </div>
 
-                    <button
-                        onClick={onAddDay}
-                        className="flex items-center justify-center min-w-[40px] h-[40px] rounded-full bg-secondary text-secondary-foreground ml-2 flex-shrink-0 border border-border transition-all active:scale-95"
-                    >
-                        <Plus className="w-5 h-5 text-primary" />
-                    </button>
+                    {days.length > 0 && (
+                        <button
+                            onClick={onAddDay}
+                            className="flex items-center justify-center min-w-[40px] h-[40px] rounded-full bg-secondary text-secondary-foreground ml-2 flex-shrink-0 border border-border transition-all active:scale-95"
+                        >
+                            <Plus className="w-5 h-5 text-primary" />
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -185,13 +188,15 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                             <Clock className="w-8 h-8 opacity-20" />
                         </div>
                         <p className="text-sm font-medium">Chưa có hoạt động nào</p>
-                        <Button
-                            variant="outline"
-                            className="mt-4 rounded-xl border-dashed border-2 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary hover:border-primary transition-all"
-                            onClick={() => onAddActivity(selectedDayId)}
-                        >
-                            <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
-                        </Button>
+                        {days.length > 0 && (
+                            <Button
+                                variant="outline"
+                                className="mt-4 rounded-xl border-dashed border-2 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary hover:border-primary transition-all"
+                                onClick={() => onAddActivity(selectedDayId)}
+                            >
+                                <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
+                            </Button>
+                        )}
                     </div>
                 ) : (
                     <div className="relative pl-10">
@@ -326,6 +331,24 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                     </div>
                 )}
             </div>
+
+            {/* Floating Add Day Button when Trip is Empty */}
+            {days.length === 0 && isOwner && createPortal(
+                <div className="fixed bottom-24 right-1 z-[100] group flex flex-col items-center">
+                    {/* Tooltip */}
+                    <div className="mb-2 px-3 py-1.5 bg-slate-900/90 backdrop-blur-sm text-white text-[11px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap -translate-y-2 group-hover:translate-y-0">
+                        Thêm ngày mới
+                    </div>
+
+                    <button
+                        onClick={onAddDay}
+                        className="w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-2xl flex items-center justify-center active:scale-90 active:brightness-110 active:ring-4 active:ring-primary/30 transition-all duration-200 animate-in zoom-in"
+                    >
+                        <Plus className="w-6 h-6" />
+                    </button>
+                </div>,
+                document.body
+            )}
         </div>
     );
 };
