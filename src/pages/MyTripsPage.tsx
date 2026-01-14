@@ -111,11 +111,6 @@ const MyTripsPage = () => {
 
   // Reset trips when search changes
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/auth');
-      return;
-    }
-
     if (isLoading) return; // Don't fetch trips while loading
 
     // Reset state when search changes

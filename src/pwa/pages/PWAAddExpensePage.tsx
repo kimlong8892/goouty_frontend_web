@@ -73,6 +73,40 @@ const PWAAddExpensePage = () => {
     }, [authLoading, isAuthenticated, navigate]);
 
     useEffect(() => {
+        const draftKey = `expense_draft_${tripId}`;
+        const savedDraft = localStorage.getItem(draftKey);
+
+        if (savedDraft) {
+            try {
+                const { formData: savedForm, amountByUserId: savedAmounts, splitMethod: savedSplit } = JSON.parse(savedDraft);
+                if (savedForm) {
+                    setFormData(prev => ({ ...prev, ...savedForm }));
+                }
+                if (savedAmounts) {
+                    setAmountByUserId(savedAmounts);
+                }
+                if (savedSplit) {
+                    setSplitMethod(savedSplit);
+                }
+            } catch (e) {
+                console.error('Error parsing draft:', e);
+            }
+        }
+    }, [tripId]);
+
+    useEffect(() => {
+        if (tripId) {
+            const draftKey = `expense_draft_${tripId}`;
+            const dataToSave = {
+                formData,
+                amountByUserId,
+                splitMethod
+            };
+            localStorage.setItem(draftKey, JSON.stringify(dataToSave));
+        }
+    }, [formData, amountByUserId, splitMethod, tripId]);
+
+    useEffect(() => {
         const fetchMembers = async () => {
             if (!tripId) return;
             try {
@@ -81,22 +115,28 @@ const PWAAddExpensePage = () => {
                 const acceptedMembers = data.filter((m: any) => m && (m.status === 'accepted' || !m.status));
                 setMembers(acceptedMembers);
 
-                if (user && acceptedMembers.length > 0) {
-                    const currentUserMember = acceptedMembers.find((m: any) => m.user.id === user.id.toString());
-                    if (currentUserMember) {
-                        setFormData(prev => ({
-                            ...prev,
-                            payerId: currentUserMember.user.id,
-                            participantIds: [currentUserMember.user.id]
-                        }));
-                    } else {
-                        setFormData(prev => ({
-                            ...prev,
-                            payerId: acceptedMembers[0].user.id,
-                            participantIds: [acceptedMembers[0].user.id]
-                        }));
+                // Only set default payer if not already set (e.g. from draft)
+                setFormData(prev => {
+                    if (prev.payerId && prev.participantIds.length > 0) return prev;
+
+                    if (user && acceptedMembers.length > 0) {
+                        const currentUserMember = acceptedMembers.find((m: any) => m.user.id === user.id.toString());
+                        if (currentUserMember) {
+                            return {
+                                ...prev,
+                                payerId: currentUserMember.user.id,
+                                participantIds: [currentUserMember.user.id]
+                            };
+                        } else {
+                            return {
+                                ...prev,
+                                payerId: acceptedMembers[0].user.id,
+                                participantIds: [acceptedMembers[0].user.id]
+                            };
+                        }
                     }
-                }
+                    return prev;
+                });
             } catch (error: any) {
                 console.error('Fetch members error:', error);
                 showToast('Không thể tải danh sách thành viên', 'error');
@@ -111,10 +151,28 @@ const PWAAddExpensePage = () => {
     }, [tripId, isAuthenticated, user]);
 
     useEffect(() => {
+        // Skip auto-calculation if we just loaded a draft that has specific amounts
+        // We can detect this if amountByUserId is populated but we haven't touched anything yet?
+        // Actually, the dependency array [formData.participantIds, formData.amount, splitMethod] handles changes.
+        // If we load from draft, formData and amountByUserId are set. 
+        // We need to ensure we don't overwrite the loaded amountByUserId with a fresh 'equal' split calculation 
+        // unless the user triggers it.
+        // Simple heuristic: If amountByUserId is empty, it's safe to calc. 
+        // If it's not empty, we assume it's correct (either from draft or user edit).
+        // But if user changes amount, we DO want to recalc.
+
+        // Better: this effect runs when amount changes. If we load draft, amount changes. 
+        // We probably need to allow this effect to run, but if we loaded a draft with 'equal' split, 
+        // the calculation will just reproduce the same result.
+        // If we loaded a 'custom' split (which we didn't save explicitly in splitMethod state yet, wait),
+        // we should save splitMethod too?
+        // The component doesn't have splitMethod persistence in my proposed code. I should add `splitMethod` to saved state.
+
         const total = Number(formData.amount || '0');
         const ids = formData.participantIds;
         if (ids.length === 0 || !total) return;
 
+        // Only auto-distribute if we are in 'equal' mode
         if (splitMethod === 'equal') {
             const totalInt = total;
             const n = ids.length;
@@ -129,6 +187,11 @@ const PWAAddExpensePage = () => {
                     next[id] = base.toLocaleString('vi-VN');
                 }
             });
+            // Only update if different to avoid loops or overwriting manual tweaks that shouldn't happen in equal mode
+            /* 
+               Actually, for simplicity, let's just let it run. 
+               If the draft had 'equal' split resulting values, this will calculate the same values.
+            */
             setAmountByUserId(next);
         }
     }, [formData.participantIds.join('|'), formData.amount, splitMethod]);
@@ -188,6 +251,10 @@ const PWAAddExpensePage = () => {
             });
 
             showToast('Đã thêm chi phí thành công', 'success');
+            // Clear draft
+            const draftKey = `expense_draft_${tripId}`;
+            localStorage.removeItem(draftKey);
+
             navigate(-1);
         } catch (error: any) {
             console.error('Add expense error:', error);

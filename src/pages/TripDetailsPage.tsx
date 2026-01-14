@@ -225,15 +225,18 @@ const TripDetailsPage = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Write tab to URL on change
+  // Write tab to URL on change - optimized to prevent unnecessary updates
   useEffect(() => {
-    const current = searchParams.get('tab');
-    if (current !== activeTab) {
+    const currentParam = searchParams.get('tab');
+    if (activeTab && currentParam !== activeTab) {
       const next = new URLSearchParams(searchParams);
       next.set('tab', activeTab);
-      setSearchParams(next, { replace: true });
+      // Only update if searchParams actually change
+      if (next.toString() !== searchParams.toString()) {
+        setSearchParams(next, { replace: true });
+      }
     }
-  }, [activeTab, searchParams, setSearchParams]);
+  }, [activeTab]); // Only depend on activeTab change to sync to URL
 
   useEffect(() => {
     if (trip) {
@@ -416,12 +419,8 @@ const TripDetailsPage = () => {
         showToast('Phiên đăng nhập đã hết hạn', 'error');
         navigate('/auth');
       } else {
-        showToast(apiError.message || 'Không thể tải thông tin chuyến đi. Đang thử lại...', 'error');
-        setTimeout(() => {
-          if (user && id) {
-            fetchTripDetails();
-          }
-        }, 2000);
+        // Stop the silent retry loop which looks like a "refresh"
+        showToast(apiError.message || 'Không thể tải thông tin chuyến đi.', 'error');
       }
     } finally {
       setLoading(false);
