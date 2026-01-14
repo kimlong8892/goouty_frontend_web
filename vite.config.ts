@@ -48,7 +48,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       VitePWA({
-        registerType: 'autoUpdate',
+        registerType: 'prompt',
         injectRegister: 'auto',
         includeAssets: ['favicon.ico', 'logo.png', 'goouty-logo.svg', 'favicon_v2.png', '*.png'],
         manifest: {

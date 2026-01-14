@@ -1,21 +1,19 @@
-FROM node:20-slim
-
-# Enable pnpm
+FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-
 WORKDIR /usr/src/app
 
+FROM base AS build
 COPY package.json pnpm-lock.yaml ./
-
-RUN pnpm install
-
-# Install curl for healthcheck
-RUN apt-get update && apt-get install -y curl
-
+RUN pnpm install --frozen-lockfile
 COPY . .
+RUN pnpm run build
+
+FROM base AS prod
+RUN npm install -g serve
+COPY --from=build /usr/src/app/dist ./dist
 
 EXPOSE 8080
 
-CMD ["pnpm", "dev", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["serve", "-s", "dist", "-l", "8080"]
