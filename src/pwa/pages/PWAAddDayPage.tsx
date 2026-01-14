@@ -111,7 +111,7 @@ const PWAAddDayPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col relative text-foreground">
+        <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
             {/* PWA Header */}
             <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
                 <button
@@ -127,7 +127,7 @@ const PWAAddDayPage = () => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 px-5 pt-6 pb-44 overflow-y-auto">
+            <div className="flex-1 px-5 pt-6 pb-10 overflow-y-auto">
                 <div className="space-y-6">
 
                     {/* Title Input */}
@@ -208,8 +208,8 @@ const PWAAddDayPage = () => {
                 </div>
             </div>
 
-            {/* Sticky Bottom Button */}
-            <div className="fixed bottom-[80px] left-0 right-0 px-5 py-4 bg-background/80 backdrop-blur-md border-t border-border/50 z-40">
+            {/* Bottom Button */}
+            <div className="px-5 py-4 bg-background border-t border-border/50 pb-safe z-40">
                 <Button
                     onClick={handleSubmit}
                     disabled={loading}

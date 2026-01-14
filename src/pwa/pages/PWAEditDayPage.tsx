@@ -117,10 +117,10 @@ const PWAEditDayPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background transition-colors duration-300">
+        <div className="h-full bg-background transition-colors duration-300 flex flex-col overflow-hidden">
             <AnimatedTransition show={showContent} animation="slide-up">
-                {/* PWA Header */}
-                <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-border/50">
+                {/* Content Header - Header part of flex flow */}
+                <div className="bg-background/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-border/50">
                     <button
                         onClick={() => navigate(-1)}
                         className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full hover:bg-secondary/80 text-foreground transition-all active:scale-95"
@@ -133,7 +133,7 @@ const PWAEditDayPage = () => {
                 </div>
 
                 {/* Content */}
-                <div className="px-5 pt-6 pb-44 flex flex-col min-h-[calc(100vh-80px)]">
+                <div className="px-5 pt-6 pb-10 flex-1 overflow-y-auto">
                     <div className="flex-1 space-y-6">
                         {/* Title Input */}
                         <div className="space-y-2">
@@ -210,8 +210,8 @@ const PWAEditDayPage = () => {
                         </div>
                     </div>
 
-                    {/* Sticky Bottom Button */}
-                    <div className="fixed bottom-[80px] left-0 right-0 px-5 py-4 bg-background/80 backdrop-blur-md border-t border-border/50 z-40">
+                    {/* Bottom Button */}
+                    <div className="px-5 py-4 bg-background border-t border-border/50 pb-safe z-40">
                         <Button
                             onClick={handleSubmit}
                             disabled={saving}

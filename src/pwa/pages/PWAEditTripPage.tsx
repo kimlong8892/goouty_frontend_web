@@ -156,7 +156,7 @@ const PWAEditTripPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col relative text-foreground">
+        <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
             {/* Header */}
             <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
                 <button
@@ -172,7 +172,7 @@ const PWAEditTripPage = () => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 px-5 pt-6 pb-32 overflow-y-auto">
+            <div className="flex-1 px-5 pt-6 pb-10 overflow-y-auto">
                 <div className="w-full max-w-md mx-auto space-y-8">
                     {/* Cover Image Upload (Circular Style) */}
                     <div className="flex justify-center">
@@ -299,8 +299,8 @@ const PWAEditTripPage = () => {
                 </div>
             </div>
 
-            {/* Sticky Bottom Button - Positioned above PWA Navbar */}
-            <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/50 pb-safe z-40">
+            {/* Bottom Button - Positioned above PWA Navbar */}
+            <div className="p-4 bg-background border-t border-border/50 pb-safe z-40">
                 <Button
                     onClick={handleUpdateTrip}
                     disabled={loading}
