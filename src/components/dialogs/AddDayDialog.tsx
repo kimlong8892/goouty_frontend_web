@@ -19,6 +19,7 @@ interface AddDayDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tripId: string;
+  startDate?: string;
   onSuccess: () => void;
 }
 
@@ -26,6 +27,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
   open,
   onOpenChange,
   tripId,
+  startDate,
   onSuccess
 }) => {
   const { isPWA } = usePWA();
@@ -34,7 +36,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
     title: '',
     description: '',
     // store date-only string
-    date: ''
+    date: startDate ? format(new Date(startDate), 'yyyy-MM-dd') : ''
   });
 
   // Lỗi inline cho form
@@ -44,7 +46,11 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
   const titleRef = useRef<HTMLInputElement | null>(null);
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', date: '' });
+    setFormData({
+      title: '',
+      description: '',
+      date: startDate ? format(new Date(startDate), 'yyyy-MM-dd') : ''
+    });
   };
 
   const handleOpenChange = (newOpen: boolean) => {

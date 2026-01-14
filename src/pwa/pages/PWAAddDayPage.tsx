@@ -38,8 +38,26 @@ const PWAAddDayPage = () => {
     useEffect(() => {
         if (!authLoading && !isAuthenticated) {
             navigate('/auth');
+            return;
         }
-    }, [authLoading, isAuthenticated, navigate]);
+
+        const fetchTripDetails = async () => {
+            if (!tripId) return;
+            try {
+                const tripData = await api.trips.getById(tripId);
+                if (tripData && tripData.startDate) {
+                    setFormData(prev => ({
+                        ...prev,
+                        date: format(new Date(tripData.startDate), 'yyyy-MM-dd')
+                    }));
+                }
+            } catch (error) {
+                console.error('Error fetching trip details:', error);
+            }
+        };
+
+        fetchTripDetails();
+    }, [authLoading, isAuthenticated, navigate, tripId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

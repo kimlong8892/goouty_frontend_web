@@ -1230,6 +1230,7 @@ const TripDetailsPage = () => {
         open={showAddDay}
         onOpenChange={setShowAddDay}
         tripId={id || ''}
+        startDate={trip.startDate}
         onSuccess={fetchDaysAndActivities}
       />
       <AddActivityDialog
