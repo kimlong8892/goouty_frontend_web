@@ -23,7 +23,8 @@ import {
   Trash2,
   ChevronDown,
   ChevronRight,
-  GripVertical
+  GripVertical,
+  Copy
 } from 'lucide-react';
 import { cn } from '@/lib/utils.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
@@ -218,6 +219,7 @@ const TripDetailsPage = () => {
   const [editTripDialogOpen, setEditTripDialogOpen] = useState(false);
   const [deleteActivityDialogOpen, setDeleteActivityDialogOpen] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
+  const [duplicateActivityData, setDuplicateActivityData] = useState<Activity | null>(null);
 
   const { id } = useParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -452,6 +454,35 @@ const TripDetailsPage = () => {
       setActivityToDelete(null);
     } catch (error: unknown) {
       showToast('Không thể xóa hoạt động', 'error');
+    }
+  };
+
+
+  const handleDuplicateActivity = (activityId: string) => {
+    // Find activity and its day/index to get fresh info and position
+    let sourceActivity: any = null;
+    let dayId: string = '';
+
+    for (const dId in activitiesByDay) {
+      const found = activitiesByDay[dId].find(a => a.id === activityId);
+      if (found) {
+        sourceActivity = found;
+        dayId = dId;
+        break;
+      }
+    }
+
+    if (!sourceActivity) {
+      showToast('Không tìm thấy hoạt động để sao chép', 'error');
+      return;
+    }
+
+    if (isPWA) {
+      navigate(`/pwa-add-activity/${dayId}`, { state: { initialData: sourceActivity } });
+    } else {
+      setSelectedDayId(dayId);
+      setDuplicateActivityData(sourceActivity);
+      setShowAddActivity(true);
     }
   };
 
@@ -814,6 +845,7 @@ const TripDetailsPage = () => {
                   onEditDay={(dayId) => navigate(`/pwa-edit-day/${dayId}`)}
                   onAddActivity={(dayId) => navigate(`/pwa-add-activity/${dayId}`)}
                   onEditActivity={(activityId) => navigate(`/pwa-edit-activity/${activityId}`)}
+                  onDuplicateActivity={handleDuplicateActivity}
                   onDeleteActivity={openDeleteActivityDialog}
                   onDragStart={handleDragStart}
                   onDragOver={handleDragOver}
@@ -1019,6 +1051,15 @@ const TripDetailsPage = () => {
                                                   <Button
                                                     variant="ghost"
                                                     size="icon"
+                                                    className="h-8 w-8 text-slate-400 hover:text-primary active:bg-primary/10 rounded-full"
+                                                    title="Chấp nhận"
+                                                    onClick={() => handleDuplicateActivity(activity.id)}
+                                                  >
+                                                    <Copy className="w-4 h-4" />
+                                                  </Button>
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="icon"
                                                     className="h-8 w-8 text-slate-400 hover:text-red-500 active:bg-red-50 rounded-full"
                                                     onClick={() => openDeleteActivityDialog(activity)}
                                                   >
@@ -1101,6 +1142,17 @@ const TripDetailsPage = () => {
                                               >
                                                 <Edit className="w-4 h-4" />
                                               </Button>
+
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-full transition-colors"
+                                                title="Sao chép"
+                                                onClick={() => handleDuplicateActivity(activity.id)}
+                                              >
+                                                <Copy className="w-4 h-4" />
+                                              </Button>
+
                                               <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -1235,9 +1287,15 @@ const TripDetailsPage = () => {
       />
       <AddActivityDialog
         open={showAddActivity}
-        onOpenChange={setShowAddActivity}
+        onOpenChange={(open) => {
+          setShowAddActivity(open);
+          if (!open) {
+            setDuplicateActivityData(null);
+          }
+        }}
         dayId={selectedDayId}
         onSuccess={fetchDaysAndActivities}
+        initialData={duplicateActivityData}
       />
       {
         editingDay && (

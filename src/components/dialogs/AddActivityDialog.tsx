@@ -20,13 +20,15 @@ interface AddActivityDialogProps {
   onOpenChange: (open: boolean) => void;
   dayId: string;
   onSuccess: () => void;
+  initialData?: any;
 }
 
 export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
   open,
   onOpenChange,
   dayId,
-  onSuccess
+  onSuccess,
+  initialData
 }) => {
   const { isPWA } = usePWA();
   const [loading, setLoading] = useState(false);
@@ -39,6 +41,29 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
     notes: '',
     important: false
   });
+
+  React.useEffect(() => {
+    const extractTime = (timeString: any) => {
+      if (!timeString) return '';
+      if (typeof timeString === 'string' && timeString.includes('T')) {
+        return timeString.split('T')[1].substring(0, 5);
+      }
+      return timeString;
+    };
+
+    if (open && initialData) {
+      setFormData({
+        title: initialData.title || '',
+        startTime: extractTime(initialData.timeStart || initialData.startTime),
+        durationMin: initialData.durationMin || 60,
+        location: initialData.location || '',
+        notes: initialData.notes || '',
+        important: !!(initialData.important || initialData.pinned)
+      });
+    } else if (open && !initialData) {
+      resetForm();
+    }
+  }, [open, initialData]);
 
   const resetForm = () => {
     setSelectedFile(null);
@@ -135,7 +160,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
             </Button>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-foreground dark:text-white">
               <Plus className="w-5 h-5 text-[#6347f9]" />
-              <span>Thêm hoạt động</span>
+              <span>{initialData ? 'Sao chép hoạt động' : 'Thêm hoạt động'}</span>
             </DialogTitle>
             <Button
               type="submit"
@@ -248,7 +273,7 @@ export const AddActivityDialog: React.FC<AddActivityDialogProps> = ({
                   Đang thêm...
                 </>
               ) : (
-                'Thêm hoạt động'
+                initialData ? 'Sao chép' : 'Thêm hoạt động'
               )}
             </Button>
           </DialogFooter>

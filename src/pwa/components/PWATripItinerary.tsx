@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Info, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical } from 'lucide-react';
+import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Info, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical, Copy, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +33,7 @@ interface PWATripItineraryProps {
     activitiesByDay: Record<string, Activity[]>;
     onAddActivity: (dayId: string) => void;
     onEditActivity: (activityId: string) => void;
+    onDuplicateActivity: (activityId: string) => void;
     onDeleteActivity: (activity: Activity) => void;
     onAddDay: () => void;
     onEditDay: (dayId: string) => void;
@@ -54,6 +55,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     activitiesByDay,
     onAddActivity,
     onEditActivity,
+    onDuplicateActivity,
     onDeleteActivity,
     onAddDay,
     onEditDay,
@@ -218,15 +220,37 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                             <div className="text-[15px] font-bold text-foreground">
                                                 {activity.timeStart ? formatTime(activity.timeStart) : "09:00"}
                                             </div>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    onEditActivity(activity.id);
-                                                }}
-                                                className="p-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all"
-                                            >
-                                                <Pencil className="w-3.5 h-3.5" />
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onDuplicateActivity(activity.id);
+                                                    }}
+                                                    className="p-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all"
+                                                    title="Sao chép"
+                                                >
+                                                    <Copy className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onEditActivity(activity.id);
+                                                    }}
+                                                    className="p-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all"
+                                                >
+                                                    <Pencil className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onDeleteActivity(activity);
+                                                    }}
+                                                    className="p-1.5 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 active:scale-95 transition-all"
+                                                    title="Xóa"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {/* Card */}

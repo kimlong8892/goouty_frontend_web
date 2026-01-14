@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { api } from '@/integrations/api/client.ts';
 import { useGlobalToast } from '@/utils/globalToast.ts';
@@ -39,11 +39,35 @@ const PWAAddActivityPage = () => {
         document.title = 'Thêm hoạt động mới - Goouty';
     }, []);
 
+    const { state } = useLocation();
+    const initialData = state?.initialData;
+
     useEffect(() => {
         if (!authLoading && !isAuthenticated) {
             navigate('/auth');
         }
     }, [authLoading, isAuthenticated, navigate]);
+
+    useEffect(() => {
+        const extractTime = (timeString: any) => {
+            if (!timeString) return '';
+            if (typeof timeString === 'string' && timeString.includes('T')) {
+                return timeString.split('T')[1].substring(0, 5);
+            }
+            return timeString;
+        };
+
+        if (initialData) {
+            setFormData({
+                title: `${initialData.title} (Copy)`,
+                startTime: extractTime(initialData.timeStart || initialData.startTime),
+                durationMin: initialData.durationMin || 60,
+                location: initialData.location || '',
+                notes: initialData.notes || '',
+                important: !!(initialData.important || initialData.pinned)
+            });
+        }
+    }, [initialData]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -114,7 +138,7 @@ const PWAAddActivityPage = () => {
                         <ChevronLeft className="w-6 h-6" />
                     </button>
                     <h1 className="text-lg font-bold absolute left-1/2 -translate-x-1/2 text-nowrap">
-                        Thêm hoạt động
+                        {initialData ? 'Sao chép hoạt động' : 'Thêm hoạt động'}
                     </h1>
                 </div>
 
@@ -241,7 +265,7 @@ const PWAAddActivityPage = () => {
                             {loading ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
                             ) : null}
-                            {loading ? 'Đang thêm...' : 'Thêm hoạt động'}
+                            {loading ? (initialData ? 'Đang sao chép...' : 'Đang thêm...') : (initialData ? 'Sao chép' : 'Thêm hoạt động')}
                         </Button>
                     </div>
                 </div>
