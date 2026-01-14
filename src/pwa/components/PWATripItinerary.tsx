@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Info, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical, Copy, Trash2 } from 'lucide-react';
+import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Info, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical, Copy, Trash2, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface Activity {
     id: string;
@@ -37,6 +38,7 @@ interface PWATripItineraryProps {
     onDeleteActivity: (activity: Activity) => void;
     onAddDay: () => void;
     onEditDay: (dayId: string) => void;
+    onDeleteDay?: (day: Day) => void;
     onDragStart?: (e: React.DragEvent, activityId: string, dayId: string) => void;
     onDragOver?: (e: React.DragEvent, activityId: string, dayId: string) => void;
     onDragEnd?: (e: React.DragEvent) => void;
@@ -59,6 +61,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     onDeleteActivity,
     onAddDay,
     onEditDay,
+    onDeleteDay,
     onDragStart,
     onDragOver,
     onDragEnd,
@@ -129,22 +132,48 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                     key={day.id}
                                     onClick={() => setSelectedDayId(day.id)}
                                     className={cn(
-                                        "flex flex-col items-center flex-1 min-w-[70px] py-2 px-1 rounded-xl transition-all relative",
+                                        "flex flex-col items-center flex-1 min-w-[100px] py-3 px-1 rounded-xl transition-all relative",
                                         isActive
                                             ? "bg-primary/10"
                                             : ""
                                     )}
                                 >
                                     {isActive && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onEditDay(day.id);
-                                            }}
-                                            className="absolute top-1 right-1 p-1 rounded-full bg-primary/20 text-primary hover:bg-primary/30 active:scale-95 transition-all"
-                                        >
-                                            <Pencil className="w-2.5 h-2.5" />
-                                        </button>
+                                        <div className="absolute top-1 right-1" onClick={(e) => e.stopPropagation()}>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <button
+                                                        className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground/60 hover:text-foreground transition-colors"
+                                                    >
+                                                        <MoreHorizontal className="w-4 h-4" />
+                                                    </button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="start" className="min-w-[140px] rounded-xl">
+                                                    <DropdownMenuItem
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onEditDay(day.id);
+                                                        }}
+                                                        className="gap-2 font-medium"
+                                                    >
+                                                        <Pencil className="w-3.5 h-3.5" />
+                                                        Chỉnh sửa
+                                                    </DropdownMenuItem>
+                                                    {isOwner && (
+                                                        <DropdownMenuItem
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onDeleteDay?.(day);
+                                                            }}
+                                                            className="gap-2 text-destructive focus:text-destructive font-medium"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                            Xóa ngày
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
                                     )}
                                     <span className={cn(
                                         "text-[15px] font-bold",

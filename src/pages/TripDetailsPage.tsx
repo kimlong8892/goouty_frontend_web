@@ -220,6 +220,8 @@ const TripDetailsPage = () => {
   const [deleteActivityDialogOpen, setDeleteActivityDialogOpen] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
   const [duplicateActivityData, setDuplicateActivityData] = useState<Activity | null>(null);
+  const [deleteDayDialogOpen, setDeleteDayDialogOpen] = useState(false);
+  const [dayToDelete, setDayToDelete] = useState<Day | null>(null);
 
   const { id } = useParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -453,6 +455,39 @@ const TripDetailsPage = () => {
       setActivityToDelete(null);
     } catch (error: unknown) {
       showToast('Không thể xóa hoạt động', 'error');
+    }
+  };
+
+  const openDeleteDayDialog = (day: Day) => {
+    setDayToDelete(day);
+    setDeleteDayDialogOpen(true);
+  };
+
+  const handleConfirmDeleteDay = async () => {
+    if (!dayToDelete) return;
+
+    try {
+      await api.days.delete(dayToDelete.id);
+
+      setDays(prev => prev.filter(d => d.id !== dayToDelete.id));
+      setExpandedDayIds(prev => prev.filter(id => id !== dayToDelete.id));
+
+      // Remove activities for this day from local state
+      setActivitiesByDay(prev => {
+        const newState = { ...prev };
+        delete newState[dayToDelete.id];
+        return newState;
+      });
+
+      showToast('Đã xóa ngày khỏi lịch trình', 'success');
+      setDeleteDayDialogOpen(false);
+      setDayToDelete(null);
+
+      // If PWA or mobile, we might need to update other state logic if needed, 
+      // but the main data is days array
+    } catch (error) {
+      console.error('Failed to delete day:', error);
+      showToast('Không thể xóa ngày', 'error');
     }
   };
 
@@ -854,6 +889,7 @@ const TripDetailsPage = () => {
                   dragOverActivityId={dragOverActivityId}
                   justDroppedId={justDroppedId}
                   isOwner={trip.userRole === 'owner'}
+                  onDeleteDay={openDeleteDayDialog}
                 />
               ) : (
                 <Card className={cn(
@@ -938,24 +974,37 @@ const TripDetailsPage = () => {
                                       {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
 
                                       <div onClick={(e) => e.stopPropagation()}>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          className={cn(
-                                            "h-8 w-8 p-0 rounded-full hover:bg-secondary text-primary bg-primary/10",
-                                            isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
-                                          )}
-                                          onClick={() => {
-                                            if (isMobileView) {
-                                              navigate(`/pwa-edit-day/${day.id}`);
-                                            } else {
-                                              setEditingDay(day);
-                                              setShowEditDay(true);
-                                            }
-                                          }}
-                                        >
-                                          <Edit className="w-4 h-4" />
-                                        </Button>
+                                        <div className="flex bg-primary/10 rounded-full p-0.5">
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className={cn(
+                                              "h-8 w-8 p-0 rounded-full hover:bg-secondary text-primary",
+                                              isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
+                                            )}
+                                            onClick={() => {
+                                              if (isMobileView) {
+                                                navigate(`/pwa-edit-day/${day.id}`);
+                                              } else {
+                                                setEditingDay(day);
+                                                setShowEditDay(true);
+                                              }
+                                            }}
+                                          >
+                                            <Edit className="w-4 h-4" />
+                                          </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className={cn(
+                                              "h-8 w-8 p-0 rounded-full hover:bg-red-100 text-red-500",
+                                              isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
+                                            )}
+                                            onClick={() => openDeleteDayDialog(day)}
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                        </div>
                                       </div>
                                     </div>
 
@@ -1276,6 +1325,33 @@ const TripDetailsPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog >
+
+      {/* Delete Day Dialog */}
+      <Dialog open={deleteDayDialogOpen} onOpenChange={setDeleteDayDialogOpen}>
+        <DialogContent className="rounded-2xl bg-white dark:bg-[#1a1a2e] border-none shadow-2xl max-w-[90vw] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Xác nhận xóa ngày</DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400 mt-2">
+              Bạn có chắc chắn muốn xóa "{dayToDelete?.title}"? Tất cả hoạt động trong ngày này cũng sẽ bị xóa. Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-row gap-3 mt-6 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDayDialogOpen(false)}
+              className="flex-1 sm:flex-none rounded-xl bg-background text-primary hover:bg-secondary border-border font-bold transition-all h-11"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleConfirmDeleteDay}
+              className="flex-1 sm:flex-none bg-red-500 hover:bg-red-600 rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-red-500/20 h-11"
+            >
+              Xóa ngày
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AddDayDialog
         open={showAddDay}
