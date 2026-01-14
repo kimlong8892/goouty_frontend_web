@@ -250,35 +250,48 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                 {activity.timeStart ? formatTime(activity.timeStart) : "09:00"}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        onDuplicateActivity(activity.id);
-                                                    }}
-                                                    className="p-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all"
-                                                    title="Sao chép"
-                                                >
-                                                    <Copy className="w-3.5 h-3.5" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        onEditActivity(activity.id);
-                                                    }}
-                                                    className="p-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all"
-                                                >
-                                                    <Pencil className="w-3.5 h-3.5" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        onDeleteActivity(activity);
-                                                    }}
-                                                    className="p-1.5 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 active:scale-95 transition-all"
-                                                    title="Xóa"
-                                                >
-                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                </button>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <button
+                                                            className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground/60 hover:text-foreground transition-colors"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <MoreHorizontal className="w-4 h-4" />
+                                                        </button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="min-w-[140px] rounded-xl z-50 bg-background/95 backdrop-blur-sm shadow-xl border-border/50">
+                                                        <DropdownMenuItem
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onDuplicateActivity(activity.id);
+                                                            }}
+                                                            className="gap-2 font-medium py-2.5 cursor-pointer"
+                                                        >
+                                                            <Copy className="w-3.5 h-3.5 text-blue-500" />
+                                                            Sao chép
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onEditActivity(activity.id);
+                                                            }}
+                                                            className="gap-2 font-medium py-2.5 cursor-pointer"
+                                                        >
+                                                            <Pencil className="w-3.5 h-3.5 text-primary" />
+                                                            Chỉnh sửa
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onDeleteActivity(activity);
+                                                            }}
+                                                            className="gap-2 text-destructive focus:text-destructive font-medium py-2.5 cursor-pointer"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                            Xóa hoạt động
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                             </div>
                                         </div>
 
