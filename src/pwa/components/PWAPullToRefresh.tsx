@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { usePWA } from '@/pwa/hooks/usePWA';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface PWAPullToRefreshProps {
     children: React.ReactNode;
@@ -8,6 +9,7 @@ interface PWAPullToRefreshProps {
 
 export const PWAPullToRefresh = ({ children }: PWAPullToRefreshProps) => {
     const { isPWA } = usePWA();
+    const queryClient = useQueryClient();
     const [pullChange, setPullChange] = useState<number>(0);
     const [refreshing, setRefreshing] = useState<boolean>(false);
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -59,7 +61,7 @@ export const PWAPullToRefresh = ({ children }: PWAPullToRefreshProps) => {
             }
         };
 
-        const handleTouchEnd = () => {
+        const handleTouchEnd = async () => {
             if (!isDraggingRef.current) return;
 
             const currentPull = pullChangeRef.current;
@@ -70,9 +72,22 @@ export const PWAPullToRefresh = ({ children }: PWAPullToRefreshProps) => {
                 setRefreshing(true);
                 setPullChange(PULL_THRESHOLD);
 
-                setTimeout(() => {
-                    window.location.reload();
-                }, 600);
+                try {
+                    // Refetch all active queries to refresh data without reloading page
+                    // This avoids showing the splash screen
+                    await queryClient.refetchQueries();
+
+                    // Small artificial delay for visual feedback
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                } catch (error) {
+                    console.error('[PullToRefresh] Error refetching data:', error);
+                    // Fallback to reload only if absolutely necessary
+                    // window.location.reload(); 
+                } finally {
+                    setRefreshing(false);
+                    setPullChange(0);
+                    pullChangeRef.current = 0;
+                }
             } else {
                 setPullChange(0);
                 pullChangeRef.current = 0;
@@ -89,7 +104,7 @@ export const PWAPullToRefresh = ({ children }: PWAPullToRefreshProps) => {
             root.removeEventListener('touchmove', handleTouchMove);
             root.removeEventListener('touchend', handleTouchEnd);
         };
-    }, [isPWA, refreshing]);
+    }, [isPWA, refreshing, queryClient]);
 
     if (!isPWA) return <>{children}</>;
 
@@ -102,7 +117,7 @@ export const PWAPullToRefresh = ({ children }: PWAPullToRefreshProps) => {
                     top: -50,
                     transform: `translateY(${Math.min(pullChange, MAX_PULL)}px)`,
                     opacity: Math.min(pullChange / 40, 1),
-                    transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    transition: isDragging || refreshing ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                 }}
             >
                 <div className="bg-white dark:bg-zinc-800 shadow-xl rounded-full p-2.5 border border-primary/20 backdrop-blur-md">
@@ -135,7 +150,7 @@ export const PWAPullToRefresh = ({ children }: PWAPullToRefreshProps) => {
                 className="flex-1 flex flex-col"
                 style={{
                     transform: `translateY(${refreshing ? PULL_THRESHOLD : pullChange}px)`,
-                    transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    transition: isDragging || refreshing ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                 }}
             >
                 {children}
