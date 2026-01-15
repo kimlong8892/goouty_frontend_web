@@ -55,7 +55,7 @@ export const PersonalBalance: React.FC<PersonalBalanceProps> = ({ userBalances }
     <div className={cn("space-y-4", isMobileView && "space-y-3")}>
       <div className="flex items-center gap-2 px-1">
         <Wallet className="w-5 h-5 text-primary" />
-        <h3 className={cn("font-bold text-slate-900 dark:text-white", isMobileView ? "text-base" : "text-lg")}>Cá nhân</h3>
+        <h3 className={cn("font-bold text-slate-900 dark:text-white", isMobileView ? "text-base" : "text-lg")}>Tổng quan nhóm</h3>
       </div>
       <div className={cn("grid gap-3", isMobileView ? "grid-cols-1" : "grid-cols-2")}>
         {userBalances.map((userBalance) => {

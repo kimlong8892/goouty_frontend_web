@@ -294,7 +294,7 @@ export const api = {
     create: async (ratingData: { stars: number; content: string }) => {
       return await api.post<DATABASE_TYPES.ratings>('/ratings', ratingData);
     },
-    getAll: async (params?: { page?: number; limit?: number }) => {
+    getAll: async (params?: { page?: number; limit?: number; userId?: string }) => {
       return await api.get<{
         data: DATABASE_TYPES.ratings[];
         pagination: {

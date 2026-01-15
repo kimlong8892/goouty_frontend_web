@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ExperienceReview } from '@/components/ExperienceReview';
 import { usePWA } from '@/pwa/hooks/usePWA';
+import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
 import { MessageSquare, Heart, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -10,6 +12,26 @@ export const FeedbackPrompter = () => {
     const [showPrompt, setShowPrompt] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const { isPWA } = usePWA();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        const checkBackendStatus = async () => {
+            if (user?.id && !localStorage.getItem('goouty_feedback_submitted')) {
+                try {
+                    const res = await api.ratings.getAll({ userId: user.id, limit: 5 });
+                    const hasMyReview = res.data?.some(r => r.userId === user.id);
+                    if (hasMyReview) {
+                        localStorage.setItem('goouty_feedback_submitted', 'true');
+                        setShowPrompt(false);
+                    }
+                } catch (e) {
+                    console.error("Failed to check feedback status", e);
+                }
+            }
+        };
+
+        checkBackendStatus();
+    }, [user]);
 
     useEffect(() => {
         // Check if already submitted
