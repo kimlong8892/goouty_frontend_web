@@ -455,7 +455,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
       {selectedCategory !== 'all' ? (
         <div className="text-center py-20 px-4">
           <MapPin className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-foreground mb-2">Sắp ra mắt</h3>
+          {/* <h3 className="text-lg font-bold text-foreground mb-2">Đang phát triển</h3> */}
           <p className="text-muted-foreground text-sm max-w-[240px] mx-auto">
             Chưa có mẫu chuyến đi nào cho danh mục này. Hãy quay lại sau nhé!
           </p>

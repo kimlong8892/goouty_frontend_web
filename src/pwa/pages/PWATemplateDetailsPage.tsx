@@ -65,6 +65,69 @@ const PWATemplateDetailsPage = () => {
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
     const [showTutorial, setShowTutorial] = useState(false);
 
+    // Swipe handling for days
+    const touchStartX = useRef<number | null>(null);
+    const touchEndX = useRef<number | null>(null);
+    const touchStartY = useRef<number | null>(null);
+    const touchEndY = useRef<number | null>(null);
+    const minSwipeDistance = 50;
+    const dayTabsScrollRef = useRef<HTMLDivElement>(null);
+
+    const handleNextDay = () => {
+        const total = (template?.days || []).length;
+        if (selectedDayIndex < total - 1) {
+            setSelectedDayIndex(prev => prev + 1);
+        }
+    };
+
+    const handlePrevDay = () => {
+        if (selectedDayIndex > 0) {
+            setSelectedDayIndex(prev => prev - 1);
+        }
+    };
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchEndX.current = null;
+        touchEndY.current = null;
+        touchStartX.current = e.targetTouches[0].clientX;
+        touchStartY.current = e.targetTouches[0].clientY;
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        touchEndX.current = e.targetTouches[0].clientX;
+        touchEndY.current = e.targetTouches[0].clientY;
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStartX.current || !touchEndX.current || !touchStartY.current || !touchEndY.current) return;
+
+        const distanceX = touchStartX.current - touchEndX.current;
+        const distanceY = touchStartY.current - touchEndY.current;
+        const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
+
+        if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
+            if (distanceX > 0) {
+                handleNextDay();
+            } else {
+                handlePrevDay();
+            }
+        }
+    };
+
+    // Scroll active tab into view
+    useEffect(() => {
+        if (dayTabsScrollRef.current) {
+            const activeTab = dayTabsScrollRef.current.querySelector('[data-active="true"]') as HTMLElement;
+            if (activeTab) {
+                activeTab.scrollIntoView({
+                    behavior: 'smooth',
+                    inline: 'center',
+                    block: 'nearest'
+                });
+            }
+        }
+    }, [selectedDayIndex]);
+
     // Auto-hide navigation controls
     const [controlsVisible, setControlsVisible] = useState(true);
     const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -256,6 +319,9 @@ const PWATemplateDetailsPage = () => {
     return (
         <div
             className="min-h-screen bg-white dark:bg-[#0a0a0a] pb-[200px]"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
         >
             {/* STICKY HEADER */}
             <div className="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md px-5 py-3 flex items-center justify-between">
@@ -431,11 +497,15 @@ const PWATemplateDetailsPage = () => {
                                 className="overflow-x-auto no-scrollbar mb-4 sticky top-[64px] bg-white dark:bg-[#0a0a0a] z-30 py-2 -mx-5 px-2 border-b border-slate-100 dark:border-zinc-800"
                                 onTouchStart={(e) => e.stopPropagation()}
                             >
-                                <div className="flex gap-8 justify-start w-max min-w-full px-5">
+                                <div
+                                    ref={dayTabsScrollRef}
+                                    className="flex gap-8 justify-start w-max min-w-full px-5"
+                                >
                                     {(template.days || []).map((day, idx) => (
                                         <button
                                             key={day.id}
                                             onClick={() => setSelectedDayIndex(idx)}
+                                            data-active={selectedDayIndex === idx}
                                             className={cn(
                                                 "flex flex-col items-center min-w-[90px] py-3 px-3 rounded-2xl transition-all duration-300",
                                                 selectedDayIndex === idx

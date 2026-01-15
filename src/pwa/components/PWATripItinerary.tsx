@@ -101,9 +101,47 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     const navigate = useNavigate();
     const dayTabsRef = useRef<HTMLDivElement>(null);
 
-    // NOTE: Removed LongPress Dialog logic in favor of Drag and Drop mechanism as per request.
+    // Swipe handling
+    const touchStartX = useRef<number | null>(null);
+    const touchEndX = useRef<number | null>(null);
+    const touchStartY = useRef<number | null>(null);
+    const touchEndY = useRef<number | null>(null);
+    const minSwipeDistance = 50;
 
-    // ... existing useState for activity ...
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchEndX.current = null;
+        touchEndY.current = null;
+        touchStartX.current = e.targetTouches[0].clientX;
+        touchStartY.current = e.targetTouches[0].clientY;
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        touchEndX.current = e.targetTouches[0].clientX;
+        touchEndY.current = e.targetTouches[0].clientY;
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStartX.current || !touchEndX.current || !touchStartY.current || !touchEndY.current) return;
+
+        const distanceX = touchStartX.current - touchEndX.current;
+        const distanceY = touchStartY.current - touchEndY.current;
+        const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
+
+        if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
+            const currentIndex = days.findIndex(d => d.id === selectedDayId);
+            if (distanceX > 0) {
+                // Swiped left -> next day
+                if (currentIndex < days.length - 1) {
+                    setSelectedDayId(days[currentIndex + 1].id);
+                }
+            } else {
+                // Swiped right -> previous day
+                if (currentIndex > 0) {
+                    setSelectedDayId(days[currentIndex - 1].id);
+                }
+            }
+        }
+    };
 
     useEffect(() => {
         if (days.length > 0 && !selectedDayId) {
@@ -155,7 +193,12 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     };
 
     return (
-        <div className="flex flex-col w-full bg-background min-h-screen">
+        <div
+            className="flex flex-col w-full bg-background min-h-screen"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+        >
             {/* Day Selector Header */}
             <div
                 className={cn(
@@ -166,6 +209,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                 <div
                     ref={dayTabsRef}
                     className="flex items-center justify-start w-full gap-4 px-4 py-2 overflow-x-auto scrollbar-hide"
+                    onTouchStart={(e) => e.stopPropagation()}
                 >
                     <div className="flex items-center gap-1">
                         {days.map((day, index) => {
