@@ -43,6 +43,7 @@ const InviteAcceptPage: React.FC = () => {
   const [loadingInvitation, setLoadingInvitation] = useState(true);
   const [invitation, setInvitation] = useState<InvitationDetails | null>(null);
   const [showSignupForm, setShowSignupForm] = useState(false);
+  const [showAcceptConfirm, setShowAcceptConfirm] = useState(false);
 
   // Form states
   const [fullName, setFullName] = useState('');
@@ -55,6 +56,18 @@ const InviteAcceptPage: React.FC = () => {
     if (!token) {
       toast.error('Token không hợp lệ');
       navigate('/');
+      return;
+    }
+
+    // Skip if already loading or if invitation is already fetched
+    if (invitation) {
+      if (!authLoading) {
+        if (isAuthenticated && !processing) {
+          setShowAcceptConfirm(true);
+        } else if (!isAuthenticated) {
+          setShowSignupForm(true);
+        }
+      }
       return;
     }
 
@@ -71,9 +84,9 @@ const InviteAcceptPage: React.FC = () => {
           return;
         }
 
-        // If user is authenticated, proceed to accept invitation
+        // If user is authenticated, show confirmation
         if (isAuthenticated) {
-          await acceptInvitation(token);
+          setShowAcceptConfirm(true);
         } else {
           // Show signup form for unauthenticated users
           setShowSignupForm(true);
@@ -120,7 +133,10 @@ const InviteAcceptPage: React.FC = () => {
         return;
       }
 
-      // After successful signup, automatically accept invitation
+      // After successful signup, the user is authenticated. 
+      // The useEffect will pick this up and show the confirmation screen
+      // or we can just proceed if that was the "Register and Join" intent.
+      // Given the button says "Register and join trip", we proceed.
       const token = searchParams.get('token');
       if (token) {
         toast.success('Đăng ký thành công! Đang tham gia chuyến đi...');
@@ -265,12 +281,86 @@ const InviteAcceptPage: React.FC = () => {
     );
   }
 
-  // If authenticated, show loading while accepting
+  if (showAcceptConfirm && isAuthenticated && invitation) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md overflow-hidden border-none shadow-2xl">
+          <div className="h-2 bg-primary"></div>
+          <CardHeader className="text-center pt-8">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="w-8 h-8 text-primary" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-slate-800">
+              Mời tham gia chuyến đi
+            </CardTitle>
+            <CardDescription className="text-slate-600 mt-2 px-4">
+              {invitation.inviter.fullName || 'Bạn'} đã được mời tham gia chuyến đi đầy thú vị cùng bạn bè.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-6 pb-8">
+            <div className="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="mt-1">
+                  <div className="w-2 h-2 rounded-full bg-primary"></div>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-50 font-medium bg-primary/80 px-2 py-0.5 rounded-md inline-block mb-1">Tên chuyến đi</p>
+                  <h3 className="text-xl font-bold text-slate-900 leading-tight">{invitation.trip.title}</h3>
+                </div>
+              </div>
+
+              {invitation.trip.province && (
+                <p className="text-sm text-slate-600 flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">📍</span>
+                  {invitation.trip.province.name}
+                </p>
+              )}
+
+              {invitation.trip.startDate && (
+                <p className="text-sm text-slate-600 flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">📅</span>
+                  {new Date(invitation.trip.startDate).toLocaleDateString('vi-VN')}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={() => {
+                  const token = searchParams.get('token');
+                  if (token) acceptInvitation(token);
+                }}
+                disabled={processing}
+                className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white h-12 text-base font-semibold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+              >
+                {processing ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Đang xử lý...
+                  </div>
+                ) : 'Chấp nhận tham gia'}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/')}
+                disabled={processing}
+                className="w-full rounded-xl text-slate-500 hover:bg-slate-100 h-12 text-base font-medium transition-all"
+              >
+                Để sau
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // If authenticated, show loading while loading invitation
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="text-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
-        <p>Đang xử lý lời mời...</p>
+        <p>Đang chuẩn bị...</p>
       </div>
     </div>
   );
