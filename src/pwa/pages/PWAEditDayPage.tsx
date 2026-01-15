@@ -185,7 +185,7 @@ const PWAEditDayPage = () => {
                                 ref={titleRef}
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                placeholder="VD: Ngày 1 - Khám phá thành phố"
+                                placeholder="VD: Khám phá thành phố"
                                 className={cn(
                                     "bg-card border-input shadow-sm rounded-xl h-14 px-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200",
                                     errors.title && "border-destructive focus-visible:ring-destructive/20"

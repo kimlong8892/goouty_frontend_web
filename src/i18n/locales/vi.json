@@ -75,7 +75,7 @@
         "tripDetails": "Chi tiết chuyến đi",
         "coverImage": "Ảnh đại diện chuyến đi",
         "uploadImage": "Tải lên ảnh đại diện",
-        "selectDate": "Chọn thời gian chuyến đi",
+        "selectDate": "Chọn ngày bắt đầu - ngày kết thúc",
         "tripDescription": "Chia sẻ về chuyến đi này - điều gì khiến bạn hứng thú?",
         "selectProvince": "Chọn tỉnh thành"
     },

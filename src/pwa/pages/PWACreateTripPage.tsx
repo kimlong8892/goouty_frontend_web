@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { DateRange } from "react-day-picker";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
@@ -26,7 +27,7 @@ const PWACreateTripPage = () => {
   const [tripName, setTripName] = useState('');
   const [destination, setDestination] = useState('');
   const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [date, setDate] = useState<DateRange | undefined>();
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,8 +63,8 @@ const PWACreateTripPage = () => {
       newErrors.destination = 'Vui lòng chọn điểm đến';
     }
 
-    if (!startDate) {
-      newErrors.startDate = 'Vui lòng chọn ngày đi';
+    if (!date?.from) {
+      newErrors.date = 'Vui lòng chọn ngày bắt đầu - ngày kết thúc';
     }
 
 
@@ -88,7 +89,8 @@ const PWACreateTripPage = () => {
         title: tripName.trim(),
         provinceId: destination.trim() || undefined,
         description: description.trim() || undefined,
-        ...(startDate && { startDate: startDate.toISOString() })
+        startDate: date?.from ? date.from.toISOString() : undefined,
+        endDate: date?.to ? date.to.toISOString() : undefined
       };
 
       const trip = await api.trips.create(tripData);
@@ -252,34 +254,65 @@ const PWACreateTripPage = () => {
               )}
             </div>
 
-            {/* Start Date */}
+            {/* Date Range */}
             <div className="space-y-2">
               <Label className="text-muted-foreground text-sm font-medium ml-1">
-                Ngày đi <span className="text-red-500">*</span>
+                Ngày bắt đầu - ngày kết thúc <span className="text-red-500">*</span>
               </Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal h-12 rounded-xl bg-card border-input hover:bg-card/80 transition-all",
-                      !startDate && "text-muted-foreground"
+                      "w-full justify-start text-left font-normal h-14 rounded-xl bg-card border-input hover:bg-card/80 transition-all",
+                      !date && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
+                    <div className="flex items-center gap-3 w-full">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <CalendarIcon className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        {date?.from ? (
+                          date.to ? (
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-foreground">
+                                {format(date.from, "dd/MM/yyyy", { locale: vi })}
+                              </span>
+                              <span className="text-muted-foreground text-xs">→</span>
+                              <span className="font-semibold text-foreground">
+                                {format(date.to, "dd/MM/yyyy", { locale: vi })}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="font-semibold text-foreground">
+                              {format(date.from, "dd/MM/yyyy", { locale: vi })}
+                            </span>
+                          )
+                        ) : (
+                          <div className="flex flex-col items-start gap-0.5">
+                            <span className="text-foreground font-medium">Chọn ngày</span>
+                            <span className="text-xs text-muted-foreground">Chạm để chọn lịch trình</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
+                    mode="range"
+                    selected={date}
+                    onSelect={setDate}
                     initialFocus
+                    numberOfMonths={1}
                     disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                   />
                 </PopoverContent>
               </Popover>
+              {errors.date && (
+                <p className="text-xs text-destructive ml-1">{errors.date}</p>
+              )}
             </div>
 
             {/* Description */}

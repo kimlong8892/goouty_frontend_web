@@ -142,7 +142,7 @@ const PWAAddDayPage = () => {
 
                     {/* Title Input */}
                     <div className="space-y-2">
-                        <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                        <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                             Tiêu đề ngày <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -150,7 +150,7 @@ const PWAAddDayPage = () => {
                             ref={titleRef}
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            placeholder="VD: Ngày 1 - Khám phá thành phố"
+                            placeholder="VD: Khám phá thành phố"
                             className={cn(
                                 "h-14 rounded-xl bg-card border-input focus:ring-primary/20 transition-all px-4 text-base",
                                 errors.title && "border-destructive focus-visible:ring-destructive/20"
@@ -163,7 +163,7 @@ const PWAAddDayPage = () => {
 
                     {/* Description Input */}
                     <div className="space-y-2">
-                        <Label htmlFor="description" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                        <Label htmlFor="description" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                             Mô tả (tùy chọn)
                         </Label>
                         <Textarea

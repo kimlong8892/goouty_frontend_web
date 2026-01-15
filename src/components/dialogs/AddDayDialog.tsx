@@ -208,7 +208,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
                 ref={titleRef}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="VD: Ngày 1 - Khám phá thành phố"
+                placeholder="VD: Khám phá thành phố"
                 className={cn(
                   "h-12 bg-card border-input focus:ring-primary/20 rounded-xl transition-all",
                   isPWA ? "bg-card border-input" : "bg-secondary dark:bg-[#242731] border-border dark:border-gray-700",

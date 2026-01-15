@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { DateRange } from "react-day-picker";
 import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
 import { useAnimateIn } from '@/lib/animations.ts';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card.tsx';
@@ -26,7 +27,7 @@ const CreateTripPage = () => {
   const [tripName, setTripName] = useState('');
   const [provinceId, setProvinceId] = useState('');
   const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [date, setDate] = useState<DateRange | undefined>();
   const [loading, setLoading] = useState(false);
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -59,8 +60,8 @@ const CreateTripPage = () => {
     if (!provinceId.trim()) {
       newErrors.provinceId = 'Vui lòng chọn tỉnh thành';
     }
-    if (!startDate) {
-      newErrors.startDate = 'Vui lòng chọn ngày đi';
+    if (!date?.from) {
+      newErrors.date = 'Vui lòng chọn ngày bắt đầu - ngày kết thúc';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -78,7 +79,8 @@ const CreateTripPage = () => {
         title: tripName.trim(),
         provinceId: provinceId.trim(),
         description: description.trim() || undefined,
-        ...(startDate && { startDate: startDate.toISOString() })
+        startDate: date?.from ? date.from.toISOString() : undefined,
+        endDate: date?.to ? date.to.toISOString() : undefined
       };
       const trip = await api.post<Trip>('/trips', tripData);
 
@@ -201,39 +203,47 @@ const CreateTripPage = () => {
 
                 <div className="space-y-2">
                   <Label className="text-muted-foreground font-medium text-sm">
-                    Ngày đi <span className="text-red-500">*</span>
+                    Ngày bắt đầu - ngày kết thúc <span className="text-red-500">*</span>
                   </Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
+                        id="date"
                         variant="outline"
                         className={cn(
                           "w-full justify-start text-left font-normal h-12 bg-secondary border-border rounded-xl hover:bg-secondary/80 transition-all duration-200",
-                          startDate ? "text-foreground hover:text-foreground" : "text-muted-foreground/60 hover:text-muted-foreground/60"
+                          !date && "text-muted-foreground/60 hover:text-muted-foreground/60"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                        {startDate ? (
-                          format(startDate, "dd/MM/yyyy", { locale: vi })
+                        {date?.from ? (
+                          date.to ? (
+                            <>
+                              {format(date.from, "dd/MM/yyyy", { locale: vi })} -{" "}
+                              {format(date.to, "dd/MM/yyyy", { locale: vi })}
+                            </>
+                          ) : (
+                            format(date.from, "dd/MM/yyyy", { locale: vi })
+                          )
                         ) : (
-                          <span>Chọn ngày đi</span>
+                          <span>Chọn ngày</span>
                         )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-card border-border" align="start">
                       <Calendar
                         initialFocus
-                        mode="single"
-                        defaultMonth={startDate}
-                        selected={startDate}
-                        onSelect={(date) => {
-                          setStartDate(date);
-                        }}
+                        mode="range"
+                        defaultMonth={date?.from}
+                        selected={date}
+                        onSelect={setDate}
+                        numberOfMonths={2}
                         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                         className="bg-card text-foreground"
                       />
                     </PopoverContent>
                   </Popover>
+                  {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
                 </div>
 
                 <div className="space-y-2">

@@ -190,7 +190,7 @@ const PWAEditActivityPage = () => {
 
                         {/* Title Input */}
                         <div className="space-y-2">
-                            <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                            <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                 Tên hoạt động <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -212,7 +212,7 @@ const PWAEditActivityPage = () => {
                         {/* Start Time and Duration */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="startTime" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                                <Label htmlFor="startTime" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                     Giờ bắt đầu <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="relative">
@@ -236,7 +236,7 @@ const PWAEditActivityPage = () => {
                                 )}
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="durationMin" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                                <Label htmlFor="durationMin" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                     Phút
                                 </Label>
                                 <Input
@@ -251,7 +251,7 @@ const PWAEditActivityPage = () => {
 
                         {/* Location Input */}
                         <div className="space-y-2">
-                            <Label htmlFor="location" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                            <Label htmlFor="location" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                 Địa điểm
                             </Label>
                             <div className="relative">
@@ -268,7 +268,7 @@ const PWAEditActivityPage = () => {
 
                         {/* Notes Input */}
                         <div className="space-y-2">
-                            <Label htmlFor="notes" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                            <Label htmlFor="notes" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                 Ghi chú
                             </Label>
                             <div className="relative">

@@ -55,6 +55,7 @@ export interface Trip {
   provinceId?: string;
   province?: Province;
   startDate?: string;
+  endDate?: string;
   description?: string;
   avatar?: string;
   userId: string;
@@ -68,6 +69,7 @@ export interface CreateTripRequest {
   title: string;
   provinceId?: string;
   startDate?: string;
+  endDate?: string;
   description?: string;
 }
 
@@ -75,6 +77,7 @@ export interface UpdateTripRequest {
   title?: string;
   provinceId?: string;
   startDate?: string;
+  endDate?: string;
   description?: string;
 }
 

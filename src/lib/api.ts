@@ -289,6 +289,16 @@ export const api = {
     },
   },
 
+  // Rating-specific API methods
+  ratings: {
+    create: async (ratingData: { stars: number; content: string }) => {
+      return await api.post<DATABASE_TYPES.ratings>('/ratings', ratingData);
+    },
+    getAll: async (params?: { page?: number; limit?: number }) => {
+      return await api.get<{ data: DATABASE_TYPES.ratings[]; total: number; page: number; limit: number; totalPages: number }>('/ratings', params);
+    },
+  },
+
   // Utility methods
   utils: {
     generateSlug: async (text: string) => {

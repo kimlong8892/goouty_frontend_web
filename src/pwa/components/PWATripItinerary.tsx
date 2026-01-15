@@ -307,14 +307,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                         })}
                     </div>
 
-                    {days.length === 0 && (
-                        <button
-                            onClick={onAddDay}
-                            className="flex items-center justify-center min-w-[40px] h-[40px] rounded-full bg-secondary text-secondary-foreground ml-2 flex-shrink-0 border border-border transition-all active:scale-95"
-                        >
-                            <Plus className="w-5 h-5 text-primary" />
-                        </button>
-                    )}
+
                     {days.length > 0 && isOwner && (
                         <button
                             onClick={onAddDay}

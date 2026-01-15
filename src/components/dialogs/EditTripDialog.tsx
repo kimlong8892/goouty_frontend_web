@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { DateRange } from "react-day-picker";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -41,8 +42,11 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
   const [tripName, setTripName] = useState(trip.title);
   const [provinceId, setProvinceId] = useState(trip.provinceId || '');
   const [description, setDescription] = useState(trip.description || '');
-  const [startDate, setStartDate] = useState<Date | undefined>(() => {
-    return trip.startDate ? new Date(trip.startDate) : undefined;
+  const [date, setDate] = useState<DateRange | undefined>(() => {
+    return trip.startDate ? {
+      from: new Date(trip.startDate),
+      to: trip.endDate ? new Date(trip.endDate) : undefined
+    } : undefined;
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [currentAvatar, setCurrentAvatar] = useState(trip.avatar || '');
@@ -68,7 +72,11 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
       setCurrentAvatar(trip.avatar || '');
       setSelectedAvatarFile(null);
       setAvatarPreview(null);
-      setStartDate(trip.startDate ? new Date(trip.startDate) : undefined);
+      setAvatarPreview(null);
+      setDate(trip.startDate ? {
+        from: new Date(trip.startDate),
+        to: trip.endDate ? new Date(trip.endDate) : undefined
+      } : undefined);
       setErrors({});
     }
   }, [open, trip]);
@@ -144,8 +152,8 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
       newErrors.provinceId = 'Vui lòng chọn tỉnh thành';
     }
 
-    if (!startDate) {
-      newErrors.startDate = 'Vui lòng chọn ngày đi';
+    if (!date?.from) {
+      newErrors.date = 'Vui lòng chọn ngày bắt đầu - ngày kết thúc';
     }
 
 
@@ -180,7 +188,8 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
         title: tripName.trim(),
         provinceId: provinceId.trim(),
         description: description.trim() || undefined,
-        ...(startDate && { startDate: startDate.toISOString() })
+        startDate: date?.from ? date.from.toISOString() : undefined,
+        endDate: date?.to ? date.to.toISOString() : undefined
       };
 
       updateTripMutation.mutate(updateData);
@@ -314,42 +323,50 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
             )}
           </div>
 
-          {/* Start Date Picker */}
+          {/* Date Range Picker */}
           <div className="space-y-2">
             <Label className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
-              Ngày đi <span className="text-red-500">*</span>
+              Ngày bắt đầu - ngày kết thúc <span className="text-red-500">*</span>
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
+                  id="date"
                   variant="outline"
                   className={cn(
                     "w-full h-12 justify-start text-left font-normal bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 rounded-xl hover:bg-secondary/80 dark:hover:bg-[#2d313d] text-foreground dark:text-white transition-all duration-200",
-                    !startDate ? "text-muted-foreground/60 dark:text-slate-500" : "text-foreground dark:text-white"
+                    !date ? "text-muted-foreground/60 dark:text-slate-500" : "text-foreground dark:text-white"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground dark:text-slate-400" />
-                  {startDate ? (
-                    format(startDate, "dd/MM/yyyy", { locale: vi })
+                  {date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "dd/MM/yyyy", { locale: vi })} -{" "}
+                        {format(date.to, "dd/MM/yyyy", { locale: vi })}
+                      </>
+                    ) : (
+                      format(date.from, "dd/MM/yyyy", { locale: vi })
+                    )
                   ) : (
-                    <span>Chọn ngày đi</span>
+                    <span>Chọn ngày</span>
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-card dark:bg-[#1c1e26] border-border dark:border-gray-700" align="start">
                 <Calendar
                   initialFocus
-                  mode="single"
-                  defaultMonth={startDate}
-                  selected={startDate}
-                  onSelect={(date) => {
-                    setStartDate(date);
-                  }}
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={setDate}
+                  numberOfMonths={2}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                   className="bg-card dark:bg-[#1c1e26] text-foreground dark:text-white"
                 />
               </PopoverContent>
             </Popover>
+            {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
           </div>
 
           <div className="space-y-2">

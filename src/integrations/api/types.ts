@@ -14,6 +14,7 @@ export namespace DATABASE_TYPES {
       phoneCode: number;
     };
     startDate?: string;
+    endDate?: string;
     description?: string;
     avatar?: string;
     userId: string;
@@ -189,5 +190,18 @@ export namespace DATABASE_TYPES {
     phoneCode: number;
     createdAt: string;
     updatedAt: string;
+  }
+
+  export interface ratings {
+    id: string;
+    stars: number;
+    content: string;
+    userId: string;
+    createdAt: string;
+    user?: {
+      id: string;
+      fullName: string;
+      profilePicture?: string;
+    };
   }
 }

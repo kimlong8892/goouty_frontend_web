@@ -143,7 +143,7 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
                   "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                   errors.title ? 'border-red-500 focus:border-red-500' : ''
                 )}
-                placeholder="VD: Ngày 1 - Khám phá thành phố"
+                placeholder="VD: Khám phá thành phố"
               />
               {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
             </div>

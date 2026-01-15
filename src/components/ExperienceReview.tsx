@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, Send, X, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { api } from '@/lib/api';
+import { DATABASE_TYPES } from '@/integrations/api/types';
 
 interface ExperienceReviewProps {
     onSuccess?: () => void;
@@ -14,11 +16,38 @@ interface ExperienceReviewProps {
 }
 
 export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: ExperienceReviewProps) => {
+    const [reviews, setReviews] = useState<DATABASE_TYPES.ratings[]>([]);
+    const [totalReviews, setTotalReviews] = useState(0);
     const [rating, setRating] = useState(0);
     const [hoveredRating, setHoveredRating] = useState(0);
     const [feedback, setFeedback] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+
+    useEffect(() => {
+        fetchReviews();
+    }, []);
+
+    const fetchReviews = async () => {
+        try {
+            // Fetch 6 to know if there's more than 5
+            const response = await api.ratings.getAll({ limit: 6 });
+            console.log('Reviews response:', response);
+            // Handle different possible response structures
+            if (response && Array.isArray(response.data)) {
+                setReviews(response.data);
+                setTotalReviews(response.total || response.data.length);
+            } else if (response && Array.isArray(response)) {
+                const reviewsArray = response as unknown as DATABASE_TYPES.ratings[];
+                setReviews(reviewsArray);
+                // If we get an array directly, we don't have total, so we guess based on length
+                setTotalReviews(reviewsArray.length);
+            }
+        } catch (error) {
+            console.error("Failed to fetch reviews:", error);
+            // Fallback is handled by the rendering logic (empty reviews array)
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,16 +60,24 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
             return;
         }
 
+
         setIsSubmitting(true);
-        // Simulate API call
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await api.ratings.create({
+                stars: rating,
+                content: feedback
+            });
+
             setIsSuccess(true);
             toast.success('Cảm ơn bạn đã đóng góp ý kiến!');
             setTimeout(() => {
                 if (onSuccess) onSuccess();
             }, 2000);
+
+            // Refresh reviews
+            fetchReviews();
         } catch (error) {
+            console.error(error);
             toast.error('Đã có lỗi xảy ra. Vui lòng thử lại sau.');
         } finally {
             setIsSubmitting(false);
@@ -155,42 +192,57 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
                 </div>
             </form>
 
-            {!isPWA && (
-                <div className="pt-6 border-t border-border/50">
-                    <h3 className="font-bold text-lg mb-4 text-foreground">Đánh giá gần đây</h3>
+            <div className="pt-6 border-t border-border/50">
+                <h3 className="font-bold text-lg mb-4 text-foreground">Đánh giá gần đây</h3>
+                <div className="space-y-4">
+
                     <div className="space-y-4">
-                        {MOCK_REVIEWS.map((review) => (
-                            <div key={review.id} className="bg-secondary/20 p-4 rounded-2xl space-y-2">
-                                <div className="flex items-center gap-3">
-                                    <Avatar className="w-8 h-8">
-                                        <AvatarImage src={review.user.avatar} />
-                                        <AvatarFallback>{review.user.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1">
-                                        <div className="font-medium text-sm text-foreground">{review.user.name}</div>
-                                        <div className="flex gap-0.5">
-                                            {[1, 2, 3, 4, 5].map((s) => (
-                                                <Star
-                                                    key={s}
-                                                    className={cn(
-                                                        "w-3 h-3 transition-colors",
-                                                        s <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"
-                                                    )}
-                                                />
-                                            ))}
+                        {reviews.length > 0 ? (
+                            reviews.slice(0, 5).map((review) => {
+                                const userName = review.user?.fullName || "Người dùng";
+                                const userAvatar = review.user?.profilePicture;
+                                const displayTime = new Date(review.createdAt).toLocaleDateString('vi-VN');
+
+                                return (
+                                    <div key={review.id} className="bg-secondary/20 p-4 rounded-2xl space-y-2">
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="w-8 h-8">
+                                                <AvatarImage src={userAvatar} />
+                                                <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1">
+                                                <div className="font-medium text-sm text-foreground">{userName}</div>
+                                                <div className="flex gap-0.5">
+                                                    {[1, 2, 3, 4, 5].map((s) => (
+                                                        <Star
+                                                            key={s}
+                                                            className={cn(
+                                                                "w-3 h-3 transition-colors",
+                                                                s <= review.stars ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"
+                                                            )}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-muted-foreground">{displayTime}</span>
                                         </div>
+                                        <p className="text-sm text-foreground/80 leading-relaxed">{review.content}</p>
                                     </div>
-                                    <span className="text-xs text-muted-foreground">{review.createdAt}</span>
-                                </div>
-                                <p className="text-sm text-foreground/80 leading-relaxed">{review.comment}</p>
+                                );
+                            })
+                        ) : (
+                            <div className="text-center py-6 text-muted-foreground">
+                                Chưa có đánh giá nào. Hãy là người đầu tiên!
                             </div>
-                        ))}
+                        )}
                     </div>
+                </div>
+                {totalReviews > 5 && (
                     <Button variant="ghost" className="w-full mt-4 text-primary font-medium hover:text-primary hover:bg-primary/10 rounded-xl h-12">
                         Xem thêm nhận xét
                     </Button>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };
