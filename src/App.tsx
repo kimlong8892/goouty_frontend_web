@@ -17,6 +17,7 @@ import { PWAAlertNotification } from "@/pwa/components/PWAAlertNotification.tsx"
 import { PWANotificationProvider, usePWANotificationContext } from "@/pwa/contexts/PWANotificationContext.tsx";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt.tsx";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton.tsx";
+import { FeedbackPrompter } from "@/components/common/FeedbackPrompter.tsx";
 import Index from "./pages/Index.tsx";
 import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
@@ -511,6 +512,7 @@ const App = () => (
               <Sonner />
               <AppContent />
               <PWAInstallPrompt />
+              <FeedbackPrompter />
             </TooltipProvider>
           </PWANotificationProvider>
         </NotificationCountProvider>

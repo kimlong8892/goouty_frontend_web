@@ -5,7 +5,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ExperienceReviewProps {
@@ -65,10 +64,10 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
     }
 
     return (
-        <div className="space-y-8">
-            <form onSubmit={handleSubmit} className="space-y-8 py-4">
-                <div className="space-y-4 text-center">
-                    <Label className="text-lg font-bold text-foreground block">
+        <div className={cn("space-y-8", isPWA && "space-y-4")}>
+            <form onSubmit={handleSubmit} className={cn("space-y-8 py-4", isPWA && "space-y-4 py-2")}>
+                <div className={cn("space-y-4 text-center", isPWA && "space-y-2")}>
+                    <Label className={cn("text-lg font-bold text-foreground block", isPWA && "text-base")}>
                         Bạn cảm thấy thế nào về Goouty?
                     </Label>
                     <div className="flex items-center justify-center gap-2">
@@ -84,6 +83,7 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
                                 <Star
                                     className={cn(
                                         "w-10 h-10 transition-colors duration-200",
+                                        isPWA && "w-8 h-8",
                                         (hoveredRating || rating) >= star
                                             ? "fill-yellow-400 text-yellow-400"
                                             : "text-muted-foreground/30"
@@ -102,8 +102,8 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
                     </p>
                 </div>
 
-                <div className="space-y-3">
-                    <Label className="text-base font-semibold flex items-center gap-2">
+                <div className={cn("space-y-3", isPWA && "space-y-2")}>
+                    <Label className={cn("text-base font-semibold flex items-center gap-2", isPWA && "text-sm")}>
                         <MessageSquare className="w-4 h-4 text-primary" />
                         Ý kiến đóng góp của bạn
                     </Label>
@@ -111,7 +111,10 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
                         placeholder="Chia sẻ trải nghiệm của bạn hoặc góp ý để chúng mình cải thiện nhé..."
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
-                        className="min-h-[120px] rounded-2xl bg-secondary/30 border-border focus:border-primary/50 resize-none text-base p-4"
+                        className={cn(
+                            "min-h-[120px] rounded-2xl bg-secondary/30 border-border focus:border-primary/50 resize-none text-base p-4",
+                            isPWA && "min-h-[100px] text-sm p-3 rounded-xl"
+                        )}
                     />
                 </div>
 
@@ -121,7 +124,10 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
                             type="button"
                             variant="ghost"
                             onClick={onCancel}
-                            className="flex-1 h-12 rounded-full font-bold hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all"
+                            className={cn(
+                                "flex-1 h-12 rounded-full font-bold hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all",
+                                isPWA && "h-10 text-sm"
+                            )}
                         >
                             Hủy
                         </Button>
@@ -129,7 +135,10 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
                     <Button
                         type="submit"
                         disabled={isSubmitting || rating === 0 || !feedback.trim()}
-                        className="flex-[2] h-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
+                        className={cn(
+                            "flex-[2] h-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 active:scale-[0.98] transition-all",
+                            isPWA && "h-10 text-sm"
+                        )}
                     >
                         {isSubmitting ? (
                             <div className="flex items-center gap-2">
@@ -146,40 +155,42 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
                 </div>
             </form>
 
-            <div className="pt-6 border-t border-border/50">
-                <h3 className="font-bold text-lg mb-4 text-foreground">Đánh giá gần đây</h3>
-                <div className="space-y-4">
-                    {MOCK_REVIEWS.map((review) => (
-                        <div key={review.id} className="bg-secondary/20 p-4 rounded-2xl space-y-2">
-                            <div className="flex items-center gap-3">
-                                <Avatar className="w-8 h-8">
-                                    <AvatarImage src={review.user.avatar} />
-                                    <AvatarFallback>{review.user.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                    <div className="font-medium text-sm text-foreground">{review.user.name}</div>
-                                    <div className="flex gap-0.5">
-                                        {[1, 2, 3, 4, 5].map((s) => (
-                                            <Star
-                                                key={s}
-                                                className={cn(
-                                                    "w-3 h-3 transition-colors",
-                                                    s <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"
-                                                )}
-                                            />
-                                        ))}
+            {!isPWA && (
+                <div className="pt-6 border-t border-border/50">
+                    <h3 className="font-bold text-lg mb-4 text-foreground">Đánh giá gần đây</h3>
+                    <div className="space-y-4">
+                        {MOCK_REVIEWS.map((review) => (
+                            <div key={review.id} className="bg-secondary/20 p-4 rounded-2xl space-y-2">
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="w-8 h-8">
+                                        <AvatarImage src={review.user.avatar} />
+                                        <AvatarFallback>{review.user.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1">
+                                        <div className="font-medium text-sm text-foreground">{review.user.name}</div>
+                                        <div className="flex gap-0.5">
+                                            {[1, 2, 3, 4, 5].map((s) => (
+                                                <Star
+                                                    key={s}
+                                                    className={cn(
+                                                        "w-3 h-3 transition-colors",
+                                                        s <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"
+                                                    )}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
+                                    <span className="text-xs text-muted-foreground">{review.createdAt}</span>
                                 </div>
-                                <span className="text-xs text-muted-foreground">{review.createdAt}</span>
+                                <p className="text-sm text-foreground/80 leading-relaxed">{review.comment}</p>
                             </div>
-                            <p className="text-sm text-foreground/80 leading-relaxed">{review.comment}</p>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                    <Button variant="ghost" className="w-full mt-4 text-primary font-medium hover:text-primary hover:bg-primary/10 rounded-xl h-12">
+                        Xem thêm nhận xét
+                    </Button>
                 </div>
-                <Button variant="ghost" className="w-full mt-4 text-primary font-medium hover:text-primary hover:bg-primary/10 rounded-xl h-12">
-                    Xem thêm nhận xét
-                </Button>
-            </div>
+            )}
         </div>
     );
 };
