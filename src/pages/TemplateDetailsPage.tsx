@@ -312,11 +312,21 @@ const TripTemplateDetailPage = () => {
                                                             day.activities.map((act) => (
                                                                 <div
                                                                     key={act.id}
-                                                                    className="flex gap-4 p-4 rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border border-slate-100 dark:border-zinc-800 hover:border-indigo-100 dark:hover:border-indigo-900/50 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors group/act"
+                                                                    className="flex items-start gap-4 p-4 rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border border-slate-100 dark:border-zinc-800 hover:border-indigo-100 dark:hover:border-indigo-900/50 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors group/act"
                                                                 >
-                                                                    <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 text-primary shadow-sm flex items-center justify-center border border-indigo-100 dark:border-zinc-700">
-                                                                        {getActivityIcon(act.title)}
-                                                                    </div>
+                                                                    {!isMobileView && (act as any).avatar ? (
+                                                                        <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-zinc-700 bg-white dark:bg-zinc-800">
+                                                                            <img
+                                                                                src={(act as any).avatar}
+                                                                                alt={act.title}
+                                                                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                                                            />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 text-primary shadow-sm flex items-center justify-center border border-indigo-100 dark:border-zinc-700">
+                                                                            {getActivityIcon(act.title)}
+                                                                        </div>
+                                                                    )}
                                                                     <div className="flex-1">
                                                                         <div className="flex items-start justify-between">
                                                                             <h4 className="font-semibold text-slate-900 dark:text-zinc-100">{act.title}</h4>
