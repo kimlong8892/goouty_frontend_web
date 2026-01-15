@@ -36,6 +36,7 @@ const PWAEditDayPage = () => {
     const [errors, setErrors] = useState<{ title?: string; date?: string }>({});
     const titleRef = useRef<HTMLInputElement>(null);
 
+
     useEffect(() => {
         document.title = 'Chỉnh sửa ngày - Goouty';
     }, []);

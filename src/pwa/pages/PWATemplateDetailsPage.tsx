@@ -431,7 +431,7 @@ const PWATemplateDetailsPage = () => {
                                 className="overflow-x-auto no-scrollbar mb-4 sticky top-[64px] bg-white dark:bg-[#0a0a0a] z-30 py-2 -mx-5 px-2 border-b border-slate-100 dark:border-zinc-800"
                                 onTouchStart={(e) => e.stopPropagation()}
                             >
-                                <div className="flex gap-8 justify-center min-w-full px-5">
+                                <div className="flex gap-8 justify-start w-max min-w-full px-5">
                                     {(template.days || []).map((day, idx) => (
                                         <button
                                             key={day.id}

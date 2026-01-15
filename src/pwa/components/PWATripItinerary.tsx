@@ -165,9 +165,9 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
             >
                 <div
                     ref={dayTabsRef}
-                    className="flex items-center justify-between w-full gap-1 px-4 py-2 overflow-x-auto scrollbar-hide"
+                    className="flex items-center justify-start w-full gap-4 px-4 py-2 overflow-x-auto scrollbar-hide"
                 >
-                    <div className="flex items-center gap-1 flex-1">
+                    <div className="flex items-center gap-1">
                         {days.map((day, index) => {
                             const isActive = day.id === selectedDayId;
                             const isDragged = draggedDayId === day.id;
@@ -213,11 +213,11 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                         <Pencil className="w-3.5 h-3.5" />
                                                         Chỉnh sửa
                                                     </DropdownMenuItem>
-                                                    {isOwner && (
+                                                    {onDeleteDay && (
                                                         <DropdownMenuItem
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                onDeleteDay?.(day);
+                                                                onDeleteDay(day);
                                                             }}
                                                             className="gap-2 text-destructive focus:text-destructive font-medium"
                                                         >
