@@ -70,10 +70,8 @@ export const TripTemplateCard = ({ template, onUseTemplate, usingTemplate, onWis
   // Dummy data for design match since API might not return these yet
   const rating = 5.0;
   const reviewCount = "6k";
-  const displayPrice = template.fee && template.fee !== "0"
-    ? template.fee.includes('VNĐ')
-      ? `Từ ${template.fee.replace('VNĐ', 'đ')}`
-      : `Từ ${Number(template.fee).toLocaleString('vi-VN')}đ`
+  const displayPrice = template.fee && Number(template.fee) > 0
+    ? `Từ ${Number(template.fee).toLocaleString('vi-VN')}đ`
     : "Linh hoạt";
 
   return (

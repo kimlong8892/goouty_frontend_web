@@ -340,14 +340,10 @@ export function EditTripDialog({ trip, children, onSuccess, open: controlledOpen
                 >
                   <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground dark:text-slate-400" />
                   {date?.from ? (
-                    date.to ? (
-                      <>
-                        {format(date.from, "dd/MM/yyyy", { locale: vi })} -{" "}
-                        {format(date.to, "dd/MM/yyyy", { locale: vi })}
-                      </>
-                    ) : (
-                      format(date.from, "dd/MM/yyyy", { locale: vi })
-                    )
+                    <>
+                      {format(date.from, "dd/MM/yyyy", { locale: vi })} -{" "}
+                      {format(date.to || date.from, "dd/MM/yyyy", { locale: vi })}
+                    </>
                   ) : (
                     <span>Chọn ngày</span>
                   )}

@@ -276,21 +276,15 @@ const PWAEditTripPage = () => {
                                             </div>
                                             <div className="flex-1">
                                                 {date?.from ? (
-                                                    date.to ? (
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-semibold text-foreground">
-                                                                {format(date.from, "dd/MM/yyyy", { locale: vi })}
-                                                            </span>
-                                                            <span className="text-muted-foreground text-xs">→</span>
-                                                            <span className="font-semibold text-foreground">
-                                                                {format(date.to, "dd/MM/yyyy", { locale: vi })}
-                                                            </span>
-                                                        </div>
-                                                    ) : (
+                                                    <div className="flex items-center gap-2">
                                                         <span className="font-semibold text-foreground">
                                                             {format(date.from, "dd/MM/yyyy", { locale: vi })}
                                                         </span>
-                                                    )
+                                                        <span className="text-muted-foreground text-xs">→</span>
+                                                        <span className="font-semibold text-foreground">
+                                                            {format(date.to || date.from, "dd/MM/yyyy", { locale: vi })}
+                                                        </span>
+                                                    </div>
                                                 ) : (
                                                     <div className="flex flex-col items-start gap-0.5">
                                                         <span className="text-foreground font-medium">Chọn ngày</span>
