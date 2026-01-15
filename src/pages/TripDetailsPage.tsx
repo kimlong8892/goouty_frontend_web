@@ -84,6 +84,7 @@ type TripDetails = {
   name: string;
   description: string;
   startDate: string;
+  endDate?: string;
   provinceId?: string;
   province?: {
     id: string;
@@ -478,6 +479,7 @@ const TripDetailsPage = () => {
         name: tripData.title,
         description: tripData.description,
         startDate: tripData.startDate,
+        endDate: tripData.endDate,
         provinceId: tripData.provinceId,
         province: tripData.province,
         isPublic: tripData.isPublic || false,
@@ -874,8 +876,8 @@ const TripDetailsPage = () => {
               {/* Meta Info */}
               <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-white/90 font-medium text-base">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-white" />
-                  <span>{formatDate(trip.startDate)}</span>
+                  <Calendar className="w-5 h-5 text-yellow-400" />
+                  <span>{formatDate(trip.startDate)} - {formatDate(trip.endDate || trip.startDate)}</span>
                 </div>
                 {trip.province && (
                   <div className="flex items-center gap-2">
