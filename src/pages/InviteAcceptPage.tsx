@@ -7,8 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, Mail, User, Lock } from 'lucide-react';
+import { Eye, EyeOff, Mail, User, Lock, MapPin, Calendar, Users, AlertCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
 
 interface InvitationDetails {
   id: string;
@@ -181,6 +184,9 @@ const InviteAcceptPage: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
+            <div className="p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden">
+              <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="w-full h-full object-contain" />
+            </div>
             <CardTitle className="text-2xl font-bold text-primary">
               Tham gia chuyến đi
             </CardTitle>
@@ -219,7 +225,7 @@ const InviteAcceptPage: React.FC = () => {
                     id="email"
                     type="email"
                     placeholder="your@email.com"
-                    value={email}
+                    value={email || invitation.invitedEmail}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10 rounded-xl border-slate-200 focus-visible:ring-primary"
                     required
@@ -284,70 +290,104 @@ const InviteAcceptPage: React.FC = () => {
   if (showAcceptConfirm && isAuthenticated && invitation) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md overflow-hidden border-none shadow-2xl">
-          <div className="h-2 bg-primary"></div>
-          <CardHeader className="text-center pt-8">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-primary" />
+        <Card className="w-full max-w-lg">
+          <CardHeader className="text-center">
+            <div className="p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden">
+              <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="w-full h-full object-contain" />
             </div>
-            <CardTitle className="text-2xl font-bold text-slate-800">
-              Mời tham gia chuyến đi
+            <CardTitle className="text-2xl">
+              Tham gia chuyến đi
             </CardTitle>
-            <CardDescription className="text-slate-600 mt-2 px-4">
-              {invitation.inviter.fullName || 'Bạn'} đã được mời tham gia chuyến đi đầy thú vị cùng bạn bè.
+            <CardDescription>
+              Bạn được mời tham gia một chuyến đi thú vị
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-6 pb-8">
-            <div className="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="mt-1">
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-50 font-medium bg-primary/80 px-2 py-0.5 rounded-md inline-block mb-1">Tên chuyến đi</p>
-                  <h3 className="text-xl font-bold text-slate-900 leading-tight">{invitation.trip.title}</h3>
+          <CardContent className="space-y-6">
+            <div className="bg-white p-4 rounded-lg border">
+              <div className="flex items-center space-x-3 mb-3">
+                <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="h-5 w-5 object-contain" />
+                <h3 className="font-semibold">{invitation.trip.title}</h3>
+              </div>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                {invitation.trip.province && (
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <span>{invitation.trip.province.name}</span>
+                  </div>
+                )}
+                {invitation.trip.startDate && (
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <span>
+                      {format(new Date(invitation.trip.startDate), 'dd/MM/yyyy', { locale: vi })}
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-primary" />
+                  <span>Mời bởi: {invitation.inviter.fullName || invitation.inviter.email}</span>
                 </div>
               </div>
-
-              {invitation.trip.province && (
-                <p className="text-sm text-slate-600 flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">📍</span>
-                  {invitation.trip.province.name}
-                </p>
-              )}
-
-              {invitation.trip.startDate && (
-                <p className="text-sm text-slate-600 flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">📅</span>
-                  {new Date(invitation.trip.startDate).toLocaleDateString('vi-VN')}
-                </p>
-              )}
             </div>
 
-            <div className="flex flex-col gap-3">
-              <Button
-                onClick={() => {
-                  const token = searchParams.get('token');
-                  if (token) acceptInvitation(token);
-                }}
-                disabled={processing}
-                className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white h-12 text-base font-semibold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
-              >
-                {processing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Đang xử lý...
-                  </div>
-                ) : 'Chấp nhận tham gia'}
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/')}
-                disabled={processing}
-                className="w-full rounded-xl text-slate-500 hover:bg-slate-100 h-12 text-base font-medium transition-all"
-              >
-                Để sau
-              </Button>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <Users className="h-4 w-4 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-blue-900">
+                    Thông tin tham gia
+                  </h4>
+                  <ul className="text-sm text-blue-700 mt-2 space-y-1">
+                    <li>• Bạn sẽ trở thành thành viên của chuyến đi</li>
+                    <li>• Có thể xem và tương tác với lịch trình</li>
+                    <li>• Nhận thông báo về các hoạt động mới</li>
+                    <li>• Tham gia thảo luận với các thành viên khác</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+                <span>Tham gia với tài khoản:</span>
+                <Badge variant="secondary" className="font-medium text-primary">
+                  {email || invitation.invitedEmail}
+                </Badge>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/')}
+                  disabled={processing}
+                  className="flex-1 rounded-xl h-11"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Hủy bỏ
+                </Button>
+                <Button
+                  onClick={() => {
+                    const token = searchParams.get('token');
+                    if (token) acceptInvitation(token);
+                  }}
+                  disabled={processing}
+                  className="flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white h-11 shadow-lg shadow-primary/20"
+                >
+                  {processing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Đang tham gia...
+                    </>
+                  ) : (
+                    <>
+                      <Users className="h-4 w-4 mr-2" />
+                      Tham gia ngay
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
