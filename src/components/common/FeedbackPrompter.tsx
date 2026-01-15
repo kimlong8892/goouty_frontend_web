@@ -12,7 +12,17 @@ export const FeedbackPrompter = () => {
     const { isPWA } = usePWA();
 
     useEffect(() => {
+        // Check if already submitted
+        const hasSubmitted = localStorage.getItem('goouty_feedback_submitted');
+        if (hasSubmitted) return;
+
         const interval = setInterval(() => {
+            // Check again inside interval in case it changed in another tab (optional but good)
+            if (localStorage.getItem('goouty_feedback_submitted')) {
+                setShowPrompt(false);
+                return;
+            }
+
             setShowPrompt(prev => {
                 if (prev || showForm) return prev;
                 return true;
@@ -104,7 +114,11 @@ export const FeedbackPrompter = () => {
 
                         <ExperienceReview
                             isPWA={isPWA}
-                            onSuccess={() => setShowForm(false)}
+                            onSuccess={() => {
+                                localStorage.setItem('goouty_feedback_submitted', 'true');
+                                setShowForm(false);
+                                setShowPrompt(false);
+                            }}
                             onCancel={() => setShowForm(false)}
                         />
                     </div>
