@@ -132,7 +132,14 @@ const PWAEditDayPage = () => {
             }
 
             showToast('Đã cập nhật ngày thành công', 'success');
-            navigate(-1);
+            if (tripId) {
+                navigate(`/trip/${tripId}?dayId=${dayId}&scrollTo=itinerary`, {
+                    replace: true,
+                    state: { skipScrollTop: true }
+                });
+            } else {
+                navigate(-1);
+            }
         } catch (error: any) {
             console.error('Update day error:', error);
             showToast(error.message || 'Không thể cập nhật ngày', 'error');

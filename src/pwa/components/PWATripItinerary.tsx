@@ -62,6 +62,8 @@ interface PWATripItineraryProps {
 
     isOwner?: boolean;
     isTabsVisible?: boolean;
+    activeDayId?: string;
+    onActiveDayChange?: (dayId: string) => void;
 }
 
 const DEFAULT_ACTIVITY_IMAGE = "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=400&auto=format&fit=crop";
@@ -95,9 +97,23 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     justDroppedDayId,
 
     isOwner,
-    isTabsVisible = true
+    isTabsVisible = true,
+    activeDayId: propActiveDayId,
+    onActiveDayChange
 }) => {
-    const [selectedDayId, setSelectedDayId] = useState<string>(days[0]?.id || '');
+    const [internalSelectedDayId, setInternalSelectedDayId] = useState<string>(days[0]?.id || '');
+
+    // Use prop if provided, otherwise use internal state
+    const selectedDayId = propActiveDayId !== undefined ? propActiveDayId : internalSelectedDayId;
+
+    const setSelectedDayId = (id: string) => {
+        if (onActiveDayChange) {
+            onActiveDayChange(id);
+        } else {
+            setInternalSelectedDayId(id);
+        }
+    };
+
     const navigate = useNavigate();
     const dayTabsRef = useRef<HTMLDivElement>(null);
 
@@ -144,8 +160,11 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     };
 
     useEffect(() => {
-        if (days.length > 0 && !selectedDayId) {
-            setSelectedDayId(days[0].id);
+        if (days.length > 0) {
+            const dayExists = days.some(d => d.id === selectedDayId);
+            if (!selectedDayId || !dayExists) {
+                setSelectedDayId(days[0].id);
+            }
         }
     }, [days, selectedDayId]);
 

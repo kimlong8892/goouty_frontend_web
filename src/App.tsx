@@ -68,8 +68,10 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   useEffect(() => {
+    // Check if we should skip scroll to top (e.g. when returning from an edit page)
+    if ((location.state as any)?.skipScrollTop) return;
     window.scrollTo(0, 0);
-  }, [location.pathname]);
+  }, [location.pathname, location.state]);
 
   return (
     <div className="transition-opacity duration-300 animate-fade-in">
