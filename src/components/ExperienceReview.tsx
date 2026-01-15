@@ -18,6 +18,9 @@ interface ExperienceReviewProps {
 export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: ExperienceReviewProps) => {
     const [reviews, setReviews] = useState<DATABASE_TYPES.ratings[]>([]);
     const [totalReviews, setTotalReviews] = useState(0);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [rating, setRating] = useState(0);
     const [hoveredRating, setHoveredRating] = useState(0);
     const [feedback, setFeedback] = useState('');
@@ -25,28 +28,58 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
     const [isSuccess, setIsSuccess] = useState(false);
 
     useEffect(() => {
-        fetchReviews();
+        fetchReviews(1);
     }, []);
 
-    const fetchReviews = async () => {
+    const fetchReviews = async (pageNum: number) => {
         try {
-            // Fetch 6 to know if there's more than 5
-            const response = await api.ratings.getAll({ limit: 6 });
+            // First page fetch 6 to check overflow, subsequent pages standard limit 5
+            const limit = 5;
+            const response = await api.ratings.getAll({ limit, page: pageNum });
             console.log('Reviews response:', response);
-            // Handle different possible response structures
+
             if (response && Array.isArray(response.data)) {
-                setReviews(response.data);
-                setTotalReviews(response.total || response.data.length);
+                if (pageNum === 1) {
+                    setReviews(response.data);
+                } else {
+                    setReviews(prev => [...prev, ...response.data]);
+                }
+                // Handle different response structures
+                if (response.pagination && typeof response.pagination.total === 'number') {
+                    setTotalReviews(response.pagination.total);
+                    setHasMore(reviews.length + response.data.length < response.pagination.total);
+                } else {
+                    // Fallback if pagination object is missing but we have data
+                    // If we got full limit (5), there SHOULD be more
+                    const currentTotal = reviews.length + response.data.length;
+                    setTotalReviews(currentTotal + (response.data.length >= limit ? 1 : 0));
+                    setHasMore(response.data.length >= limit);
+                }
             } else if (response && Array.isArray(response)) {
+                // Fallback for array response
                 const reviewsArray = response as unknown as DATABASE_TYPES.ratings[];
-                setReviews(reviewsArray);
-                // If we get an array directly, we don't have total, so we guess based on length
-                setTotalReviews(reviewsArray.length);
+                if (pageNum === 1) {
+                    setReviews(reviewsArray);
+                } else {
+                    setReviews(prev => [...prev, ...reviewsArray]);
+                }
+                setTotalReviews(reviewsArray.length); // Can't really know total here
+                setHasMore(false); // Assume no more if just array
             }
         } catch (error) {
             console.error("Failed to fetch reviews:", error);
-            // Fallback is handled by the rendering logic (empty reviews array)
+        } finally {
+            setIsLoadingMore(false);
         }
+    };
+
+    const handleLoadMore = () => {
+        setIsLoadingMore(true);
+        setPage(prev => {
+            const nextPage = prev + 1;
+            fetchReviews(nextPage);
+            return nextPage;
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +108,8 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
             }, 2000);
 
             // Refresh reviews
-            fetchReviews();
+            fetchReviews(1);
+            setPage(1);
         } catch (error) {
             console.error(error);
             toast.error('Đã có lỗi xảy ra. Vui lòng thử lại sau.');
@@ -198,7 +232,7 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
 
                     <div className="space-y-4">
                         {reviews.length > 0 ? (
-                            reviews.slice(0, 5).map((review) => {
+                            reviews.map((review) => {
                                 const userName = review.user?.fullName || "Người dùng";
                                 const userAvatar = review.user?.profilePicture;
                                 const displayTime = new Date(review.createdAt).toLocaleDateString('vi-VN');
@@ -237,9 +271,14 @@ export const ExperienceReview = ({ onSuccess, onCancel, isPWA = false }: Experie
                         )}
                     </div>
                 </div>
-                {totalReviews > 5 && (
-                    <Button variant="ghost" className="w-full mt-4 text-primary font-medium hover:text-primary hover:bg-primary/10 rounded-xl h-12">
-                        Xem thêm nhận xét
+                {(totalReviews > 5 && reviews.length < totalReviews) && (
+                    <Button
+                        variant="ghost"
+                        onClick={handleLoadMore}
+                        disabled={isLoadingMore}
+                        className="w-full mt-4 text-primary font-medium hover:text-primary hover:bg-primary/10 rounded-xl h-12"
+                    >
+                        {isLoadingMore ? "Đang tải..." : "Xem thêm nhận xét"}
                     </Button>
                 )}
             </div>

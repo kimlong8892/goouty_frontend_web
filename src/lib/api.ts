@@ -295,7 +295,15 @@ export const api = {
       return await api.post<DATABASE_TYPES.ratings>('/ratings', ratingData);
     },
     getAll: async (params?: { page?: number; limit?: number }) => {
-      return await api.get<{ data: DATABASE_TYPES.ratings[]; total: number; page: number; limit: number; totalPages: number }>('/ratings', params);
+      return await api.get<{
+        data: DATABASE_TYPES.ratings[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        }
+      }>('/ratings', params);
     },
   },
 
