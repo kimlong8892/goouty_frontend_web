@@ -555,6 +555,17 @@ const TripDetailsPage = () => {
     }
   };
 
+  // Listen for PWA pull-to-refresh event
+  useEffect(() => {
+    const handlePWARefresh = () => {
+      console.log('PWA Refresh event received in TripDetailsPage');
+      fetchTripDetails();
+    };
+
+    window.addEventListener('pwa-refresh', handlePWARefresh);
+    return () => window.removeEventListener('pwa-refresh', handlePWARefresh);
+  }, [id, user]);
+
   const openDeleteActivityDialog = (activity: Activity) => {
     setActivityToDelete(activity);
     setDeleteActivityDialogOpen(true);

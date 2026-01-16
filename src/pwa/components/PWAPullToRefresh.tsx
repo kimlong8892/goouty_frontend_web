@@ -77,6 +77,9 @@ export const PWAPullToRefresh = ({ children }: PWAPullToRefreshProps) => {
                     // This avoids showing the splash screen
                     await queryClient.refetchQueries();
 
+                    // Emit a custom event for components that don't use React Query
+                    window.dispatchEvent(new CustomEvent('pwa-refresh'));
+
                     // Small artificial delay for visual feedback
                     await new Promise(resolve => setTimeout(resolve, 800));
                 } catch (error) {

@@ -247,6 +247,17 @@ const PWATripListPage = () => {
     }
   };
 
+  // Listen for PWA pull-to-refresh event
+  useEffect(() => {
+    const handlePWARefresh = () => {
+      console.log('PWA Refresh event received in PWATripListPage');
+      fetchTrips(true);
+    };
+
+    window.addEventListener('pwa-refresh', handlePWARefresh);
+    return () => window.removeEventListener('pwa-refresh', handlePWARefresh);
+  }, [fetchTrips]);
+
   const handleTripClick = (trip: TripWithMember) => {
     navigate(`/trip/${trip.id}`);
   };
