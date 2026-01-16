@@ -266,7 +266,7 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                       {isReceiver ? (
                         <div className={cn("grid gap-4", isMobileView ? "grid-cols-1" : "grid-cols-2")}>
                           <div className="space-y-1.5">
-                            <label className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest pl-1">Bạn đã trả bao nhiêu?</label>
+                            <label className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest pl-1">Họ đã trả bao nhiêu?</label>
                             <input
                               type="text"
                               inputMode="numeric"
