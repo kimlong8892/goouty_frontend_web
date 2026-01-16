@@ -293,7 +293,7 @@ export function NotificationCard({
           </p>
 
           {/* Action Buttons for Invitations (Keep these for functionality) */}
-          {isInvitation && !notification.data?.responded && (
+          {isInvitation && !notification.data?.responded && !isPWA && (
             <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
               <Button
                 size="sm"
