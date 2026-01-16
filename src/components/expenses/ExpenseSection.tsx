@@ -239,183 +239,153 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-8 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-            <ExpenseSummary
-              calculation={{ ...calculation, transactionCount: transactions.length }}
-              onAddExpense={handleAddExpense}
-              canAddExpense={isOwner || isMember}
-              onShowHistory={() => setShowHistoryDialog(true)}
-            />
-            <PersonalBalance userBalances={calculation.userBalances} />
-          </TabsContent>
+          <div className="overflow-hidden -mx-4 px-4">
+            <div
+              className="flex w-[300%] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              style={{ transform: `translateX(${activeTab === 'overview' ? '0%' : activeTab === 'settlements' ? '-33.333%' : '-66.666%'})` }}
+            >
+              {/* SLIDE 1: Overview */}
+              <div className="w-1/3 pr-8 space-y-8">
+                <ExpenseSummary
+                  calculation={{ ...calculation, transactionCount: transactions.length }}
+                  onAddExpense={handleAddExpense}
+                  canAddExpense={isOwner || isMember}
+                  onShowHistory={() => setShowHistoryDialog(true)}
+                />
+                <PersonalBalance userBalances={calculation.userBalances} />
+              </div>
 
-          <TabsContent value="settlements" className="space-y-6 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-            {isPWA ? (
-              <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
-                <TabsList
-                  className="grid grid-cols-2 bg-slate-100/50 dark:bg-white/5 p-1 rounded-xl h-10 w-full mb-4"
-                  onTouchStart={(e) => e.stopPropagation()}
-                >
-                  <TabsTrigger
-                    value="personal"
-                    className="rounded-lg px-4 text-[12px] font-bold tracking-wider data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary dark:data-[state=active]:text-white dark:text-white/50 transition-all flex items-center justify-center gap-1.5"
+              {/* SLIDE 2: Settlements */}
+              <div className="w-1/3 px-4 space-y-6">
+                <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
+                  <TabsList
+                    className="grid grid-cols-2 bg-slate-100/50 dark:bg-white/5 p-1 rounded-xl h-10 w-full mb-4"
+                    onTouchStart={(e) => e.stopPropagation()}
                   >
-                    <User className="w-3.5 h-3.5" />
-                    Cá nhân
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="group"
-                    className="rounded-lg px-4 text-[12px] font-bold tracking-wider data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary dark:data-[state=active]:text-white dark:text-white/50 transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <Users2 className="w-3.5 h-3.5" />
-                    Cả nhóm
-                  </TabsTrigger>
-                </TabsList>
+                    <TabsTrigger
+                      value="personal"
+                      className="rounded-lg px-4 text-[12px] font-bold tracking-wider data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary dark:data-[state=active]:text-white dark:text-white/50 transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      Cá nhân
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="group"
+                      className="rounded-lg px-4 text-[12px] font-bold tracking-wider data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary dark:data-[state=active]:text-white dark:text-white/50 transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <Users2 className="w-3.5 h-3.5" />
+                      Cả nhóm
+                    </TabsTrigger>
+                  </TabsList>
 
-                <div className="overflow-hidden">
-                  <div
-                    className={cn(
-                      "flex w-[200%] transition-transform ease-[cubic-bezier(0.16,1,0.3,1)]",
-                      isDragging ? "duration-0" : "duration-500"
-                    )}
-                    style={{
-                      transform: `translateX(calc(${activeSubTab === 'personal' ? '0%' : '-50%'} + ${touchDelta}px))`
-                    }}
-                  >
-                    {/* Cá nhân Content */}
-                    <div className="w-1/2 px-0.5 space-y-6">
-                      <div className="flex items-center gap-2 px-1 mb-2">
-                        <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
-                        <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
-                      </div>
-
-                      {(() => {
-                        const personalSettlements = settlements.filter(s => s.debtorId === user?.id || s.creditorId === user?.id);
-                        const pendingPersonal = personalSettlements.filter(s => s.status === 'pending');
-
-                        return (
-                          <>
-                            {pendingPersonal.length > 0 ? (
-                              <SettlementStatus
-                                settlements={pendingPersonal}
-                                onSettlementUpdate={handleSettlementUpdate}
-                              />
-                            ) : (
-                              <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group mb-6">
-                                <div className="absolute top-0 right-0 p-4 opacity-10">
-                                  <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
-                                </div>
-                                <div className="flex items-center gap-4 relative z-10">
-                                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                                    <CheckCircle2 className="w-6 h-6 text-white" />
-                                  </div>
-                                  <div>
-                                    <h3 className="font-black text-green-800 dark:text-green-400 text-base">Bạn đã hoàn tất!</h3>
-                                    <p className="text-xs text-green-700/80 dark:text-green-500/70 font-medium">
-                                      Tất cả các khoản thu chi cá nhân của bạn đã được giải quyết xong.
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            {personalSettlements.length > 0 && (
-                              <PaymentHistory settlements={personalSettlements} />
-                            )}
-                          </>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Cả nhóm Content */}
-                    <div className="w-1/2 px-0.5 space-y-6">
-                      <div className="flex items-center gap-2 px-1 mb-2">
-                        <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
-                        <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
-                      </div>
-
-                      {settlements.some(s => s.status === 'pending') && (
-                        <SettlementStatus
-                          settlements={settlements}
-                          onSettlementUpdate={handleSettlementUpdate}
-                        />
+                  <div className="overflow-hidden">
+                    <div
+                      className={cn(
+                        "flex w-[200%] transition-transform ease-[cubic-bezier(0.16,1,0.3,1)]",
+                        isDragging ? "duration-0" : "duration-500"
                       )}
-                      {calculation.isBalanced && settlements.length === 0 && (
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
-                          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
-                            <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
-                          </div>
-                          <div className="flex items-center gap-4 relative z-10">
-                            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200 dark:shadow-green-900/40">
-                              <CheckCircle2 className="w-6 h-6 text-white" />
-                            </div>
-                            <div>
-                              <h3 className="font-black text-green-800 dark:text-green-400 text-lg">Tất cả đã cân bằng!</h3>
-                              <p className="text-sm text-green-700/80 dark:text-green-500/70 font-medium">
-                                Tuyệt vời! Mọi chi phí đã được thanh toán và chia đều cho tất cả mọi người.
-                              </p>
-                            </div>
-                          </div>
+                      style={{
+                        transform: `translateX(calc(${activeSubTab === 'personal' ? '0%' : '-50%'} + ${touchDelta}px))`
+                      }}
+                    >
+                      {/* Cá nhân Content */}
+                      <div className="w-1/2 px-0.5 space-y-6">
+                        <div className="flex items-center gap-2 px-1 mb-2">
+                          <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
+                          <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
                         </div>
-                      )}
-                      {settlements.length > 0 && (
-                        <PaymentHistory settlements={settlements} />
-                      )}
+
+                        {(() => {
+                          const personalSettlements = settlements.filter(s => s.debtorId === user?.id || s.creditorId === user?.id);
+                          const pendingPersonal = personalSettlements.filter(s => s.status === 'pending');
+
+                          return (
+                            <>
+                              {pendingPersonal.length > 0 ? (
+                                <SettlementStatus
+                                  settlements={pendingPersonal}
+                                  onSettlementUpdate={handleSettlementUpdate}
+                                />
+                              ) : (
+                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group mb-6">
+                                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                                    <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
+                                  </div>
+                                  <div className="flex items-center gap-4 relative z-10">
+                                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                                      <CheckCircle2 className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div>
+                                      <h3 className="font-black text-green-800 dark:text-green-400 text-base">Bạn đã hoàn tất!</h3>
+                                      <p className="text-xs text-green-700/80 dark:text-green-500/70 font-medium">
+                                        Tất cả các khoản thu chi cá nhân của bạn đã được giải quyết xong.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              {personalSettlements.length > 0 && (
+                                <PaymentHistory settlements={personalSettlements} />
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+
+                      {/* Cả nhóm Content */}
+                      <div className="w-1/2 px-0.5 space-y-6">
+                        <div className="flex items-center gap-2 px-1 mb-2">
+                          <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
+                          <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
+                        </div>
+
+                        {settlements.some(s => s.status === 'pending') && (
+                          <SettlementStatus
+                            settlements={settlements}
+                            onSettlementUpdate={handleSettlementUpdate}
+                          />
+                        )}
+                        {calculation.isBalanced && settlements.length === 0 && (
+                          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
+                              <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
+                            </div>
+                            <div className="flex items-center gap-4 relative z-10">
+                              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200 dark:shadow-green-900/40">
+                                <CheckCircle2 className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="font-black text-green-800 dark:text-green-400 text-lg">Tất cả đã cân bằng!</h3>
+                                <p className="text-sm text-green-700/80 dark:text-green-500/70 font-medium">
+                                  Tuyệt vời! Mọi chi phí đã được thanh toán và chia đều cho tất cả mọi người.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {settlements.length > 0 && (
+                          <PaymentHistory settlements={settlements} />
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Tabs>
-            ) : (
-              <>
-                {settlements.some(s => s.status === 'pending') && (
-                  <SettlementStatus
-                    settlements={settlements}
-                    onSettlementUpdate={handleSettlementUpdate}
+                </Tabs>
+              </div>
+
+              {/* SLIDE 3: Payments */}
+              <div className="w-1/3 pl-8">
+                <div className="pt-2">
+                  <ExpenseList
+                    key={expenseListKey}
+                    tripId={tripId}
+                    isOwner={isOwner}
+                    isMember={isMember}
+                    onExpenseChange={handleSettlementUpdate}
                   />
-                )}
-
-                {calculation.isBalanced && settlements.length === 0 && (
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
-                      <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div className="flex items-center gap-4 relative z-10">
-                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200 dark:shadow-green-900/40">
-                        <CheckCircle2 className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-black text-green-800 dark:text-green-400 text-lg">Tất cả đã cân bằng!</h3>
-                        <p className="text-sm text-green-700/80 dark:text-green-500/70 font-medium">
-                          Tuyệt vời! Mọi chi phí đã được thanh toán và chia đều cho tất cả mọi người.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {settlements.length > 0 && (
-                  <PaymentHistory settlements={settlements} />
-                )}
-
-                {settlements.length === 0 && !calculation.isBalanced && (
-                  <div className="text-center py-12 rounded-[24px] border border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
-                    <p className="text-slate-400 dark:text-slate-500 font-medium italic">Chưa có đối soát nào cần thực hiện</p>
-                  </div>
-                )}
-              </>
-            )}
-          </TabsContent>
-
-          <TabsContent value="payments" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-            <div className="pt-2">
-              <ExpenseList
-                key={expenseListKey}
-                tripId={tripId}
-                isOwner={isOwner}
-                isMember={isMember}
-                onExpenseChange={handleSettlementUpdate}
-              />
+                </div>
+              </div>
             </div>
-          </TabsContent>
+          </div>
         </Tabs>
 
         {/* Add Expense Dialog */}
