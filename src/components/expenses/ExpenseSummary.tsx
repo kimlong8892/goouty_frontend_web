@@ -11,12 +11,14 @@ interface ExpenseSummaryProps {
   calculation: ExpenseCalculationResponse;
   onAddExpense: () => void;
   canAddExpense: boolean;
+  onShowHistory?: () => void;
 }
 
 export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
   calculation,
   onAddExpense,
-  canAddExpense
+  canAddExpense,
+  onShowHistory
 }) => {
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
@@ -70,7 +72,22 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[10px] font-black text-slate-400 dark:text-muted-foreground uppercase tracking-widest">Số giao dịch</span>
                 </div>
-                <p className={cn("font-black text-slate-900 dark:text-foreground", isMobileView ? "text-2xl" : "text-3xl")}>{calculation.transactionCount}</p>
+                <div className="flex items-center gap-3">
+                  <p className={cn("font-black text-slate-900 dark:text-white leading-none", isMobileView ? "text-2xl" : "text-3xl")}>{calculation.transactionCount}</p>
+                  {onShowHistory && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onShowHistory();
+                      }}
+                      className="h-7 px-2 text-[10px] font-bold text-primary hover:text-primary/80 hover:bg-primary/5 transition-all uppercase tracking-widest bg-primary/5 rounded-lg relative z-30"
+                    >
+                      Xem lịch sử
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className={cn("rounded-2xl bg-primary/10 flex items-center justify-center", isMobileView ? "w-12 h-12" : "w-16 h-16")}>
                 <ReceiptText className={cn("text-primary", isMobileView ? "w-6 h-6" : "w-8 h-8")} />

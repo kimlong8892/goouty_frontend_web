@@ -10,6 +10,7 @@ import { EditExpenseDialog } from '@/components/dialogs/EditExpenseDialog.tsx';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
+import { usePWA } from '@/pwa/hooks/usePWA.ts';
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
   onExpenseChange
 }) => {
   const { user } = useAuth();
+  const { isPWA } = usePWA();
   const [expenses, setExpenses] = useState<DATABASE_TYPES.expenses[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -159,139 +161,148 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-foreground">Lịch sử chi tiêu</h2>
-        <Badge variant="outline" className="text-slate-400 dark:text-muted-foreground border-slate-200 dark:border-border rounded-full px-3">
-          {expenses.length} khoản chi
-        </Badge>
-      </div>
-
-      {expenses.length === 0 ? (
-        <Card className="rounded-[32px] border-2 border-dashed border-slate-100 dark:border-border shadow-none bg-slate-50/50 dark:bg-card/50">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-6">
-              <ReceiptText className="w-8 h-8 text-primary/40 dark:text-primary/50" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-800 dark:text-foreground mb-2">Chưa có chi phí nào</h3>
-            <p className="text-slate-500 dark:text-muted-foreground text-sm max-w-xs mb-8">
-              Bắt đầu ghi lại các khoản chi tiêu để hệ thống tự động tính toán và chia sẻ chi phí.
-            </p>
-            {(isOwner || isMember) && (
-              <Button
-                onClick={() => setShowAddDialog(true)}
-                className="rounded-xl bg-primary hover:bg-primary/90 text-white"
-              >
-                <Handshake className="w-4 h-4 mr-2" />
-                Ghi chú chi phí ngay
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+      {isPWA ? (
+        <div className="flex justify-end mb-2">
+          <Badge variant="outline" className="text-slate-400 dark:text-muted-foreground border-slate-200 dark:border-border rounded-full px-3 py-1 font-bold">
+            {expenses.length} khoản chi
+          </Badge>
+        </div>
       ) : (
-        <div className="space-y-4">
-          {expenses.map((expense) => {
-            const payerInfo = getPayerInfo(expense.payerId);
-            const participants = getParticipantInfos(expense.participants);
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-foreground">Lịch sử chi tiêu</h2>
+          <Badge variant="outline" className="text-slate-400 dark:text-muted-foreground border-slate-200 dark:border-border rounded-full px-3">
+            {expenses.length} khoản chi
+          </Badge>
+        </div>
+      )}
+      {
+        expenses.length === 0 ? (
+          <Card className="rounded-[32px] border-2 border-dashed border-slate-100 dark:border-border shadow-none bg-slate-50/50 dark:bg-card/50">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-6">
+                <ReceiptText className="w-8 h-8 text-primary/40 dark:text-primary/50" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-foreground mb-2">Chưa có chi phí nào</h3>
+              <p className="text-slate-500 dark:text-muted-foreground text-sm max-w-xs mb-8">
+                Bắt đầu ghi lại các khoản chi tiêu để hệ thống tự động tính toán và chia sẻ chi phí.
+              </p>
+              {(isOwner || isMember) && (
+                <Button
+                  onClick={() => setShowAddDialog(true)}
+                  className="rounded-xl bg-primary hover:bg-primary/90 text-white"
+                >
+                  <Handshake className="w-4 h-4 mr-2" />
+                  Ghi chú chi phí ngay
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {expenses.map((expense) => {
+              const payerInfo = getPayerInfo(expense.payerId);
+              const participants = getParticipantInfos(expense.participants);
 
-            return (
-              <div
-                key={expense.id}
-                className={`group rounded-[24px] border transition-all duration-300 relative overflow-hidden ${expense.isLocked ? 'bg-slate-50/80 dark:bg-slate-900/40 border-slate-100 dark:border-border opacity-90' : 'bg-white dark:bg-secondary/40 border-slate-100 dark:border-border hover:border-primary/30 dark:hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5'
-                  }`}
-              >
-                <div className="p-5 md:p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className={`text-lg font-bold ${expense.isLocked ? 'text-slate-500 dark:text-muted-foreground' : 'text-slate-900 dark:text-foreground group-hover:text-primary transition-colors'}`}>
-                          {expense.title}
-                        </h3>
-                        {expense.isLocked && <Lock className="w-3 h-3 text-slate-400 dark:text-muted-foreground" />}
-                      </div>
-                      {expense.description && (
-                        <p className="text-sm text-slate-400 dark:text-muted-foreground leading-relaxed max-w-md">{expense.description}</p>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <p className={`text-xl font-black ${expense.isLocked ? 'text-slate-400 dark:text-muted-foreground' : 'text-slate-900 dark:text-foreground'}`}>
-                        {formatCurrency(expense.amount)}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        {canEditOrDelete(expense) && !expense.isLocked && (
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditExpense(expense)}
-                              className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors"
-                            >
-                              <Edit className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteExpense(expense)}
-                              className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 transition-colors"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        )}
-                        <span className="text-[10px] font-bold text-slate-300 dark:text-muted-foreground bg-slate-50 dark:bg-secondary px-2 py-0.5 rounded-full uppercase tracking-tighter shadow-sm border border-slate-100 dark:border-border">
-                          {formatDate(expense.date)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-50 dark:border-border">
-                    <div className="flex items-center gap-6">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-bold text-slate-400 dark:text-muted-foreground uppercase tracking-widest">Người chi</span>
+              return (
+                <div
+                  key={expense.id}
+                  className={`group rounded-[24px] border transition-all duration-300 relative overflow-hidden ${expense.isLocked ? 'bg-slate-50/80 dark:bg-slate-900/40 border-slate-100 dark:border-border opacity-90' : 'bg-white dark:bg-secondary/40 border-slate-100 dark:border-border hover:border-primary/30 dark:hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5'
+                    }`}
+                >
+                  <div className="p-5 md:p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <Avatar className="w-8 h-8 border border-white dark:border-border shadow-sm font-bold">
-                            {payerInfo.profilePicture && <AvatarImage src={payerInfo.profilePicture} />}
-                            <AvatarFallback className="text-xs bg-slate-100 dark:bg-secondary text-primary">
-                              {payerInfo.name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm font-bold text-slate-700 dark:text-foreground/90">{payerInfo.name}</span>
+                          <h3 className={`text-lg font-bold ${expense.isLocked ? 'text-slate-500 dark:text-muted-foreground' : 'text-slate-900 dark:text-foreground group-hover:text-primary transition-colors'}`}>
+                            {expense.title}
+                          </h3>
+                          {expense.isLocked && <Lock className="w-3 h-3 text-slate-400 dark:text-muted-foreground" />}
                         </div>
+                        {expense.description && (
+                          <p className="text-sm text-slate-400 dark:text-muted-foreground leading-relaxed max-w-md">{expense.description}</p>
+                        )}
                       </div>
-
-                      <div className="flex flex-col gap-1 border-l border-slate-100 dark:border-border pl-6">
-                        <span className="text-[10px] font-bold text-slate-400 dark:text-muted-foreground uppercase tracking-widest">Chia sẻ cho</span>
-                        <div className="flex items-center -space-x-2">
-                          {participants.slice(0, 4).map((p, i) => (
-                            <Avatar key={i} className="w-8 h-8 border-2 border-white dark:border-border shadow-sm font-bold">
-                              {p.profilePicture && <AvatarImage src={p.profilePicture} />}
-                              <AvatarFallback className="text-xs bg-slate-50 dark:bg-secondary text-slate-400 dark:text-muted-foreground">
-                                {p.name.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                          ))}
-                          {participants.length > 4 && (
-                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-card border-2 border-white dark:border-border flex items-center justify-center text-xs font-bold text-slate-400 dark:text-muted-foreground z-10">
-                              +{participants.length - 4}
+                      <div className="flex flex-col items-end gap-2">
+                        <p className={`text-xl font-black ${expense.isLocked ? 'text-slate-400 dark:text-muted-foreground' : 'text-slate-900 dark:text-foreground'}`}>
+                          {formatCurrency(expense.amount)}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          {canEditOrDelete(expense) && !expense.isLocked && (
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditExpense(expense)}
+                                className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteExpense(expense)}
+                                className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
                             </div>
                           )}
+                          <span className="text-[10px] font-bold text-slate-300 dark:text-muted-foreground bg-slate-50 dark:bg-secondary px-2 py-0.5 rounded-full uppercase tracking-tighter shadow-sm border border-slate-100 dark:border-border">
+                            {formatDate(expense.date)}
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <div className="bg-primary/10 dark:bg-primary/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm border border-primary/10 dark:border-primary/20">
-                        <Users className="w-3 h-3 text-primary" />
-                        <span className="text-[10px] font-bold text-primary">{expense.participants.length} người</span>
+                    <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-50 dark:border-border">
+                      <div className="flex items-center gap-6">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold text-slate-400 dark:text-muted-foreground uppercase tracking-widest">Người chi</span>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-8 h-8 border border-white dark:border-border shadow-sm font-bold">
+                              {payerInfo.profilePicture && <AvatarImage src={payerInfo.profilePicture} />}
+                              <AvatarFallback className="text-xs bg-slate-100 dark:bg-secondary text-primary">
+                                {payerInfo.name.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm font-bold text-slate-700 dark:text-foreground/90">{payerInfo.name}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1 border-l border-slate-100 dark:border-border pl-6">
+                          <span className="text-[10px] font-bold text-slate-400 dark:text-muted-foreground uppercase tracking-widest">Chia sẻ cho</span>
+                          <div className="flex items-center -space-x-2">
+                            {participants.slice(0, 4).map((p, i) => (
+                              <Avatar key={i} className="w-8 h-8 border-2 border-white dark:border-border shadow-sm font-bold">
+                                {p.profilePicture && <AvatarImage src={p.profilePicture} />}
+                                <AvatarFallback className="text-xs bg-slate-50 dark:bg-secondary text-slate-400 dark:text-muted-foreground">
+                                  {p.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            ))}
+                            {participants.length > 4 && (
+                              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-card border-2 border-white dark:border-border flex items-center justify-center text-xs font-bold text-slate-400 dark:text-muted-foreground z-10">
+                                +{participants.length - 4}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <div className="bg-primary/10 dark:bg-primary/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm border border-primary/10 dark:border-primary/20">
+                          <Users className="w-3 h-3 text-primary" />
+                          <span className="text-[10px] font-bold text-primary">{expense.participants.length} người</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )
+      }
 
       <AddExpenseDialog
         open={showAddDialog}
@@ -339,6 +350,6 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   );
 };

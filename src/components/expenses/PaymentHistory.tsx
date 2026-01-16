@@ -6,6 +6,7 @@ import { PaymentSettlementResponse, PaymentTransactionResponse } from '@/types/e
 import { api } from '@/integrations/api/client.ts';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import { useAuth } from '@/contexts/AuthContext.tsx';
+import { usePWA } from '@/pwa/hooks/usePWA.ts';
 import { cn } from '@/lib/utils';
 
 interface PaymentHistoryProps {
@@ -23,6 +24,7 @@ const formatDateTime = (iso: string) => {
 export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) => {
   const [transactionsBySettlement, setTransactionsBySettlement] = React.useState<Record<string, PaymentTransactionResponse[]>>({});
   const { user } = useAuth();
+  const { isPWA } = usePWA();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -88,17 +90,19 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
 
   return (
     <Card className="rounded-[24px] border-none shadow-sm bg-white dark:bg-card/50 border border-slate-100 dark:border-white/5 overflow-hidden">
-      <CardHeader className="pb-4 flex flex-row items-center justify-between">
-        <div className="flex items-center gap-2">
-          <History className="w-5 h-5 text-primary" />
-          <CardTitle className="text-lg font-bold text-slate-900 dark:text-white">Giải quyết trả tiền</CardTitle>
-        </div>
-        <div className="flex gap-2">
-          <Badge variant="secondary" className="bg-primary/10 text-primary border-transparent rounded-full px-3">
-            {settlements.length} giao dịch
-          </Badge>
-        </div>
-      </CardHeader>
+      {!isPWA && (
+        <CardHeader className="pb-4 flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <History className="w-5 h-5 text-primary" />
+            <CardTitle className="text-lg font-bold text-slate-900 dark:text-white">Giải quyết trả tiền</CardTitle>
+          </div>
+          <div className="flex gap-2">
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-transparent rounded-full px-3">
+              {settlements.length} giao dịch
+            </Badge>
+          </div>
+        </CardHeader>
+      )}
       <CardContent className="p-6">
         <div className="space-y-4">
           {settlements.map((settlement) => {
@@ -187,10 +191,15 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
                     "p-4 rounded-2xl text-xs font-medium leading-relaxed",
                     isCompleted ? 'bg-green-100/50 text-green-800 dark:bg-green-500/10 dark:text-green-400' : 'bg-orange-100/50 text-orange-800 dark:bg-orange-500/10 dark:text-orange-400'
                   )}>
-                    {isCompleted
-                      ? `${debtorName} đã hoàn tất việc chuyển tiền cho ${creditorName}`
-                      : `${debtorName} cần thanh toán thêm ${formatCurrency(remainingAmount)} cho ${creditorName}`
-                    }
+                    {isPWA ? (
+                      isCompleted
+                        ? `${debtorName} đã hoàn tất thanh toán`
+                        : `${debtorName} còn thiếu ${formatCurrency(remainingAmount)}`
+                    ) : (
+                      isCompleted
+                        ? `${debtorName} đã hoàn tất việc chuyển tiền cho ${creditorName}`
+                        : `${debtorName} cần thanh toán thêm ${formatCurrency(remainingAmount)} cho ${creditorName}`
+                    )}
                   </div>
 
                   {/* Transactions details */}
@@ -202,7 +211,11 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
                           <div key={tx.id} className="flex items-center justify-between bg-white/60 dark:bg-white/5 p-3 rounded-xl border border-white dark:border-white/5">
                             <div className="flex flex-col gap-0.5">
                               <span className="text-xs font-bold text-slate-900 dark:text-white">
-                                {debtorName} <span className="text-slate-400 font-normal">đã chuyển cho</span> {creditorName}
+                                {isPWA ? (
+                                  <>{debtorName} <span className="text-primary italic">đã chuyển {formatCurrency(tx.amount)}</span></>
+                                ) : (
+                                  <>{debtorName} <span className="text-slate-400 font-normal">đã chuyển cho</span> {creditorName}</>
+                                )}
                               </span>
                               <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
                                 <span>{tx.note || (tx.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản')}</span>
@@ -210,7 +223,7 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
                                 <span>{formatDateTime(String(tx.createdAt))}</span>
                               </span>
                             </div>
-                            <span className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(tx.amount)}</span>
+                            {!isPWA && <span className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(tx.amount)}</span>}
                           </div>
                         ))}
                       </div>

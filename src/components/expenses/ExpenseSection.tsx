@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
 import { ExpenseSummary } from './ExpenseSummary';
 import { PersonalBalance } from './PersonalBalance';
 import { SettlementStatus } from './SettlementStatus';
 import { PaymentHistory } from './PaymentHistory';
+import { PaymentHistoryDialog } from './PaymentHistoryDialog';
 import { ExpenseList } from './ExpenseList';
 import { AddExpenseDialog } from '@/components/dialogs/AddExpenseDialog.tsx';
 import { ExpenseCalculationResponse, PaymentSettlementResponse, PaymentTransactionResponse } from '@/types/expense';
 import { api } from '@/integrations/api/client.ts';
 import { toast } from 'sonner';
-import { CheckCircle2, Sparkles } from 'lucide-react';
+import { CheckCircle2, Sparkles, LayoutGrid, ReceiptText, Handshake, CreditCard } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
+import { useAuth } from '@/contexts/AuthContext.tsx';
+import { User, Users2 } from 'lucide-react';
 
 interface ExpenseSectionProps {
   tripId: string;
@@ -25,12 +29,57 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
 }) => {
   const navigate = useNavigate();
   const { isPWA } = usePWA();
+  const { user } = useAuth();
   const [calculation, setCalculation] = useState<ExpenseCalculationResponse | null>(null);
   const [settlements, setSettlements] = useState<PaymentSettlementResponse[]>([]);
   const [transactions, setTransactions] = useState<PaymentTransactionResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [expenseListKey, setExpenseListKey] = useState(0);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [activeSubTab, setActiveSubTab] = useState('personal');
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const touchEndY = useRef<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchEndX.current = null;
+    touchEndY.current = null;
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchStartY.current = e.targetTouches[0].clientY;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+    touchEndY.current = e.targetTouches[0].clientY;
+  };
+
+  const handleSubSwipe = (distanceX: number) => {
+    const subTabs = ['personal', 'group'];
+    const currentIndex = subTabs.indexOf(activeSubTab);
+    if (distanceX > 0) { // Swipe left -> next
+      if (currentIndex < subTabs.length - 1) setActiveSubTab(subTabs[currentIndex + 1]);
+    } else { // Swipe right -> prev
+      if (currentIndex > 0) setActiveSubTab(subTabs[currentIndex - 1]);
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current || !touchStartY.current || !touchEndY.current) return;
+
+    const distanceX = touchStartX.current - touchEndX.current;
+    const distanceY = touchStartY.current - touchEndY.current;
+    const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
+
+    if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
+      if (activeTab === 'settlements') {
+        handleSubSwipe(distanceX);
+      }
+    }
+  };
 
   const fetchCalculation = async () => {
     try {
@@ -46,15 +95,17 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
     try {
       const data = await api.expenses.getPaymentSettlements(tripId);
       setSettlements(data);
+      return data;
     } catch (error: any) {
       console.error('Error fetching settlements:', error);
+      return [];
     }
   };
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (currentSettlements: PaymentSettlementResponse[]) => {
     try {
       const allTransactions = [];
-      for (const settlement of settlements) {
+      for (const settlement of currentSettlements) {
         try {
           const settlementTransactions = await api.expenses.getPaymentTransactions(settlement.id);
           allTransactions.push(...settlementTransactions);
@@ -69,16 +120,22 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   };
 
   const handleSettlementUpdate = async () => {
-    await Promise.all([fetchCalculation(), fetchSettlements()]);
-    await fetchTransactions();
+    const [_, currentSettlements] = await Promise.all([
+      fetchCalculation(),
+      fetchSettlements()
+    ]);
+    await fetchTransactions(currentSettlements);
     setExpenseListKey(prev => prev + 1);
   };
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchCalculation(), fetchSettlements()]);
-      await fetchTransactions();
+      const [_, currentSettlements] = await Promise.all([
+        fetchCalculation(),
+        fetchSettlements()
+      ]);
+      await fetchTransactions(currentSettlements);
       setLoading(false);
     };
     loadData();
@@ -115,13 +172,233 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
     );
   }
 
+  if (isPWA) {
+    return (
+      <div
+        className="space-y-6 min-h-[60vh]"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList
+            className="grid grid-cols-3 h-14 p-1 bg-secondary/30 dark:bg-white/5 rounded-[20px] w-full mb-6"
+            onTouchStart={(e) => e.stopPropagation()}
+          >
+            <TabsTrigger
+              value="overview"
+              className="rounded-[16px] data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:shadow-lg data-[state=active]:text-primary dark:data-[state=active]:text-white transition-all duration-300 flex flex-col items-center justify-center gap-1 h-full py-1 text-slate-500 dark:text-white/50"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span className="text-[9px] font-bold uppercase tracking-tight leading-none text-center px-1">Tổng quan nhóm</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="settlements"
+              className="rounded-[16px] data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:shadow-lg data-[state=active]:text-primary dark:data-[state=active]:text-white transition-all duration-300 flex flex-col items-center justify-center gap-1 h-full py-1 text-slate-500 dark:text-white/50"
+            >
+              <Handshake className="w-4 h-4" />
+              <span className="text-[9px] font-bold uppercase tracking-tight leading-none text-center px-1">Giải quyết trả tiền</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="payments"
+              className="rounded-[16px] data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:shadow-lg data-[state=active]:text-primary dark:data-[state=active]:text-white transition-all duration-300 flex flex-col items-center justify-center gap-1 h-full py-1 text-slate-500 dark:text-white/50"
+            >
+              <ReceiptText className="w-4 h-4" />
+              <span className="text-[9px] font-bold uppercase tracking-tight leading-none text-center px-1">Lịch sử chi tiêu</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-8 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+            <ExpenseSummary
+              calculation={{ ...calculation, transactionCount: transactions.length }}
+              onAddExpense={handleAddExpense}
+              canAddExpense={isOwner || isMember}
+              onShowHistory={() => setShowHistoryDialog(true)}
+            />
+            <PersonalBalance userBalances={calculation.userBalances} />
+          </TabsContent>
+
+          <TabsContent value="settlements" className="space-y-6 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+            {isPWA ? (
+              <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
+                <TabsList
+                  className="grid grid-cols-2 bg-slate-100/50 dark:bg-white/5 p-1 rounded-xl h-10 w-full mb-4"
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
+                  <TabsTrigger
+                    value="personal"
+                    className="rounded-lg px-4 text-[12px] font-bold tracking-wider data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary dark:data-[state=active]:text-white dark:text-white/50 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    Cá nhân
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="group"
+                    className="rounded-lg px-4 text-[12px] font-bold tracking-wider data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary dark:data-[state=active]:text-white dark:text-white/50 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <Users2 className="w-3.5 h-3.5" />
+                    Cả nhóm
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="personal" className="space-y-6 animate-in fade-in-50 duration-300">
+                  <div className="flex items-center gap-2 px-1 mb-2">
+                    <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
+                    <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
+                  </div>
+
+                  {(() => {
+                    const personalSettlements = settlements.filter(s => s.debtorId === user?.id || s.creditorId === user?.id);
+                    const pendingPersonal = personalSettlements.filter(s => s.status === 'pending');
+
+                    return (
+                      <>
+                        {pendingPersonal.length > 0 ? (
+                          <SettlementStatus
+                            settlements={pendingPersonal}
+                            onSettlementUpdate={handleSettlementUpdate}
+                          />
+                        ) : (
+                          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group mb-6">
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                              <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
+                            </div>
+                            <div className="flex items-center gap-4 relative z-10">
+                              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                                <CheckCircle2 className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="font-black text-green-800 dark:text-green-400 text-base">Bạn đã hoàn tất!</h3>
+                                <p className="text-xs text-green-700/80 dark:text-green-500/70 font-medium">
+                                  Tất cả các khoản thu chi cá nhân của bạn đã được giải quyết xong.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {personalSettlements.length > 0 && (
+                          <PaymentHistory settlements={personalSettlements} />
+                        )}
+                      </>
+                    );
+                  })()}
+                </TabsContent>
+
+                <TabsContent value="group" className="space-y-6 animate-in fade-in-50 duration-300">
+                  <div className="flex items-center gap-2 px-1 mb-2">
+                    <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
+                    <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
+                  </div>
+
+                  {settlements.some(s => s.status === 'pending') && (
+                    <SettlementStatus
+                      settlements={settlements}
+                      onSettlementUpdate={handleSettlementUpdate}
+                    />
+                  )}
+                  {calculation.isBalanced && settlements.length === 0 && (
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
+                        <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200 dark:shadow-green-900/40">
+                          <CheckCircle2 className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-green-800 dark:text-green-400 text-lg">Tất cả đã cân bằng!</h3>
+                          <p className="text-sm text-green-700/80 dark:text-green-500/70 font-medium">
+                            Tuyệt vời! Mọi chi phí đã được thanh toán và chia đều cho tất cả mọi người.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {settlements.length > 0 && (
+                    <PaymentHistory settlements={settlements} />
+                  )}
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <>
+                {settlements.some(s => s.status === 'pending') && (
+                  <SettlementStatus
+                    settlements={settlements}
+                    onSettlementUpdate={handleSettlementUpdate}
+                  />
+                )}
+
+                {calculation.isBalanced && settlements.length === 0 && (
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
+                      <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200 dark:shadow-green-900/40">
+                        <CheckCircle2 className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-black text-green-800 dark:text-green-400 text-lg">Tất cả đã cân bằng!</h3>
+                        <p className="text-sm text-green-700/80 dark:text-green-500/70 font-medium">
+                          Tuyệt vời! Mọi chi phí đã được thanh toán và chia đều cho tất cả mọi người.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {settlements.length > 0 && (
+                  <PaymentHistory settlements={settlements} />
+                )}
+
+                {settlements.length === 0 && !calculation.isBalanced && (
+                  <div className="text-center py-12 rounded-[24px] border border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
+                    <p className="text-slate-400 dark:text-slate-500 font-medium italic">Chưa có đối soát nào cần thực hiện</p>
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="payments" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+            <div className="pt-2">
+              <ExpenseList
+                key={expenseListKey}
+                tripId={tripId}
+                isOwner={isOwner}
+                isMember={isMember}
+                onExpenseChange={handleSettlementUpdate}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Add Expense Dialog */}
+        <AddExpenseDialog
+          open={showAddExpenseDialog}
+          onOpenChange={setShowAddExpenseDialog}
+          tripId={tripId}
+          onSuccess={handleExpenseAdded}
+        />
+
+        <PaymentHistoryDialog
+          open={showHistoryDialog}
+          onOpenChange={setShowHistoryDialog}
+          transactions={transactions}
+          settlements={settlements}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-10">
       {/* Chi phí chuyến đi - Trip Expenses Summary */}
       <ExpenseSummary
-        calculation={calculation}
+        calculation={{ ...calculation, transactionCount: transactions.length }}
         onAddExpense={handleAddExpense}
         canAddExpense={isOwner || isMember}
+        onShowHistory={() => setShowHistoryDialog(true)}
       />
 
       <div className="grid grid-cols-1 gap-10">
@@ -173,6 +450,14 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
         </div>
       </div>
 
+      {/* Payment History Dialog */}
+      <PaymentHistoryDialog
+        open={showHistoryDialog}
+        onOpenChange={setShowHistoryDialog}
+        transactions={transactions}
+        settlements={settlements}
+      />
+
       {/* Add Expense Dialog */}
       <AddExpenseDialog
         open={showAddExpenseDialog}
@@ -183,3 +468,4 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
     </div>
   );
 };
+
