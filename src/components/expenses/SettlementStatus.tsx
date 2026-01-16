@@ -269,21 +269,21 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
                       {isReceiver ? (
                         <div className={cn("grid gap-4", isMobileView ? "grid-cols-1" : "grid-cols-2")}>
                           {(isPWA && showFormId !== settlement.id) ? (
-                            <div className={cn("flex gap-2 w-full", isPWA ? "flex-row" : (isMobileView ? "flex-col" : "col-span-2"))}>
+                            <div className={cn("flex gap-1.5 w-full", isPWA ? "flex-row" : (isMobileView ? "flex-col" : "col-span-2"))}>
                               <Button
-                                className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 dark:shadow-none"
+                                className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 dark:shadow-none px-2 text-[13px]"
                                 onClick={() => setShowFormId(settlement.id)}
                               >
-                                <Check className="w-4 h-4 mr-2" /> Ghi nhận thanh toán
+                                <Check className="w-4 h-4 mr-1.5 flex-shrink-0" /> Ghi nhận thanh toán
                               </Button>
                               {(settlement as any).creditor?.bankId && (settlement as any).creditor?.bankNumber && (
                                 <Button
                                   variant="outline"
-                                  className={cn("h-11 rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5", isPWA ? "px-4" : (isMobileView ? "w-full" : "w-11 p-0"))}
+                                  className={cn("h-11 rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 flex-shrink-0", isPWA ? "px-2.5" : (isMobileView ? "w-full" : "w-11 p-0"))}
                                   onClick={() => setQrSettlementId(settlement.id)}
                                 >
-                                  <QrCode className="w-5 h-5 text-slate-600 dark:text-slate-400 mr-2" />
-                                  {isMobileView && "QR"}
+                                  <QrCode className="w-5 h-5 text-slate-600 dark:text-slate-400 mr-1" />
+                                  {isMobileView && <span className="text-[13px]">QR</span>}
                                 </Button>
                               )}
                             </div>
