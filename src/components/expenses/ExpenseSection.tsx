@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
 import { ExpenseSummary } from './ExpenseSummary';
@@ -39,6 +40,8 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   const [expenseListKey, setExpenseListKey] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
   const [activeSubTab, setActiveSubTab] = useState('personal');
+  const [touchDelta, setTouchDelta] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -46,15 +49,39 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   const minSwipeDistance = 50;
 
   const onTouchStart = (e: React.TouchEvent) => {
+    if (activeTab !== 'settlements') return;
     touchEndX.current = null;
     touchEndY.current = null;
     touchStartX.current = e.targetTouches[0].clientX;
     touchStartY.current = e.targetTouches[0].clientY;
+    setIsDragging(true);
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-    touchEndY.current = e.targetTouches[0].clientY;
+    if (!isDragging || !touchStartX.current) return;
+    const currentX = e.targetTouches[0].clientX;
+    const currentY = e.targetTouches[0].clientY;
+
+    // Check if it's a vertical swipe to allow scrolling
+    if (touchStartY.current) {
+      const diffY = Math.abs(currentY - touchStartY.current);
+      const diffX = Math.abs(currentX - touchStartX.current);
+      if (diffY > diffX && diffY > 10) {
+        setIsDragging(false);
+        return;
+      }
+    }
+
+    let deltaX = currentX - touchStartX.current;
+
+    // Rubber banding at edges
+    if ((activeSubTab === 'personal' && deltaX > 0) || (activeSubTab === 'group' && deltaX < 0)) {
+      deltaX = deltaX * 0.3;
+    }
+
+    setTouchDelta(deltaX);
+    touchEndX.current = currentX;
+    touchEndY.current = currentY;
   };
 
   const handleSubSwipe = (distanceX: number) => {
@@ -68,17 +95,21 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   };
 
   const onTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current || !touchStartY.current || !touchEndY.current) return;
+    if (!isDragging) return;
+    setIsDragging(false);
+    const finalDelta = touchDelta;
+    setTouchDelta(0);
 
-    const distanceX = touchStartX.current - touchEndX.current;
-    const distanceY = touchStartY.current - touchEndY.current;
-    const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
-
-    if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
-      if (activeTab === 'settlements') {
-        handleSubSwipe(distanceX);
+    if (Math.abs(finalDelta) > minSwipeDistance) {
+      if (finalDelta < 0 && activeSubTab === 'personal') {
+        setActiveSubTab('group');
+      } else if (finalDelta > 0 && activeSubTab === 'group') {
+        setActiveSubTab('personal');
       }
     }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   const fetchCalculation = async () => {
@@ -243,8 +274,13 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
 
                 <div className="overflow-hidden">
                   <div
-                    className="flex w-[200%] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-                    style={{ transform: `translateX(${activeSubTab === 'personal' ? '0%' : '-50%'})` }}
+                    className={cn(
+                      "flex w-[200%] transition-transform ease-[cubic-bezier(0.16,1,0.3,1)]",
+                      isDragging ? "duration-0" : "duration-500"
+                    )}
+                    style={{
+                      transform: `translateX(calc(${activeSubTab === 'personal' ? '0%' : '-50%'} + ${touchDelta}px))`
+                    }}
                   >
                     {/* Cá nhân Content */}
                     <div className="w-1/2 px-0.5 space-y-6">
