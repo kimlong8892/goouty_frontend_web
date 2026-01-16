@@ -104,9 +104,15 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     const [internalSelectedDayId, setInternalSelectedDayId] = useState<string>(days[0]?.id || '');
     const [touchDelta, setTouchDelta] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
+    const [stableDayId, setStableDayId] = useState<string>(days[0]?.id || '');
 
     // Use prop if provided, otherwise use internal state
     const selectedDayId = propActiveDayId !== undefined ? propActiveDayId : internalSelectedDayId;
+
+    useEffect(() => {
+        const timer = setTimeout(() => setStableDayId(selectedDayId), 500);
+        return () => clearTimeout(timer);
+    }, [selectedDayId]);
 
     const setSelectedDayId = (id: string) => {
         if (onActiveDayChange) {
@@ -241,7 +247,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
 
     return (
         <div
-            className="flex flex-col w-full bg-background min-h-screen"
+            className="flex flex-col w-full bg-background min-h-0"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -351,7 +357,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
             <div className="flex-1 overflow-hidden relative">
                 <div
                     className={cn(
-                        "flex w-full transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                        "flex w-full transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] items-start",
                         isDragging ? "duration-0" : ""
                     )}
                     style={{
@@ -362,7 +368,13 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                     {days.map((day, dIdx) => {
                         const dayActivities = activitiesByDay[day.id] || [];
                         return (
-                            <div key={day.id} className="w-full flex-shrink-0 px-4 py-6">
+                            <div
+                                key={day.id}
+                                className={cn(
+                                    "w-full flex-shrink-0 px-4 py-6",
+                                    day.id !== selectedDayId && day.id !== stableDayId && "h-0 overflow-hidden"
+                                )}
+                            >
                                 <div className="mb-6">
                                     <h2 className="text-xl font-black text-foreground text-center">
                                         {day.title || `Ngày ${dIdx + 1}`}
