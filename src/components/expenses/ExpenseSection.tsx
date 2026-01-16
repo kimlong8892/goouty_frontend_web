@@ -239,13 +239,13 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
             </TabsTrigger>
           </TabsList>
 
-          <div className="overflow-hidden -mx-4 px-4">
+          <div className="overflow-hidden -mx-4">
             <div
               className="flex w-[300%] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{ transform: `translateX(${activeTab === 'overview' ? '0%' : activeTab === 'settlements' ? '-33.333%' : '-66.666%'})` }}
             >
               {/* SLIDE 1: Overview */}
-              <div className="w-1/3 pr-8 space-y-8">
+              <div className="w-1/3 px-4 space-y-8">
                 <ExpenseSummary
                   calculation={{ ...calculation, transactionCount: transactions.length }}
                   onAddExpense={handleAddExpense}
@@ -373,7 +373,7 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
               </div>
 
               {/* SLIDE 3: Payments */}
-              <div className="w-1/3 pl-8">
+              <div className="w-1/3 px-4">
                 <div className="pt-2">
                   <ExpenseList
                     key={expenseListKey}
