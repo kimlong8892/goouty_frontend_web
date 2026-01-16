@@ -155,10 +155,10 @@ const InviteAcceptPage: React.FC = () => {
 
   if (loadingInvitation) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Đang tải thông tin lời mời...</p>
+          <p className="dark:text-slate-300">Đang tải thông tin lời mời...</p>
         </div>
       </div>
     );
@@ -166,10 +166,10 @@ const InviteAcceptPage: React.FC = () => {
 
   if (!invitation) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <Card className="w-full max-w-md">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900">
+        <Card className="w-full max-w-md dark:bg-slate-900 dark:border-slate-800">
           <CardContent className="pt-6 text-center">
-            <p className="text-red-600">Lời mời không hợp lệ hoặc đã hết hạn</p>
+            <p className="text-red-600 dark:text-red-400">Lời mời không hợp lệ hoặc đã hết hạn</p>
             <Button onClick={() => navigate('/')} className="mt-4">
               Về trang chủ
             </Button>
@@ -181,8 +181,8 @@ const InviteAcceptPage: React.FC = () => {
 
   if (showSignupForm && !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md dark:bg-slate-900 dark:border-slate-800">
           <CardHeader className="text-center">
             <div className="p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden">
               <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="w-full h-full object-contain" />
@@ -211,7 +211,7 @@ const InviteAcceptPage: React.FC = () => {
                     placeholder="Nhập họ và tên"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 rounded-xl border-slate-200 focus-visible:ring-primary"
+                    className="pl-10 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus-visible:ring-primary"
                     required
                   />
                 </div>
@@ -227,12 +227,12 @@ const InviteAcceptPage: React.FC = () => {
                     placeholder="your@email.com"
                     value={email || invitation.invitedEmail}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 rounded-xl border-slate-200 focus-visible:ring-primary"
+                    className="pl-10 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus-visible:ring-primary"
                     required
                     disabled
                   />
                 </div>
-                <p className="text-xs text-slate-500">Email này đã được mời tham gia chuyến đi</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Email này đã được mời tham gia chuyến đi</p>
               </div>
 
               <div className="space-y-2">
@@ -245,7 +245,7 @@ const InviteAcceptPage: React.FC = () => {
                     placeholder="Nhập mật khẩu"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 rounded-xl border-slate-200 focus-visible:ring-primary"
+                    className="pl-10 pr-10 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus-visible:ring-primary"
                     required
                     minLength={6}
                   />
@@ -257,7 +257,7 @@ const InviteAcceptPage: React.FC = () => {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-500">Mật khẩu tối thiểu 6 ký tự</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Mật khẩu tối thiểu 6 ký tự</p>
               </div>
 
               <Button
@@ -269,7 +269,7 @@ const InviteAcceptPage: React.FC = () => {
               </Button>
 
               <div className="text-center">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-slate-600 dark:text-slate-400">
                   Đã có tài khoản?{' '}
                   <button
                     type="button"
@@ -289,8 +289,8 @@ const InviteAcceptPage: React.FC = () => {
 
   if (showAcceptConfirm && isAuthenticated && invitation) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-lg">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-lg dark:bg-slate-900 dark:border-slate-800">
           <CardHeader className="text-center">
             <div className="p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden">
               <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="w-full h-full object-contain" />
@@ -303,12 +303,12 @@ const InviteAcceptPage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-white p-4 rounded-lg border">
+            <div className="bg-white dark:bg-slate-950 p-4 rounded-lg border dark:border-slate-800">
               <div className="flex items-center space-x-3 mb-3">
                 <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="h-5 w-5 object-contain" />
-                <h3 className="font-semibold">{invitation.trip.title}</h3>
+                <h3 className="font-semibold dark:text-white">{invitation.trip.title}</h3>
               </div>
-              <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="space-y-2 text-sm text-muted-foreground dark:text-slate-400">
                 {invitation.trip.province && (
                   <div className="flex items-center space-x-2">
                     <MapPin className="h-4 w-4 text-primary" />
@@ -330,16 +330,16 @@ const InviteAcceptPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <div className="bg-blue-100 p-2 rounded-full">
-                  <Users className="h-4 w-4 text-blue-600" />
+                <div className="bg-blue-100 dark:bg-blue-900/40 p-2 rounded-full">
+                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-blue-900">
+                  <h4 className="font-medium text-blue-900 dark:text-blue-100">
                     Thông tin tham gia
                   </h4>
-                  <ul className="text-sm text-blue-700 mt-2 space-y-1">
+                  <ul className="text-sm text-blue-700 dark:text-blue-300 mt-2 space-y-1">
                     <li>• Bạn sẽ trở thành thành viên của chuyến đi</li>
                     <li>• Có thể xem và tương tác với lịch trình</li>
                     <li>• Nhận thông báo về các hoạt động mới</li>
@@ -352,7 +352,7 @@ const InviteAcceptPage: React.FC = () => {
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
                 <span>Tham gia với tài khoản:</span>
-                <Badge variant="secondary" className="font-medium text-primary">
+                <Badge variant="secondary" className="font-medium text-primary dark:bg-slate-800 dark:text-indigo-300">
                   {email || invitation.invitedEmail}
                 </Badge>
               </div>
@@ -362,7 +362,7 @@ const InviteAcceptPage: React.FC = () => {
                   variant="outline"
                   onClick={() => navigate('/')}
                   disabled={processing}
-                  className="flex-1 rounded-xl h-11"
+                  className="flex-1 rounded-xl h-11 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Hủy bỏ
@@ -397,10 +397,10 @@ const InviteAcceptPage: React.FC = () => {
 
   // If authenticated, show loading while loading invitation
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900">
       <div className="text-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
-        <p>Đang chuẩn bị...</p>
+        <p className="dark:text-slate-300">Đang chuẩn bị...</p>
       </div>
     </div>
   );
