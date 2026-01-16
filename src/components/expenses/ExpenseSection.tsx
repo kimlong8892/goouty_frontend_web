@@ -241,83 +241,92 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="personal" className="space-y-6 animate-in fade-in-50 duration-300">
-                  <div className="flex items-center gap-2 px-1 mb-2">
-                    <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
-                    <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
-                  </div>
+                <div className="overflow-hidden">
+                  <div
+                    className="flex w-[200%] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                    style={{ transform: `translateX(${activeSubTab === 'personal' ? '0%' : '-50%'})` }}
+                  >
+                    {/* Cá nhân Content */}
+                    <div className="w-1/2 px-0.5 space-y-6">
+                      <div className="flex items-center gap-2 px-1 mb-2">
+                        <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
+                        <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
+                      </div>
 
-                  {(() => {
-                    const personalSettlements = settlements.filter(s => s.debtorId === user?.id || s.creditorId === user?.id);
-                    const pendingPersonal = personalSettlements.filter(s => s.status === 'pending');
+                      {(() => {
+                        const personalSettlements = settlements.filter(s => s.debtorId === user?.id || s.creditorId === user?.id);
+                        const pendingPersonal = personalSettlements.filter(s => s.status === 'pending');
 
-                    return (
-                      <>
-                        {pendingPersonal.length > 0 ? (
-                          <SettlementStatus
-                            settlements={pendingPersonal}
-                            onSettlementUpdate={handleSettlementUpdate}
-                          />
-                        ) : (
-                          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group mb-6">
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                              <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
+                        return (
+                          <>
+                            {pendingPersonal.length > 0 ? (
+                              <SettlementStatus
+                                settlements={pendingPersonal}
+                                onSettlementUpdate={handleSettlementUpdate}
+                              />
+                            ) : (
+                              <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group mb-6">
+                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                  <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
+                                </div>
+                                <div className="flex items-center gap-4 relative z-10">
+                                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                                    <CheckCircle2 className="w-6 h-6 text-white" />
+                                  </div>
+                                  <div>
+                                    <h3 className="font-black text-green-800 dark:text-green-400 text-base">Bạn đã hoàn tất!</h3>
+                                    <p className="text-xs text-green-700/80 dark:text-green-500/70 font-medium">
+                                      Tất cả các khoản thu chi cá nhân của bạn đã được giải quyết xong.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {personalSettlements.length > 0 && (
+                              <PaymentHistory settlements={personalSettlements} />
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Cả nhóm Content */}
+                    <div className="w-1/2 px-0.5 space-y-6">
+                      <div className="flex items-center gap-2 px-1 mb-2">
+                        <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
+                        <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
+                      </div>
+
+                      {settlements.some(s => s.status === 'pending') && (
+                        <SettlementStatus
+                          settlements={settlements}
+                          onSettlementUpdate={handleSettlementUpdate}
+                        />
+                      )}
+                      {calculation.isBalanced && settlements.length === 0 && (
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
+                          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
+                            <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
+                          </div>
+                          <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200 dark:shadow-green-900/40">
+                              <CheckCircle2 className="w-6 h-6 text-white" />
                             </div>
-                            <div className="flex items-center gap-4 relative z-10">
-                              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                                <CheckCircle2 className="w-6 h-6 text-white" />
-                              </div>
-                              <div>
-                                <h3 className="font-black text-green-800 dark:text-green-400 text-base">Bạn đã hoàn tất!</h3>
-                                <p className="text-xs text-green-700/80 dark:text-green-500/70 font-medium">
-                                  Tất cả các khoản thu chi cá nhân của bạn đã được giải quyết xong.
-                                </p>
-                              </div>
+                            <div>
+                              <h3 className="font-black text-green-800 dark:text-green-400 text-lg">Tất cả đã cân bằng!</h3>
+                              <p className="text-sm text-green-700/80 dark:text-green-500/70 font-medium">
+                                Tuyệt vời! Mọi chi phí đã được thanh toán và chia đều cho tất cả mọi người.
+                              </p>
                             </div>
                           </div>
-                        )}
-                        {personalSettlements.length > 0 && (
-                          <PaymentHistory settlements={personalSettlements} />
-                        )}
-                      </>
-                    );
-                  })()}
-                </TabsContent>
-
-                <TabsContent value="group" className="space-y-6 animate-in fade-in-50 duration-300">
-                  <div className="flex items-center gap-2 px-1 mb-2">
-                    <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
-                    <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
-                  </div>
-
-                  {settlements.some(s => s.status === 'pending') && (
-                    <SettlementStatus
-                      settlements={settlements}
-                      onSettlementUpdate={handleSettlementUpdate}
-                    />
-                  )}
-                  {calculation.isBalanced && settlements.length === 0 && (
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-100 dark:border-green-500/20 rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
-                        <Sparkles className="w-16 h-16 text-green-600 dark:text-green-400" />
-                      </div>
-                      <div className="flex items-center gap-4 relative z-10">
-                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-200 dark:shadow-green-900/40">
-                          <CheckCircle2 className="w-6 h-6 text-white" />
                         </div>
-                        <div>
-                          <h3 className="font-black text-green-800 dark:text-green-400 text-lg">Tất cả đã cân bằng!</h3>
-                          <p className="text-sm text-green-700/80 dark:text-green-500/70 font-medium">
-                            Tuyệt vời! Mọi chi phí đã được thanh toán và chia đều cho tất cả mọi người.
-                          </p>
-                        </div>
-                      </div>
+                      )}
+                      {settlements.length > 0 && (
+                        <PaymentHistory settlements={settlements} />
+                      )}
                     </div>
-                  )}
-                  {settlements.length > 0 && (
-                    <PaymentHistory settlements={settlements} />
-                  )}
-                </TabsContent>
+                  </div>
+                </div>
               </Tabs>
             ) : (
               <>
