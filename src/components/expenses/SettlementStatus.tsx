@@ -389,11 +389,17 @@ export const SettlementStatus: React.FC<SettlementStatusProps> = ({
       {/* QR Modal */}
       <Dialog open={!!qrSettlementId} onOpenChange={(open) => !open && setQrSettlementId(null)}>
         <DialogContent className={cn(
-          "bg-white dark:bg-slate-900 border-none shadow-2xl overflow-hidden flex flex-col transition-all duration-300",
+          "bg-white dark:bg-[#050505] border-none shadow-2xl overflow-hidden flex flex-col transition-all duration-500",
+          "dark:border-[0.5px] dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,1),0_0_20px_rgba(139,92,246,0.15)]",
+          "dark:bg-gradient-to-b dark:from-[#0a0a0a] dark:to-[#030303]",
           isPWA
-            ? "rounded-[32px] p-6 w-[300px] mx-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-4"
+            ? "rounded-[32px] p-6 w-[310px] mx-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-4"
             : (isMobileView ? "h-full w-full max-w-none rounded-none p-4" : "rounded-[32px] p-8 max-w-sm")
         )}>
+          {/* Beveled edge effect for 3D look */}
+          <div className="absolute inset-0 pointer-events-none border-[0.5px] border-white/5 rounded-[32px] dark:block hidden" />
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden" />
+
           <DialogHeader className={cn(isPWA ? "mb-0" : (isMobileView ? "mb-4 pt-10" : "mb-6"))}>
             {!isPWA && (
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
