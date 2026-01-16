@@ -40,6 +40,19 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   const [expenseListKey, setExpenseListKey] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
   const [activeSubTab, setActiveSubTab] = useState('personal');
+  const [stableTab, setStableTab] = useState('overview');
+  const [stableSubTab, setStableSubTab] = useState('personal');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setStableTab(activeTab), 500);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setStableSubTab(activeSubTab), 500);
+    return () => clearTimeout(timer);
+  }, [activeSubTab]);
+
   const [touchDelta, setTouchDelta] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -206,14 +219,14 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   if (isPWA) {
     return (
       <div
-        className="space-y-6 min-h-[60vh]"
+        className="space-y-4 min-h-0"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList
-            className="grid grid-cols-3 h-14 p-1 bg-secondary/30 dark:bg-white/5 rounded-[20px] w-full mb-6"
+            className="grid grid-cols-3 h-14 p-1 bg-secondary/30 dark:bg-white/5 rounded-[20px] w-full mb-4"
             onTouchStart={(e) => e.stopPropagation()}
           >
             <TabsTrigger
@@ -241,11 +254,14 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
 
           <div className="overflow-hidden -mx-4">
             <div
-              className="flex w-[300%] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="flex w-[300%] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] items-start"
               style={{ transform: `translateX(${activeTab === 'overview' ? '0%' : activeTab === 'settlements' ? '-33.333%' : '-66.666%'})` }}
             >
               {/* SLIDE 1: Overview */}
-              <div className="w-1/3 px-4 space-y-8">
+              <div className={cn(
+                "w-1/3 px-4 space-y-4",
+                activeTab !== 'overview' && stableTab !== 'overview' && "h-0 overflow-hidden"
+              )}>
                 <ExpenseSummary
                   calculation={{ ...calculation, transactionCount: transactions.length }}
                   onAddExpense={handleAddExpense}
@@ -256,7 +272,10 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
               </div>
 
               {/* SLIDE 2: Settlements */}
-              <div className="w-1/3 px-4 space-y-6">
+              <div className={cn(
+                "w-1/3 px-4 space-y-6",
+                activeTab !== 'settlements' && stableTab !== 'settlements' && "h-0 overflow-hidden"
+              )}>
                 <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
                   <TabsList
                     className="grid grid-cols-2 bg-slate-100/50 dark:bg-white/5 p-1 rounded-xl h-10 w-full mb-4"
@@ -281,7 +300,7 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
                   <div className="overflow-hidden">
                     <div
                       className={cn(
-                        "flex w-[200%] transition-transform ease-[cubic-bezier(0.16,1,0.3,1)]",
+                        "flex w-[200%] transition-transform ease-[cubic-bezier(0.16,1,0.3,1)] items-start",
                         isDragging ? "duration-0" : "duration-500"
                       )}
                       style={{
@@ -289,7 +308,10 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
                       }}
                     >
                       {/* Cá nhân Content */}
-                      <div className="w-1/2 px-0.5 space-y-6">
+                      <div className={cn(
+                        "w-1/2 px-0.5 space-y-6 transition-opacity",
+                        activeSubTab !== 'personal' && stableSubTab !== 'personal' && "h-0 overflow-hidden opacity-0"
+                      )}>
                         <div className="flex items-center gap-2 px-1 mb-2">
                           <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
                           <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
@@ -333,7 +355,10 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
                       </div>
 
                       {/* Cả nhóm Content */}
-                      <div className="w-1/2 px-0.5 space-y-6">
+                      <div className={cn(
+                        "w-1/2 px-0.5 space-y-6 transition-opacity",
+                        activeSubTab !== 'group' && stableSubTab !== 'group' && "h-0 overflow-hidden opacity-0"
+                      )}>
                         <div className="flex items-center gap-2 px-1 mb-2">
                           <CreditCard className="w-5 h-5 text-orange-600 dark:text-orange-500" />
                           <h3 className="font-bold text-slate-900 dark:text-white text-base">Thanh toán</h3>
@@ -373,7 +398,10 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
               </div>
 
               {/* SLIDE 3: Payments */}
-              <div className="w-1/3 px-4">
+              <div className={cn(
+                "w-1/3 px-4",
+                activeTab !== 'payments' && stableTab !== 'payments' && "h-0 overflow-hidden"
+              )}>
                 <div className="pt-2">
                   <ExpenseList
                     key={expenseListKey}

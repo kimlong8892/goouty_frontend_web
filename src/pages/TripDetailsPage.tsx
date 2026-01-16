@@ -1415,7 +1415,8 @@ const TripDetailsPage = () => {
 
               <TabsContent value="expenses" className="mt-0">
                 <Card className={cn(
-                  "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
+                  "border-none shadow-xl bg-card overflow-hidden",
+                  !isMobileView && "min-h-[500px]",
                   isMobileView ? "rounded-3xl" : "rounded-[32px]"
                 )}>
                   <CardContent className={isMobileView ? "p-4" : "p-8"}>
@@ -1430,7 +1431,8 @@ const TripDetailsPage = () => {
 
               <TabsContent value="members" className="mt-0">
                 <Card className={cn(
-                  "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
+                  "border-none shadow-xl bg-card overflow-hidden",
+                  !isMobileView && "min-h-[500px]",
                   isMobileView ? "rounded-3xl" : "rounded-[32px]"
                 )}>
                   <CardContent className={isMobileView ? "p-4" : "p-8"}>
@@ -1445,7 +1447,8 @@ const TripDetailsPage = () => {
 
               <TabsContent value="share" className="mt-0">
                 <Card className={cn(
-                  "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
+                  "border-none shadow-xl bg-card overflow-hidden",
+                  !isMobileView && "min-h-[500px]",
                   isMobileView ? "rounded-3xl" : "rounded-[32px]"
                 )}>
                   <CardContent className={isMobileView ? "p-4" : "p-8"}>
@@ -1467,8 +1470,8 @@ const TripDetailsPage = () => {
             </Tabs>
 
           </div>
-        </div>
-      </AnimatedTransition>
+        </div >
+      </AnimatedTransition >
 
       {/* Delete Activity Dialog */}
       < Dialog open={deleteActivityDialogOpen} onOpenChange={setDeleteActivityDialogOpen} >
@@ -1498,7 +1501,7 @@ const TripDetailsPage = () => {
       </Dialog >
 
       {/* Delete Day Dialog */}
-      <Dialog open={deleteDayDialogOpen} onOpenChange={setDeleteDayDialogOpen}>
+      < Dialog open={deleteDayDialogOpen} onOpenChange={setDeleteDayDialogOpen} >
         <DialogContent className="rounded-2xl bg-white dark:bg-[#1a1a2e] border-none shadow-2xl max-w-[90vw] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Xác nhận xóa ngày</DialogTitle>
@@ -1522,7 +1525,7 @@ const TripDetailsPage = () => {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       <AddDayDialog
         open={showAddDay}
