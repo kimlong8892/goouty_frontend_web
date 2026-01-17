@@ -88,7 +88,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
       setFormData({
         title: initialData?.title || '',
         amount: initialData?.amount || '',
-        date: '',
+        date: new Date().toISOString().split('T')[0],
         description: '',
         payerId: '',
         participantIds: [] as string[]
