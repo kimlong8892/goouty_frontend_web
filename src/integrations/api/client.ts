@@ -397,6 +397,9 @@ export const api = {
 
   // AI-specific API methods
   ai: {
+    getUsage: async () => {
+      return await api.get<{ success: boolean; data: { usedCount: number; dailyLimit: number; remaining: number } }>('/ai/usage');
+    },
     processBill: async (image: File) => {
       const formData = new FormData();
       formData.append('image', image);

@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { Card, CardContent } from '@/components/ui/card.tsx';
 import { Button } from '@/components/ui/button.tsx';
-import { DollarSign, TrendingUp, Plus, ReceiptText, Scan, Upload, Camera } from 'lucide-react';
+import { DollarSign, TrendingUp, Plus, ReceiptText, Scan, Upload, Camera, Zap } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,9 +33,27 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const cameraInputRef = React.useRef<HTMLInputElement>(null);
   const [isScanning, setIsScanning] = React.useState(false);
+  const [usage, setUsage] = React.useState<{ usedCount: number; dailyLimit: number; remaining: number } | null>(null);
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
   const isMobileView = isPWA || isMobile;
+
+  const fetchUsage = async () => {
+    try {
+      const res = await api.ai.getUsage();
+      if (res.success) {
+        setUsage(res.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch AI usage:', error);
+    }
+  };
+
+  React.useEffect(() => {
+    if (canAddExpense) {
+      fetchUsage();
+    }
+  }, [canAddExpense]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -108,7 +126,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
                 <Button
                   variant="outline"
                   size={isMobileView ? "sm" : "default"}
-                  disabled={isScanning}
+                  disabled={isScanning || usage?.remaining === 0}
                   className="rounded-xl border-primary text-primary hover:bg-primary/5 shadow-lg shadow-primary/5 dark:shadow-none"
                 >
                   {isScanning ? (
@@ -121,6 +139,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[160px] border-slate-100 dark:border-white/10 shadow-2xl z-[100]">
                 <DropdownMenuItem
+                  disabled={usage?.remaining === 0}
                   onClick={() => fileInputRef.current?.click()}
                   className="rounded-xl py-2.5 px-3 focus:bg-primary/10 focus:text-primary cursor-pointer transition-all font-bold"
                 >
@@ -128,12 +147,26 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
                   <span className="text-sm">Tải hóa đơn</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  disabled={usage?.remaining === 0}
                   onClick={() => cameraInputRef.current?.click()}
                   className="rounded-xl py-2.5 px-3 focus:bg-primary/10 focus:text-primary cursor-pointer transition-all font-bold"
                 >
                   <Camera className="w-4 h-4 mr-2.5" />
                   <span className="text-sm">Chụp hóa đơn</span>
                 </DropdownMenuItem>
+                {usage && (
+                  <div className="mt-2 pt-2 border-t border-slate-100 dark:border-white/10 px-3 pb-1">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-muted-foreground uppercase tracking-widest font-black">
+                      <div className="flex items-center gap-1">
+                        <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
+                        <span>Hết hạn trong ngày</span>
+                      </div>
+                      <span className={cn(usage.remaining === 0 ? "text-red-500" : "text-primary")}>
+                        {usage.remaining}/{usage.dailyLimit}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -152,13 +185,18 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
 
                     if (result.success) {
                       toast.success('Xử lý hóa đơn thành công!');
+                      fetchUsage();
                       onAddExpense({
                         title: result.data.name,
                         amount: result.data.total.toString()
                       });
                     }
                   } catch (error: any) {
-                    toast.error(error.message || 'Không thể xử lý hóa đơn');
+                    const message = error.response?.data?.message || error.message || 'Không thể xử lý hóa đơn';
+                    toast.error(message);
+                    if (error.response?.status === 403) {
+                      fetchUsage();
+                    }
                   } finally {
                     setIsScanning(false);
                     if (e.target) e.target.value = '';
@@ -181,13 +219,18 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
 
                     if (result.success) {
                       toast.success('Xử lý hóa đơn thành công!');
+                      fetchUsage();
                       onAddExpense({
                         title: result.data.name,
                         amount: result.data.total.toString()
                       });
                     }
                   } catch (error: any) {
-                    toast.error(error.message || 'Không thể xử lý hóa đơn');
+                    const message = error.response?.data?.message || error.message || 'Không thể xử lý hóa đơn';
+                    toast.error(message);
+                    if (error.response?.status === 403) {
+                      fetchUsage();
+                    }
                   } finally {
                     setIsScanning(false);
                     if (e.target) e.target.value = '';
@@ -198,6 +241,15 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
           </div>
         )}
       </div>
+
+      {usage?.remaining === 0 && (
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-2xl p-3 animate-fade-in">
+          <p className="text-xs text-red-600 dark:text-red-400 font-bold flex items-center gap-2">
+            <Zap className="w-3.5 h-3.5 fill-red-600 dark:fill-red-400" />
+            Bạn đã dùng hết 5 lượt quét hóa đơn AI trong ngày hôm nay.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <Card className="rounded-[24px] border-none shadow-sm bg-gradient-to-br from-primary to-primary/80 text-white overflow-hidden relative">
