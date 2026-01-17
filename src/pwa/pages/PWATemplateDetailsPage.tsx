@@ -738,7 +738,8 @@ const PWATemplateDetailsPage = () => {
                     {/* Fixed Bottom Action for PWA */}
                     <div className={cn(
                         "fixed left-0 w-full bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-border/50 p-4 z-[9997] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] transition-all duration-300",
-                        isAuthenticated ? "bottom-[70px]" : "bottom-0 pb-8 safe-area-bottom"
+                        isAuthenticated ? "bottom-[70px]" : "bottom-0 pb-8 safe-area-bottom",
+                        isShareSheetOpen ? "opacity-0 pointer-events-none translate-y-10" : "opacity-100 translate-y-0"
                     )}>
                         <div className="max-w-md mx-auto">
                             <Button
