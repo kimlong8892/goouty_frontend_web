@@ -460,7 +460,7 @@ export const Navbar = () => {
   return (
     <>
       <TooltipProvider>
-        <header className="sticky top-0 z-50 w-full py-4 bg-transparent">
+        <header className="sticky top-0 z-50 w-full pt-0 pb-4 bg-transparent">
           <div className="max-w-7xl mx-auto px-4">
             <nav className={cn(
               "flex items-center justify-between px-6 py-3 rounded-full transition-all duration-300",
