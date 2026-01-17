@@ -68,39 +68,21 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
     <div className={cn("space-y-6", isMobileView && "space-y-4")}>
       {/* Full-screen Loading Overlay */}
       {isScanning && createPortal(
-        <div className={cn(
-          "fixed inset-0 z-[10000] flex flex-col items-center justify-center animate-fade-in",
-          isPWA ? "bg-black/80 backdrop-blur-xl" : "bg-slate-950/40 backdrop-blur-sm"
-        )}>
-          {isPWA ? (
-            <div className="flex flex-col items-center gap-6">
-              {/* iOS Style Activity Indicator */}
-              <div className="relative w-12 h-12">
-                {[...Array(12)].map((_, i) => (
-                  <div key={i} className="ios-spinner-blade bg-white" />
-                ))}
-              </div>
-              <div className="text-center space-y-1">
-                <p className="text-white font-bold text-lg">Đang trích xuất hóa đơn...</p>
-                <p className="text-white/40 text-[10px] px-10 leading-relaxed uppercase tracking-[0.3em] font-black">AI Processing</p>
+        <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center animate-fade-in bg-slate-950/40 backdrop-blur-sm">
+          <div className="bg-white dark:bg-card p-10 rounded-[48px] shadow-2xl flex flex-col items-center gap-8 border border-slate-100 dark:border-white/10 animate-slide-up mx-6 max-w-[400px]">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Scan className="w-10 h-10 text-primary" />
               </div>
             </div>
-          ) : (
-            <div className="bg-white dark:bg-card p-8 rounded-[32px] shadow-2xl flex flex-col items-center gap-6 border border-slate-100 dark:border-white/10 animate-slide-up">
-              <div className="relative">
-                <div className="w-20 h-20 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Scan className="w-8 h-8 text-primary" />
-                </div>
-              </div>
-              <div className="text-center space-y-2">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">AI đang quét hóa đơn</h3>
-                <p className="text-sm text-slate-500 dark:text-muted-foreground font-medium px-4 max-w-[280px]">
-                  Vui lòng đợi trong giây lát, Goouty đang trích xuất thông tin chi phí giúp bạn...
-                </p>
-              </div>
+            <div className="text-center space-y-3">
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight">AI ĐANG QUÉT HÓA ĐƠN</h3>
+              <p className="text-base text-slate-500 dark:text-muted-foreground font-medium px-2">
+                Vui lòng đợi trong giây lát, Goouty đang trích xuất thông tin chi phí giúp bạn...
+              </p>
             </div>
-          )}
+          </div>
         </div>,
         document.body
       )}
