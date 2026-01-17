@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA.ts';
 import { api } from '@/integrations/api/client.ts';
@@ -43,9 +43,11 @@ interface Member {
 const PWAAddExpensePage = () => {
     const { tripId } = useParams<{ tripId: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
     const { user, isAuthenticated, isLoading: authLoading } = useAuth();
     const { showToast } = useGlobalToast();
     const showContent = useAnimateIn(false, 300);
+    const initialData = location.state?.initialData;
 
     const [loading, setLoading] = useState(false);
     const [members, setMembers] = useState<Member[]>([]);
@@ -147,8 +149,20 @@ const PWAAddExpensePage = () => {
 
         if (isAuthenticated && tripId) {
             fetchMembers();
+
+            // Completely clear all fields
+            setFormData({
+                title: initialData?.title || '',
+                amount: initialData?.amount || '',
+                date: '',
+                description: '',
+                payerId: '',
+                participantIds: [] as string[]
+            });
+            setAmountByUserId({});
+            setSplitMethod('equal');
         }
-    }, [tripId, isAuthenticated, user]);
+    }, [tripId, isAuthenticated, user, initialData]);
 
     useEffect(() => {
         // Skip auto-calculation if we just loaded a draft that has specific amounts

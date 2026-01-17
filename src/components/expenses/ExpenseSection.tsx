@@ -42,6 +42,7 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
   const [activeSubTab, setActiveSubTab] = useState('personal');
   const [stableTab, setStableTab] = useState('overview');
   const [stableSubTab, setStableSubTab] = useState('personal');
+  const [initialExpenseData, setInitialExpenseData] = useState<{ title: string; amount: string } | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setStableTab(activeTab), 500);
@@ -185,10 +186,11 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
     loadData();
   }, [tripId]);
 
-  const handleAddExpense = () => {
+  const handleAddExpense = (initialData?: { title: string; amount: string }) => {
     if (isPWA) {
-      navigate(`/pwa-add-expense/${tripId}`);
+      navigate(`/pwa-add-expense/${tripId}`, { state: { initialData } });
     } else {
+      setInitialExpenseData(initialData || null);
       setShowAddExpenseDialog(true);
     }
   };
@@ -419,9 +421,13 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
         {/* Add Expense Dialog */}
         <AddExpenseDialog
           open={showAddExpenseDialog}
-          onOpenChange={setShowAddExpenseDialog}
+          onOpenChange={(open) => {
+            setShowAddExpenseDialog(open);
+            if (!open) setInitialExpenseData(null);
+          }}
           tripId={tripId}
           onSuccess={handleExpenseAdded}
+          initialData={initialExpenseData}
         />
 
         <PaymentHistoryDialog
@@ -504,9 +510,13 @@ export const ExpenseSection: React.FC<ExpenseSectionProps> = ({
       {/* Add Expense Dialog */}
       <AddExpenseDialog
         open={showAddExpenseDialog}
-        onOpenChange={setShowAddExpenseDialog}
+        onOpenChange={(open) => {
+          setShowAddExpenseDialog(open);
+          if (!open) setInitialExpenseData(null);
+        }}
         tripId={tripId}
         onSuccess={handleExpenseAdded}
+        initialData={initialExpenseData}
       />
     </div>
   );

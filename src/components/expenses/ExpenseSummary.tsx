@@ -1,15 +1,25 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Card, CardContent } from '@/components/ui/card.tsx';
 import { Button } from '@/components/ui/button.tsx';
-import { DollarSign, TrendingUp, Plus, ReceiptText } from 'lucide-react';
+import { DollarSign, TrendingUp, Plus, ReceiptText, Scan, Upload, Camera } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu.tsx';
 import { ExpenseCalculationResponse } from '@/types/expense';
 import { useIsMobile } from '@/hooks/use-mobile.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
 import { cn } from '@/lib/utils';
+import { api } from '@/integrations/api/client.ts';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 interface ExpenseSummaryProps {
   calculation: ExpenseCalculationResponse;
-  onAddExpense: () => void;
+  onAddExpense: (initialData?: { title: string; amount: string }) => void;
   canAddExpense: boolean;
   onShowHistory?: () => void;
 }
@@ -20,6 +30,9 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
   canAddExpense,
   onShowHistory
 }) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const cameraInputRef = React.useRef<HTMLInputElement>(null);
+  const [isScanning, setIsScanning] = React.useState(false);
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
   const isMobileView = isPWA || isMobile;
@@ -35,20 +48,154 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
 
   return (
     <div className={cn("space-y-6", isMobileView && "space-y-4")}>
+      {/* Full-screen Loading Overlay */}
+      {isScanning && createPortal(
+        <div className={cn(
+          "fixed inset-0 z-[10000] flex flex-col items-center justify-center animate-fade-in",
+          isPWA ? "bg-black/80 backdrop-blur-xl" : "bg-slate-950/40 backdrop-blur-sm"
+        )}>
+          {isPWA ? (
+            <div className="flex flex-col items-center gap-6">
+              {/* iOS Style Activity Indicator */}
+              <div className="relative w-12 h-12">
+                {[...Array(12)].map((_, i) => (
+                  <div key={i} className="ios-spinner-blade bg-white" />
+                ))}
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-white font-bold text-lg">Đang trích xuất hóa đơn...</p>
+                <p className="text-white/40 text-[10px] px-10 leading-relaxed uppercase tracking-[0.3em] font-black">AI Processing</p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white dark:bg-card p-8 rounded-[32px] shadow-2xl flex flex-col items-center gap-6 border border-slate-100 dark:border-white/10 animate-slide-up">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Scan className="w-8 h-8 text-primary" />
+                </div>
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">AI đang quét hóa đơn</h3>
+                <p className="text-sm text-slate-500 dark:text-muted-foreground font-medium px-4 max-w-[280px]">
+                  Vui lòng đợi trong giây lát, Goouty đang trích xuất thông tin chi phí giúp bạn...
+                </p>
+              </div>
+            </div>
+          )}
+        </div>,
+        document.body
+      )}
+
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className={cn("font-bold text-slate-900 dark:text-foreground", isMobileView ? "text-lg" : "text-xl")}>Chi phí</h2>
           {!isMobileView && <p className="text-slate-500 dark:text-muted-foreground text-sm mt-1">Quản lý ngân sách và chi tiêu</p>}
         </div>
         {canAddExpense && (
-          <Button
-            onClick={onAddExpense}
-            size={isMobileView ? "sm" : "default"}
-            className="rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/10 dark:shadow-none flex-shrink-0"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />
-            {isMobileView ? "Thêm" : "Thêm chi phí"}
-          </Button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Button
+              onClick={() => onAddExpense()}
+              size={isMobileView ? "sm" : "default"}
+              className="rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/10 dark:shadow-none"
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              {isMobileView ? "Thêm" : "Thêm chi phí"}
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size={isMobileView ? "sm" : "default"}
+                  disabled={isScanning}
+                  className="rounded-xl border-primary text-primary hover:bg-primary/5 shadow-lg shadow-primary/5 dark:shadow-none"
+                >
+                  {isScanning ? (
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <Scan className="w-4 h-4 mr-1.5" />
+                  )}
+                  {isMobileView ? "Quét" : "Quét hóa đơn"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[160px] border-slate-100 dark:border-white/10 shadow-2xl z-[100]">
+                <DropdownMenuItem
+                  onClick={() => fileInputRef.current?.click()}
+                  className="rounded-xl py-2.5 px-3 focus:bg-primary/10 focus:text-primary cursor-pointer transition-all font-bold"
+                >
+                  <Upload className="w-4 h-4 mr-2.5" />
+                  <span className="text-sm">Tải hóa đơn</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="rounded-xl py-2.5 px-3 focus:bg-primary/10 focus:text-primary cursor-pointer transition-all font-bold"
+                >
+                  <Camera className="w-4 h-4 mr-2.5" />
+                  <span className="text-sm">Chụp hóa đơn</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Hidden Inputs */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*,.pdf"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  try {
+                    setIsScanning(true);
+                    const result = await api.ai.processBill(file);
+
+                    if (result.success) {
+                      toast.success('Xử lý hóa đơn thành công!');
+                      onAddExpense({
+                        title: result.data.name,
+                        amount: result.data.total.toString()
+                      });
+                    }
+                  } catch (error: any) {
+                    toast.error(error.message || 'Không thể xử lý hóa đơn');
+                  } finally {
+                    setIsScanning(false);
+                    if (e.target) e.target.value = '';
+                  }
+                }
+              }}
+            />
+            <input
+              type="file"
+              ref={cameraInputRef}
+              className="hidden"
+              accept="image/*"
+              capture="environment"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  try {
+                    setIsScanning(true);
+                    const result = await api.ai.processBill(file);
+
+                    if (result.success) {
+                      toast.success('Xử lý hóa đơn thành công!');
+                      onAddExpense({
+                        title: result.data.name,
+                        amount: result.data.total.toString()
+                      });
+                    }
+                  } catch (error: any) {
+                    toast.error(error.message || 'Không thể xử lý hóa đơn');
+                  } finally {
+                    setIsScanning(false);
+                    if (e.target) e.target.value = '';
+                  }
+                }
+              }}
+            />
+          </div>
         )}
       </div>
 

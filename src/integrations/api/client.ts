@@ -394,4 +394,13 @@ export const api = {
       return await api.post<{ slug: string }>('/utils/generate-slug', { text });
     },
   },
+
+  // AI-specific API methods
+  ai: {
+    processBill: async (image: File) => {
+      const formData = new FormData();
+      formData.append('image', image);
+      return await api.post<{ success: boolean; data: { name: string; total: number } }>('/ai/process-bill', formData);
+    },
+  },
 };
