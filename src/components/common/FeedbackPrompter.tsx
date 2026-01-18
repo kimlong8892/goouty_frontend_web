@@ -15,12 +15,11 @@ export const FeedbackPrompter = () => {
     const { user } = useAuth();
 
     useEffect(() => {
-        const checkBackendStatus = async () => {
+        const checkRatingStatus = async () => {
             if (user?.id && !localStorage.getItem('goouty_feedback_submitted')) {
                 try {
-                    const res = await api.ratings.getAll({ userId: user.id, limit: 5 });
-                    const hasMyReview = res.data?.some(r => r.userId === user.id);
-                    if (hasMyReview) {
+                    const res = await api.ratings.check();
+                    if (res.hasRated) {
                         localStorage.setItem('goouty_feedback_submitted', 'true');
                         setShowPrompt(false);
                     }
@@ -30,28 +29,44 @@ export const FeedbackPrompter = () => {
             }
         };
 
-        checkBackendStatus();
+        checkRatingStatus();
     }, [user]);
 
     useEffect(() => {
-        // Check if already submitted
+        // Check if already submitted or dismissed
         const hasSubmitted = localStorage.getItem('goouty_feedback_submitted');
-        if (hasSubmitted) return;
+        const hasDismissed = localStorage.getItem('goouty_feedback_dismissed');
 
-        const interval = setInterval(() => {
-            // Check again inside interval in case it changed in another tab (optional but good)
-            if (localStorage.getItem('goouty_feedback_submitted')) {
-                setShowPrompt(false);
-                return;
-            }
+        if (hasSubmitted === 'true' || hasDismissed === 'true') {
+            setShowPrompt(false);
+            return;
+        }
 
-            setShowPrompt(prev => {
-                if (prev || showForm) return prev;
-                return true;
-            });
-        }, 30000); // 30 seconds
+        const today = new Date().toLocaleDateString('en-CA');
 
-        return () => clearInterval(interval);
+        // Only show after 1 day of usage
+        const firstVisit = localStorage.getItem('goouty_first_visit');
+        if (!firstVisit) {
+            localStorage.setItem('goouty_first_visit', today);
+            return;
+        }
+        if (firstVisit === today) {
+            return;
+        }
+
+        // Check if already shown today
+        const lastShown = localStorage.getItem('goouty_feedback_last_shown');
+        if (lastShown === today) {
+            setShowPrompt(false);
+            return;
+        }
+
+        // Show immediately if all conditions met
+        setShowPrompt(prev => {
+            if (prev || showForm) return prev;
+            localStorage.setItem('goouty_feedback_last_shown', today);
+            return true;
+        });
     }, [showForm]);
 
     const handleOpenForm = () => {
@@ -105,6 +120,7 @@ export const FeedbackPrompter = () => {
                         onClick={(e) => {
                             e.stopPropagation();
                             setShowPrompt(false);
+                            localStorage.setItem('goouty_feedback_dismissed', 'true');
                         }}
                         className="p-1 hover:bg-secondary rounded-lg transition-colors group/close"
                     >
@@ -141,7 +157,10 @@ export const FeedbackPrompter = () => {
                                 setShowForm(false);
                                 setShowPrompt(false);
                             }}
-                            onCancel={() => setShowForm(false)}
+                            onCancel={() => {
+                                setShowForm(false);
+                                localStorage.setItem('goouty_feedback_dismissed', 'true');
+                            }}
                         />
                     </div>
                 </DialogContent>

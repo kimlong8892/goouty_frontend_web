@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 import fs from "fs";
 
@@ -37,6 +38,7 @@ export default defineConfig(({ mode }) => {
           ? new URL(env.VITE_FRONTEND_URL).hostname
           : undefined,
         "hoang-local.goouty.com",
+        "hoang-local.nguyenkimlongdev.click"
       ].filter(Boolean) as string[],
       historyApiFallback: true,
       proxy: {
@@ -51,8 +53,47 @@ export default defineConfig(({ mode }) => {
 
     plugins: [
       react(),
-      // ❌ KHÔNG CÓ VitePWA
-      // ❌ KHÔNG SERVICE WORKER
+      VitePWA({
+        registerType: "autoUpdate",
+        includeAssets: ["favicon_v2.png", "goouty-logo.svg", "footer_logo_circle_1765975206486.png"],
+        manifest: {
+          name: "Goouty",
+          short_name: "Goouty",
+          description: "Goouty - Ứng dụng lập kế hoạch chuyến đi và quản lý chi phí nhóm",
+          theme_color: "#edeeff",
+          background_color: "#edeeff",
+          display: "standalone",
+          scope: "/",
+          start_url: "/",
+          icons: [
+            {
+              src: "footer_logo_circle_1765975206486.png",
+              sizes: "192x192",
+              type: "image/png",
+            },
+            {
+              src: "footer_logo_circle_1765975206486.png",
+              sizes: "512x512",
+              type: "image/png",
+            },
+            {
+              src: "footer_logo_circle_1765975206486.png",
+              sizes: "1024x1024",
+              type: "image/png",
+            },
+            {
+              src: "footer_logo_circle_1765975206486.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any maskable",
+            },
+          ],
+        },
+        devOptions: {
+          enabled: true,
+          type: "module",
+        },
+      }),
     ],
 
     build: {

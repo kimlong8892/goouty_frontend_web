@@ -295,6 +295,28 @@ const TripDetailsPage = () => {
     }
   };
 
+  const handlePWAReorderActivities = async (dayId: string, newActivities: Activity[]) => {
+    // Optimistic update
+    setActivitiesByDay(prev => ({
+      ...prev,
+      [dayId]: newActivities
+    }));
+
+    try {
+      const reorderData = newActivities.map((activity, index) => ({
+        id: activity.id,
+        sortOrder: index
+      }));
+
+      await api.activities.reorder(reorderData);
+      showToast('Đã cập nhật thứ tự hoạt động', 'success');
+    } catch (error) {
+      console.error('Failed to reorder activities:', error);
+      showToast('Không thể sắp xếp lại hoạt động', 'error');
+      fetchDaysAndActivities();
+    }
+  };
+
 
 
   // Dialog states
@@ -1029,6 +1051,7 @@ const TripDetailsPage = () => {
                     isOwner={trip.userRole === 'owner'}
                     onDeleteDay={openDeleteDayDialog}
                     onReorderDays={handlePWAReorderDays}
+                    onReorderActivities={handlePWAReorderActivities}
                     // Day Drag Props
                     onDayDragStart={handleDayDragStart}
                     onDayDragOver={handleDayDragOver}
@@ -1103,7 +1126,7 @@ const TripDetailsPage = () => {
                                   dragOverDayId === day.id && "translate-y-2 scale-[1.01]",
                                   justDroppedDayId === day.id && "ring-2 ring-primary/40 bg-primary/[0.03] rounded-xl"
                                 )}
-                                draggable={trip.userRole === 'owner' && !isMobileView}
+                                draggable={trip.userRole === 'owner'}
                                 onDragStart={(e) => handleDayDragStart(e, day.id)}
                                 onDragOver={(e) => handleDayDragOver(e, day.id)}
                                 onDragEnd={handleDayDragEnd}
@@ -1435,7 +1458,7 @@ const TripDetailsPage = () => {
                   !isMobileView && "min-h-[500px]",
                   isMobileView ? "rounded-3xl" : "rounded-[32px]"
                 )}>
-                  <CardContent className={isMobileView ? "p-4" : "p-8"}>
+                  <CardContent className={isMobileView ? "p-3 px-1.5" : "p-8"}>
                     <TripMembers
                       tripId={id || ''}
                       tripOwnerId={trip.userId}
