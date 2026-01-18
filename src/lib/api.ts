@@ -294,6 +294,9 @@ export const api = {
     create: async (ratingData: { stars: number; content: string }) => {
       return await api.post<DATABASE_TYPES.ratings>('/ratings', ratingData);
     },
+    check: async () => {
+      return await api.get<{ hasRated: boolean; rating: DATABASE_TYPES.ratings | null }>('/ratings/check');
+    },
     getAll: async (params?: { page?: number; limit?: number; userId?: string }) => {
       return await api.get<{
         data: DATABASE_TYPES.ratings[];
