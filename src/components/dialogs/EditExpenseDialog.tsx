@@ -80,13 +80,16 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
 
   useEffect(() => {
     if (expense && open) {
+      const payerId = expense.payerId?.toString() || '';
+      const participantIds = expense.participants?.map(p => p.user.id.toString()) || [];
+
       setFormData({
         title: expense.title,
         amount: expense.amount.toString(),
         date: expense.date.split('T')[0],
         description: expense.description || '',
-        payerId: expense.payerId.toString(),
-        participantIds: expense.participants?.map(p => p.user.id.toString()) || []
+        payerId: payerId,
+        participantIds: participantIds
       });
 
       if (expense.participants && expense.participants.length > 0) {
@@ -110,6 +113,17 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
       }
     }
   }, [expense, open]);
+
+  // Ensure payerId is still set correctly once members are loaded
+  // This handles the timing issue where Select might clear its value if options are not yet available
+  useEffect(() => {
+    if (open && expense && members.length > 0 && !formData.payerId) {
+      setFormData(prev => ({
+        ...prev,
+        payerId: expense.payerId.toString()
+      }));
+    }
+  }, [members, open, expense]);
 
   useEffect(() => {
     if (open) {
