@@ -355,7 +355,7 @@ export const PWATripTemplatesList = ({ onUseTemplate, usingTemplate }: PWATripTe
             <DrawerContent className="max-h-[85vh] p-0 rounded-t-[32px]">
               <div className="mx-auto w-12 h-1.5 bg-muted rounded-full my-4" />
               <DrawerHeader className="px-6">
-                <DrawerTitle className="text-2xl font-bold">{t('template.selectProvince')}</DrawerTitle>
+                <DrawerTitle className="text-2xl font-bold">{t('Điểm đến')}</DrawerTitle>
                 <div className="relative mt-4">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
