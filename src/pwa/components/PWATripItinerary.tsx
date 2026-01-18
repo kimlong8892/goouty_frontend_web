@@ -51,14 +51,11 @@ interface PWATripItineraryProps {
     dragOverActivityId?: string | null;
     justDroppedId?: string | null;
 
-    // Day Drag
-    onDayDragStart?: (e: React.DragEvent, dayId: string) => void;
-    onDayDragOver?: (e: React.DragEvent, dayId: string) => void;
-    onDayDragEnd?: (e: React.DragEvent) => void;
-    onDayDrop?: (e: React.DragEvent, dayId: string) => void;
+    // Day Props
     draggedDayId?: string | null;
     dragOverDayId?: string | null;
     justDroppedDayId?: string | null;
+    onReorderActivities?: (dayId: string, newActivities: Activity[]) => Promise<void>;
 
     isOwner?: boolean;
     isTabsVisible?: boolean;
@@ -87,14 +84,11 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     dragOverActivityId,
     justDroppedId,
 
-    // Day Drag
-    onDayDragStart,
-    onDayDragOver,
-    onDayDragEnd,
-    onDayDrop,
+    // Day Props
     draggedDayId,
     dragOverDayId,
     justDroppedDayId,
+    onReorderActivities,
 
     isOwner,
     isTabsVisible = true,
@@ -245,6 +239,38 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
         return timeString;
     };
 
+    const handleMoveDay = async (dayId: string, direction: 'left' | 'right') => {
+        if (!onReorderDays) return;
+        const currentIndex = days.findIndex(d => d.id === dayId);
+        if (currentIndex === -1) return;
+
+        const newIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+        if (newIndex < 0 || newIndex >= days.length) return;
+
+        const newDays = [...days];
+        const [movedDay] = newDays.splice(currentIndex, 1);
+        newDays.splice(newIndex, 0, movedDay);
+
+        const newOrderIds = newDays.map(d => d.id);
+        await onReorderDays(newOrderIds);
+    };
+
+    const handleMoveActivity = async (dayId: string, activityId: string, direction: 'up' | 'down') => {
+        if (!onReorderActivities) return;
+        const dayActivities = activitiesByDay[dayId] || [];
+        const currentIndex = dayActivities.findIndex(a => a.id === activityId);
+        if (currentIndex === -1) return;
+
+        const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        if (newIndex < 0 || newIndex >= dayActivities.length) return;
+
+        const newActivities = [...dayActivities];
+        const [movedActivity] = newActivities.splice(currentIndex, 1);
+        newActivities.splice(newIndex, 0, movedActivity);
+
+        await onReorderActivities(dayId, newActivities);
+    };
+
     return (
         <div
             className="flex flex-col w-full bg-background min-h-0"
@@ -275,12 +301,6 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                     key={day.id}
                                     data-day-id={day.id} // Added for scrolling
                                     onClick={() => setSelectedDayId(day.id)}
-                                    // Drag Handlers
-                                    draggable={isOwner}
-                                    onDragStart={(e) => isOwner && onDayDragStart?.(e, day.id)}
-                                    onDragOver={(e) => isOwner && onDayDragOver?.(e, day.id)}
-                                    onDragEnd={onDayDragEnd}
-                                    onDrop={(e) => isOwner && onDayDrop?.(e, day.id)}
                                     className={cn(
                                         "flex flex-col items-center flex-1 min-w-[100px] py-3 px-1 rounded-xl transition-all relative select-none",
                                         isActive ? "bg-primary/10" : "",
@@ -310,6 +330,30 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                         <Pencil className="w-3.5 h-3.5" />
                                                         Chỉnh sửa
                                                     </DropdownMenuItem>
+                                                    {isOwner && index > 0 && (
+                                                        <DropdownMenuItem
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleMoveDay(day.id, 'left');
+                                                            }}
+                                                            className="gap-2 font-medium"
+                                                        >
+                                                            <ArrowUp className="w-3.5 h-3.5 rotate-[270deg]" />
+                                                            Đưa lên trước
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    {isOwner && index < days.length - 1 && (
+                                                        <DropdownMenuItem
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleMoveDay(day.id, 'right');
+                                                            }}
+                                                            className="gap-2 font-medium"
+                                                        >
+                                                            <ArrowDown className="w-3.5 h-3.5 rotate-[270deg]" />
+                                                            Đưa ra sau
+                                                        </DropdownMenuItem>
+                                                    )}
                                                     {onDeleteDay && (
                                                         <DropdownMenuItem
                                                             onClick={(e) => {
@@ -372,7 +416,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                 key={day.id}
                                 className={cn(
                                     "w-full flex-shrink-0 px-4 py-6",
-                                    day.id !== selectedDayId && day.id !== stableDayId && "h-0 overflow-hidden"
+                                    (day.id !== selectedDayId && day.id !== stableDayId && !isDragging) && "h-0 overflow-hidden"
                                 )}
                             >
                                 <div className="mb-6">
@@ -448,6 +492,30 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                                             <Pencil className="w-3.5 h-3.5 text-primary" />
                                                                             Chỉnh sửa
                                                                         </DropdownMenuItem>
+                                                                        {isOwner && index > 0 && (
+                                                                            <DropdownMenuItem
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleMoveActivity(day.id, activity.id, 'up');
+                                                                                }}
+                                                                                className="gap-2 font-medium py-2.5 cursor-pointer"
+                                                                            >
+                                                                                <ArrowUp className="w-3.5 h-3.5 text-orange-500" />
+                                                                                Chuyển lên trên
+                                                                            </DropdownMenuItem>
+                                                                        )}
+                                                                        {isOwner && index < dayActivities.length - 1 && (
+                                                                            <DropdownMenuItem
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleMoveActivity(day.id, activity.id, 'down');
+                                                                                }}
+                                                                                className="gap-2 font-medium py-2.5 cursor-pointer"
+                                                                            >
+                                                                                <ArrowDown className="w-3.5 h-3.5 text-orange-500" />
+                                                                                Chuyển xuống dưới
+                                                                            </DropdownMenuItem>
+                                                                        )}
                                                                         <DropdownMenuItem
                                                                             onClick={(e) => {
                                                                                 e.stopPropagation();
