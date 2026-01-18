@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Info, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical, Copy, Trash2, MoreHorizontal, ArrowUp, ArrowDown, Check, ArrowUpDown } from 'lucide-react';
+import { Plus, Clock, MapPin, ChevronRight, Bus, Navigation, Car, TramFront, Bike, Ship, FileText, Pencil, GripVertical, Copy, Trash2, MoreHorizontal, ArrowUp, ArrowDown, Check, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { PWATripGuide } from './PWATripGuide';
 
 interface Activity {
     id: string;
@@ -110,9 +111,26 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     const [touchDelta, setTouchDelta] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [stableDayId, setStableDayId] = useState<string>(days[0]?.id || '');
+    const [showGuide, setShowGuide] = useState(false);
+
+    // Auto-show guide for owners
+    useEffect(() => {
+        if (isOwner && days.length > 0) {
+            // Check if we've shown the guide before
+            const hasSeen = localStorage.getItem('hasSeenTripGuide_v2');
+            if (!hasSeen) {
+                if (!hasSeen) {
+                    setShowGuide(true);
+                }
+            }
+        }
+    }, [isOwner, days.length]);
 
     // Use prop if provided, otherwise use internal state
     const selectedDayId = propActiveDayId !== undefined ? propActiveDayId : internalSelectedDayId;
+
+    // ... (keep existing code in between) ...
+
 
     useEffect(() => {
         const timer = setTimeout(() => setStableDayId(selectedDayId), 500);
@@ -298,10 +316,15 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
             >
                 <div
                     ref={dayTabsRef}
-                    className="flex items-center justify-start w-full gap-4 px-4 py-2 overflow-x-auto scrollbar-hide"
+                    className="w-full overflow-x-auto scrollbar-hide"
                     onTouchStart={(e) => e.stopPropagation()}
                 >
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-center min-w-full w-fit gap-1 py-2 px-2">
+                        {/* Spacer for centering balance */}
+                        {days.length > 0 && isOwner && (
+                            <div className="w-12 flex-shrink-0" />
+                        )}
+
                         {days.map((day, index) => {
                             const isActive = day.id === selectedDayId;
                             const isDragged = draggedDayId === day.id;
@@ -391,7 +414,6 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                         isActive ? "text-primary" : "text-muted-foreground"
                                     )}>
                                         Ngày {index + 1}
-                                        {isOwner && !isActive && <GripVertical className="w-3 h-3 text-muted-foreground/30" />}
                                     </span>
                                     {isActive && (
                                         <div className="absolute -bottom-[8px] left-0 right-0 h-1 bg-primary rounded-t-full shadow-primary/30" />
@@ -399,19 +421,20 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                 </button>
                             );
                         })}
+
+                        {/* Spacer for right button clearance */}
+                        {days.length > 0 && isOwner && (
+                            <div className="w-12 flex-shrink-0" />
+                        )}
                     </div>
-
-
-                    {days.length > 0 && isOwner && (
-                        <button
-                            onClick={onAddDay}
-                            className="flex items-center justify-center min-w-[40px] h-[40px] rounded-full bg-secondary text-secondary-foreground ml-2 flex-shrink-0 border border-border transition-all active:scale-95"
-                        >
-                            <Plus className="w-5 h-5 text-primary" />
-                        </button>
-                    )}
                 </div>
             </div>
+
+            <PWATripGuide
+                isOpen={showGuide}
+                onClose={() => setShowGuide(false)}
+                onComplete={() => localStorage.setItem('hasSeenTripGuide_v2', 'true')}
+            />
 
             {/* Activities Timeline */}
             <div className="flex-1 overflow-hidden relative">
@@ -564,8 +587,8 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                         >
                                                             {/* Drag Handle for Owner */}
                                                             {isOwner && (
-                                                                <div className="absolute -left-8 top-1/2 -translate-y-1/2 p-2 text-muted-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    <GripVertical className="w-5 h-5" />
+                                                                <div className="absolute -left-10 top-[42px] -translate-y-1/2 w-8 h-8 bg-background shadow-sm border border-border/60 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing z-20 hover:scale-105 transition-all">
+                                                                    <GripVertical className="w-4 h-4 text-muted-foreground" />
                                                                 </div>
                                                             )}
 
@@ -654,9 +677,9 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                 </div>
             </div>
 
-            {/* Floating Add Day Button when Trip is Empty */}
-            {days.length === 0 && isOwner && createPortal(
-                <div className="fixed bottom-24 right-1 z-[100] group flex flex-col items-center">
+            {/* Floating Add Day Button */}
+            {isOwner && createPortal(
+                <div className="fixed bottom-24 right-4 z-[100] group flex flex-col items-center">
                     {/* Tooltip */}
                     <div className="mb-2 px-3 py-1.5 bg-slate-900/90 backdrop-blur-sm text-white text-[11px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap -translate-y-2 group-hover:translate-y-0">
                         Thêm ngày mới
@@ -664,7 +687,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
 
                     <button
                         onClick={onAddDay}
-                        className="w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-2xl flex items-center justify-center active:scale-90 active:brightness-110 active:ring-4 active:ring-primary/30 transition-all duration-200 animate-in zoom-in"
+                        className="w-12 h-12 rounded-full bg-secondary text-primary shadow-xl border-border border flex items-center justify-center active:scale-90 active:brightness-95 transition-all duration-200 animate-in zoom-in"
                     >
                         <Plus className="w-6 h-6" />
                     </button>
