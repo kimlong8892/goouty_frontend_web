@@ -1,3 +1,4 @@
+import { checkAndClearCache } from "@/utils/versionCheck";
 import { Toaster } from "@/components/ui/toaster.tsx";
 import { Toaster as Sonner } from "@/components/ui/sonner.tsx";
 import { TooltipProvider } from "@/components/ui/tooltip.tsx";
@@ -501,24 +502,30 @@ const AppContentWithRouter = ({ isPWAMode }: { isPWAMode: boolean }) => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <AuthProvider>
-        <NotificationCountProvider>
-          <PWANotificationProvider>
-            <TooltipProvider delayDuration={100}>
-              <Toaster />
-              <Sonner />
-              <AppContent />
-              <PWAInstallPrompt />
-              <FeedbackPrompter />
-            </TooltipProvider>
-          </PWANotificationProvider>
-        </NotificationCountProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    checkAndClearCache();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <NotificationCountProvider>
+            <PWANotificationProvider>
+              <TooltipProvider delayDuration={100}>
+                <Toaster />
+                <Sonner />
+                <AppContent />
+                <PWAInstallPrompt />
+                <FeedbackPrompter />
+              </TooltipProvider>
+            </PWANotificationProvider>
+          </NotificationCountProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
