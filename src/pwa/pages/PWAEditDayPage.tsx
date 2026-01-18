@@ -124,7 +124,7 @@ const PWAEditDayPage = () => {
                     });
 
                     const dayIds = sortedDays.map(d => d.id);
-                    await api.patch('/days/reorder', { dayIds });
+                    await api.days.reorder(dayIds);
                 } catch (reorderError) {
                     console.error('Failed to reorder days:', reorderError);
                     // Don't block success flow, just log it

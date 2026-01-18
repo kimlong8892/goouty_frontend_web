@@ -265,11 +265,11 @@ const TripDetailsPage = () => {
       // Call API
       try {
         const dayIds = newDays.map(d => d.id);
-        await api.patch('/days/reorder', { dayIds });
+        await api.days.reorder(dayIds);
       } catch (error) {
         console.error('Failed to reorder days:', error);
         showToast('Không thể sắp xếp ngày', 'error');
-        // Revert (optional, but good for UX)
+        // Revert
         fetchDaysAndActivities();
       }
     }
@@ -286,7 +286,7 @@ const TripDetailsPage = () => {
     setDays(newDays);
 
     try {
-      await api.patch('/days/reorder', { dayIds: newOrderIds });
+      await api.days.reorder(newOrderIds);
       showToast('Đã cập nhật thứ tự ngày', 'success');
     } catch (error) {
       console.error('Failed to reorder days:', error);
