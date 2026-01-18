@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo chi phí mới - Goouty</title>
+    <style>
+        :root {
+            --primary: #6347f9;
+            --background: #edeeff;
+            --text-main: #1a1a2e;
+            --text-muted: #6b7280;
+            --card-bg: #ffffff;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Lexend', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #edeeff;
+            color: #1a1a2e;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(99, 71, 249, 0.1);
+        }
+
+        .header-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            background-color: #6347f9;
+        }
+
+        .content {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #6347f9;
+        }
+
+        .trip-context {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .message {
+            font-size: 16px;
+            margin-bottom: 32px;
+            color: #4b5563;
+        }
+
+        .expense-card {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+            position: relative;
+        }
+
+        .expense-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #111827;
+        }
+
+        .expense-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: #4b5563;
+        }
+
+        .expense-detail-icon {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .amount-badge {
+            display: inline-block;
+            background-color: #ecfdf5;
+            color: #059669;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 8px;
+        }
+
+        .btn-container {
+            margin-top: 32px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            border-radius: 99px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #6347f9;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(99, 71, 249, 0.4);
+        }
+
+        .footer {
+            padding: 32px;
+            text-align: center;
+            font-size: 14px;
+            color: #9ca3af;
+            background-color: #fdfdff;
+            border-top: 1px solid #f1f1f1;
+        }
+
+        .logo {
+            width: 100px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #e5e7eb;
+            margin: 16px 0;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                margin-top: 0;
+                margin-bottom: 0;
+                border-radius: 0;
+            }
+
+            .content {
+                padding: 24px;
+            }
+
+            .btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header Image -->
+        <img src="https://antigravity.ai/assets/expense_created_header.png" alt="Chi phí mới" class="header-image">
+
+        <div class="content">
+            <div class="trip-context">Chuyến đi: {{tripTitle}}</div>
+            <h1 class="greeting">Có chi phí mới!</h1>
+            <p class="message">
+                Chào <strong>{{userName}}</strong>,<br>
+                Một khoản chi tiêu mới vừa được thêm vào nhóm của bạn. Hãy kiểm tra thông tin chi tiết bên dưới.
+            </p>
+
+            <div class="expense-card">
+                <div class="expense-title">{{expenseTitle}}</div>
+
+                <div class="expense-detail">
+                    <span class="expense-detail-icon">👤</span>
+                    <span>Người thanh toán: <strong>{{actionBy}}</strong></span>
+                </div>
+
+                <div class="expense-detail">
+                    <span class="expense-detail-icon">📅</span>
+                    <span>Ngày: {{createdAt}}</span>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="expense-detail">
+                    <span class="expense-detail-icon">💰</span>
+                    <span>Tổng số tiền:</span>
+                </div>
+                <div class="amount-badge">{{expenseAmount}}</div>
+            </div>
+
+            <div class="btn-container">
+                <a href="{{expenseUrl}}" class="btn btn-primary">Xem chi tiết & Chia tiền</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <img src="https://antigravity.ai/assets/goouty-logo.png" alt="Goouty Logo" class="logo">
+            <div class="footer-links">
+                <a href="#">Trang chủ</a> |
+                <a href="#">Lịch sử chi phí</a> |
+                <a href="#">Cài đặt</a>
+            </div>
+            <p>© 2026 Goouty. All rights reserved.<br>Ứng dụng quản lý tài chính nhóm thông minh.</p>
+        </div>
+    </div>
+</body>
+
+</html>

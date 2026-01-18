@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cập nhật chi phí - Goouty</title>
+</head>
+
+<body style="margin:0;padding:0;background-color:#edeeff;font-family:'Inter', 'Lexend', Arial, sans-serif;">
+    <div style="background-color:#edeeff;padding:40px 10px;">
+        <div
+            style="background-color:#ffffff;border-radius:16px;color:#1a1a2e;margin:0 auto;max-width:600px;overflow:hidden;box-shadow:0 10px 25px rgba(99, 71, 249, 0.1);">
+
+            <!-- HEADER -->
+            <div style="background-color:#DDD6FE;padding:0;text-align:center;">
+                <img style="display:block;width:100%;height:auto;"
+                    src="https://s3.cloudfly.vn/goouty-dev/media-manager/1768631071756-Logo%20ngang.svg"
+                    alt="Goouty Logo">
+            </div>
+
+            <!-- HEADER ACCENT LINE -->
+            <div style="background-color:#f1f1f1;height:1px;font-size:0;line-height:0;">&nbsp;</div>
+
+            <!-- BODY -->
+            <div style="padding:40px;text-align:center;">
+                <!-- Trip Context -->
+                <div
+                    style="color:#6b7280;font-size:13px;letter-spacing:1px;margin-bottom:16px;text-transform:uppercase;font-weight:600;">
+                    Chuyến đi: {{tripTitle}}
+                </div>
+
+                <!-- Greeting -->
+                <h1 style="color:#6347f9;font-size:24px;margin:0 0 16px;font-weight:700;">
+                    Chi phí đã được cập nhật!
+                </h1>
+
+                <!-- Message -->
+                <p style="color:#4b5563;font-size:16px;line-height:1.6;margin-bottom:32px;">
+                    Chào <strong>{{userName}}</strong>,<br>
+                    Một khoản chi tiêu trong nhóm của bạn đã được chỉnh sửa thông tin. Hãy kiểm tra các thay đổi mới
+                    nhất bên dưới.
+                </p>
+
+                <!-- Expense Card -->
+                <div
+                    style="background-color:#F5F3FF;border-radius:12px;border:1px solid #DDD6FE;margin-bottom:32px;padding:24px;text-align:left;">
+                    <div style="color:#111827;font-size:20px;margin-bottom:16px;font-weight:700;">
+                        {{expenseTitle}}
+                    </div>
+
+                    <div style="color:#4b5563;font-size:15px;margin-bottom:10px;">
+                        <span style="display:inline-block;width:24px;">👤</span> Người chỉnh sửa:
+                        <strong>{{actionBy}}</strong>
+                    </div>
+
+                    <div style="color:#4b5563;font-size:15px;margin-bottom:16px;">
+                        <span style="display:inline-block;width:24px;">📅</span> Ngày cập nhật: {{updatedAt}}
+                    </div>
+
+                    <!-- Divider -->
+                    <div style="background-color:#DDD6FE;height:1px;margin:16px 0;font-size:0;line-height:0;">&nbsp;
+                    </div>
+
+                    <div style="color:#4b5563;font-size:15px;margin-bottom:8px;">
+                        💰 Tổng số tiền mới:
+                    </div>
+
+                    <div
+                        style="background-color:#DDD6FE;border-radius:999px;color:#6347f9;display:inline-block;font-size:18px;padding:6px 20px;font-weight:700;">
+                        {{expenseAmount}}
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div style="margin-top:32px;">
+                    <a href="{{expenseUrl}}"
+                        style="background-color:#6347f9;border-radius:999px;color:#ffffff;display:inline-block;font-size:16px;padding:14px 40px;text-decoration:none;font-weight:700;box-shadow:0 4px 14px rgba(99, 71, 249, 0.4);">
+                        Xem chi tiết thay đổi
+                    </a>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div
+                style="padding:32px;text-align:center;background-color:#fdfdff;border-top:1px solid #f1f1f1;color:#9ca3af;font-size:14px;">
+                <!-- <div style="margin-bottom:16px;">
+                    <img src="https://antigravity.ai/assets/goouty-logo.png" alt="Goouty"
+                        style="width:80px;margin-bottom:12px;opacity:0.6;">
+                </div> -->
+                <div style="margin-bottom:16px;">
+                    <a href="#" style="color:#9ca3af;text-decoration:none;margin:0 8px;">hi@goouty.com</a>
+                    <!-- <a href="#" style="color:#9ca3af;text-decoration:none;margin:0 8px;"></a> |
+                    <a href="#" style="color:#9ca3af;text-decoration:none;margin:0 8px;">Cài đặt</a> -->
+                </div>
+                <p style="margin:0;line-height:1.6;">
+                    © 2026 Goouty. All rights reserved.<br>
+                    Ứng dụng quản lý tài chính nhóm thông minh.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

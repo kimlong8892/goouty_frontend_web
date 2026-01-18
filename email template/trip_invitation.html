@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lời mời tham gia chuyến đi - Goouty</title>
+    <style>
+        :root {
+            --primary: #6347f9;
+            --background: #edeeff;
+            --text-main: #1a1a2e;
+            --text-muted: #6b7280;
+            --card-bg: #ffffff;
+            --accent: #f59e0b;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Lexend', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #edeeff;
+            color: #1a1a2e;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(99, 71, 249, 0.1);
+        }
+        .header-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .content {
+            padding: 40px;
+            text-align: center;
+        }
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #6347f9;
+        }
+        .message {
+            font-size: 16px;
+            margin-bottom: 32px;
+            color: #4b5563;
+        }
+        .trip-card {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+        }
+        .trip-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #111827;
+        }
+        .trip-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .trip-detail-icon {
+            margin-right: 8px;
+            color: #6347f9;
+        }
+        .btn-container {
+            margin-top: 32px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 99px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #6347f9;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(99, 71, 249, 0.4);
+        }
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #4b5563 !important;
+            margin-left: 12px;
+        }
+        .footer {
+            padding: 32px;
+            text-align: center;
+            font-size: 14px;
+            color: #9ca3af;
+            background-color: #fdfdff;
+            border-top: 1px solid #f1f1f1;
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 16px;
+        }
+        .footer-links {
+            margin-bottom: 16px;
+        }
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        @media only screen and (max-width: 600px) {
+            .container {
+                margin-top: 0;
+                margin-bottom: 0;
+                border-radius: 0;
+            }
+            .content {
+                padding: 24px;
+            }
+            .btn-secondary {
+                margin-left: 0;
+                margin-top: 12px;
+                display: block;
+            }
+            .btn-primary {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Image Placeholder - In real usage, this should be a hosted URL -->
+        <img src="https://s3.cloudfly.vn/goouty-dev/media-manager/1768639101066-12345.png" alt="Sẵn sàng cho chuyến đi mới" class="header-image">
+        
+        <div class="content">
+            <h1 class="greeting">Bạn nhận được một lời mời!</h1>
+            <p class="message">
+                Chào <strong>{{userName}}</strong>,<br>
+                <strong>{{inviterName}}</strong> vừa mời bạn tham gia chuyến đi sắp tới. Hãy chuẩn bị hành lý và cùng nhau tạo nên những kỷ niệm đáng nhớ nhé!
+            </p>
+
+            <div class="trip-card">
+                <div class="trip-name">{{tripTitle}}</div>
+                <div class="trip-detail">
+                    <span class="trip-detail-icon">📍</span>
+                    <span>{{LOCATION}}</span>
+                </div>
+                <div class="trip-detail">
+                    <span class="trip-detail-icon">📅</span>
+                    <span>{{DATE_RANGE}}</span>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <a href="{{ACCEPT_URL}}" class="btn btn-primary">Xem chi tiết</a>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-links">
+                <a href="#">hi@goouty.com
+            </div>
+            <p>© 2026 Goouty. All rights reserved.<br>Ứng dụng lên kế hoạch và chia sẻ chi phí du lịch hàng đầu.</p>
+        </div>
+    </div>
+</body>
+</html>
