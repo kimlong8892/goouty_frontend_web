@@ -57,6 +57,12 @@ interface PWATripItineraryProps {
     justDroppedDayId?: string | null;
     onReorderActivities?: (dayId: string, newActivities: Activity[]) => Promise<void>;
 
+    // Day Drag
+    onDayDragStart?: (e: React.DragEvent, dayId: string) => void;
+    onDayDragOver?: (e: React.DragEvent, dayId: string) => void;
+    onDayDragEnd?: (e: React.DragEvent) => void;
+    onDayDrop?: (e: React.DragEvent, dayId: string) => void;
+
     isOwner?: boolean;
     isTabsVisible?: boolean;
     activeDayId?: string;
@@ -89,6 +95,11 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     dragOverDayId,
     justDroppedDayId,
     onReorderActivities,
+
+    onDayDragStart,
+    onDayDragOver,
+    onDayDragEnd,
+    onDayDrop,
 
     isOwner,
     isTabsVisible = true,
@@ -301,6 +312,11 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                     key={day.id}
                                     data-day-id={day.id} // Added for scrolling
                                     onClick={() => setSelectedDayId(day.id)}
+                                    draggable={isOwner}
+                                    onDragStart={(e) => onDayDragStart?.(e, day.id)}
+                                    onDragOver={(e) => onDayDragOver?.(e, day.id)}
+                                    onDragEnd={(e) => onDayDragEnd?.(e)}
+                                    onDrop={(e) => onDayDrop?.(e, day.id)}
                                     className={cn(
                                         "flex flex-col items-center flex-1 min-w-[100px] py-3 px-1 rounded-xl transition-all relative select-none",
                                         isActive ? "bg-primary/10" : "",

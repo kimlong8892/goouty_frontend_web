@@ -166,6 +166,11 @@ export const api = {
     delete: async (id: string) => {
       return await api.delete(`/days/${id}`);
     },
+    reorder: async (dayIds: string[]) => {
+      // Reorder days using the list of IDs
+      // Backend expects { dayIds: string[] }
+      return await api.patch('/days/reorder', { dayIds });
+    },
   },
 
   // Activity-specific API methods
