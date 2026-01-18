@@ -118,6 +118,17 @@ function NotificationsPage() {
     await refreshStats();
   };
 
+  // Listen for PWA pull-to-refresh event
+  React.useEffect(() => {
+    const handlePWARefresh = () => {
+      console.log('PWA Refresh event received in NotificationsPage');
+      handleRefresh();
+    };
+
+    window.addEventListener('pwa-refresh', handlePWARefresh);
+    return () => window.removeEventListener('pwa-refresh', handlePWARefresh);
+  }, [fetchNotifications, refreshStats]);
+
   // Handle tab change
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);

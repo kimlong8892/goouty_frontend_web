@@ -3,9 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { api } from '@/integrations/api/client';
-import { TripTemplateCard } from '@/components/TripTemplateCard';
 import { DATABASE_TYPES } from '@/integrations/api/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { PWAMasonryCard } from '../components/PWAMasonryCard';
+
+// Add CSS to hide scrollbar
+const style = `
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+`;
 
 const PWAWishlistPage = () => {
     const navigate = useNavigate();
@@ -19,6 +30,7 @@ const PWAWishlistPage = () => {
         } else {
             setLoading(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated]);
 
     const loadWishlist = async () => {
@@ -42,13 +54,14 @@ const PWAWishlistPage = () => {
 
     return (
         <div className="min-h-screen bg-background text-foreground pb-24">
+            <style>{style}</style>
             {/* Header */}
-            <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-4 flex items-center border-b border-border">
+            <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-4 flex items-center border-b border-border/40">
                 <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => navigate(-1)}
-                    className="rounded-full"
+                    className="rounded-full hover:bg-secondary"
                 >
                     <ChevronLeft className="w-6 h-6" />
                 </Button>
@@ -63,14 +76,35 @@ const PWAWishlistPage = () => {
                         <p className="text-muted-foreground">Đang tải danh sách...</p>
                     </div>
                 ) : templates.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6">
-                        {templates.map((template) => (
-                            <TripTemplateCard
-                                key={template.id}
-                                template={{ ...template, isWishlisted: true }}
-                                onWishlistUpdate={handleWishlistUpdate}
-                            />
-                        ))}
+                    <div className="flex gap-4">
+                        {/* Column 1: Indices 0, 2, 4... */}
+                        <div className="flex-1 flex flex-col gap-4">
+                            {templates.map((template, index) => {
+                                if (index % 2 !== 0) return null;
+                                return (
+                                    <PWAMasonryCard
+                                        key={template.id}
+                                        template={{ ...template, isWishlisted: true }}
+                                        index={index}
+                                        onWishlistToggle={handleWishlistUpdate}
+                                    />
+                                );
+                            })}
+                        </div>
+                        {/* Column 2: Indices 1, 3, 5... */}
+                        <div className="flex-1 flex flex-col gap-4">
+                            {templates.map((template, index) => {
+                                if (index % 2 === 0) return null;
+                                return (
+                                    <PWAMasonryCard
+                                        key={template.id}
+                                        template={{ ...template, isWishlisted: true }}
+                                        index={index}
+                                        onWishlistToggle={handleWishlistUpdate}
+                                    />
+                                );
+                            })}
+                        </div>
                     </div>
                 ) : (
                     <div className="py-20 flex flex-col items-center justify-center text-center px-8">

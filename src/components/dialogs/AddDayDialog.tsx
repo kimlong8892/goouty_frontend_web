@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
@@ -19,6 +19,7 @@ interface AddDayDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tripId: string;
+  startDate?: string;
   onSuccess: () => void;
 }
 
@@ -26,6 +27,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
   open,
   onOpenChange,
   tripId,
+  startDate,
   onSuccess
 }) => {
   const { isPWA } = usePWA();
@@ -34,23 +36,52 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
     title: '',
     description: '',
     // store date-only string
-    date: ''
+    date: startDate ? format(new Date(startDate), 'yyyy-MM-dd') : ''
   });
 
   // Lỗi inline cho form
   const [errors, setErrors] = useState<{ title?: string; date?: string }>({});
 
   // Refs để focus input đầu tiên bị lỗi
+  // Refs để focus input đầu tiên bị lỗi
   const titleRef = useRef<HTMLInputElement | null>(null);
 
-  const resetForm = () => {
-    setFormData({ title: '', description: '', date: '' });
+  const calculateNextDate = async () => {
+    if (!tripId) return;
+    try {
+      const days = await api.days.getByTrip(tripId);
+      if (days && days.length > 0) {
+        const dates = days.map(d => new Date(d.date).getTime());
+        const maxDate = Math.max(...dates);
+        const nextDay = new Date(maxDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+        return format(nextDay, 'yyyy-MM-dd');
+      } else if (startDate) {
+        return format(new Date(startDate), 'yyyy-MM-dd');
+      }
+    } catch (e) {
+      console.error("Failed to fetch days for date calculation", e);
+    }
+    // Default fallback
+    return startDate ? format(new Date(startDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
   };
 
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen && !loading) {
+  const resetForm = async () => {
+    const nextDate = await calculateNextDate();
+    setFormData({
+      title: '',
+      description: '',
+      date: nextDate
+    });
+  };
+
+  useEffect(() => {
+    if (open) {
       resetForm();
     }
+  }, [open]);
+
+  const handleOpenChange = (newOpen: boolean) => {
     onOpenChange(newOpen);
   };
 
@@ -66,15 +97,10 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
       if (!focused) { titleRef.current?.focus(); focused = true; }
     }
 
+    // Auto-calculated, no user validation needed.
     if (!formData.date) {
-      newErrors.date = 'Vui lòng chọn ngày';
-    } else {
-      const selectedDate = new Date(formData.date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selectedDate < today) {
-        newErrors.date = 'Không thể chọn ngày trong quá khứ';
-      }
+      // Should have been set by resetForm, but safety net
+      formData.date = format(new Date(), 'yyyy-MM-dd');
     }
 
     setErrors(newErrors);
@@ -86,15 +112,14 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
       const dayData: CreateDayRequest = {
         title: formData.title.trim(),
         description: formData.description.trim() || undefined,
-        // send ISO at midnight local for date-only
-        date: new Date(`${formData.date}T00:00:00`).toISOString(),
         tripId: tripId
       };
 
       const newDay = await api.post<Day>('/days', dayData);
 
       toast.success('Đã thêm ngày thành công');
-      resetForm();
+      // resetForm will be called on next open
+      // resetForm(); 
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
@@ -183,7 +208,7 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
                 ref={titleRef}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="VD: Ngày 1 - Khám phá thành phố"
+                placeholder="VD: Khám phá thành phố"
                 className={cn(
                   "h-12 bg-card border-input focus:ring-primary/20 rounded-xl transition-all",
                   isPWA ? "bg-card border-input" : "bg-secondary dark:bg-[#242731] border-border dark:border-gray-700",
@@ -192,46 +217,6 @@ export const AddDayDialog: React.FC<AddDayDialogProps> = ({
               />
               {errors.title && (
                 <p className="text-sm text-red-500 ml-1">{errors.title}</p>
-              )}
-            </div>
-
-            {/* Date Input */}
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-muted-foreground font-medium text-sm ml-1">
-                Ngày <span className="text-red-500">*</span>
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="date"
-                    variant="outline"
-                    className={cn(
-                      "w-full h-12 justify-start text-left font-normal rounded-xl transition-all",
-                      isPWA ? "bg-card border-input" : "bg-secondary dark:bg-[#242731] border-border dark:border-gray-700",
-                      !formData.date ? "text-muted-foreground" : "text-foreground",
-                      errors.date && "border-red-500 text-red-500"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
-                    {formData.date ? (
-                      format(new Date(formData.date), "dd/MM/yyyy")
-                    ) : (
-                      <span>Chọn ngày</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-card border-border shadow-xl" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.date ? new Date(formData.date) : undefined}
-                    onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                    initialFocus
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  />
-                </PopoverContent>
-              </Popover>
-              {errors.date && (
-                <p className="text-sm text-red-500 ml-1">{errors.date}</p>
               )}
             </div>
 

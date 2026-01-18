@@ -32,8 +32,10 @@ import {
   ChevronLeft,
   FileText,
   Layout,
-  Info
+  Info,
+  Star
 } from 'lucide-react';
+import { ExperienceReview } from '@/components/ExperienceReview.tsx';
 import { notificationService } from '@/services/notificationService';
 import NotificationSettings from '@/components/NotificationSettings';
 import {
@@ -67,7 +69,7 @@ const VIETQR_TEMPLATE = 'compact';
 const Profile = () => {
   const navigate = useNavigate();
   const showContent = useAnimateIn(false, 300);
-  const [subPage, setSubPage] = useState<'settings' | 'change-password' | null>(null);
+  const [subPage, setSubPage] = useState<'settings' | 'change-password' | 'review' | null>(null);
   const { user, logout } = useAuth();
   const { isPWA } = usePWA();
   const { theme, toggleTheme } = useTheme();
@@ -77,6 +79,7 @@ const Profile = () => {
 
   // Password change state
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -364,6 +367,19 @@ const Profile = () => {
                     </div>
                     <ChevronRight className="w-5 h-5 text-gray-400" />
                   </div>
+
+                  <div
+                    onClick={() => setSubPage('review')}
+                    className="flex items-center justify-between py-2 cursor-pointer active:opacity-70 transition-opacity"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-foreground shrink-0">
+                        <Star className="w-5 h-5 text-yellow-500" />
+                      </div>
+                      <span className="text-base font-medium text-foreground">Đánh giá trải nghiệm</span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
                 </div>
 
                 {/* Logout */}
@@ -430,6 +446,37 @@ const Profile = () => {
                   <Switch checked={pushEnabled} onCheckedChange={handleTogglePush} />
                 </div>
               )}
+            </div>
+          </div>
+        </AnimatedTransition>
+
+        {/* Sub-page: Experience Review */}
+        <AnimatedTransition show={subPage === 'review'} animation="slide-up">
+          <div className={`fixed inset-0 bg-background z-50 overflow-y-auto ${subPage === 'review' ? 'block' : 'hidden'}`}>
+            <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50 px-4 py-4">
+              <div className="flex items-center justify-between relative">
+                <button
+                  type="button"
+                  onClick={() => setSubPage(null)}
+                  className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full hover:bg-secondary/80 text-foreground transition-all active:scale-95 touch-manipulation"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+
+                <h2 className="text-lg font-bold text-foreground absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-max">
+                  Đánh giá trải nghiệm
+                </h2>
+
+                <div className="w-8"></div>
+              </div>
+            </div>
+
+            <div className="px-6 py-6">
+              <ExperienceReview
+                isPWA={true}
+                onSuccess={() => setSubPage(null)}
+                onCancel={() => setSubPage(null)}
+              />
             </div>
           </div>
         </AnimatedTransition>
@@ -773,6 +820,26 @@ const Profile = () => {
                     >
                       <Heart className="w-5 h-5 mr-4 text-red-500 group-hover:scale-110 transition-transform" /> Danh sách yêu thích
                     </Button>
+
+                    <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="group w-full justify-start h-16 rounded-[24px] bg-secondary hover:bg-secondary/80 text-foreground hover:text-primary font-bold border-none transition-all pl-6"
+                        >
+                          <Star className="w-5 h-5 mr-4 text-yellow-500 group-hover:scale-110 transition-transform fill-yellow-500" /> Đánh giá trải nghiệm
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[500px] rounded-[32px] max-h-[90vh] overflow-y-auto w-full">
+                        <DialogHeader>
+                          <DialogTitle className="text-2xl font-bold text-center">Đánh giá & Góp ý</DialogTitle>
+                        </DialogHeader>
+                        <ExperienceReview
+                          onSuccess={() => setIsReviewDialogOpen(false)}
+                          onCancel={() => setIsReviewDialogOpen(false)}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>

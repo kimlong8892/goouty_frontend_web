@@ -145,7 +145,6 @@ export const ChromePWAStatus: React.FC = () => {
             <li>• Cài đặt nhanh từ thanh địa chỉ</li>
             <li>• Truy cập nhanh và tiện lợi</li>
             <li>• Thông báo push real-time</li>
-            <li>• Đồng bộ dữ liệu nền</li>
             <li>• Trải nghiệm như ứng dụng native</li>
           </ul>
         </div>

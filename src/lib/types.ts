@@ -55,6 +55,7 @@ export interface Trip {
   provinceId?: string;
   province?: Province;
   startDate?: string;
+  endDate?: string;
   description?: string;
   avatar?: string;
   userId: string;
@@ -68,6 +69,7 @@ export interface CreateTripRequest {
   title: string;
   provinceId?: string;
   startDate?: string;
+  endDate?: string;
   description?: string;
 }
 
@@ -75,6 +77,7 @@ export interface UpdateTripRequest {
   title?: string;
   provinceId?: string;
   startDate?: string;
+  endDate?: string;
   description?: string;
 }
 
@@ -90,7 +93,7 @@ export interface Day {
 export interface CreateDayRequest {
   title: string;
   description?: string;
-  date: string;
+  date?: string;
   startTime?: string;
   tripId: string;
 }
@@ -104,6 +107,7 @@ export interface Activity {
   notes?: string;
   important: boolean;
   dayId: string;
+  avatar?: string;
 }
 
 export interface CreateActivityRequest {
@@ -114,6 +118,7 @@ export interface CreateActivityRequest {
   notes?: string;
   important?: boolean;
   dayId: string;
+  avatar?: string;
 }
 
 export interface UpdateActivityRequest {
@@ -124,6 +129,7 @@ export interface UpdateActivityRequest {
   notes?: string;
   important?: boolean;
   dayId?: string;
+  avatar?: string;
 }
 
 // Trip Members types

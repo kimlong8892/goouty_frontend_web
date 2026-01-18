@@ -69,10 +69,11 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
       newErrors.title = 'Vui lòng nhập tiêu đề ngày';
       if (!focused) { titleRef.current?.focus(); focused = true; }
     }
-    if (!formData.date) {
-      newErrors.date = 'Vui lòng chọn ngày';
-      if (!focused) { dateRef.current?.focus(); focused = true; }
+    if (!formData.title.trim()) {
+      newErrors.title = 'Vui lòng nhập tiêu đề ngày';
+      if (!focused) { titleRef.current?.focus(); focused = true; }
     }
+
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0 || !day) return;
 
@@ -81,8 +82,6 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
       const payload: any = {
         title: formData.title.trim(),
         description: formData.description.trim() || undefined,
-        // normalize to midnight
-        date: new Date(`${formData.date}T00:00:00`).toISOString(),
       };
 
       await api.days.update(day.id, payload);
@@ -144,11 +143,12 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
                   "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                   errors.title ? 'border-red-500 focus:border-red-500' : ''
                 )}
-                placeholder="VD: Ngày 1 - Khám phá thành phố"
+                placeholder="VD: Khám phá thành phố"
               />
               {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
             </div>
 
+            {/* Description Input */}
             <div className="space-y-2">
               <Label htmlFor="description" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">Mô tả ngày</Label>
               <Textarea
@@ -159,57 +159,6 @@ export const EditDayDialog: React.FC<EditDayDialogProps> = ({ open, onOpenChange
                 className="bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
                 placeholder="Mô tả chi tiết về ngày này..."
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-muted-foreground dark:text-slate-300 font-medium text-sm">
-                Ngày <span className="text-red-500">*</span>
-              </Label>
-              {isPWA ? (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="date"
-                      variant="outline"
-                      className={cn(
-                        "w-full h-12 justify-start text-left font-normal bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 rounded-xl hover:bg-secondary/80 dark:hover:bg-[#2d313d] text-foreground dark:text-white transition-all duration-200",
-                        !formData.date ? "text-muted-foreground/60 dark:text-slate-500" : "text-foreground dark:text-white",
-                        errors.date && "border-red-500 hover:border-red-500/80"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground dark:text-slate-400" />
-                      {formData.date ? (
-                        format(new Date(formData.date), "dd/MM/yyyy")
-                      ) : (
-                        <span>dd/mm/yyyy</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-card dark:bg-[#1c1e26] border-border dark:border-gray-700" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formData.date ? new Date(formData.date) : undefined}
-                      onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                      initialFocus
-                      className="bg-card dark:bg-[#1c1e26] text-foreground dark:text-white"
-                    />
-                  </PopoverContent>
-                </Popover>
-              ) : (
-                <Input
-                  id="date"
-                  type="date"
-                  ref={dateRef}
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  aria-invalid={!!errors.date}
-                  className={cn(
-                    "h-12 bg-secondary dark:bg-[#242731] border-border dark:border-gray-700 text-foreground dark:text-white placeholder:text-muted-foreground/60 dark:placeholder:text-slate-500 focus:border-primary hover:border-primary transition-colors rounded-xl outline-none focus-visible:ring-0 focus-visible:ring-offset-0 block w-full",
-                    errors.date ? 'border-red-500 focus:border-red-500' : ''
-                  )}
-                />
-              )}
-              {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
             </div>
           </div>
 

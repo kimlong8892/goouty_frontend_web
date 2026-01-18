@@ -27,6 +27,7 @@ const PWAEditDayPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [tripId, setTripId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -34,6 +35,7 @@ const PWAEditDayPage = () => {
     });
     const [errors, setErrors] = useState<{ title?: string; date?: string }>({});
     const titleRef = useRef<HTMLInputElement>(null);
+
 
     useEffect(() => {
         document.title = 'Chỉnh sửa ngày - Goouty';
@@ -57,6 +59,9 @@ const PWAEditDayPage = () => {
                     description: data.description || '',
                     date: data.date ? format(new Date(data.date), 'yyyy-MM-dd') : ''
                 });
+                if (data.tripId) {
+                    setTripId(data.tripId);
+                }
             } catch (error: any) {
                 console.error('Fetch day error:', error);
                 showToast('Không thể tải thông tin ngày', 'error');
@@ -81,8 +86,8 @@ const PWAEditDayPage = () => {
             newErrors.title = 'Vui lòng nhập tiêu đề ngày';
         }
 
-        if (!formData.date) {
-            newErrors.date = 'Vui lòng chọn ngày';
+        if (!formData.title.trim()) {
+            newErrors.title = 'Vui lòng nhập tiêu đề ngày';
         }
 
         setErrors(newErrors);
@@ -93,13 +98,48 @@ const PWAEditDayPage = () => {
             const dayData = {
                 title: formData.title.trim(),
                 description: formData.description.trim() || null,
-                date: new Date(`${formData.date}T00:00:00`).toISOString(),
             };
 
+            // 1. Update the day
             await api.days.update(dayId, dayData);
 
+            // 2. If we have tripId, re-fetch all days, sort them, and update order
+            if (tripId) {
+                try {
+                    const allDays = await api.days.getByTrip(tripId);
+
+                    // Sort by date, then by ID (simulating creation order if dates are same)
+                    const sortedDays = allDays.sort((a, b) => {
+                        const dateA = new Date(a.date).getTime();
+                        const dateB = new Date(b.date).getTime();
+                        if (dateA !== dateB) {
+                            return dateA - dateB;
+                        }
+                        // Secondary sort by ID for stability
+                        // Assuming numeric IDs or string IDs that are somewhat chronological??
+                        // If standard UUIDs, this might not be chronological, but it IS stable.
+                        // Ideally we'd use 'createdAt' but 'days' type might not have it exposed here easily without checking types.
+                        // Let's stick to stable sort.
+                        return a.id > b.id ? 1 : -1;
+                    });
+
+                    const dayIds = sortedDays.map(d => d.id);
+                    await api.patch('/days/reorder', { dayIds });
+                } catch (reorderError) {
+                    console.error('Failed to reorder days:', reorderError);
+                    // Don't block success flow, just log it
+                }
+            }
+
             showToast('Đã cập nhật ngày thành công', 'success');
-            navigate(-1);
+            if (tripId) {
+                navigate(`/trip/${tripId}?dayId=${dayId}&scrollTo=itinerary`, {
+                    replace: true,
+                    state: { skipScrollTop: true }
+                });
+            } else {
+                navigate(-1);
+            }
         } catch (error: any) {
             console.error('Update day error:', error);
             showToast(error.message || 'Không thể cập nhật ngày', 'error');
@@ -117,10 +157,10 @@ const PWAEditDayPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background transition-colors duration-300">
+        <div className="h-full bg-background transition-colors duration-300 flex flex-col overflow-hidden">
             <AnimatedTransition show={showContent} animation="slide-up">
-                {/* PWA Header */}
-                <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-border/50">
+                {/* Content Header - Header part of flex flow */}
+                <div className="bg-background/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-border/50">
                     <button
                         onClick={() => navigate(-1)}
                         className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full hover:bg-secondary/80 text-foreground transition-all active:scale-95"
@@ -133,7 +173,7 @@ const PWAEditDayPage = () => {
                 </div>
 
                 {/* Content */}
-                <div className="px-5 pt-6 pb-44 flex flex-col min-h-[calc(100vh-80px)]">
+                <div className="px-5 pt-6 pb-10 flex-1 overflow-y-auto">
                     <div className="flex-1 space-y-6">
                         {/* Title Input */}
                         <div className="space-y-2">
@@ -145,7 +185,7 @@ const PWAEditDayPage = () => {
                                 ref={titleRef}
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                placeholder="VD: Ngày 1 - Khám phá thành phố"
+                                placeholder="VD: Khám phá thành phố"
                                 className={cn(
                                     "bg-card border-input shadow-sm rounded-xl h-14 px-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200",
                                     errors.title && "border-destructive focus-visible:ring-destructive/20"
@@ -153,44 +193,6 @@ const PWAEditDayPage = () => {
                             />
                             {errors.title && (
                                 <p className="text-xs text-destructive ml-1">{errors.title}</p>
-                            )}
-                        </div>
-
-                        {/* Date Input */}
-                        <div className="space-y-2">
-                            <Label htmlFor="date" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
-                                Ngày
-                            </Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        id="date"
-                                        variant="outline"
-                                        className={cn(
-                                            "w-full h-14 justify-start text-left font-normal rounded-xl bg-card border-input shadow-sm hover:bg-card/80 transition-all px-4 text-base",
-                                            !formData.date && "text-muted-foreground",
-                                            errors.date && "border-destructive text-destructive"
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-3 h-5 w-5 text-muted-foreground" />
-                                        {formData.date ? (
-                                            format(new Date(formData.date), "dd/MM/yyyy")
-                                        ) : (
-                                            "Chọn ngày"
-                                        )}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={formData.date ? new Date(formData.date) : undefined}
-                                        onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                            {errors.date && (
-                                <p className="text-xs text-destructive ml-1">{errors.date}</p>
                             )}
                         </div>
 
@@ -210,8 +212,8 @@ const PWAEditDayPage = () => {
                         </div>
                     </div>
 
-                    {/* Sticky Bottom Button */}
-                    <div className="fixed bottom-[80px] left-0 right-0 px-5 py-4 bg-background/80 backdrop-blur-md border-t border-border/50 z-40">
+                    {/* Bottom Button */}
+                    <div className="px-5 py-4 bg-background border-t border-border/50 pb-safe z-40">
                         <Button
                             onClick={handleSubmit}
                             disabled={saving}

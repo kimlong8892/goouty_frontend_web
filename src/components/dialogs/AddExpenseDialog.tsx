@@ -34,13 +34,18 @@ interface AddExpenseDialogProps {
   onOpenChange: (open: boolean) => void;
   tripId: string;
   onSuccess: () => void;
+  initialData?: {
+    title: string;
+    amount: string;
+  } | null;
 }
 
 export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
   open,
   onOpenChange,
   tripId,
-  onSuccess
+  onSuccess,
+  initialData
 }) => {
   const { user } = useAuth();
   const { isPWA } = usePWA();
@@ -78,8 +83,20 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
     if (open) {
       fetchMembers();
       setErrors({});
+
+      // Completely clear all fields
+      setFormData({
+        title: initialData?.title || '',
+        amount: initialData?.amount || '',
+        date: new Date().toISOString().split('T')[0],
+        description: '',
+        payerId: '',
+        participantIds: [] as string[]
+      });
+      setAmountByUserId({});
+      setSplitMethod('equal');
     }
-  }, [open, tripId]);
+  }, [open, tripId, initialData]);
 
   useEffect(() => {
     if (open && user && members.length > 0) {

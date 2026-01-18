@@ -9,8 +9,7 @@ import AuthModal from '@/components/AuthModal.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { SyncStatus } from '@/components/SyncStatus.tsx';
-import { useOfflineStatus } from '@/lib/offline/OfflineManager';
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -130,7 +129,7 @@ const NavItem = ({ to, icon, label, active, onClick, hasSubmenu, children, isPWA
   );
 };
 
-const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled }: NavItemProps & { isHighlighted?: boolean, disabled?: boolean }) => {
+const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled, id }: NavItemProps & { isHighlighted?: boolean, disabled?: boolean, id?: string }) => {
   const handleClick = (e: React.MouseEvent) => {
     if (disabled) {
       e.preventDefault();
@@ -138,6 +137,8 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
     }
     onClick();
   };
+
+  const isProfile = id === 'profile';
 
   return (
     <Tooltip>
@@ -148,7 +149,8 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
             "relative flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-300",
             "hover:bg-primary/10 hover:text-primary",
             "overflow-hidden flex-shrink-0 min-w-0",
-            active ? "bg-primary text-primary-foreground" : "text-foreground/80",
+            active && !isProfile ? "bg-primary text-primary-foreground" : "text-foreground/80",
+            active && isProfile ? "text-primary bg-transparent" : "",
             isHighlighted && "shadow-lg scale-105",
             disabled && "opacity-50 cursor-not-allowed"
           )}
@@ -156,7 +158,8 @@ const PWANavItem = ({ to, icon, label, active, onClick, isHighlighted, disabled 
         >
           <span className={cn(
             "transition-all duration-300 text-xl flex items-center justify-center",
-            active ? "text-primary-foreground" : "text-foreground/60",
+            active && !isProfile ? "text-primary-foreground" : "text-foreground/60",
+            active && isProfile ? "text-primary" : "",
             isHighlighted && active && "text-primary-foreground"
           )}>
             {icon}
@@ -276,7 +279,7 @@ export const Navbar = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout, user, isLoading } = useAuth();
-  const { isOnline, pendingCount } = useOfflineStatus();
+
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
   const isMobileView = isPWA || isMobile;
@@ -323,29 +326,48 @@ export const Navbar = () => {
   useEffect(() => {
     const path = location.pathname;
 
-    if (path === '/') {
+    if (path === '/' || path.startsWith('/template/') || path.startsWith('/pwa-template-details/')) {
       setActive('home');
-    } else if (path === '/my-trips') {
+    }
+    else if (path.startsWith('/trip/')) {
+      setActive(isPWA ? 'pwa-trips' : 'my-trips');
+    }
+    else if (path === '/my-trips') {
       setActive('my-trips');
-    } else if (path === '/pwa-trips') {
+    }
+    else if (
+      path === '/pwa-trips' ||
+      path.startsWith('/pwa-edit-trip/') ||
+      path.startsWith('/pwa-add-day/') ||
+      path.startsWith('/pwa-edit-day/') ||
+      path.startsWith('/pwa-edit-day/') ||
+      path.startsWith('/pwa-add-activity/') ||
+      path.startsWith('/pwa-edit-activity/') ||
+      path.startsWith('/pwa-add-expense/') ||
+      path.startsWith('/pwa-invite-member/')
+    ) {
       setActive('pwa-trips');
-    } else if (path === '/profile') {
+    }
+    else if (path === '/profile' || path.startsWith('/profile/') || path === '/pwa-change-password' || path === '/pwa-terms' || path === '/pwa-privacy' || path === '/pwa-about') {
       setActive('profile');
-    } else if (path === '/settings') {
+    }
+    else if (path === '/settings') {
       setActive('settings');
-    } else if (path === '/create-trip' || path === '/pwa-create-trip') {
+    }
+    else if (path === '/create-trip' || path === '/pwa-create-trip') {
       setActive('create-trip');
-
-    } else if (path === '/auth') {
+    }
+    else if (path === '/auth') {
       setActive('login');
-    } else if (path === '/wishlist') {
+    }
+    else if (path === '/wishlist') {
       setActive('wishlist');
     }
     else {
-      // For trip details pages, keep current active or default to home
+      // For any other unexpected paths, fallback based on PWA mode or default to home
       setActive(prev => prev || 'home');
     }
-  }, [location.pathname]);
+  }, [location.pathname, isPWA]);
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -364,7 +386,7 @@ export const Navbar = () => {
 
   const handleNavItemClick = (id: string) => {
     setActive(id);
-    if (id === 'home') {
+    if (id === 'home' || id === 'pwa-trips' || id === 'my-trips') { // Scroll to top for main tabs
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -405,7 +427,7 @@ export const Navbar = () => {
 
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (
-            <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-lg px-4 py-2 pb-8 border-t border-border/50">
+            <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-background/90 backdrop-blur-lg px-4 py-2 pb-6 border-t border-border/50">
               <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
                 <div className="pointer-events-auto">
                   {/* Removed SyncStatus icon from PWA nav as requested */}
@@ -415,6 +437,7 @@ export const Navbar = () => {
                 {pwaNavItems.map((item) => (
                   <PWANavItem
                     key={item.id}
+                    id={item.id}
                     to={item.to}
                     icon={item.icon}
                     label={item.label}
@@ -424,9 +447,9 @@ export const Navbar = () => {
                   />
                 ))}
               </div>
-            </nav>
+            </nav >
           )}
-        </TooltipProvider>
+        </TooltipProvider >
 
         <AuthModal isOpen={isAuthModalOpen} onClose={handleCloseAuthModal} />
       </>
@@ -437,7 +460,7 @@ export const Navbar = () => {
   return (
     <>
       <TooltipProvider>
-        <header className="sticky top-0 z-50 w-full py-4 bg-transparent">
+        <header className="sticky top-0 z-50 w-full pt-0 pb-4 bg-transparent">
           <div className="max-w-7xl mx-auto px-4">
             <nav className={cn(
               "flex items-center justify-between px-6 py-3 rounded-full transition-all duration-300",

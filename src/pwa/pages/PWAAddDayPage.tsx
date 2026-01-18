@@ -38,8 +38,42 @@ const PWAAddDayPage = () => {
     useEffect(() => {
         if (!authLoading && !isAuthenticated) {
             navigate('/auth');
+            return;
         }
-    }, [authLoading, isAuthenticated, navigate]);
+
+        const fetchTripDetails = async () => {
+            if (!tripId) return;
+            try {
+                const tripData = await api.trips.getById(tripId);
+                if (tripData) {
+                    let nextDate = '';
+
+                    if (tripData.days && tripData.days.length > 0) {
+                        // Find the latest date
+                        const dates = tripData.days.map(d => new Date(d.date).getTime());
+                        const maxDate = Math.max(...dates);
+                        const nextDay = new Date(maxDate);
+                        nextDay.setDate(nextDay.getDate() + 1);
+                        nextDate = format(nextDay, 'yyyy-MM-dd');
+                    } else if (tripData.startDate) {
+                        nextDate = format(new Date(tripData.startDate), 'yyyy-MM-dd');
+                    } else {
+                        // Fallback to today if no trip start date (though unlikely for a valid trip)
+                        nextDate = format(new Date(), 'yyyy-MM-dd');
+                    }
+
+                    setFormData(prev => ({
+                        ...prev,
+                        date: nextDate
+                    }));
+                }
+            } catch (error) {
+                console.error('Error fetching trip details:', error);
+            }
+        };
+
+        fetchTripDetails();
+    }, [authLoading, isAuthenticated, navigate, tripId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -53,15 +87,10 @@ const PWAAddDayPage = () => {
             if (!focused) { titleRef.current?.focus(); focused = true; }
         }
 
+        // Auto-calculated date is used, no validation needed for user input
         if (!formData.date) {
-            newErrors.date = 'Vui lòng chọn ngày';
-        } else {
-            const selectedDate = new Date(formData.date);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (selectedDate < today) {
-                newErrors.date = 'Không thể chọn ngày trong quá khứ';
-            }
+            // Should not happen if fetch works, but as fallback set today
+            formData.date = format(new Date(), 'yyyy-MM-dd');
         }
 
         setErrors(newErrors);
@@ -72,7 +101,6 @@ const PWAAddDayPage = () => {
             const dayData: any = {
                 title: formData.title.trim(),
                 description: formData.description.trim() || undefined,
-                date: new Date(`${formData.date}T00:00:00`).toISOString(),
                 tripId: tripId
             };
 
@@ -93,7 +121,7 @@ const PWAAddDayPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col relative text-foreground">
+        <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
             {/* PWA Header */}
             <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
                 <button
@@ -109,12 +137,12 @@ const PWAAddDayPage = () => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 px-5 pt-6 pb-44 overflow-y-auto">
+            <div className="flex-1 px-5 pt-6 pb-10 overflow-y-auto">
                 <div className="space-y-6">
 
                     {/* Title Input */}
                     <div className="space-y-2">
-                        <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                        <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                             Tiêu đề ngày <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -122,7 +150,7 @@ const PWAAddDayPage = () => {
                             ref={titleRef}
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            placeholder="VD: Ngày 1 - Khám phá thành phố"
+                            placeholder="VD: Khám phá thành phố"
                             className={cn(
                                 "h-14 rounded-xl bg-card border-input focus:ring-primary/20 transition-all px-4 text-base",
                                 errors.title && "border-destructive focus-visible:ring-destructive/20"
@@ -133,48 +161,9 @@ const PWAAddDayPage = () => {
                         )}
                     </div>
 
-                    {/* Date Input */}
-                    <div className="space-y-2">
-                        <Label htmlFor="date" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
-                            Ngày <span className="text-red-500">*</span>
-                        </Label>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    id="date"
-                                    variant="outline"
-                                    className={cn(
-                                        "w-full h-14 justify-start text-left font-normal rounded-xl bg-card border-input hover:bg-card/80 transition-all px-4 text-base shadow-sm",
-                                        !formData.date && "text-muted-foreground",
-                                        errors.date && "border-destructive text-destructive"
-                                    )}
-                                >
-                                    <CalendarIcon className="mr-3 h-5 w-5 text-muted-foreground" />
-                                    {formData.date ? (
-                                        format(new Date(formData.date), "dd/MM/yyyy")
-                                    ) : (
-                                        "Chọn ngày"
-                                    )}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={formData.date ? new Date(formData.date) : undefined}
-                                    onSelect={(date) => setFormData({ ...formData, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                    initialFocus
-                                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                />
-                            </PopoverContent>
-                        </Popover>
-                        {errors.date && (
-                            <p className="text-xs text-destructive ml-1">{errors.date}</p>
-                        )}
-                    </div>
-
                     {/* Description Input */}
                     <div className="space-y-2">
-                        <Label htmlFor="description" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                        <Label htmlFor="description" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                             Mô tả (tùy chọn)
                         </Label>
                         <Textarea
@@ -190,8 +179,8 @@ const PWAAddDayPage = () => {
                 </div>
             </div>
 
-            {/* Sticky Bottom Button */}
-            <div className="fixed bottom-[80px] left-0 right-0 px-5 py-4 bg-background/80 backdrop-blur-md border-t border-border/50 z-40">
+            {/* Bottom Button */}
+            <div className="px-5 py-4 bg-background border-t border-border/50 pb-safe z-40">
                 <Button
                     onClick={handleSubmit}
                     disabled={loading}

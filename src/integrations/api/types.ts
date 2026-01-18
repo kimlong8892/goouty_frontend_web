@@ -14,6 +14,7 @@ export namespace DATABASE_TYPES {
       phoneCode: number;
     };
     startDate?: string;
+    endDate?: string;
     description?: string;
     avatar?: string;
     userId: string;
@@ -166,6 +167,18 @@ export namespace DATABASE_TYPES {
         dayId: string;
       }[];
     }[];
+    next?: {
+      id: string;
+      title: string;
+      avatar: string;
+      createdAt: string;
+    };
+    previous?: {
+      id: string;
+      title: string;
+      avatar: string;
+      createdAt: string;
+    };
   }
 
   export interface provinces {
@@ -177,5 +190,18 @@ export namespace DATABASE_TYPES {
     phoneCode: number;
     createdAt: string;
     updatedAt: string;
+  }
+
+  export interface ratings {
+    id: string;
+    stars: number;
+    content: string;
+    userId: string;
+    createdAt: string;
+    user?: {
+      id: string;
+      fullName: string;
+      profilePicture?: string;
+    };
   }
 }

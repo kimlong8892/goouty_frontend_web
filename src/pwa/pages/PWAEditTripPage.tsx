@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { DateRange } from "react-day-picker";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
@@ -27,7 +28,7 @@ const PWAEditTripPage = () => {
     const [tripName, setTripName] = useState('');
     const [destination, setDestination] = useState('');
     const [description, setDescription] = useState('');
-    const [startDate, setStartDate] = useState<Date | undefined>();
+    const [date, setDate] = useState<DateRange | undefined>();
     const [currentAvatar, setCurrentAvatar] = useState<string | null>(null);
     const [coverImage, setCoverImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -54,7 +55,10 @@ const PWAEditTripPage = () => {
             setDescription(trip.description || '');
             setCurrentAvatar(trip.avatar || null);
             if (trip.startDate) {
-                setStartDate(new Date(trip.startDate));
+                setDate({
+                    from: new Date(trip.startDate),
+                    to: trip.endDate ? new Date(trip.endDate) : undefined
+                });
             }
         } catch (error: any) {
             console.error('Fetch trip error:', error);
@@ -73,6 +77,14 @@ const PWAEditTripPage = () => {
 
         if (!tripName.trim()) {
             newErrors.tripName = 'Vui lòng nhập tên chuyến đi';
+        }
+
+        if (!destination.trim()) {
+            newErrors.destination = 'Vui lòng chọn điểm đến';
+        }
+
+        if (!date?.from) {
+            newErrors.date = 'Vui lòng chọn ngày bắt đầu - ngày kết thúc';
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -98,7 +110,8 @@ const PWAEditTripPage = () => {
                 title: tripName.trim(),
                 provinceId: destination.trim(),
                 description: description.trim() || undefined,
-                ...(startDate && { startDate: startDate.toISOString() })
+                startDate: date?.from ? date.from.toISOString() : undefined,
+                endDate: date?.to ? date.to.toISOString() : undefined
             };
 
             await api.trips.update(id, tripData);
@@ -148,7 +161,7 @@ const PWAEditTripPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col relative text-foreground">
+        <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
             {/* Header */}
             <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
                 <button
@@ -164,7 +177,7 @@ const PWAEditTripPage = () => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 px-5 pt-6 pb-32 overflow-y-auto">
+            <div className="flex-1 px-5 pt-6 pb-10 overflow-y-auto">
                 <div className="w-full max-w-md mx-auto space-y-8">
                     {/* Cover Image Upload (Circular Style) */}
                     <div className="flex justify-center">
@@ -226,7 +239,7 @@ const PWAEditTripPage = () => {
                         {/* Destination */}
                         <div className="space-y-2">
                             <Label htmlFor="destination" className="text-muted-foreground text-sm font-medium ml-1">
-                                Điểm đến (tùy chọn)
+                                Điểm đến <span className="text-red-500">*</span>
                             </Label>
                             <ProvinceSelector
                                 value={destination}
@@ -243,34 +256,59 @@ const PWAEditTripPage = () => {
                             )}
                         </div>
 
-                        {/* Start Date */}
+                        {/* Date Range Picker */}
                         <div className="space-y-2">
                             <Label className="text-muted-foreground text-sm font-medium ml-1">
-                                Ngày đi
+                                Ngày bắt đầu - ngày kết thúc <span className="text-red-500">*</span>
                             </Label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
                                         className={cn(
-                                            "w-full justify-start text-left font-normal h-12 rounded-xl bg-card border-input hover:bg-card/80",
-                                            !startDate && "text-muted-foreground"
+                                            "w-full justify-start text-left font-normal h-14 rounded-xl bg-card border-input hover:bg-card/80 transition-all",
+                                            !date && "text-muted-foreground"
                                         )}
                                     >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {startDate ? format(startDate, "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
+                                        <div className="flex items-center gap-3 w-full">
+                                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                                <CalendarIcon className="h-5 w-5" />
+                                            </div>
+                                            <div className="flex-1">
+                                                {date?.from ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-semibold text-foreground">
+                                                            {format(date.from, "dd/MM/yyyy", { locale: vi })}
+                                                        </span>
+                                                        <span className="text-muted-foreground text-xs">→</span>
+                                                        <span className="font-semibold text-foreground">
+                                                            {format(date.to || date.from, "dd/MM/yyyy", { locale: vi })}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-col items-start gap-0.5">
+                                                        <span className="text-foreground font-medium">Chọn ngày</span>
+                                                        <span className="text-xs text-muted-foreground">Chạm để chọn lịch trình</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
-                                        mode="single"
-                                        selected={startDate}
-                                        onSelect={setStartDate}
+                                        mode="range"
+                                        selected={date}
+                                        onSelect={setDate}
                                         initialFocus
+                                        numberOfMonths={1}
                                         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                                     />
                                 </PopoverContent>
                             </Popover>
+                            {errors.date && (
+                                <p className="text-xs text-destructive ml-1">{errors.date}</p>
+                            )}
                         </div>
 
                         {/* Description */}
@@ -291,8 +329,8 @@ const PWAEditTripPage = () => {
                 </div>
             </div>
 
-            {/* Sticky Bottom Button - Positioned above PWA Navbar */}
-            <div className="fixed bottom-[80px] left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/50 pb-safe z-40">
+            {/* Bottom Button - Positioned above PWA Navbar */}
+            <div className="p-4 bg-background border-t border-border/50 pb-safe z-40">
                 <Button
                     onClick={handleUpdateTrip}
                     disabled={loading}

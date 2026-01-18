@@ -15,6 +15,8 @@ import { cn } from '@/lib/utils.ts';
 import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
 import { useAnimateIn } from '@/lib/animations.ts';
 
+import { ActivityAvatarUpload } from '@/components/ActivityAvatarUpload.tsx';
+
 const PWAEditActivityPage = () => {
     const { activityId } = useParams<{ activityId: string }>();
     const navigate = useNavigate();
@@ -24,6 +26,7 @@ const PWAEditActivityPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [currentImage, setCurrentImage] = useState<string>('');
     const [formData, setFormData] = useState({
         title: '',
         startTime: '',
@@ -32,7 +35,7 @@ const PWAEditActivityPage = () => {
         notes: '',
         important: false
     });
-    const [errors, setErrors] = useState<{ title?: string }>({});
+    const [errors, setErrors] = useState<{ title?: string; startTime?: string }>({});
     const titleRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -72,6 +75,10 @@ const PWAEditActivityPage = () => {
                     notes: data.notes || '',
                     important: data.important || data.pinned || false
                 });
+
+                if (data.avatar) {
+                    setCurrentImage(data.avatar);
+                }
             } catch (error: any) {
                 console.error('Fetch activity error:', error);
                 showToast('Không thể tải thông tin hoạt động', 'error');
@@ -86,12 +93,19 @@ const PWAEditActivityPage = () => {
         }
     }, [activityId, isAuthenticated, navigate]);
 
+    const [newAvatarFile, setNewAvatarFile] = useState<File | null>(null);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!activityId) return;
 
         if (!formData.title.trim()) {
             setErrors({ title: 'Vui lòng nhập tên hoạt động' });
+            return;
+        }
+
+        if (!formData.startTime) {
+            setErrors({ startTime: 'Vui lòng chọn giờ bắt đầu' });
             return;
         }
 
@@ -112,7 +126,18 @@ const PWAEditActivityPage = () => {
                 updateData[key] === undefined && delete updateData[key]
             );
 
-            await api.activities.update(activityId, updateData);
+            let payload: any = updateData;
+
+            if (newAvatarFile) {
+                const formDataObj = new FormData();
+                Object.entries(updateData).forEach(([key, value]) => {
+                    formDataObj.append(key, String(value));
+                });
+                formDataObj.append('avatar', newAvatarFile);
+                payload = formDataObj;
+            }
+
+            await api.activities.update(activityId, payload);
 
             showToast('Đã cập nhật hoạt động thành công', 'success');
             navigate(-1);
@@ -133,10 +158,10 @@ const PWAEditActivityPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background transition-colors duration-300">
+        <div className="h-full bg-background transition-colors duration-300 flex flex-col overflow-hidden">
             <AnimatedTransition show={showContent} animation="slide-up">
-                {/* PWA Header */}
-                <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-border/50">
+                {/* Header part of flex flow */}
+                <div className="bg-background/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-border/50">
                     <button
                         onClick={() => navigate(-1)}
                         className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full hover:bg-secondary/80 text-foreground transition-all active:scale-95"
@@ -149,11 +174,23 @@ const PWAEditActivityPage = () => {
                 </div>
 
                 {/* Content */}
-                <div className="px-5 pt-6 pb-44 flex flex-col min-h-[calc(100vh-80px)]">
+                <div className="px-5 pt-6 pb-10 flex-1 overflow-y-auto">
                     <div className="flex-1 space-y-6">
+                        {/* Avatar Upload */}
+                        <div className="flex justify-center mb-2">
+                            <ActivityAvatarUpload
+                                currentImage={currentImage}
+                                onImageSelected={(file) => {
+                                    setNewAvatarFile(file);
+                                    // Preview is handled by the component
+                                }}
+                                size="lg"
+                            />
+                        </div>
+
                         {/* Title Input */}
                         <div className="space-y-2">
-                            <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                            <Label htmlFor="title" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                 Tên hoạt động <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -175,8 +212,8 @@ const PWAEditActivityPage = () => {
                         {/* Start Time and Duration */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="startTime" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
-                                    Giờ bắt đầu
+                                <Label htmlFor="startTime" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
+                                    Giờ bắt đầu <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="relative">
                                     <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/60" />
@@ -184,13 +221,22 @@ const PWAEditActivityPage = () => {
                                         id="startTime"
                                         type="time"
                                         value={formData.startTime}
-                                        onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                                        className="bg-card border-input shadow-sm rounded-xl h-14 pl-12 pr-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
+                                        onChange={(e) => {
+                                            setFormData({ ...formData, startTime: e.target.value });
+                                            if (errors.startTime) setErrors({ ...errors, startTime: undefined });
+                                        }}
+                                        className={cn(
+                                            "bg-card border-input shadow-sm rounded-xl h-14 pl-12 pr-4 text-base text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200",
+                                            errors.startTime && "border-destructive focus-visible:ring-destructive/20"
+                                        )}
                                     />
                                 </div>
+                                {errors.startTime && (
+                                    <p className="text-xs text-destructive ml-1">{errors.startTime}</p>
+                                )}
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="durationMin" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                                <Label htmlFor="durationMin" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                     Phút
                                 </Label>
                                 <Input
@@ -205,7 +251,7 @@ const PWAEditActivityPage = () => {
 
                         {/* Location Input */}
                         <div className="space-y-2">
-                            <Label htmlFor="location" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                            <Label htmlFor="location" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                 Địa điểm
                             </Label>
                             <div className="relative">
@@ -222,7 +268,7 @@ const PWAEditActivityPage = () => {
 
                         {/* Notes Input */}
                         <div className="space-y-2">
-                            <Label htmlFor="notes" className="text-[13px] text-muted-foreground font-medium pl-1 uppercase tracking-wider opacity-70">
+                            <Label htmlFor="notes" className="text-[13px] text-muted-foreground font-medium pl-1 tracking-wider opacity-70">
                                 Ghi chú
                             </Label>
                             <div className="relative">
@@ -244,7 +290,7 @@ const PWAEditActivityPage = () => {
                                 id="important"
                                 checked={formData.important}
                                 onCheckedChange={(checked) => setFormData({ ...formData, important: !!checked })}
-                                className="w-5 h-5 rounded-md border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                className="w-5 h-5 rounded-md border-primary/20 data-[state=checked]:bg-[#6347f9] data-[state=checked]:border-[#6347f9]"
                             />
                             <div className="flex items-center gap-2 flex-1 cursor-pointer" onClick={() => setFormData({ ...formData, important: !formData.important })}>
                                 <Star className={cn("w-4 h-4 transition-colors", formData.important ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground")} />
@@ -253,12 +299,12 @@ const PWAEditActivityPage = () => {
                         </div>
                     </div>
 
-                    {/* Sticky Bottom Button */}
-                    <div className="fixed bottom-[80px] left-0 right-0 px-5 py-4 bg-background/80 backdrop-blur-md border-t border-border/50 z-40">
+                    {/* Bottom Button */}
+                    <div className="px-5 py-4 bg-background border-t border-border/50 pb-safe z-40">
                         <Button
                             onClick={handleSubmit}
                             disabled={saving}
-                            className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
+                            className="w-full h-14 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
                         >
                             {saving ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
@@ -7,27 +7,50 @@ import { useGlobalToast } from '@/utils/globalToast.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   Search,
-  Filter,
   MapPin,
-  Calendar,
   Users,
-  Plus,
-  ChevronRight,
-  ChevronDown,
-  Plane,
-  Hotel,
-  Camera,
-  Car,
-  MoreVertical,
-  Trash2,
-  Eye
+  Bell,
+  Navigation,
+  Loader2,
+  Calendar,
+  SlidersHorizontal,
+  Check,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
-import { Badge } from '@/components/ui/badge.tsx';
-import { Card, CardContent } from '@/components/ui/card.tsx';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu.tsx';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar.tsx';
+import { useNotificationCountContext } from '@/contexts/NotificationCountContext';
+import { useTranslation } from 'react-i18next';
+import { DATABASE_TYPES } from '@/integrations/api/types';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+  DrawerFooter,
+  DrawerClose
+} from "@/components/ui/drawer";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+// Add CSS to hide scrollbar
+const style = `
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+`;
 
 type TripWithMember = {
   id: string;
@@ -60,34 +83,46 @@ type TripWithMember = {
 
 const PWATripListPage = () => {
   const { showToast } = useGlobalToast();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { isPWA } = usePWA();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  // const { unreadCount } = useNotificationCountContext(); // Removed unused context
 
   const [trips, setTrips] = useState<TripWithMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchTrigger, setSearchTrigger] = useState(0);
   const [searchLoading, setSearchLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [isScrolled, setIsScrolled] = useState(false);
 
-  // Manual search trigger
-  const handleManualSearch = () => {
-    setSearchTrigger(prev => prev + 1);
-  };
+  // Filter States
+  const [provinces, setProvinces] = useState<DATABASE_TYPES.provinces[]>([]);
+  const [selectedProvince, setSelectedProvince] = useState<string>('all');
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [provinceSearchQuery, setProvinceSearchQuery] = useState('');
 
-  // Handle scroll for header style
+  // Ref for infinite scroll
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, loading]);
 
   // Set page title
   useEffect(() => {
@@ -96,68 +131,74 @@ const PWATripListPage = () => {
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       navigate('/auth');
       return;
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, authLoading, navigate]);
 
-  // Reset trips when search changes
+  // Load provinces
   useEffect(() => {
-    if (isLoading || !isAuthenticated) return;
+    const loadProvinces = async () => {
+      try {
+        const response = await api.provinces.getAll();
+        setProvinces(Array.isArray(response) ? response : []);
+      } catch (error) {
+        console.error('Error loading provinces:', error);
+      }
+    };
+    loadProvinces();
+  }, []);
 
-    // Reset state when search changes
+  // Initial fetch and Filter change refetch
+  useEffect(() => {
+    if (authLoading || !isAuthenticated) return;
+
+    // Reset and fetch when filters change
     setTrips([]);
     setCurrentPage(1);
     setHasMore(true);
-    fetchTrips(true); // true = isInitialLoad
-  }, [isAuthenticated, isLoading, user, searchTrigger]);
+    fetchTrips(true);
+  }, [isAuthenticated, authLoading, user, selectedProvince, selectedDate]);
 
-  const handleLoadMore = useCallback(() => {
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!loading) { // Avoid search on initial load being called twice
+        setTrips([]);
+        setCurrentPage(1);
+        setHasMore(true);
+        fetchTrips(true);
+      }
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  const handleLoadMore = () => {
     if (hasMore && !loadingMore) {
       setCurrentPage(prev => prev + 1);
+      fetchTrips(false);
     }
-  }, [hasMore, loadingMore]);
-
-  // Load more trips when page changes (for infinite scroll)
-  useEffect(() => {
-    if (currentPage > 1 && hasMore && !loadingMore) {
-      fetchTrips(false); // false = not initial load
-    }
-  }, [currentPage]);
-
-  // Infinite scroll effect
-  useEffect(() => {
-    if (!isPWA) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-      // Load more when user scrolls to bottom (with 100px threshold)
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
-        handleLoadMore();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isPWA, hasMore, loadingMore, handleLoadMore]);
+  };
 
   const fetchTrips = async (isInitialLoad: boolean = true) => {
     if (!user) return;
 
-    // Show appropriate loading state
     if (isInitialLoad) {
-      setLoading(true);
+      if (!trips.length) setLoading(true);
+      else setSearchLoading(true);
     } else {
       setLoadingMore(true);
     }
 
     try {
+      const pageToFetch = isInitialLoad ? 1 : currentPage + 1;
       const response = await api.trips.getAll({
         search: searchQuery || undefined,
-        page: currentPage,
-        limit: 3
+        provinceId: selectedProvince !== 'all' ? selectedProvince : undefined,
+        startDate: selectedDate || undefined,
+        page: pageToFetch,
+        limit: 10
       });
 
       const tripsWithMembers: TripWithMember[] = response.trips.map((trip: any) => {
@@ -187,14 +228,14 @@ const PWATripListPage = () => {
         };
       });
 
-      // Update trips state
       if (isInitialLoad) {
         setTrips(tripsWithMembers);
+        setCurrentPage(1);
       } else {
         setTrips(prev => [...prev, ...tripsWithMembers]);
+        setCurrentPage(pageToFetch);
       }
 
-      // Update pagination state
       setHasMore(response.pagination.page < response.pagination.totalPages);
     } catch (error: any) {
       console.error('Fetch trips error:', error);
@@ -206,58 +247,16 @@ const PWATripListPage = () => {
     }
   };
 
-  const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return '—';
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
+  // Listen for PWA pull-to-refresh event
+  useEffect(() => {
+    const handlePWARefresh = () => {
+      console.log('PWA Refresh event received in PWATripListPage');
+      fetchTrips(true);
+    };
 
-  const getTripStatus = (startDate: string | undefined) => {
-    if (!startDate) return 'planning';
-    const today = new Date();
-    const start = new Date(startDate);
-
-    if (start < today) return 'completed';
-    if (start.toDateString() === today.toDateString()) return 'ongoing';
-    return 'upcoming';
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'planning': return 'bg-blue-500';
-      case 'upcoming': return 'bg-green-500';
-      case 'ongoing': return 'bg-orange-500';
-      case 'completed': return 'bg-gray-500';
-      default: return 'bg-blue-500';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'planning': return 'Đang lập kế hoạch';
-      case 'upcoming': return 'Sắp tới';
-      case 'ongoing': return 'Đang diễn ra';
-      case 'completed': return 'Đã hoàn thành';
-      default: return 'Đang lập kế hoạch';
-    }
-  };
-
-  const getTripIcon = (provinceName?: string) => {
-    if (!provinceName) return <MapPin className="w-4 h-4" />;
-    const dest = provinceName.toLowerCase();
-    if (dest.includes('bay') || dest.includes('flight') || dest.includes('máy bay')) {
-      return <Plane className="w-4 h-4" />;
-    } else if (dest.includes('khách sạn') || dest.includes('hotel') || dest.includes('homestay')) {
-      return <Hotel className="w-4 h-4" />;
-    } else if (dest.includes('du lịch') || dest.includes('tour') || dest.includes('thăm quan')) {
-      return <Camera className="w-4 h-4" />;
-    } else {
-      return <Car className="w-4 h-4" />;
-    }
-  };
+    window.addEventListener('pwa-refresh', handlePWARefresh);
+    return () => window.removeEventListener('pwa-refresh', handlePWARefresh);
+  }, [fetchTrips]);
 
   const handleTripClick = (trip: TripWithMember) => {
     navigate(`/trip/${trip.id}`);
@@ -267,250 +266,331 @@ const PWATripListPage = () => {
     navigate('/create-trip');
   };
 
-  const handleTripAction = async (action: string, trip: TripWithMember) => {
-    // No actions for now as delete is removed
+  const clearFilters = () => {
+    setSelectedProvince('all');
+    setSelectedDate('');
+    setSearchQuery('');
   };
 
-
-
-  if (isLoading) {
+  if (loading && !searchLoading && trips.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-4 pb-20 px-4">
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Đang tải...</p>
-          </div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground font-medium">Đang tải chuyến đi...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen pb-20 px-4 bg-background text-foreground">
+  const hasActiveFilters = selectedProvince !== 'all' || selectedDate !== '';
 
-      {/* Search - Fixed at top */}
-      <div className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-200 py-3 px-4 pt-[max(env(safe-area-inset-top),12px)]",
-        isScrolled ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm" : "bg-transparent"
-      )}>
-        <div className="max-w-6xl mx-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+  return (
+    <div className="w-full max-w-7xl mx-auto bg-background text-foreground pb-24 min-h-screen">
+      <style>{style}</style>
+
+      {/* Header Section */}
+      <div className="px-4 pt-6 pb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
+              <AvatarImage src={user?.profilePicture} alt={user?.fullName || 'User'} />
+              <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                {(user?.fullName || 'G').charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-muted-foreground text-sm font-medium flex items-center gap-1">
+                {t('common.greeting', { defaultValue: 'Xin chào' })}, {user?.fullName?.split(' ')[0] || t('common.guest', { defaultValue: 'Bạn' })} <span className="animate-wave">👋</span>
+              </span>
+              <h1 className="text-xl font-bold text-foreground leading-tight">
+                Đây là những chuyến đi của bạn
+              </h1>
+            </div>
+          </div>
+
+          {/* Notification Button Removed */}
+        </div>
+      </div>
+
+      {/* Sticky Top Search Bar & Filter Button */}
+      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg px-4 pt-4 pb-2 mb-4">
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 w-5 h-5" />
             <Input
               placeholder="Tìm kiếm chuyến đi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleManualSearch()}
-              className="pl-10 h-11 bg-card border-border focus:border-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-sm rounded-xl text-foreground placeholder:text-muted-foreground/60"
-              disabled={searchLoading}
+              className="pl-12 pr-4 h-12 bg-secondary/50 border-none rounded-full text-base placeholder:text-muted-foreground/40 focus-visible:ring-1 focus-visible:ring-primary/20 transition-all font-medium w-full"
             />
             {searchLoading && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                <Loader2 className="w-4 h-4 animate-spin text-primary" />
               </div>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Spacer to account for fixed search bar */}
-      <div className="h-28"></div>
+          <Drawer open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+            <DrawerTrigger asChild>
+              <Button
+                className={cn(
+                  "h-12 w-12 rounded-full p-0 flex items-center justify-center shrink-0 transition-all",
+                  hasActiveFilters
+                    ? "bg-primary text-white hover:bg-primary/90 shadow-primary/20"
+                    : "bg-secondary/50 text-foreground hover:bg-secondary/80"
+                )}
+              >
+                <SlidersHorizontal className="w-5 h-5" />
+                {hasActiveFilters && (
+                  <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-background" />
+                )}
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="max-h-[85vh] p-0 rounded-t-[32px]">
+              <div className="mx-auto w-12 h-1.5 bg-muted rounded-full my-4" />
+              <DrawerHeader className="px-6 text-left">
+                <DrawerTitle className="text-2xl font-bold">Bộ lọc tìm kiếm</DrawerTitle>
+              </DrawerHeader>
 
-      {/* Hero Section */}
-      <div className="flex flex-col items-center justify-center pt-2 pb-6 text-center px-4">
-        <div className="w-full h-32 relative mb-2 flex items-center justify-center overflow-hidden">
-          {/* Speed Lines */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="speed-streak w-16 top-[35%] right-0" style={{ animationDelay: '0s' }}></div>
-            <div className="speed-streak w-20 top-[50%] right-0" style={{ animationDelay: '0.2s' }}></div>
-            <div className="speed-streak w-14 top-[65%] right-0" style={{ animationDelay: '0.4s' }}></div>
-          </div>
-
-          <div className="w-32 h-32 relative z-10 animate-mascot-run">
-            <img
-              src="/my_trips_mascot.png"
-              alt="My Trips Mascot"
-              className="w-full h-full object-contain drop-shadow-sm"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-            {/* Exhaust Smoke */}
-            <div className="absolute bottom-6 left-4 pointer-events-none">
-              <div className="smoke-particle" style={{ animationDelay: '0s', width: '8px', height: '8px' }}></div>
-              <div className="smoke-particle" style={{ animationDelay: '0.3s', width: '8px', height: '8px' }}></div>
-              <div className="smoke-particle" style={{ animationDelay: '0.6s', width: '8px', height: '8px' }}></div>
-            </div>
-          </div>
-        </div>
-        <h1 className="text-2xl font-black text-primary uppercase tracking-wide mb-2 drop-shadow-sm text-center w-full">
-          CHUYẾN ĐI CỦA TÔI
-        </h1>
-        <p className="text-muted-foreground font-bold text-sm">
-          Quản lý và theo dõi tất cả chuyến đi
-        </p>
-      </div>
-
-      {/* Trips Grid */}
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-flex items-center gap-2">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600">Đang tải...</p>
-          </div>
-        </div>
-      ) : searchLoading ? (
-        <div className="text-center py-12">
-          <div className="inline-flex items-center gap-2">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600">Đang tìm kiếm...</p>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            {trips.map((trip) => {
-              const status = getTripStatus(trip.startDate);
-              // const statusColor = getStatusColor(status); // Not using status color for badge in new design for now unless requested
-              // const statusLabel = getStatusLabel(status);
-
-              return (
-                <div
-                  key={trip.id}
-                  className="group relative rounded-[32px] overflow-hidden border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(108,93,211,0.15)] transition-all duration-500 bg-card h-[450px] w-full flex flex-col cursor-pointer"
-                  onClick={() => handleTripClick(trip)}
-                >
-                  {/* Background Image - Full Cover */}
-                  <div className="relative h-1/2 overflow-hidden bg-gray-100">
-                    {trip.avatar ? (
-                      <img
-                        src={trip.avatar}
-                        alt={trip.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
+              <div className="px-6 pb-8 overflow-y-auto max-h-[60vh] no-scrollbar space-y-6">
+                {/* Date Filter */}
+                {/* Date Filter */}
+                <div className="space-y-3">
+                  <label className="text-sm font-bold text-muted-foreground uppercase tracking-wide">Thời gian khởi hành</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full h-12 rounded-xl justify-start text-left font-normal bg-secondary/50 border-none hover:bg-primary/10 hover:text-primary",
+                          !selectedDate && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {selectedDate ? format(new Date(selectedDate), "dd/MM/yyyy") : <span>Chọn ngày...</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={selectedDate ? new Date(selectedDate) : undefined}
+                        onSelect={(date) => setSelectedDate(date ? format(date, "yyyy-MM-dd") : "")}
+                        initialFocus
                       />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <Plane className="w-16 h-16 text-gray-300" />
-                      </div>
-                    )}
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-60" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+
+                {/* Province Filter */}
+                <div className="space-y-3">
+                  <label className="text-sm font-bold text-muted-foreground uppercase tracking-wide">Điểm đến (Tỉnh/Thành)</label>
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Tìm kiếm tỉnh thành..."
+                      className="pl-10 h-11 bg-muted/50 border-none rounded-xl"
+                      value={provinceSearchQuery}
+                      onChange={(e) => setProvinceSearchQuery(e.target.value)}
+                    />
                   </div>
 
-                  {/* Content Card */}
-                  <div className="flex-1 bg-card p-6 flex flex-col justify-between relative -mt-6 rounded-t-[32px] z-10">
-                    <div className="space-y-4">
-                      {/* Title */}
-                      <h3 className="font-bold text-lg text-foreground leading-snug line-clamp-2" title={trip.title}>
-                        {trip.title}
-                      </h3>
-
-                      {/* Details */}
-                      <div className="space-y-2">
-                        {/* Location */}
-                        <div className="flex items-center text-muted-foreground font-medium text-sm">
-                          <MapPin size={16} className="mr-2 text-destructive" />
-                          <span className="truncate">{trip.province?.name || 'Chưa xác định'}</span>
-                        </div>
-
-                        {/* Members */}
-                        <div className="flex items-center text-muted-foreground font-medium text-sm">
-                          <Users size={16} className="mr-2 text-primary" />
-                          <span>{trip.member_count || 1} thành viên</span>
-                        </div>
-
-                        {/* Owner */}
-                        <div className="flex items-center text-muted-foreground font-medium text-sm pt-1">
-                          <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-accent-foreground text-[10px] font-bold mr-2 overflow-hidden flex-shrink-0">
-                            {trip.user?.profilePicture ? (
-                              <img src={trip.user.profilePicture} alt="Owner" className="w-full h-full object-cover" />
-                            ) : (
-                              <span>{(trip.user?.fullName || 'A').charAt(0).toUpperCase()}</span>
-                            )}
-                          </div>
-                          <span className="truncate">Chủ chuyến đi: <span className="text-foreground font-medium">{trip.user?.fullName || 'Tôi'}</span></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="pt-2">
-                      <Button
-                        className="w-full rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold h-11 shadow-[0_4px_15px_rgba(108,93,211,0.3)] hover:shadow-[0_8px_25px_rgba(108,93,211,0.4)] transition-all active:scale-[0.98]"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTripClick(trip);
-                        }}
-                      >
-                        Xem chi tiết
-                        <Eye className="ml-2 w-4 h-4" />
-                      </Button>
-                    </div>
+                  <div className="grid grid-cols-1 gap-1 max-h-[300px] overflow-y-auto pr-1">
+                    <button
+                      onClick={() => setSelectedProvince('all')}
+                      className={cn(
+                        "flex items-center justify-between px-4 py-3 rounded-xl transition-all",
+                        selectedProvince === 'all' ? "bg-primary/10 text-primary font-bold" : "hover:bg-muted/50 text-foreground font-medium"
+                      )}
+                    >
+                      <span>Tất cả</span>
+                      {selectedProvince === 'all' && <Check className="w-5 h-5" />}
+                    </button>
+                    {provinces
+                      .filter(p => p.name.toLowerCase().includes(provinceSearchQuery.toLowerCase()))
+                      .map((province) => (
+                        <button
+                          key={province.id}
+                          onClick={() => setSelectedProvince(province.id)}
+                          className={cn(
+                            "flex items-center justify-between px-4 py-3 rounded-xl transition-all",
+                            selectedProvince === province.id ? "bg-primary/10 text-primary font-bold" : "hover:bg-muted/50 text-foreground font-medium"
+                          )}
+                        >
+                          <span>{province.name}</span>
+                          {selectedProvince === province.id && <Check className="w-5 h-5" />}
+                        </button>
+                      ))}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Loading More Skeleton */}
-          {loadingMore && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <Card key={`skeleton-${index}`} className="bg-card overflow-hidden border-border">
-                  <div className="h-40 bg-secondary animate-pulse"></div>
-                  <CardContent className="p-4">
-                    <div className="h-6 bg-secondary rounded animate-pulse mb-3"></div>
-                    <div className="space-y-2 mb-4">
-                      <div className="h-4 bg-secondary rounded animate-pulse"></div>
-                      <div className="h-4 bg-secondary rounded animate-pulse w-3/4"></div>
-                      <div className="h-4 bg-secondary rounded animate-pulse w-1/2"></div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 bg-secondary rounded-full animate-pulse mr-2"></div>
-                        <div className="h-4 bg-secondary rounded animate-pulse w-20"></div>
-                      </div>
-                      <div className="h-8 bg-secondary rounded animate-pulse w-24"></div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {/* Empty State */}
-          {trips.length === 0 && (
-            <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-full mb-4">
-                <Plane className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">
-                {searchQuery ? 'Không tìm thấy chuyến đi' : 'Chưa có chuyến đi nào'}
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                {searchQuery
-                  ? 'Thử tìm kiếm với từ khóa khác'
-                  : 'Bắt đầu tạo chuyến đi đầu tiên của bạn'
-                }
-              </p>
-              {!searchQuery && (
-                <Button
-                  onClick={handleCreateTrip}
-                  className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Tạo chuyến đi đầu tiên
-                </Button>
-              )}
-            </div>
-          )}
-        </>
-      )}
 
+              <DrawerFooter className="px-6 pb-8 pt-2">
+                <div className="flex gap-3 w-full">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-12 rounded-xl font-bold border-none bg-secondary hover:bg-primary/20 hover:text-primary transition-colors"
+                    onClick={clearFilters}
+                  >
+                    Đặt lại
+                  </Button>
+                  <DrawerClose asChild>
+                    <Button className="flex-1 h-12 rounded-xl font-bold bg-primary hover:bg-primary/90 text-white">
+                      Áp dụng
+                    </Button>
+                  </DrawerClose>
+                </div>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      </div>
+
+      {/* Trips Masonry Grid */}
+      {
+        trips.length === 0 && !loading ? (
+          <div className="text-center py-12 px-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary/50 rounded-full mb-4">
+              <MapPin className="w-8 h-8 text-muted-foreground/50" />
+            </div>
+            <h3 className="text-lg font-bold mb-2 text-foreground">
+              {searchQuery ? 'Không tìm thấy chuyến đi' : 'Chưa có chuyến đi nào'}
+            </h3>
+            <p className="text-muted-foreground mb-6 text-sm">
+              {searchQuery
+                ? 'Thử tìm kiếm với từ khóa khác xem sao'
+                : 'Hãy bắt đầu hành trình mới của bạn ngay hôm nay!'
+              }
+            </p>
+            {!searchQuery && (
+              <Button
+                onClick={handleCreateTrip}
+                className="bg-primary text-primary-foreground font-bold rounded-full px-6 shadow-xl shadow-primary/20"
+              >
+                Tạo chuyến đi đầu tiên
+              </Button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-4 px-4">
+              {/* Column 1 */}
+              <div className="flex-1 flex flex-col gap-4">
+                {trips.map((trip, index) => {
+                  if (index % 2 !== 0) return null;
+                  return (
+                    <TripMasonryCard
+                      key={trip.id}
+                      trip={trip}
+                      index={index}
+                      onClick={handleTripClick}
+                    />
+                  );
+                })}
+              </div>
+              {/* Column 2 */}
+              <div className="flex-1 flex flex-col gap-4">
+                {trips.map((trip, index) => {
+                  if (index % 2 === 0) return null;
+                  return (
+                    <TripMasonryCard
+                      key={trip.id}
+                      trip={trip}
+                      index={index}
+                      onClick={handleTripClick}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Infinite Scroll Sentinel */}
+            {hasMore && (
+              <div ref={loadMoreRef} className="flex justify-center py-6 min-h-[60px]">
+                {loadingMore && (
+                  <div className="flex items-center gap-2 text-primary">
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )
+      }
+
+      {/* End of results */}
+      {
+        !hasMore && trips.length > 0 && (
+          <div className="text-center py-8">
+            <p className="text-xs font-medium text-muted-foreground/50 uppercase tracking-widest">
+              — Đã hiển thị hết danh sách —
+            </p>
+          </div>
+        )
+      }
+
+    </div >
+  );
+};
+
+// Inline Masonry Card Component for Trips
+const TripMasonryCard: React.FC<{ trip: TripWithMember; index: number; onClick: (trip: TripWithMember) => void }> = ({ trip, index, onClick }) => {
+  // Pattern: Row 1 (T, S), Row 2 (S, T)
+  const isTall = index % 4 === 0 || index % 4 === 3;
+
+  return (
+    <div
+      className="flex flex-col cursor-pointer w-full group overflow-hidden rounded-[24px] border border-border/40 shadow-sm"
+      onClick={() => onClick(trip)}
+    >
+      <div
+        className={cn(
+          "relative w-full overflow-hidden bg-muted",
+          isTall ? "aspect-[3/4]" : "aspect-[4/3]"
+        )}
+        style={{ aspectRatio: isTall ? '3/4' : '4/3' }}
+      >
+        <img
+          src={trip.avatar || "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&auto=format&fit=crop&q=60"}
+          alt={trip.title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&auto=format&fit=crop&q=60";
+          }}
+        />
+
+        {/* Location Overlay */}
+        <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-full text-white text-[10px] font-bold max-w-[calc(100%-24px)]">
+          <Navigation size={10} className="fill-white shrink-0" />
+          <span className="truncate">{trip.province?.name || "Chưa xác định"}</span>
+        </div>
+
+        {/* Status Badge (formerly Role Badge) */}
+        <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-[10px] font-bold backdrop-blur-md border border-white/20 bg-black/40 text-white">
+          {trip.startDate ? new Date(trip.startDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : 'Planning'}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5 p-3 bg-[#EBE8FF] dark:bg-[#1A1825] rounded-b-[24px] -mt-1 pt-4 flex-1">
+        <h3 className="text-foreground font-bold text-sm leading-tight">
+          {trip.title}
+        </h3>
+
+        <div className="flex items-center gap-1.5 mt-auto">
+          <span className="text-[10px] text-muted-foreground/70">
+            bởi <span className="text-foreground font-semibold">{trip.user?.fullName || 'Ẩn danh'}</span>
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5 pt-1">
+          <Users className="w-3.5 h-3.5 text-primary" />
+          <span className="text-[11px] text-muted-foreground font-medium">
+            {trip.member_count}
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

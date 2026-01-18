@@ -23,7 +23,8 @@ import {
   Trash2,
   ChevronDown,
   ChevronRight,
-  GripVertical
+  GripVertical,
+  Copy
 } from 'lucide-react';
 import { cn } from '@/lib/utils.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
@@ -65,6 +66,7 @@ type ApiActivity = {
   dayId: number;
   pinned?: boolean;
   images?: any[];
+  avatar?: string | null;
 };
 
 type ApiDay = {
@@ -82,6 +84,7 @@ type TripDetails = {
   name: string;
   description: string;
   startDate: string;
+  endDate?: string;
   provinceId?: string;
   province?: {
     id: string;
@@ -131,6 +134,7 @@ type Activity = {
   pinned?: boolean;
   orderIndex?: number;
   images?: { id: string; url: string; filename: string }[];
+  avatar?: string;
 };
 
 type Expense = {
@@ -189,11 +193,17 @@ const TripDetailsPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isMobileView]);
 
-  // State for collapsible days (default empty = all collapsed)
+  // [EXISTING CODE] ...
   const [expandedDayIds, setExpandedDayIds] = useState<string[]>([]);
   const [draggedActivity, setDraggedActivity] = useState<{ id: string, dayId: string } | null>(null);
   const [dragOverActivityId, setDragOverActivityId] = useState<string | null>(null);
   const [justDroppedId, setJustDroppedId] = useState<string | null>(null);
+
+  // Day Drag & Drop State
+  const [draggedDayId, setDraggedDayId] = useState<string | null>(null);
+  const [dragOverDayId, setDragOverDayId] = useState<string | null>(null);
+  const [justDroppedDayId, setJustDroppedDayId] = useState<string | null>(null);
+
   const [showAddDay, setShowAddDay] = useState(false);
 
   const toggleDay = (dayId: string) => {
@@ -204,6 +214,89 @@ const TripDetailsPage = () => {
     );
   };
 
+  // ... [EXISTING CODE] ...
+
+  // Day Drag Handlers
+  const handleDayDragStart = (e: React.DragEvent, dayId: string) => {
+    // Enabled for mobile now as per request for PWA
+    setDraggedDayId(dayId);
+    e.dataTransfer.setData('dayId', dayId);
+    e.dataTransfer.effectAllowed = 'move';
+
+    // Ghost image or style
+    const target = e.currentTarget as HTMLElement;
+    setTimeout(() => {
+      target.style.opacity = '0.5';
+    }, 0);
+  };
+
+  const handleDayDragOver = (e: React.DragEvent, dayId: string) => {
+    e.preventDefault();
+    if (draggedDayId && draggedDayId !== dayId) {
+      setDragOverDayId(dayId);
+      e.dataTransfer.dropEffect = 'move';
+    }
+  };
+
+  const handleDayDragEnd = (e: React.DragEvent) => {
+    const target = e.currentTarget as HTMLElement;
+    target.style.opacity = '1';
+    setDraggedDayId(null);
+    setDragOverDayId(null);
+  };
+
+  const handleDayDrop = async (e: React.DragEvent, targetDayId: string) => {
+    e.preventDefault();
+    if (!draggedDayId || draggedDayId === targetDayId) return;
+
+    const sourceIndex = days.findIndex(d => d.id === draggedDayId);
+    const targetIndex = days.findIndex(d => d.id === targetDayId);
+
+    if (sourceIndex !== -1 && targetIndex !== -1) {
+      // Reorder locally
+      const newDays = [...days];
+      const [removed] = newDays.splice(sourceIndex, 1);
+      newDays.splice(targetIndex, 0, removed);
+
+      setDays(newDays);
+      setJustDroppedDayId(draggedDayId);
+      setTimeout(() => setJustDroppedDayId(null), 2000);
+
+      // Call API
+      try {
+        const dayIds = newDays.map(d => d.id);
+        await api.patch('/days/reorder', { dayIds });
+      } catch (error) {
+        console.error('Failed to reorder days:', error);
+        showToast('Không thể sắp xếp ngày', 'error');
+        // Revert (optional, but good for UX)
+        fetchDaysAndActivities();
+      }
+    }
+
+    setDraggedDayId(null);
+    setDragOverDayId(null);
+  };
+
+  const handlePWAReorderDays = async (newOrderIds: string[]) => {
+    // Optimistic update
+    const newDays = newOrderIds.map(id => days.find(d => d.id === id)!).filter(Boolean);
+    if (newDays.length !== days.length) return;
+
+    setDays(newDays);
+
+    try {
+      await api.patch('/days/reorder', { dayIds: newOrderIds });
+      showToast('Đã cập nhật thứ tự ngày', 'success');
+    } catch (error) {
+      console.error('Failed to reorder days:', error);
+      showToast('Không thể sắp xếp ngày', 'error');
+      fetchDaysAndActivities();
+    }
+  };
+
+
+
   // Dialog states
   const [showAddActivity, setShowAddActivity] = useState(false);
   const [showEditDay, setShowEditDay] = useState(false);
@@ -211,25 +304,40 @@ const TripDetailsPage = () => {
   const [showEditActivity, setShowEditActivity] = useState(false);
   const [editingActivity, setEditingActivity] = useState<LibActivity | null>(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
-  const [selectedDayId, setSelectedDayId] = useState<string>('');
+  const initialDayId = searchParams.get('dayId') || '';
+  const [selectedDayId, setSelectedDayId] = useState<string>(initialDayId);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editTripDialogOpen, setEditTripDialogOpen] = useState(false);
   const [deleteActivityDialogOpen, setDeleteActivityDialogOpen] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
+  const [duplicateActivityData, setDuplicateActivityData] = useState<Activity | null>(null);
+  const [deleteDayDialogOpen, setDeleteDayDialogOpen] = useState(false);
+  const [dayToDelete, setDayToDelete] = useState<Day | null>(null);
+  const itinerarySectionRef = React.useRef<HTMLDivElement>(null);
 
   const { id } = useParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Write tab to URL on change
+  // Write tab and dayId to URL on change - optimized to prevent unnecessary updates
   useEffect(() => {
-    const current = searchParams.get('tab');
-    if (current !== activeTab) {
-      const next = new URLSearchParams(searchParams);
+    const next = new URLSearchParams(searchParams);
+    let changed = false;
+
+    if (activeTab && next.get('tab') !== activeTab) {
       next.set('tab', activeTab);
+      changed = true;
+    }
+
+    if (selectedDayId && next.get('dayId') !== selectedDayId) {
+      next.set('dayId', selectedDayId);
+      changed = true;
+    }
+
+    if (changed) {
       setSearchParams(next, { replace: true });
     }
-  }, [activeTab, searchParams, setSearchParams]);
+  }, [activeTab, selectedDayId]);
 
   useEffect(() => {
     if (trip) {
@@ -238,6 +346,32 @@ const TripDetailsPage = () => {
       document.title = 'Chi tiết chuyến đi - Goouty';
     }
   }, [trip]);
+
+  // Handle scrollTo=itinerary param
+  useEffect(() => {
+    const scrollTo = searchParams.get('scrollTo');
+    if (scrollTo === 'itinerary' && !loading && trip) {
+      const timer = setTimeout(() => {
+        if (itinerarySectionRef.current) {
+          // Adjust scroll position to account for sticky header height (60px)
+          const offset = 80; // 60px header + some extra padding
+          const elementPosition = itinerarySectionRef.current.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+
+          // Clean up the search param
+          const next = new URLSearchParams(searchParams);
+          next.delete('scrollTo');
+          setSearchParams(next, { replace: true });
+        }
+      }, 500); // Wait for content to settle
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, loading, trip, setSearchParams]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -305,7 +439,8 @@ const TripDetailsPage = () => {
             id: image.id.toString(),
             url: image.url,
             filename: image.filename
-          }))
+          })),
+          avatar: (activity as any).avatar || undefined
         }));
       });
 
@@ -344,6 +479,7 @@ const TripDetailsPage = () => {
         name: tripData.title,
         description: tripData.description,
         startDate: tripData.startDate,
+        endDate: tripData.endDate,
         provinceId: tripData.provinceId,
         province: tripData.province,
         isPublic: tripData.isPublic || false,
@@ -387,7 +523,8 @@ const TripDetailsPage = () => {
               id: image.id.toString(),
               url: image.url,
               filename: image.filename
-            }))
+            })),
+            avatar: (activity as any).avatar || undefined
           }));
         });
 
@@ -410,17 +547,24 @@ const TripDetailsPage = () => {
         showToast('Phiên đăng nhập đã hết hạn', 'error');
         navigate('/auth');
       } else {
-        showToast(apiError.message || 'Không thể tải thông tin chuyến đi. Đang thử lại...', 'error');
-        setTimeout(() => {
-          if (user && id) {
-            fetchTripDetails();
-          }
-        }, 2000);
+        // Stop the silent retry loop which looks like a "refresh"
+        showToast(apiError.message || 'Không thể tải thông tin chuyến đi.', 'error');
       }
     } finally {
       setLoading(false);
     }
   };
+
+  // Listen for PWA pull-to-refresh event
+  useEffect(() => {
+    const handlePWARefresh = () => {
+      console.log('PWA Refresh event received in TripDetailsPage');
+      fetchTripDetails();
+    };
+
+    window.addEventListener('pwa-refresh', handlePWARefresh);
+    return () => window.removeEventListener('pwa-refresh', handlePWARefresh);
+  }, [id, user]);
 
   const openDeleteActivityDialog = (activity: Activity) => {
     setActivityToDelete(activity);
@@ -448,6 +592,68 @@ const TripDetailsPage = () => {
       setActivityToDelete(null);
     } catch (error: unknown) {
       showToast('Không thể xóa hoạt động', 'error');
+    }
+  };
+
+  const openDeleteDayDialog = (day: Day) => {
+    setDayToDelete(day);
+    setDeleteDayDialogOpen(true);
+  };
+
+  const handleConfirmDeleteDay = async () => {
+    if (!dayToDelete) return;
+
+    try {
+      await api.days.delete(dayToDelete.id);
+
+      setDays(prev => prev.filter(d => d.id !== dayToDelete.id));
+      setExpandedDayIds(prev => prev.filter(id => id !== dayToDelete.id));
+
+      // Remove activities for this day from local state
+      setActivitiesByDay(prev => {
+        const newState = { ...prev };
+        delete newState[dayToDelete.id];
+        return newState;
+      });
+
+      showToast('Đã xóa ngày khỏi lịch trình', 'success');
+      setDeleteDayDialogOpen(false);
+      setDayToDelete(null);
+
+      // If PWA or mobile, we might need to update other state logic if needed, 
+      // but the main data is days array
+    } catch (error) {
+      console.error('Failed to delete day:', error);
+      showToast('Không thể xóa ngày', 'error');
+    }
+  };
+
+
+  const handleDuplicateActivity = (activityId: string) => {
+    // Find activity and its day/index to get fresh info and position
+    let sourceActivity: any = null;
+    let dayId: string = '';
+
+    for (const dId in activitiesByDay) {
+      const found = activitiesByDay[dId].find(a => a.id === activityId);
+      if (found) {
+        sourceActivity = found;
+        dayId = dId;
+        break;
+      }
+    }
+
+    if (!sourceActivity) {
+      showToast('Không tìm thấy hoạt động để sao chép', 'error');
+      return;
+    }
+
+    if (isPWA) {
+      navigate(`/pwa-add-activity/${dayId}`, { state: { initialData: sourceActivity } });
+    } else {
+      setSelectedDayId(dayId);
+      setDuplicateActivityData(sourceActivity);
+      setShowAddActivity(true);
     }
   };
 
@@ -681,8 +887,8 @@ const TripDetailsPage = () => {
               {/* Meta Info */}
               <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-white/90 font-medium text-base">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-white" />
-                  <span>{formatDate(trip.startDate)}</span>
+                  <Calendar className="w-5 h-5 text-yellow-400" />
+                  <span>{formatDate(trip.startDate)} - {formatDate(trip.endDate || trip.startDate)}</span>
                 </div>
                 {trip.province && (
                   <div className="flex items-center gap-2">
@@ -729,59 +935,23 @@ const TripDetailsPage = () => {
           </div>
 
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className={cn(
-              "z-30 mb-8 transition-[top] duration-300",
-              isMobileView
-                ? cn("sticky -mx-4 w-[calc(100%+2rem)]", isTabsVisible ? "top-[60px]" : "top-[-100px]")
-                : "relative top-0 mx-0 bg-transparent z-0",
-              isPWA ? "bg-background/95 backdrop-blur-md border-b border-border/10" : ""
-            )}>
-              <div className={cn("overflow-x-auto scrollbar-hide px-4", isPWA ? "py-4" : "py-2")}>
-                <TabsList className={cn(
-                  "h-auto p-0 flex flex-nowrap items-center",
-                  isMobileView ? "justify-start gap-2 w-max min-w-full" : "justify-between gap-3 w-full",
-                  isPWA ? "bg-secondary/40 dark:bg-secondary/35 p-1.5 rounded-full" : "bg-transparent pb-2"
-                )}>
-                  <TabsTrigger
-                    value="itinerary"
-                    className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
-                      isMobileView
-                        ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
-                        : "flex-1 px-8 py-4 text-base"
-                    )}
-                  >
-                    <Clock className="mr-2 w-5 h-5" />
-                    Lịch trình
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="expenses"
-                    className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
-                      isMobileView
-                        ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
-                        : "flex-1 px-8 py-4 text-base"
-                    )}
-                  >
-                    <DollarSign className="mr-2 w-5 h-5" />
-                    Chi phí
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="members"
-                    className={cn(
-                      "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
-                      isMobileView
-                        ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
-                        : "flex-1 px-8 py-4 text-base"
-                    )}
-                  >
-                    <Users className="mr-2 w-5 h-5" />
-                    Thành viên ({trip.memberCount || 1})
-                  </TabsTrigger>
-                  {trip.userRole === 'owner' && (
+          <div ref={itinerarySectionRef}>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <div className={cn(
+                "z-30 mb-8 transition-[top] duration-300",
+                isMobileView
+                  ? cn("sticky -mx-4 w-[calc(100%+2rem)]", isTabsVisible ? "top-[60px]" : "top-[-100px]")
+                  : "relative top-0 mx-0 bg-transparent z-0",
+                isPWA ? "bg-background/95 backdrop-blur-md border-b border-border/10" : ""
+              )}>
+                <div className={cn("overflow-x-auto scrollbar-hide px-4", isPWA ? "py-4" : "py-2")}>
+                  <TabsList className={cn(
+                    "h-auto p-0 flex flex-nowrap items-center",
+                    isMobileView ? "justify-start gap-2 w-max min-w-full" : "justify-between gap-3 w-full",
+                    isPWA ? "bg-secondary/40 dark:bg-secondary/35 p-1.5 rounded-full" : "bg-transparent pb-2"
+                  )}>
                     <TabsTrigger
-                      value="share"
+                      value="itinerary"
                       className={cn(
                         "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
                         isMobileView
@@ -789,400 +959,518 @@ const TripDetailsPage = () => {
                           : "flex-1 px-8 py-4 text-base"
                       )}
                     >
-                      <Share2 className="mr-2 w-5 h-5" />
-                      Chia sẻ
+                      <Clock className="mr-2 w-5 h-5" />
+                      Lịch trình
                     </TabsTrigger>
-                  )}
-                </TabsList>
-              </div>
-            </div>
-
-            <TabsContent value="itinerary" className="mt-0">
-              {isPWA ? (
-                <PWATripItinerary
-                  days={days}
-                  activitiesByDay={activitiesByDay}
-                  isTabsVisible={isTabsVisible}
-                  onAddDay={() => {
-                    if (id) navigate(`/pwa-add-day/${id}`);
-                    else setShowAddDay(true);
-                  }}
-                  onEditDay={(dayId) => navigate(`/pwa-edit-day/${dayId}`)}
-                  onAddActivity={(dayId) => navigate(`/pwa-add-activity/${dayId}`)}
-                  onEditActivity={(activityId) => navigate(`/pwa-edit-activity/${activityId}`)}
-                  onDeleteActivity={openDeleteActivityDialog}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDragEnd={handleDragEnd}
-                  onDrop={handleDrop}
-                  draggedActivity={draggedActivity}
-                  dragOverActivityId={dragOverActivityId}
-                  justDroppedId={justDroppedId}
-                  isOwner={trip.userRole === 'owner'}
-                />
-              ) : (
-                <Card className={cn(
-                  "border-none shadow-xl bg-card overflow-hidden text-card-foreground",
-                  isMobileView ? "rounded-3xl" : "rounded-[32px]"
-                )}>
-                  <CardHeader className={cn(
-                    "flex flex-row items-center justify-between",
-                    isMobileView ? "px-5 pt-6 pb-2" : "px-8 pt-8 pb-4"
-                  )}>
-                    <div>
-                      <h2 className={cn(
-                        "font-bold text-foreground mb-1",
-                        isMobileView ? "text-xl" : "text-2xl"
-                      )}>Lịch trình</h2>
-                      {!isMobileView && <p className="text-muted-foreground font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
-                    </div>
-                    <Button
-                      onClick={() => {
-                        if (isMobileView && id) {
-                          navigate(`/pwa-add-day/${id}`);
-                        } else {
-                          setShowAddDay(true);
-                        }
-                      }}
-                      size={isMobileView ? "sm" : "default"}
-                      className="rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg"
+                    <TabsTrigger
+                      value="expenses"
+                      className={cn(
+                        "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
+                        isMobileView
+                          ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
+                          : "flex-1 px-8 py-4 text-base"
+                      )}
                     >
-                      <Plus className="w-4 h-4 mr-1.5" />
-                      Thêm ngày
-                    </Button>
-                  </CardHeader>
+                      <DollarSign className="mr-2 w-5 h-5" />
+                      Chi phí
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="members"
+                      className={cn(
+                        "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
+                        isMobileView
+                          ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
+                          : "flex-1 px-8 py-4 text-base"
+                      )}
+                    >
+                      <Users className="mr-2 w-5 h-5" />
+                      Thành viên ({trip.memberCount || 1})
+                    </TabsTrigger>
+                    {trip.userRole === 'owner' && (
+                      <TabsTrigger
+                        value="share"
+                        className={cn(
+                          "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
+                          isMobileView
+                            ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
+                            : "flex-1 px-8 py-4 text-base"
+                        )}
+                      >
+                        <Share2 className="mr-2 w-5 h-5" />
+                        Chia sẻ
+                      </TabsTrigger>
+                    )}
+                  </TabsList>
+                </div>
+              </div>
 
-                  <CardContent className={cn(
-                    "pb-12",
-                    isMobileView ? "px-5" : "px-8"
+              <TabsContent value="itinerary" className="mt-0">
+                {isPWA ? (
+                  <PWATripItinerary
+                    days={days}
+                    activitiesByDay={activitiesByDay}
+                    isTabsVisible={isTabsVisible}
+                    onAddDay={() => {
+                      if (id) navigate(`/pwa-add-day/${id}`);
+                      else setShowAddDay(true);
+                    }}
+                    onEditDay={(dayId) => navigate(`/pwa-edit-day/${dayId}`)}
+                    onAddActivity={(dayId) => navigate(`/pwa-add-activity/${dayId}`)}
+                    onEditActivity={(activityId) => navigate(`/pwa-edit-activity/${activityId}`)}
+                    onDuplicateActivity={handleDuplicateActivity}
+                    onDeleteActivity={openDeleteActivityDialog}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDragEnd={handleDragEnd}
+                    onDrop={handleDrop}
+                    draggedActivity={draggedActivity}
+                    dragOverActivityId={dragOverActivityId}
+                    justDroppedId={justDroppedId}
+                    isOwner={trip.userRole === 'owner'}
+                    onDeleteDay={openDeleteDayDialog}
+                    onReorderDays={handlePWAReorderDays}
+                    // Day Drag Props
+                    onDayDragStart={handleDayDragStart}
+                    onDayDragOver={handleDayDragOver}
+                    onDayDragEnd={handleDayDragEnd}
+                    onDayDrop={handleDayDrop}
+                    draggedDayId={draggedDayId}
+                    dragOverDayId={dragOverDayId}
+                    justDroppedDayId={justDroppedDayId}
+                    activeDayId={selectedDayId}
+                    onActiveDayChange={setSelectedDayId}
+                  />
+                ) : (
+                  <Card className={cn(
+                    "border-none shadow-xl bg-card overflow-hidden text-card-foreground",
+                    isMobileView ? "rounded-3xl" : "rounded-[32px]"
                   )}>
-                    {days.length === 0 ? (
-                      <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl bg-secondary/30">
-                        <div className="flex justify-center mb-4">
-                          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Calendar className="w-8 h-8 text-primary/40" />
-                          </div>
-                        </div>
-                        <h3 className="text-lg font-semibold text-foreground mb-2">Chưa có lịch trình</h3>
-                        <p className="text-muted-foreground mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
-                        <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-primary hover:bg-primary/90">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Thêm ngày đầu tiên
-                        </Button>
+                    <CardHeader className={cn(
+                      "flex flex-row items-center justify-between",
+                      isMobileView ? "px-5 pt-6 pb-2" : "px-8 pt-8 pb-4"
+                    )}>
+                      <div>
+                        <h2 className={cn(
+                          "font-bold text-foreground mb-1",
+                          isMobileView ? "text-xl" : "text-2xl"
+                        )}>Lịch trình</h2>
+                        {!isMobileView && <p className="text-muted-foreground font-medium">Chi tiết hoạt động từng ngày cho chuyến đi này</p>}
                       </div>
-                    ) : (
-                      <div className="space-y-10 relative">
-                        {days.map((day, index) => {
-                          const isExpanded = expandedDayIds.includes(day.id);
-                          return (
-                            <div key={day.id} className="relative">
-                              <div className={cn(
-                                "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-secondary rounded-xl transition-colors",
-                                isMobileView ? "p-1 -mx-1" : "p-2 -mx-2"
-                              )}
-                                onClick={() => toggleDay(day.id)}
+                      <Button
+                        onClick={() => {
+                          if (isMobileView && id) {
+                            navigate(`/pwa-add-day/${id}`);
+                          } else {
+                            setShowAddDay(true);
+                          }
+                        }}
+                        size={isMobileView ? "sm" : "default"}
+                        className="rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg"
+                      >
+                        <Plus className="w-4 h-4 mr-1.5" />
+                        Thêm ngày
+                      </Button>
+                    </CardHeader>
+
+                    <CardContent className={cn(
+                      "pb-12",
+                      isMobileView ? "px-5" : "px-8"
+                    )}>
+                      {days.length === 0 ? (
+                        <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl bg-secondary/30">
+                          <div className="flex justify-center mb-4">
+                            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                              <Calendar className="w-8 h-8 text-primary/40" />
+                            </div>
+                          </div>
+                          <h3 className="text-lg font-semibold text-foreground mb-2">Chưa có lịch trình</h3>
+                          <p className="text-muted-foreground mb-6">Hãy bắt đầu thêm ngày đầu tiên cho chuyến đi của bạn</p>
+                          <Button onClick={() => setShowAddDay(true)} className="rounded-xl bg-primary hover:bg-primary/90">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Thêm ngày đầu tiên
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-10 relative">
+                          {days.map((day, index) => {
+                            const isExpanded = expandedDayIds.includes(day.id);
+                            return (
+                              <div
+                                key={day.id}
+                                className={cn(
+                                  "relative transition-all duration-300",
+                                  draggedDayId === day.id && "opacity-40 border-2 border-dashed border-primary/50 rounded-xl p-4 bg-primary/5",
+                                  dragOverDayId === day.id && "translate-y-2 scale-[1.01]",
+                                  justDroppedDayId === day.id && "ring-2 ring-primary/40 bg-primary/[0.03] rounded-xl"
+                                )}
+                                draggable={trip.userRole === 'owner' && !isMobileView}
+                                onDragStart={(e) => handleDayDragStart(e, day.id)}
+                                onDragOver={(e) => handleDayDragOver(e, day.id)}
+                                onDragEnd={handleDayDragEnd}
+                                onDrop={(e) => handleDayDrop(e, day.id)}
                               >
-                                <div className={cn(
-                                  "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
-                                  isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
-                                  isExpanded ? "bg-primary text-primary-foreground dark:shadow-[0_0_15px_rgba(99,71,249,0.7)]" : "bg-secondary text-muted-foreground"
-                                )}>
-                                  {index + 1}
-                                </div>
-                                <div className="flex-1 pt-0.5">
-                                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                    <h3 className={cn(
-                                      "font-bold leading-tight transition-colors",
-                                      isExpanded ? "text-foreground" : "text-muted-foreground",
-                                      isMobileView ? "text-lg" : "text-xl"
-                                    )}>
-                                      {day.title}
-                                    </h3>
-
-                                    <div className="flex items-center gap-1">
-                                      {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
-
-                                      <div onClick={(e) => e.stopPropagation()}>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          className={cn(
-                                            "h-8 w-8 p-0 rounded-full hover:bg-secondary text-primary bg-primary/10",
-                                            isMobileView ? "opacity-100" : "opacity-0 group-hover/header:opacity-100 transition-opacity"
-                                          )}
-                                          onClick={() => {
-                                            if (isMobileView) {
-                                              navigate(`/pwa-edit-day/${day.id}`);
-                                            } else {
-                                              setEditingDay(day);
-                                              setShowEditDay(true);
-                                            }
-                                          }}
-                                        >
-                                          <Edit className="w-4 h-4" />
-                                        </Button>
-                                      </div>
-                                    </div>
-
-                                    <Badge variant="outline" className="text-primary font-normal bg-secondary border-border ml-auto md:ml-0">
-                                      {formatDate(day.date)}
-                                    </Badge>
+                                {/* Drag Handle Indicator */}
+                                {trip.userRole === 'owner' && !isMobileView && (
+                                  <div className="absolute -left-8 top-6 p-2 cursor-grab active:cursor-grabbing text-muted-foreground/20 hover:text-primary transition-colors opacity-0 hover:opacity-100 hidden lg:block" title="Kéo để sắp xếp ngày">
+                                    <GripVertical className="w-5 h-5" />
                                   </div>
-                                  {day.description && (
-                                    <p className="text-muted-foreground mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>
-                                  )}
-                                </div>
-                              </div>
-
-                              {isExpanded && (
+                                )}
                                 <div className={cn(
-                                  "border-l-2 border-border/50 space-y-4 pb-8 animate-in slide-in-from-top-2 duration-300",
-                                  isMobileView ? "pl-3 ml-3" : "pl-5 ml-5"
-                                )}>
-                                  {(!activitiesByDay[day.id] || activitiesByDay[day.id].length === 0) ? (
-                                    <div className="p-4 rounded-2xl border border-dashed border-border bg-secondary/20 text-muted-foreground text-sm italic text-center">
-                                      Chưa có hoạt động nào cho ngày này
-                                    </div>
-                                  ) : (
-                                    activitiesByDay[day.id].map((activity) => (
-                                      <div
-                                        key={activity.id}
-                                        draggable={trip.userRole === 'owner'}
-                                        onDragStart={(e) => handleDragStart(e, activity.id, day.id)}
-                                        onDragOver={(e) => handleDragOver(e, activity.id, day.id)}
-                                        onDragEnd={handleDragEnd}
-                                        onDrop={(e) => handleDrop(e, activity.id, day.id)}
-                                        className={cn(
-                                          "group bg-card border border-border rounded-2xl transition-all duration-300 relative select-none hover:border-primary/30",
-                                          isMobileView ? "p-4" : "p-5",
-                                          !isMobileView && "hover:shadow-md",
-                                          draggedActivity?.id === activity.id && "opacity-40",
-                                          dragOverActivityId === activity.id && "border-primary border-t-4",
-                                          justDroppedId === activity.id && "ring-2 ring-primary/40 bg-primary/[0.03] border-primary/50 scale-[1.01] shadow-lg z-20",
-                                          trip.userRole === 'owner' && "cursor-grab active:cursor-grabbing"
-                                        )}
-                                      >
-                                        <div className="flex justify-between items-start gap-3">
-                                          {trip.userRole === 'owner' && (
-                                            <div className="pt-1.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0">
-                                              <GripVertical className="w-5 h-5" />
-                                            </div>
-                                          )}
-                                          <div className="space-y-2 flex-1 min-w-0">
-                                            <div className="flex items-start justify-between">
-                                              <h4 className={cn(
-                                                "font-bold text-foreground break-words",
-                                                isMobileView ? "text-base" : "text-lg"
-                                              )}>{activity.title}</h4>
+                                  "flex items-start gap-3 mb-4 cursor-pointer select-none group/header hover:bg-secondary rounded-xl transition-colors",
+                                  isMobileView ? "p-1 -mx-1" : "p-2 -mx-2"
+                                )}
+                                  onClick={() => toggleDay(day.id)}
+                                >
+                                  <div className={cn(
+                                    "flex-shrink-0 rounded-full flex items-center justify-center font-bold shadow-sm transition-all",
+                                    isMobileView ? "w-8 h-8 text-base" : "w-10 h-10 text-lg",
+                                    isExpanded ? "bg-primary text-primary-foreground dark:shadow-[0_0_15px_rgba(99,71,249,0.7)]" : "bg-secondary text-muted-foreground"
+                                  )}>
+                                    {index + 1}
+                                  </div>
+                                  <div className="flex-1 pt-0.5">
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                      <h3 className={cn(
+                                        "font-bold leading-tight transition-colors",
+                                        isExpanded ? "text-foreground" : "text-muted-foreground",
+                                        isMobileView ? "text-lg" : "text-xl"
+                                      )}>
+                                        {day.title}
+                                      </h3>
 
-                                              {isMobileView && (
-                                                <div className="flex items-center -mt-1 ml-1" onClick={(e) => e.stopPropagation()}>
-                                                  <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-slate-400 hover:text-purple-600 active:bg-purple-50 rounded-full"
-                                                    onClick={() => {
-                                                      if (isMobileView) {
-                                                        navigate(`/pwa-edit-activity/${activity.id}`);
+                                      <div className="flex items-center gap-1">
+                                        {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground/50" /> : <ChevronRight className="w-4 h-4 text-muted-foreground/50" />}
+
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                          <div className="flex bg-primary/10 rounded-full p-0.5">
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              className={cn(
+                                                "h-8 w-8 p-0 rounded-full hover:bg-secondary text-primary",
+                                                "opacity-100"
+                                              )}
+                                              onClick={() => {
+                                                if (isMobileView) {
+                                                  navigate(`/pwa-edit-day/${day.id}`);
+                                                } else {
+                                                  setEditingDay(day);
+                                                  setShowEditDay(true);
+                                                }
+                                              }}
+                                            >
+                                              <Edit className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              className={cn(
+                                                "h-8 w-8 p-0 rounded-full hover:bg-red-100 text-red-500",
+                                                "opacity-100"
+                                              )}
+                                              onClick={() => openDeleteDayDialog(day)}
+                                            >
+                                              <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {isMobileView && (
+                                        <Badge variant="outline" className="text-primary font-normal bg-secondary border-border ml-auto md:ml-0">
+                                          {formatDate(day.date)}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    {day.description && (
+                                      <p className="text-muted-foreground mt-1 pl-1 text-[13px] leading-snug">{day.description}</p>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {isExpanded && (
+                                  <div className={cn(
+                                    "border-l-2 border-border/50 space-y-4 pb-8 animate-in slide-in-from-top-2 duration-300",
+                                    isMobileView ? "pl-3 ml-3" : "pl-5 ml-5"
+                                  )}>
+                                    {(!activitiesByDay[day.id] || activitiesByDay[day.id].length === 0) ? (
+                                      <div className="p-4 rounded-2xl border border-dashed border-border bg-secondary/20 text-muted-foreground text-sm italic text-center">
+                                        Chưa có hoạt động nào cho ngày này
+                                      </div>
+                                    ) : (
+                                      activitiesByDay[day.id].map((activity) => (
+                                        <div
+                                          key={activity.id}
+                                          draggable={trip.userRole === 'owner'}
+                                          onDragStart={(e) => handleDragStart(e, activity.id, day.id)}
+                                          onDragOver={(e) => handleDragOver(e, activity.id, day.id)}
+                                          onDragEnd={handleDragEnd}
+                                          onDrop={(e) => handleDrop(e, activity.id, day.id)}
+                                          className={cn(
+                                            "group bg-card border border-border rounded-2xl transition-all duration-300 relative select-none hover:border-primary/30",
+                                            isMobileView ? "p-4" : "p-5",
+                                            !isMobileView && "hover:shadow-md",
+                                            draggedActivity?.id === activity.id && "opacity-40",
+                                            dragOverActivityId === activity.id && "border-primary border-t-4",
+                                            justDroppedId === activity.id && "ring-2 ring-primary/40 bg-primary/[0.03] border-primary/50 scale-[1.01] shadow-lg z-20",
+                                            trip.userRole === 'owner' && "cursor-grab active:cursor-grabbing"
+                                          )}
+                                        >
+                                          <div className="flex justify-between items-start gap-3">
+                                            {trip.userRole === 'owner' && (
+                                              <div className="pt-1.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0">
+                                                <GripVertical className="w-5 h-5" />
+                                              </div>
+                                            )}
+
+                                            {/* Activity Image */}
+                                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-sm border border-border">
+                                              <img
+                                                src={activity.avatar || "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=400&auto=format&fit=crop"}
+                                                alt={activity.title}
+                                                className="w-full h-full object-cover"
+                                              />
+                                            </div>
+
+                                            <div className="space-y-2 flex-1 min-w-0">
+                                              <div className="flex items-start justify-between">
+                                                <h4 className={cn(
+                                                  "font-bold text-foreground break-words",
+                                                  isMobileView ? "text-base" : "text-lg"
+                                                )}>{activity.title}</h4>
+
+                                                {isMobileView && (
+                                                  <div className="flex items-center -mt-1 ml-1" onClick={(e) => e.stopPropagation()}>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="icon"
+                                                      className="h-8 w-8 text-slate-400 hover:text-purple-600 active:bg-purple-50 rounded-full"
+                                                      onClick={() => {
+                                                        if (isMobileView) {
+                                                          navigate(`/pwa-edit-activity/${activity.id}`);
+                                                        } else {
+                                                          setEditingActivity({
+                                                            id: activity.id,
+                                                            title: activity.title,
+                                                            startTime: activity.timeStart || undefined,
+                                                            durationMin: activity.durationMin,
+                                                            location: activity.location,
+                                                            notes: activity.notes,
+                                                            important: activity.pinned || false,
+                                                            dayId: activity.dayId,
+                                                            images: activity.images
+                                                          } as any);
+                                                          setShowEditActivity(true);
+                                                        }
+                                                      }}
+                                                    >
+                                                      <Edit className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="icon"
+                                                      className="h-8 w-8 text-slate-400 hover:text-primary active:bg-primary/10 rounded-full"
+                                                      title="Chấp nhận"
+                                                      onClick={() => handleDuplicateActivity(activity.id)}
+                                                    >
+                                                      <Copy className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="icon"
+                                                      className="h-8 w-8 text-slate-400 hover:text-red-500 active:bg-red-50 rounded-full"
+                                                      onClick={() => openDeleteActivityDialog(activity)}
+                                                    >
+                                                      <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                  </div>
+                                                )}
+                                              </div>
+
+                                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-slate-500">
+                                                {activity.pinned && (
+                                                  <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-2 py-0.5 border-0">
+                                                    Quan trọng
+                                                  </Badge>
+                                                )}
+
+                                                {activity.timeStart && (
+                                                  <div className="flex items-center text-foreground bg-secondary px-2 py-1 rounded-md">
+                                                    <Clock className="w-3 h-3 mr-1 text-primary" />
+                                                    {formatTime(activity.timeStart)}
+                                                    {activity.durationMin && <span className="text-muted-foreground/50 mx-1">|</span>}
+                                                    {activity.durationMin && <span>{activity.durationMin}p</span>}
+                                                  </div>
+                                                )}
+
+                                                {activity.location && (
+                                                  <div
+                                                    className="flex flex-col gap-0.5 group/loc cursor-pointer"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location!)}`;
+                                                      if (isPWA) {
+                                                        window.location.href = url;
                                                       } else {
-                                                        setEditingActivity({
-                                                          id: activity.id,
-                                                          title: activity.title,
-                                                          startTime: activity.timeStart || undefined,
-                                                          durationMin: activity.durationMin,
-                                                          location: activity.location,
-                                                          notes: activity.notes,
-                                                          important: activity.pinned || false,
-                                                          dayId: activity.dayId,
-                                                          images: activity.images
-                                                        } as any);
-                                                        setShowEditActivity(true);
+                                                        window.open(url, '_blank');
                                                       }
                                                     }}
                                                   >
-                                                    <Edit className="w-4 h-4" />
-                                                  </Button>
-                                                  <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-slate-400 hover:text-red-500 active:bg-red-50 rounded-full"
-                                                    onClick={() => openDeleteActivityDialog(activity)}
-                                                  >
-                                                    <Trash2 className="w-4 h-4" />
-                                                  </Button>
+                                                    <div className="flex items-start">
+                                                      <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C] mt-0.5 flex-shrink-0" />
+                                                      <span className="text-slate-600 dark:text-slate-400 group-hover/loc:text-primary transition-colors">{activity.location}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 ml-4 overflow-hidden">
+                                                      <span className="text-[10px] text-primary font-bold hover:underline underline-offset-2 transition-all">
+                                                        Xem trong bản đồ
+                                                      </span>
+                                                      <ChevronRight className="w-3 h-3 text-primary animate-pulse" />
+                                                    </div>
+                                                  </div>
+                                                )}
+                                              </div>
+
+                                              {activity.notes && (
+                                                <div className="pt-2 text-muted-foreground text-[13px] leading-relaxed bg-secondary/50 p-2.5 rounded-xl mt-2 border border-border/50">
+                                                  {activity.notes}
                                                 </div>
                                               )}
                                             </div>
 
-                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-slate-500">
-                                              {activity.pinned && (
-                                                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-2 py-0.5 border-0">
-                                                  Quan trọng
-                                                </Badge>
-                                              )}
-
-                                              {activity.timeStart && (
-                                                <div className="flex items-center text-foreground bg-secondary px-2 py-1 rounded-md">
-                                                  <Clock className="w-3 h-3 mr-1 text-primary" />
-                                                  {formatTime(activity.timeStart)}
-                                                  {activity.durationMin && <span className="text-muted-foreground/50 mx-1">|</span>}
-                                                  {activity.durationMin && <span>{activity.durationMin}p</span>}
-                                                </div>
-                                              )}
-
-                                              {activity.location && (
-                                                <div
-                                                  className="flex flex-col gap-0.5 group/loc cursor-pointer"
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location!)}`;
-                                                    if (isPWA) {
-                                                      window.location.href = url;
-                                                    } else {
-                                                      window.open(url, '_blank');
-                                                    }
+                                            {!isMobileView && (
+                                              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                                <Button
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-full transition-colors"
+                                                  onClick={() => {
+                                                    setEditingActivity({
+                                                      id: activity.id,
+                                                      title: activity.title,
+                                                      startTime: activity.timeStart || undefined,
+                                                      durationMin: activity.durationMin,
+                                                      location: activity.location,
+                                                      notes: activity.notes,
+                                                      important: activity.pinned || false,
+                                                      dayId: activity.dayId,
+                                                      images: activity.images
+                                                    } as any);
+                                                    setShowEditActivity(true);
                                                   }}
                                                 >
-                                                  <div className="flex items-start">
-                                                    <MapPin className="w-3 h-3 mr-1 text-[#FF4D4C] mt-0.5 flex-shrink-0" />
-                                                    <span className="text-slate-600 dark:text-slate-400 group-hover/loc:text-primary transition-colors">{activity.location}</span>
-                                                  </div>
-                                                  <div className="flex items-center gap-1 ml-4 overflow-hidden">
-                                                    <span className="text-[10px] text-primary font-bold hover:underline underline-offset-2 transition-all">
-                                                      Xem trong bản đồ
-                                                    </span>
-                                                    <ChevronRight className="w-3 h-3 text-primary animate-pulse" />
-                                                  </div>
-                                                </div>
-                                              )}
-                                            </div>
+                                                  <Edit className="w-4 h-4" />
+                                                </Button>
 
-                                            {activity.notes && (
-                                              <div className="pt-2 text-muted-foreground text-[13px] leading-relaxed bg-secondary/50 p-2.5 rounded-xl mt-2 border border-border/50">
-                                                {activity.notes}
+                                                <Button
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-full transition-colors"
+                                                  title="Sao chép"
+                                                  onClick={() => handleDuplicateActivity(activity.id)}
+                                                >
+                                                  <Copy className="w-4 h-4" />
+                                                </Button>
+
+                                                <Button
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 rounded-full transition-colors"
+                                                  onClick={() => openDeleteActivityDialog(activity)}
+                                                >
+                                                  <Trash2 className="w-4 h-4" />
+                                                </Button>
                                               </div>
                                             )}
                                           </div>
-
-                                          {!isMobileView && (
-                                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-full transition-colors"
-                                                onClick={() => {
-                                                  setEditingActivity({
-                                                    id: activity.id,
-                                                    title: activity.title,
-                                                    startTime: activity.timeStart || undefined,
-                                                    durationMin: activity.durationMin,
-                                                    location: activity.location,
-                                                    notes: activity.notes,
-                                                    important: activity.pinned || false,
-                                                    dayId: activity.dayId,
-                                                    images: activity.images
-                                                  } as any);
-                                                  setShowEditActivity(true);
-                                                }}
-                                              >
-                                                <Edit className="w-4 h-4" />
-                                              </Button>
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 rounded-full transition-colors"
-                                                onClick={() => openDeleteActivityDialog(activity)}
-                                              >
-                                                <Trash2 className="w-4 h-4" />
-                                              </Button>
-                                            </div>
-                                          )}
                                         </div>
-                                      </div>
-                                    ))
-                                  )}
+                                      ))
+                                    )}
 
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                      if (isMobileView) {
-                                        navigate(`/pwa-add-activity/${day.id}`);
-                                      } else {
-                                        setSelectedDayId(day.id);
-                                        setShowAddActivity(true);
-                                      }
-                                    }}
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => {
+                                        if (isMobileView) {
+                                          navigate(`/pwa-add-activity/${day.id}`);
+                                        } else {
+                                          setSelectedDayId(day.id);
+                                          setShowAddActivity(true);
+                                        }
+                                      }}
 
-                                    className="w-full border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-12 rounded-2xl font-medium transition-all"
-                                  >
-                                    <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                                      className="w-full border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-12 rounded-2xl font-medium transition-all"
+                                    >
+                                      <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              <TabsContent value="expenses" className="mt-0">
+                <Card className={cn(
+                  "border-none shadow-xl bg-card overflow-hidden",
+                  !isMobileView && "min-h-[500px]",
+                  isMobileView ? "rounded-3xl" : "rounded-[32px]"
+                )}>
+                  <CardContent className={isMobileView ? "p-4" : "p-8"}>
+                    <ExpenseSection
+                      tripId={id || ''}
+                      isOwner={trip?.userRole === 'owner'}
+                      isMember={trip?.userRole === 'member'}
+                    />
                   </CardContent>
                 </Card>
-              )}
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="expenses" className="mt-0">
-              <Card className={cn(
-                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
-                isMobileView ? "rounded-3xl" : "rounded-[32px]"
-              )}>
-                <CardContent className={isMobileView ? "p-4" : "p-8"}>
-                  <ExpenseSection
-                    tripId={id || ''}
-                    isOwner={trip?.userRole === 'owner'}
-                    isMember={trip?.userRole === 'member'}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
+              <TabsContent value="members" className="mt-0">
+                <Card className={cn(
+                  "border-none shadow-xl bg-card overflow-hidden",
+                  !isMobileView && "min-h-[500px]",
+                  isMobileView ? "rounded-3xl" : "rounded-[32px]"
+                )}>
+                  <CardContent className={isMobileView ? "p-4" : "p-8"}>
+                    <TripMembers
+                      tripId={id || ''}
+                      tripOwnerId={trip.userId}
+                      onCountChange={(count) => setTrip((prev) => prev ? { ...prev, memberCount: count } : prev)}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <TabsContent value="members" className="mt-0">
-              <Card className={cn(
-                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
-                isMobileView ? "rounded-3xl" : "rounded-[32px]"
-              )}>
-                <CardContent className={isMobileView ? "p-4" : "p-8"}>
-                  <TripMembers
-                    tripId={id || ''}
-                    tripOwnerId={trip.userId}
-                    onCountChange={(count) => setTrip((prev) => prev ? { ...prev, memberCount: count } : prev)}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
+              <TabsContent value="share" className="mt-0">
+                <Card className={cn(
+                  "border-none shadow-xl bg-card overflow-hidden",
+                  !isMobileView && "min-h-[500px]",
+                  isMobileView ? "rounded-3xl" : "rounded-[32px]"
+                )}>
+                  <CardContent className={isMobileView ? "p-4" : "p-8"}>
+                    <ShareLinkManager trip={{
+                      id: trip.id,
+                      title: trip.name,
+                      provinceId: trip.provinceId || '',
+                      province: trip.province,
+                      startDate: trip.startDate,
+                      description: trip.description,
+                      userId: trip.userId,
+                      shareToken: trip.shareToken,
+                      isPublic: trip.isPublic
+                    }} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <TabsContent value="share" className="mt-0">
-              <Card className={cn(
-                "border-none shadow-xl bg-card overflow-hidden min-h-[500px]",
-                isMobileView ? "rounded-3xl" : "rounded-[32px]"
-              )}>
-                <CardContent className={isMobileView ? "p-4" : "p-8"}>
-                  <ShareLinkManager trip={{
-                    id: trip.id,
-                    title: trip.name,
-                    provinceId: trip.provinceId || '',
-                    province: trip.province,
-                    startDate: trip.startDate,
-                    description: trip.description,
-                    userId: trip.userId,
-                    shareToken: trip.shareToken,
-                    isPublic: trip.isPublic
-                  }} />
-                </CardContent>
-              </Card>
-            </TabsContent>
+            </Tabs>
 
-          </Tabs>
-
-        </div>
+          </div>
+        </div >
       </AnimatedTransition >
 
       {/* Delete Activity Dialog */}
@@ -1212,17 +1500,51 @@ const TripDetailsPage = () => {
         </DialogContent>
       </Dialog >
 
+      {/* Delete Day Dialog */}
+      < Dialog open={deleteDayDialogOpen} onOpenChange={setDeleteDayDialogOpen} >
+        <DialogContent className="rounded-2xl bg-white dark:bg-[#1a1a2e] border-none shadow-2xl max-w-[90vw] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Xác nhận xóa ngày</DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400 mt-2">
+              Bạn có chắc chắn muốn xóa "{dayToDelete?.title}"? Tất cả hoạt động trong ngày này cũng sẽ bị xóa. Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-row gap-3 mt-6 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDayDialogOpen(false)}
+              className="flex-1 sm:flex-none rounded-xl bg-background text-primary hover:bg-secondary border-border font-bold transition-all h-11"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleConfirmDeleteDay}
+              className="flex-1 sm:flex-none bg-red-500 hover:bg-red-600 rounded-xl text-white font-bold transition-all shadow-lg hover:shadow-red-500/20 h-11"
+            >
+              Xóa ngày
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog >
+
       <AddDayDialog
         open={showAddDay}
         onOpenChange={setShowAddDay}
         tripId={id || ''}
+        startDate={days.length === 0 ? trip.startDate : undefined}
         onSuccess={fetchDaysAndActivities}
       />
       <AddActivityDialog
         open={showAddActivity}
-        onOpenChange={setShowAddActivity}
+        onOpenChange={(open) => {
+          setShowAddActivity(open);
+          if (!open) {
+            setDuplicateActivityData(null);
+          }
+        }}
         dayId={selectedDayId}
         onSuccess={fetchDaysAndActivities}
+        initialData={duplicateActivityData}
       />
       {
         editingDay && (

@@ -199,6 +199,22 @@ export const api = {
     reorder: async (activities: { id: string; sortOrder: number }[]) => {
       return await api.post('/activities/reorder', { activities });
     },
+    uploadImage: async (id: string, file: File) => {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      return await api.request<{
+        success: boolean;
+        message: string;
+        data: {
+          url: string;
+        };
+        activity: DATABASE_TYPES.activities;
+      }>(`/activities/${id}/avatar`, {
+        method: 'POST',
+        body: formData,
+      });
+    },
   },
 
   // Expense-specific API methods
@@ -270,6 +286,24 @@ export const api = {
     },
     getById: async (id: string) => {
       return await api.get<DATABASE_TYPES.provinces>(`/provinces/${id}`);
+    },
+  },
+
+  // Rating-specific API methods
+  ratings: {
+    create: async (ratingData: { stars: number; content: string }) => {
+      return await api.post<DATABASE_TYPES.ratings>('/ratings', ratingData);
+    },
+    getAll: async (params?: { page?: number; limit?: number; userId?: string }) => {
+      return await api.get<{
+        data: DATABASE_TYPES.ratings[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        }
+      }>('/ratings', params);
     },
   },
 

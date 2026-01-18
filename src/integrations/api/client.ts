@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DATABASE_TYPES } from './types';
 import { envUtils } from '../../lib/env';
-import { offlineManager } from '../../lib/offline/OfflineManager';
+
 
 const API_URL = envUtils.getApiBaseUrl();
 
@@ -47,15 +47,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(backendError);
     }
 
-    // Check for network errors (no response)
-    if (!error.response && error.config) {
-      // Don't queue login/register requests
-      const isAuthRequest = error.config.url?.includes('/auth/login') || error.config.url?.includes('/auth/register');
 
-      if (!isAuthRequest) {
-        offlineManager.queueRequest(error.config);
-      }
-    }
 
     return Promise.reject(error);
   }
@@ -89,9 +81,11 @@ export const api = {
 
   // Trip-specific API methods
   trips: {
-    getAll: async (params?: { search?: string; page?: number; limit?: number }) => {
+    getAll: async (params?: { search?: string; page?: number; limit?: number; provinceId?: string; startDate?: string }) => {
       const queryParams = new URLSearchParams();
       if (params?.search) queryParams.append('search', params.search);
+      if (params?.provinceId && params.provinceId !== 'all') queryParams.append('provinceId', params.provinceId);
+      if (params?.startDate) queryParams.append('startDate', params.startDate);
       if (params?.page) queryParams.append('page', params.page.toString());
       if (params?.limit) queryParams.append('limit', params.limit.toString());
 
@@ -398,6 +392,18 @@ export const api = {
   utils: {
     generateSlug: async (text: string) => {
       return await api.post<{ slug: string }>('/utils/generate-slug', { text });
+    },
+  },
+
+  // AI-specific API methods
+  ai: {
+    getUsage: async () => {
+      return await api.get<{ success: boolean; data: { usedCount: number; dailyLimit: number; remaining: number } }>('/ai/usage');
+    },
+    processBill: async (image: File) => {
+      const formData = new FormData();
+      formData.append('image', image);
+      return await api.post<{ success: boolean; data: { name: string; total: number } }>('/ai/process-bill', formData);
     },
   },
 };

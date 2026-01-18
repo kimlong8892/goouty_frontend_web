@@ -10,9 +10,10 @@ import { useAuth } from '@/contexts/AuthContext';
 interface PWAMasonryCardProps {
     template: DATABASE_TYPES.tripTemplates;
     index: number;
+    onWishlistToggle?: (id: string, newStatus: boolean) => void;
 }
 
-export const PWAMasonryCard = ({ template, index }: PWAMasonryCardProps) => {
+export const PWAMasonryCard = ({ template, index, onWishlistToggle }: PWAMasonryCardProps) => {
     const { toast } = useToast();
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
@@ -51,6 +52,7 @@ export const PWAMasonryCard = ({ template, index }: PWAMasonryCardProps) => {
                 await api.tripTemplates.removeFromWishlist(template.id);
             }
             setIsFavorite(newFavoriteStatus);
+            onWishlistToggle?.(template.id, newFavoriteStatus);
         } catch (error) {
             console.error('Error toggling wishlist:', error);
         } finally {

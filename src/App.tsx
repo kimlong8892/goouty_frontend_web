@@ -11,11 +11,13 @@ import { PWASimpleLoading } from "@/pwa/components/PWASimpleLoading.tsx";
 import { useAppLoading } from "@/hooks/useAppLoading.ts";
 import { cn } from "@/lib/utils.ts";
 import { usePWA } from "@/pwa/hooks/usePWA";
+import { PWAPullToRefresh } from "@/pwa/components/PWAPullToRefresh.tsx";
 import { PWANotificationToast } from "@/pwa/components/PWANotificationToast.tsx";
 import { PWAAlertNotification } from "@/pwa/components/PWAAlertNotification.tsx";
 import { PWANotificationProvider, usePWANotificationContext } from "@/pwa/contexts/PWANotificationContext.tsx";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt.tsx";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton.tsx";
+import { FeedbackPrompter } from "@/components/common/FeedbackPrompter.tsx";
 import Index from "./pages/Index.tsx";
 import CreateTripPage from "./pages/CreateTripPage.tsx";
 import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
@@ -67,8 +69,10 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   useEffect(() => {
+    // Check if we should skip scroll to top (e.g. when returning from an edit page)
+    if ((location.state as any)?.skipScrollTop) return;
     window.scrollTo(0, 0);
-  }, [location.pathname]);
+  }, [location.pathname, location.state]);
 
   return (
     <div className="transition-opacity duration-300 animate-fade-in">
@@ -481,16 +485,18 @@ const AppContentWithRouter = ({ isPWAMode }: { isPWAMode: boolean }) => {
       {/* PWA Alert Notification - positioned above navbar */}
       <PWAAlertNotification />
       <Navbar />
-      <main className="flex-1">
-        <AppRoutes />
-      </main>
-      {/* Only show Footer if not in Mobile/PWA mode */}
-      {!isMobileView && (
-        <>
-          <Footer />
-          <ScrollToTopButton />
-        </>
-      )}
+      <PWAPullToRefresh>
+        <main className="flex-1">
+          <AppRoutes />
+        </main>
+        {/* Only show Footer if not in Mobile/PWA mode */}
+        {!isMobileView && (
+          <>
+            <Footer />
+            <ScrollToTopButton />
+          </>
+        )}
+      </PWAPullToRefresh>
     </div>
   );
 };
@@ -506,6 +512,7 @@ const App = () => (
               <Sonner />
               <AppContent />
               <PWAInstallPrompt />
+              <FeedbackPrompter />
             </TooltipProvider>
           </PWANotificationProvider>
         </NotificationCountProvider>

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
@@ -62,6 +63,158 @@ const PWATemplateDetailsPage = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+    const [showTutorial, setShowTutorial] = useState(false);
+    const [touchDelta, setTouchDelta] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [stableDayIndex, setStableDayIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setStableDayIndex(selectedDayIndex), 500);
+        return () => clearTimeout(timer);
+    }, [selectedDayIndex]);
+
+    // Swipe handling for days
+    const touchStartX = useRef<number | null>(null);
+    const touchEndX = useRef<number | null>(null);
+    const touchStartY = useRef<number | null>(null);
+    const touchEndY = useRef<number | null>(null);
+    const minSwipeDistance = 50;
+    const dayTabsScrollRef = useRef<HTMLDivElement>(null);
+
+    const handleNextDay = () => {
+        const total = (template?.days || []).length;
+        if (selectedDayIndex < total - 1) {
+            setSelectedDayIndex(prev => prev + 1);
+        }
+    };
+
+    const handlePrevDay = () => {
+        if (selectedDayIndex > 0) {
+            setSelectedDayIndex(prev => prev - 1);
+        }
+    };
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchEndX.current = null;
+        touchEndY.current = null;
+        touchStartX.current = e.targetTouches[0].clientX;
+        touchStartY.current = e.targetTouches[0].clientY;
+        setIsDragging(true);
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        if (!isDragging || !touchStartX.current) return;
+        const currentX = e.targetTouches[0].clientX;
+        const currentY = e.targetTouches[0].clientY;
+
+        // Check if it's a vertical swipe to allow scrolling
+        if (touchStartY.current) {
+            const diffY = Math.abs(currentY - touchStartY.current);
+            const diffX = Math.abs(currentX - touchStartX.current);
+            if (diffY > diffX && diffY > 5) { // Sensitivity
+                setIsDragging(false);
+                setTouchDelta(0);
+                return;
+            }
+        }
+
+        let deltaX = currentX - touchStartX.current;
+        const totalDays = (template?.days || []).length;
+
+        // Rubber banding at edges
+        if ((selectedDayIndex === 0 && deltaX > 0) || (selectedDayIndex === totalDays - 1 && deltaX < 0)) {
+            deltaX = deltaX * 0.35;
+        }
+
+        setTouchDelta(deltaX);
+        touchEndX.current = currentX;
+    };
+
+    const onTouchEnd = () => {
+        if (!isDragging) return;
+        setIsDragging(false);
+        const finalDelta = touchDelta;
+        setTouchDelta(0);
+
+        if (Math.abs(finalDelta) > minSwipeDistance) {
+            if (finalDelta < 0) {
+                handleNextDay();
+            } else {
+                handlePrevDay();
+            }
+        }
+
+        touchStartX.current = null;
+        touchStartY.current = null;
+    };
+
+    // Scroll active tab into view
+    useEffect(() => {
+        if (dayTabsScrollRef.current) {
+            const activeTab = dayTabsScrollRef.current.querySelector('[data-active="true"]') as HTMLElement;
+            if (activeTab) {
+                activeTab.scrollIntoView({
+                    behavior: 'smooth',
+                    inline: 'center',
+                    block: 'nearest'
+                });
+            }
+        }
+    }, [selectedDayIndex]);
+
+    // Auto-hide navigation controls
+    const [controlsVisible, setControlsVisible] = useState(true);
+    const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const resetControlsTimeout = () => {
+        // Don't auto-hide if tutorial is showing
+        if (showTutorial) return;
+
+        setControlsVisible(true);
+        if (controlsTimeoutRef.current) {
+            clearTimeout(controlsTimeoutRef.current);
+        }
+        controlsTimeoutRef.current = setTimeout(() => {
+            setControlsVisible(false);
+        }, 500); // Fade out after 0.5 seconds of inactivity
+    };
+
+    // Check for tutorial on mount and template load
+    useEffect(() => {
+        if (template && (template.next || template.previous)) {
+            const hasSeen = localStorage.getItem('pwa_template_nav_tutorial_seen');
+            if (!hasSeen) {
+                setShowTutorial(true);
+                setControlsVisible(true);
+                if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+            }
+        }
+    }, [template]);
+
+    const handleDismissTutorial = () => {
+        localStorage.setItem('pwa_template_nav_tutorial_seen', 'true');
+        setShowTutorial(false);
+        resetControlsTimeout();
+    };
+
+    useEffect(() => {
+        resetControlsTimeout();
+
+        const handleActivity = () => resetControlsTimeout();
+
+        window.addEventListener('scroll', handleActivity);
+        window.addEventListener('touchstart', handleActivity);
+        window.addEventListener('click', handleActivity);
+
+        return () => {
+            if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+            window.removeEventListener('scroll', handleActivity);
+            window.removeEventListener('touchstart', handleActivity);
+            window.removeEventListener('click', handleActivity);
+        };
+    }, []);
+
+
 
     useEffect(() => {
         if (id) {
@@ -198,7 +351,9 @@ const PWATemplateDetailsPage = () => {
     if (!template) return null;
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0a0a0a] pb-[200px]">
+        <div
+            className="min-h-screen bg-white dark:bg-[#0a0a0a] pb-[200px]"
+        >
             {/* STICKY HEADER */}
             <div className="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md px-5 py-3 flex items-center justify-between">
                 <button
@@ -275,6 +430,31 @@ const PWATemplateDetailsPage = () => {
                 </div>
             </div>
 
+
+
+            {/* Tutorial Overlay */}
+            {showTutorial && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center px-8 text-center animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] shadow-2xl max-w-sm border border-white/20">
+                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <ArrowLeft className="w-8 h-8 text-primary" />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">
+                            Điều hướng dễ dàng
+                        </h3>
+                        <p className="text-slate-600 dark:text-zinc-400 font-medium mb-6 leading-relaxed">
+                            Sử dụng hai nút mũi tên ở cạnh màn hình để xem các mẫu chuyến đi khác một cách nhanh chóng.
+                        </p>
+                        <Button
+                            onClick={handleDismissTutorial}
+                            className="w-full h-12 rounded-xl text-base font-bold bg-primary hover:bg-primary/90"
+                        >
+                            Đã hiểu
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             {/* CONTENT HEADER */}
             <div className="px-6 py-6">
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -344,12 +524,19 @@ const PWATemplateDetailsPage = () => {
 
                         {/* Day Selector */}
                         {(template.days || []).length > 1 && (
-                            <div className="overflow-x-auto no-scrollbar mb-4 sticky top-[64px] bg-white dark:bg-[#0a0a0a] z-30 py-2 -mx-5 px-2 border-b border-slate-100 dark:border-zinc-800">
-                                <div className="flex gap-8 justify-center min-w-full px-5">
+                            <div
+                                className="overflow-x-auto no-scrollbar mb-4 sticky top-[64px] bg-white dark:bg-[#0a0a0a] z-30 py-2 -mx-5 px-2 border-b border-slate-100 dark:border-zinc-800"
+                                onTouchStart={(e) => e.stopPropagation()}
+                            >
+                                <div
+                                    ref={dayTabsScrollRef}
+                                    className="flex gap-8 justify-start w-max min-w-full px-5"
+                                >
                                     {(template.days || []).map((day, idx) => (
                                         <button
                                             key={day.id}
                                             onClick={() => setSelectedDayIndex(idx)}
+                                            data-active={selectedDayIndex === idx}
                                             className={cn(
                                                 "flex flex-col items-center min-w-[90px] py-3 px-3 rounded-2xl transition-all duration-300",
                                                 selectedDayIndex === idx
@@ -364,129 +551,134 @@ const PWATemplateDetailsPage = () => {
                             </div>
                         )}
 
-                        {/* Selected Day Title */}
-                        {template.days?.[selectedDayIndex] && (
-                            <div className="mb-5 px-1">
-                                <h4 className="text-xl font-black text-slate-900 dark:text-white leading-tight text-center">
-                                    {template.days[selectedDayIndex].title || `Ngày ${selectedDayIndex + 1}`}
-                                </h4>
-                            </div>
-                        )}
+                        <div
+                            className="overflow-hidden relative"
+                            onTouchStart={onTouchStart}
+                            onTouchMove={onTouchMove}
+                            onTouchEnd={onTouchEnd}
+                        >
+                            <div
+                                className={cn(
+                                    "flex w-full transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] items-start",
+                                    isDragging ? "duration-0" : ""
+                                )}
+                                style={{
+                                    transform: `translateX(calc(${-selectedDayIndex * 100}% + ${touchDelta}px))`,
+                                    willChange: 'transform'
+                                } as any}
+                            >
+                                {(template.days || []).map((day, dIdx) => (
+                                    <div
+                                        key={day.id}
+                                        className={cn(
+                                            "w-full flex-shrink-0 px-1",
+                                            dIdx !== selectedDayIndex && dIdx !== stableDayIndex && "h-0 overflow-hidden"
+                                        )}
+                                    >
+                                        {/* Selected Day Title */}
+                                        <div className="mb-5 px-1">
+                                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-tight text-center">
+                                                {day.title || `Ngày ${dIdx + 1}`}
+                                            </h4>
+                                        </div>
 
-                        {/* Activities List for Selected Day */}
-                        <div className="relative pl-8 pr-1">
-                            {template.days?.[selectedDayIndex]?.activities && (template.days[selectedDayIndex].activities || []).length > 0 ? (
-                                (template.days[selectedDayIndex].activities || [])
-                                    .sort((a, b) => (a.activityOrder || 0) - (b.activityOrder || 0))
-                                    .map((act, idx, arr) => (
-                                        <div key={act.id} className="relative mb-6 last:mb-4">
-                                            {/* Timeline Line */}
-                                            {idx !== arr.length - 1 && (
-                                                <div className="absolute left-[-21px] top-10 bottom-[-30px] w-[2px] border-l-2 border-dashed border-slate-200 dark:border-zinc-800" />
-                                            )}
+                                        {/* Activities List for Day */}
+                                        <div className="relative pl-8 pr-1">
+                                            {day.activities && (day.activities || []).length > 0 ? (
+                                                (day.activities || [])
+                                                    .sort((a, b) => (a.activityOrder || 0) - (b.activityOrder || 0))
+                                                    .map((act, idx, arr) => (
+                                                        <div key={act.id} className="relative mb-8 last:mb-4">
+                                                            {/* Timeline Line */}
+                                                            {idx !== arr.length - 1 && (
+                                                                <div className="absolute left-[-21px] top-10 bottom-[-32px] w-[2px] border-l-2 border-dashed border-slate-200 dark:border-zinc-800" />
+                                                            )}
 
-                                            {/* Timeline Node - Sequence Number */}
-                                            <div className="absolute left-[-36px] top-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-black text-xs z-10 shadow-sm">
-                                                {idx + 1}
-                                            </div>
+                                                            {/* Timeline Node - Sequence Number */}
+                                                            <div className="absolute left-[-36px] top-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-black text-xs z-10 shadow-sm">
+                                                                {idx + 1}
+                                                            </div>
 
-                                            <div className="flex flex-col gap-2">
-                                                <div className="text-sm font-black text-slate-900 dark:text-zinc-100 ml-1">
-                                                    {formatTime(act.startTime) || "09:00"}
-                                                </div>
+                                                            <div className="flex flex-col gap-2">
+                                                                <div className="text-sm font-black text-slate-900 dark:text-zinc-100 ml-1">
+                                                                    {formatTime(act.startTime) || "09:00"}
+                                                                </div>
 
-                                                <div className="bg-white dark:bg-zinc-900/40 rounded-[2rem] border border-slate-100 dark:border-zinc-800 p-3 flex gap-4 shadow-sm active:scale-[0.98] transition-transform">
-                                                    <div className="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-inner">
-                                                        <img
-                                                            src={(act as any).avatar || "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=300&q=80"}
-                                                            alt={act.title}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0 flex flex-col justify-center py-1">
-                                                        <h4 className="font-bold text-slate-900 dark:text-white text-[17px] leading-tight mb-1 whitespace-normal">{act.title}</h4>
-                                                        <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 mb-2 flex items-center gap-1">
-                                                            {act.location && (
-                                                                <div
-                                                                    className="flex flex-col gap-0.5 group/loc cursor-pointer"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        window.location.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.location!)}`;
-                                                                    }}
-                                                                >
-                                                                    <span className="flex items-start gap-1 text-slate-500 dark:text-zinc-400 group-hover/loc:text-primary transition-colors">
-                                                                        <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-red-500" />
-                                                                        <span className="flex-1 whitespace-normal leading-relaxed">
-                                                                            {act.location}
-                                                                        </span>
-                                                                    </span>
-                                                                    <div className="flex items-center gap-1 ml-4 overflow-hidden">
-                                                                        <span className="text-[10px] text-primary dark:text-primary font-bold hover:underline underline-offset-2 transition-all">
-                                                                            Xem trong bản đồ
-                                                                        </span>
-                                                                        <ChevronRight className="w-3 h-3 text-primary dark:text-primary animate-pulse" />
+                                                                <div className="bg-white dark:bg-zinc-900/40 rounded-[2rem] border border-slate-100 dark:border-zinc-800 p-3 flex gap-4 shadow-sm active:scale-[0.98] transition-transform">
+                                                                    <div className="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-inner">
+                                                                        <img
+                                                                            src={(act as any).avatar || "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=300&q=80"}
+                                                                            alt={act.title}
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0 flex flex-col justify-center py-1">
+                                                                        <h4 className="font-bold text-slate-900 dark:text-white text-[17px] leading-tight mb-1 whitespace-normal">{act.title}</h4>
+                                                                        <div className="text-xs font-bold text-slate-500 dark:text-zinc-400 mb-2">
+                                                                            {act.location && (
+                                                                                <div
+                                                                                    className="flex flex-col gap-0.5 group/loc cursor-pointer"
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        window.location.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.location!)}`;
+                                                                                    }}
+                                                                                >
+                                                                                    <span className="flex items-start gap-1 text-slate-500 dark:text-zinc-400 group-hover/loc:text-primary transition-colors">
+                                                                                        <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-red-500" />
+                                                                                        <span className="flex-1 whitespace-normal leading-relaxed">
+                                                                                            {act.location}
+                                                                                        </span>
+                                                                                    </span>
+                                                                                    <div className="flex items-center gap-1 ml-4 overflow-hidden">
+                                                                                        <span className="text-[10px] text-primary dark:text-primary font-bold hover:underline underline-offset-2 transition-all">
+                                                                                            Xem trong bản đồ
+                                                                                        </span>
+                                                                                        <ChevronRight className="w-3 h-3 text-primary dark:text-primary animate-pulse" />
+                                                                                    </div>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 dark:text-zinc-500">
+                                                                            {act.durationMin ? (
+                                                                                <span className="flex items-center gap-1 flex-shrink-0">
+                                                                                    <Clock className="w-3.5 h-3.5 flex-shrink-0 text-yellow-500" /> {act.durationMin}p
+                                                                                </span>
+                                                                            ) : null}
+                                                                        </div>
+
+                                                                        {act.notes && (
+                                                                            <div className="mt-2 pt-2 border-t border-slate-50 dark:border-zinc-800/50 flex gap-1.5 items-start w-full">
+                                                                                <FileText className="w-3 h-3 mt-0.5 flex-shrink-0 text-slate-400" />
+                                                                                <p className="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed italic whitespace-normal">
+                                                                                    {act.notes}
+                                                                                </p>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </div>
-                                                            )}
-                                                        </p>
-                                                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 dark:text-zinc-500">
-                                                            {act.durationMin ? (
-                                                                <span className="flex items-center gap-1 flex-shrink-0">
-                                                                    <Clock className="w-3.5 h-3.5 flex-shrink-0 text-yellow-500" /> {act.durationMin}p
-                                                                </span>
-                                                            ) : null}
-                                                        </div>
-
-                                                        {act.notes && (
-                                                            <div className="mt-2 pt-2 border-t border-slate-50 dark:border-zinc-800/50 flex gap-1.5 items-start w-full">
-                                                                <FileText className="w-3 h-3 mt-0.5 flex-shrink-0 text-slate-400" />
-                                                                <p className="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed italic whitespace-normal">
-                                                                    {act.notes}
-                                                                </p>
                                                             </div>
-                                                        )}
+                                                        </div>
+                                                    ))
+                                            ) : (
+                                                <div className="text-center py-12 bg-slate-50 dark:bg-zinc-900/50 rounded-[2rem] border border-dashed border-slate-200 dark:border-zinc-800 mb-8 mx-1">
+                                                    <div className="w-16 h-16 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                                        <Calendar className="w-8 h-8 text-slate-300" />
                                                     </div>
+                                                    <p className="text-slate-500 dark:text-zinc-500 font-bold">Ngày này chưa có hoạt động.</p>
+                                                    <p className="text-[11px] text-slate-400 mt-1 uppercase tracking-widest">Hãy chọn ngày khác hoặc quay lại sau</p>
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
-                                    ))
-                            ) : (
-                                <div className="text-center py-12 bg-slate-50 dark:bg-zinc-900/50 rounded-[2rem] border border-dashed border-slate-200 dark:border-zinc-800 mb-8">
-                                    <div className="w-16 h-16 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                        <Calendar className="w-8 h-8 text-slate-300" />
                                     </div>
-                                    <p className="text-slate-500 dark:text-zinc-500 font-bold">Ngày này chưa có hoạt động.</p>
-                                    <p className="text-[11px] text-slate-400 mt-1 uppercase tracking-widest">Hãy chọn ngày khác hoặc quay lại sau</p>
-                                </div>
-                            )}
+                                ))}
+                            </div>
                         </div>
                     </div>
 
                 </div>
 
-                {/* Fixed Bottom Action for PWA */}
-                <div className={cn(
-                    "fixed left-0 w-full bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 p-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] transition-all duration-300",
-                    isAuthenticated ? "bottom-[85px] pb-4" : "bottom-0 pb-8 safe-area-bottom"
-                )}>
-                    <Button
-                        size="lg"
-                        className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"
-                        onClick={handleUseTemplate}
-                        disabled={usingTemplate}
-                    >
-                        {usingTemplate ? (
-                            <>
-                                <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Đang tạo...
-                            </>
-                        ) : (
-                            <>
-                                Sử dụng Template này <ChevronRight className="w-5 h-5 ml-1" />
-                            </>
-                        )}
-                    </Button>
-                </div>
             </AnimatedTransition>
+
 
             {/* SHARE SHEET */}
             <Sheet open={isShareSheetOpen} onOpenChange={setIsShareSheetOpen}>
@@ -540,6 +732,87 @@ const PWATemplateDetailsPage = () => {
                     <div className="h-8 safe-area-bottom" />
                 </SheetContent>
             </Sheet>
+
+            {createPortal(
+                <>
+                    {/* Fixed Bottom Action for PWA */}
+                    <div className={cn(
+                        "fixed left-0 w-full bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-border/50 p-4 z-[9997] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] transition-all duration-300",
+                        isAuthenticated ? "bottom-[70px]" : "bottom-0 pb-8 safe-area-bottom",
+                        isShareSheetOpen ? "opacity-0 pointer-events-none translate-y-10" : "opacity-100 translate-y-0"
+                    )}>
+                        <div className="max-w-md mx-auto">
+                            <Button
+                                size="lg"
+                                className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"
+                                onClick={handleUseTemplate}
+                                disabled={usingTemplate}
+                            >
+                                {usingTemplate ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Đang tạo...
+                                    </>
+                                ) : (
+                                    <>
+                                        Sử dụng Template này <ChevronRight className="w-5 h-5 ml-1" />
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Navigation Arrows Overlay - Fixed true positioning via Portal */}
+                    {template.previous && (
+                        <button
+                            onClick={() => navigate(`/pwa-template-details/${template.previous!.id}`)}
+                            className={cn(
+                                "fixed left-3 top-[50dvh] -translate-y-1/2 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all duration-500",
+                                showTutorial ? "z-[9999] opacity-100 translate-x-0 ring-4 ring-primary/50 animate-pulse" : "z-[9999]",
+                                !showTutorial && (controlsVisible ? "opacity-100 translate-x-0" : "opacity-30 -translate-x-1/2 hover:opacity-100 hover:translate-x-0")
+                            )}
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                    )}
+
+                    {template.next && (
+                        <button
+                            onClick={() => navigate(`/pwa-template-details/${template.next!.id}`)}
+                            className={cn(
+                                "fixed right-3 top-[50dvh] -translate-y-1/2 w-11 h-11 bg-white/90 dark:bg-zinc-800/50 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-primary dark:hover:border-primary active:scale-90 transition-all duration-500",
+                                showTutorial ? "z-[9999] opacity-100 translate-x-0 ring-4 ring-primary/50 animate-pulse" : "z-[9999]",
+                                !showTutorial && (controlsVisible ? "opacity-100 translate-x-0" : "opacity-30 translate-x-1/2 hover:opacity-100 hover:translate-x-0")
+                            )}
+                        >
+                            <ChevronRight className="w-6 h-6" />
+                        </button>
+                    )}
+
+                    {/* Tutorial Overlay */}
+                    {showTutorial && (
+                        <div className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center px-8 text-center animate-in fade-in duration-300">
+                            <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] shadow-2xl max-w-sm border border-white/20">
+                                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <ArrowLeft className="w-8 h-8 text-primary" />
+                                </div>
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">
+                                    Điều hướng dễ dàng
+                                </h3>
+                                <p className="text-slate-600 dark:text-zinc-400 font-medium mb-6 leading-relaxed">
+                                    Sử dụng hai nút mũi tên ở cạnh màn hình để xem các mẫu chuyến đi khác một cách nhanh chóng.
+                                </p>
+                                <Button
+                                    onClick={handleDismissTutorial}
+                                    className="w-full h-12 rounded-xl text-base font-bold bg-primary hover:bg-primary/90"
+                                >
+                                    Đã hiểu
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </>,
+                document.body
+            )}
         </div>
     );
 };

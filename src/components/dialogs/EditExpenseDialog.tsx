@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
-import { Edit3, X, Calendar as CalendarIcon, User, Users, Wallet, Check } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Edit3, X, Calendar as CalendarIcon, User, Users, Wallet, Check, ChevronLeft, Info } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -208,32 +209,19 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
         "max-w-md bg-white dark:bg-card rounded-[32px] border-none shadow-2xl p-0 overflow-hidden flex flex-col z-[100]",
-        isMobileView ? "h-full w-full max-w-none rounded-none [&>button]:hidden bg-[#eeedfe] dark:bg-background" : "max-h-[90vh]"
+        isMobileView ? "h-full w-full max-w-none rounded-none [&>button]:hidden bg-[#eeedfe] dark:bg-background z-[90]" : "max-h-[90vh]"
       )}>
         {isMobileView ? (
-          <div className="px-4 py-4 border-b border-gray-200/50 dark:border-border/50 flex-shrink-0 bg-white dark:bg-card flex items-center justify-between">
+          <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
             <button
               onClick={() => onOpenChange(false)}
-              disabled={loading}
-              className="flex items-center text-muted-foreground hover:text-gray-900 disabled:opacity-50 transition-colors text-lg font-medium active:scale-95 touch-manipulation"
-              type="button"
+              className="p-2 -ml-2 text-foreground/80 hover:text-foreground active:scale-95 transition-transform rounded-full hover:bg-muted"
             >
-              Hủy
+              <ChevronLeft className="w-6 h-6" />
             </button>
-            <DialogTitle className="text-lg font-bold text-gray-900 dark:text-foreground">
+            <h1 className="text-lg font-bold absolute left-1/2 -translate-x-1/2 dark:text-foreground">
               Chỉnh sửa chi phí
-            </DialogTitle>
-            <button
-              onClick={handleSubmit}
-              disabled={loading || membersLoading}
-              className="flex items-center text-primary hover:text-primary/90 disabled:text-gray-400 transition-colors font-bold text-lg active:scale-95 touch-manipulation"
-              type="button"
-            >
-              {loading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-              ) : null}
-              Xong
-            </button>
+            </h1>
           </div>
         ) : (
           <DialogHeader className={cn("p-6 pb-2 flex-shrink-0", isMobileView && "px-4 pt-4")}>
@@ -248,66 +236,74 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
           </DialogHeader>
         )}
 
-        <form onSubmit={handleSubmit} className={cn("flex-1 overflow-y-auto py-4 custom-scrollbar", isMobileView ? "px-4" : "px-8 space-y-6")}>
-          <div className={cn("space-y-4", isMobileView && "bg-white dark:bg-card rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-border")}>
+        <form onSubmit={handleSubmit} className={cn("flex-1 overflow-y-auto py-4 custom-scrollbar", isMobileView ? "px-5 pt-6 pb-32" : "px-8 space-y-6")}>
+          <div className={cn(isMobileView ? "w-full max-w-md mx-auto space-y-6" : "space-y-4")}>
             {/* Title */}
-            <div className="space-y-1.5">
-              <Label htmlFor="title" className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground ml-1">
-                Tên chi phí
+            <div className="space-y-2">
+              <Label htmlFor="title" className={cn(
+                "font-medium ml-1",
+                isMobileView ? "text-muted-foreground text-sm" : "text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground"
+              )}>
+                Tên chi phí <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="title"
-                className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-foreground"
+                className={cn(
+                  "rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-foreground transition-all",
+                  isMobileView ? "h-14 rounded-2xl bg-card border-input focus:ring-primary/20 text-base" : "h-12"
+                )}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="VD: Khách sạn, Tiền xăng..."
+                placeholder={isMobileView ? "Ví dụ: Ăn tối tại Đà Lạt" : "VD: Khách sạn, Tiền xăng..."}
               />
             </div>
 
-            {/* Description */}
-            <div className="space-y-1.5">
-              <Label htmlFor="description" className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground ml-1">
-                Mô tả
-              </Label>
-              <Input
-                id="description"
-                className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-medium text-slate-700 dark:text-foreground/90"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Nhập ghi chú thêm..."
-              />
-            </div>
+            {/* Description is now lower in AddExpensePage, let's keep it here for now or move it to end */}
 
             {/* Amount and Date */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5 text-center sm:text-left">
-                <Label htmlFor="amount" className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground ml-1 block sm:inline">
-                  Số tiền (VNĐ)
+            <div className={cn("grid gap-4", isMobileView ? "grid-cols-2" : "grid-cols-2 gap-3")}>
+              <div className="space-y-2">
+                <Label htmlFor="amount" className={cn(
+                  "font-medium ml-1",
+                  isMobileView ? "text-muted-foreground text-sm" : "text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground"
+                )}>
+                  Số tiền (VNĐ) <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id="amount"
-                  className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-black text-slate-900 dark:text-foreground"
-                  value={formatCurrencyInput(formData.amount)}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value.replace(/[^0-9]/g, '') })}
-                  placeholder="0"
-                />
+                <div className="relative">
+                  <Input
+                    id="amount"
+                    inputMode="numeric"
+                    className={cn(
+                      "rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-black text-slate-900 dark:text-foreground transition-all",
+                      isMobileView ? "h-14 rounded-2xl bg-card border-input focus:ring-primary/20 pr-12 text-base" : "h-12"
+                    )}
+                    value={formatCurrencyInput(formData.amount)}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value.replace(/[^0-9]/g, '') })}
+                    placeholder="0"
+                  />
+                  {isMobileView && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-muted-foreground">đ</span>}
+                </div>
               </div>
-              <div className="space-y-1.5 text-center sm:text-left">
-                <Label htmlFor="date" className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground ml-1 block sm:inline">
-                  Ngày
+              <div className="space-y-2">
+                <Label htmlFor="date" className={cn(
+                  "font-medium ml-1",
+                  isMobileView ? "text-muted-foreground text-sm" : "text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground"
+                )}>
+                  Ngày <span className="text-red-500">*</span>
                 </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full h-12 justify-start text-left font-bold rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary hover:bg-transparent hover:text-slate-900 dark:hover:text-foreground px-3",
+                        "w-full justify-start text-left rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary hover:bg-transparent hover:text-slate-900 dark:hover:text-foreground px-3 transition-all",
+                        isMobileView ? "h-14 rounded-2xl bg-card border-input hover:bg-card/80 text-base font-normal" : "h-12 font-bold",
                         !formData.date && "text-muted-foreground"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-slate-500" />
+                      <CalendarIcon className={cn("mr-2 h-4 w-4 text-slate-500", isMobileView && "opacity-50")} />
                       {formData.date ? (
-                        format(new Date(formData.date + 'T00:00:00'), "dd/MM/yyyy")
+                        format(new Date(formData.date + 'T00:00:00'), "dd/MM/yyyy", isMobileView ? { locale: vi } : undefined)
                       ) : (
                         <span>Chọn ngày</span>
                       )}
@@ -326,21 +322,29 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             </div>
 
             {/* Payer */}
-            <div className="space-y-1.5">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground ml-1">Người trả</Label>
+            <div className="space-y-2">
+              <Label className={cn(
+                "font-medium ml-1",
+                isMobileView ? "text-muted-foreground text-sm" : "text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground"
+              )}>Người trả tiền</Label>
               <Select value={formData.payerId} onValueChange={(v) => setFormData({ ...formData, payerId: v })}>
-                <SelectTrigger className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary font-bold text-slate-700 dark:text-foreground">
+                <SelectTrigger className={cn(
+                  "rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary text-slate-700 dark:text-foreground transition-all",
+                  isMobileView ? "h-14 rounded-2xl bg-card border-input focus:ring-primary/20 text-base font-medium" : "h-12 font-bold"
+                )}>
                   <SelectValue placeholder="Chọn người trả" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-slate-100 dark:border-border bg-white dark:bg-popover shadow-xl max-h-[250px] z-[200]">
+                <SelectContent className="rounded-xl border-slate-100 dark:border-border bg-white dark:bg-popover shadow-xl z-[200]">
                   {members.map((m) => (
-                    <SelectItem key={m.user.id} value={m.user.id.toString()} className="rounded-lg hover:bg-slate-50 dark:hover:bg-secondary">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="w-5 h-5">
+                    <SelectItem key={m.user.id} value={m.user.id.toString()} className="rounded-xl py-3 px-3 m-1">
+                      <div className="flex items-center gap-3">
+                        <Avatar className={cn("shrink-0", isMobileView ? "w-8 h-8 ring-2 ring-primary/10" : "w-5 h-5")}>
                           <AvatarImage src={m.user.profilePicture} />
-                          <AvatarFallback className="text-[8px] bg-slate-100 dark:bg-secondary text-slate-500 dark:text-muted-foreground uppercase font-bold">{(m.user.fullName || m.user.email).charAt(0).toUpperCase()}</AvatarFallback>
+                          <AvatarFallback className={cn("bg-primary/10 text-primary font-bold uppercase", isMobileView ? "text-[10px]" : "text-[8px]")}>
+                            {(m.user.fullName || m.user.email).charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
-                        <span className="text-xs font-bold text-slate-700 dark:text-foreground/90">{m.user.fullName || m.user.email} {user?.id === m.user.id && '(bạn)'}</span>
+                        <span className={cn("font-semibold", isMobileView ? "text-sm" : "text-xs")}>{m.user.fullName || m.user.email} {user?.id === m.user.id && '(bạn)'}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -351,25 +355,40 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             {/* Participants */}
             <div className="space-y-3">
               <div className="flex items-center justify-between ml-1">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground">Tham gia</Label>
+                <Label className={cn(
+                  "font-medium",
+                  isMobileView ? "text-muted-foreground text-sm" : "text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground"
+                )}>Người cùng tham gia</Label>
                 <span className="text-[10px] font-black text-primary bg-primary/5 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                   {formData.participantIds.length} người
                 </span>
               </div>
-              <div className="bg-slate-50/50 dark:bg-secondary/30 border border-slate-100 dark:border-border rounded-2xl p-1 max-h-[160px] overflow-y-auto space-y-0.5 shadow-inner custom-scrollbar">
+              <div className={cn(
+                "border rounded-2xl p-2 overflow-y-auto space-y-1 custom-scrollbar transition-all",
+                isMobileView ? "bg-card/50 border-input max-h-[220px] ring-1 ring-border/5" : "bg-slate-50/50 dark:bg-secondary/30 border-slate-100 dark:border-border max-h-[160px] p-1 space-y-0.5 shadow-inner"
+              )}>
                 {members.map((m) => (
-                  <label key={m.user.id} className="flex items-center justify-between p-2.5 hover:bg-white dark:hover:bg-secondary rounded-xl cursor-pointer transition-all group">
+                  <label key={m.user.id} className={cn(
+                    "flex items-center justify-between hover:bg-primary/5 rounded-2xl cursor-pointer transition-all group",
+                    isMobileView ? "p-3" : "p-2.5"
+                  )}>
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-8 h-8 font-bold border-2 border-white dark:border-border shadow-sm ring-1 ring-slate-100 dark:ring-border">
+                      <Avatar className={cn(
+                        "shrink-0 font-bold border-2 border-white dark:border-border shadow-sm ring-1 ring-slate-100 dark:ring-border",
+                        isMobileView ? "w-9 h-9" : "w-8 h-8"
+                      )}>
                         <AvatarImage src={m.user.profilePicture} />
                         <AvatarFallback className="bg-white dark:bg-secondary text-primary">{(m.user.fullName || m.user.email).charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
-                      <span className="text-xs font-bold text-slate-700 dark:text-foreground group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{m.user.fullName || m.user.email} {user?.id === m.user.id && '(bạn)'}</span>
+                      <span className={cn("font-semibold text-foreground/90 transition-colors", isMobileView ? "text-sm" : "text-xs")}>{m.user.fullName || m.user.email} {user?.id === m.user.id && '(bạn)'}</span>
                     </div>
                     <Checkbox
                       checked={formData.participantIds.includes(m.user.id.toString())}
                       onCheckedChange={() => toggleParticipant(m.user.id.toString())}
-                      className="rounded-full h-5 w-5 border-slate-200 dark:border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all"
+                      className={cn(
+                        "rounded-full border-input data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all",
+                        isMobileView ? "h-6 w-6" : "h-5 w-5"
+                      )}
                     />
                   </label>
                 ))}
@@ -379,40 +398,119 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             {/* Allocation */}
             {formData.participantIds.length > 1 && (
               <div className="space-y-3 pt-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground ml-1">Phân bổ chi phí</Label>
-                <div className="bg-white dark:bg-card border border-slate-100 dark:border-border rounded-2xl shadow-sm overflow-hidden ring-1 ring-slate-50 dark:ring-border">
-                  <div className="max-h-[180px] overflow-y-auto divide-y divide-slate-50 dark:divide-border custom-scrollbar">
+                <div className="flex items-center gap-2 mb-1">
+                  {isMobileView && <Info className="w-3.5 h-3.5 text-primary" />}
+                  <Label className={cn(
+                    "font-medium ml-1",
+                    isMobileView ? "text-muted-foreground text-sm" : "text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground"
+                  )}>Chia tiền chi tiết</Label>
+                </div>
+                <div className={cn(
+                  "border rounded-2xl overflow-hidden shadow-sm transition-all",
+                  isMobileView ? "bg-card border-input" : "bg-white dark:bg-card border-slate-100 dark:border-border ring-1 ring-slate-50 dark:ring-border"
+                )}>
+                  <div className={cn(
+                    "overflow-y-auto divide-y custom-scrollbar",
+                    isMobileView ? "max-h-[200px] divide-border" : "max-h-[180px] divide-slate-50 dark:divide-border"
+                  )}>
                     {formData.participantIds.map((pid) => {
                       const m = members.find(mm => mm.user.id === pid);
                       if (!m) return null;
                       return (
-                        <div key={pid} className="flex items-center justify-between p-3.5 hover:bg-slate-50 dark:hover:bg-secondary transition-colors">
-                          <div className="flex items-center gap-2">
-                            <Avatar className="w-6 h-6 border-2 border-white dark:border-border shadow-sm">
+                        <div key={pid} className={cn(
+                          "flex items-center justify-between hover:bg-primary/5 transition-colors",
+                          isMobileView ? "p-4" : "p-3.5"
+                        )}>
+                          <div className="flex items-center gap-3">
+                            <Avatar className={cn(
+                              "shrink-0 border-2 border-white dark:border-border shadow-sm",
+                              isMobileView ? "w-7 h-7 ring-1 ring-input" : "w-6 h-6"
+                            )}>
                               <AvatarImage src={m.user.profilePicture} />
-                              <AvatarFallback className="text-[8px] bg-slate-50 dark:bg-secondary text-slate-400 dark:text-muted-foreground uppercase">{(m.user.fullName || m.user.email).charAt(0)}</AvatarFallback>
+                              <AvatarFallback className={cn("font-bold uppercase", isMobileView ? "text-[10px] bg-muted" : "text-[8px] bg-slate-50 dark:bg-secondary text-slate-400 dark:text-muted-foreground")}>
+                                {(m.user.fullName || m.user.email).charAt(0)}
+                              </AvatarFallback>
                             </Avatar>
-                            <span className="text-xs font-bold text-slate-600 dark:text-foreground/80 truncate max-w-[100px]">{m.user.fullName || m.user.email}</span>
+                            <span className={cn("font-bold text-foreground/70 truncate", isMobileView ? "text-xs max-w-[120px]" : "text-xs max-w-[100px]")}>{m.user.fullName || m.user.email}</span>
                           </div>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            className="w-28 h-8 text-right pr-3 text-xs font-black text-primary border-none focus:ring-1 focus:ring-primary/20 rounded-lg bg-slate-50/50 dark:bg-secondary/50 dark:placeholder:text-muted-foreground/50"
-                            value={(amountByUserId[pid] ?? '').toString()}
-                            onChange={(e) => {
-                              const digits = e.target.value.replace(/[^0-9]/g, '');
-                              setAmountByUserId(prev => ({ ...prev, [pid]: Number(digits || '0').toLocaleString('vi-VN') }));
-                            }}
-                          />
+                          <div className={cn(
+                            "flex items-center transition-all",
+                            isMobileView ? "gap-1.5 bg-muted/50 px-3 py-1.5 rounded-xl border border-input/50 focus-within:ring-1 focus-within:ring-primary/30" : ""
+                          )}>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              className={cn(
+                                "text-right font-black text-primary border-none focus:ring-0 p-0 transition-all",
+                                isMobileView ? "w-24 text-xs bg-transparent" : "w-28 h-8 pr-3 text-xs rounded-lg bg-slate-50/50 dark:bg-secondary/50 dark:placeholder:text-muted-foreground/50 focus:ring-1 focus:ring-primary/20"
+                              )}
+                              value={(amountByUserId[pid] ?? '').toString()}
+                              onChange={(e) => {
+                                const digits = e.target.value.replace(/[^0-9]/g, '');
+                                setAmountByUserId(prev => ({ ...prev, [pid]: Number(digits || '0').toLocaleString('vi-VN') }));
+                              }}
+                            />
+                            {isMobileView && <span className="text-[10px] font-black text-primary">đ</span>}
+                          </div>
                         </div>
                       );
                     })}
                   </div>
                 </div>
                 <div className="px-1 flex justify-between items-center">
-                  <span className="text-[10px] text-slate-400 dark:text-muted-foreground font-bold uppercase tracking-widest leading-none">Tổng phải bằng:</span>
-                  <span className="text-[10px] font-black text-slate-900 dark:text-foreground leading-none">{formatCurrencyInput(formData.amount)} VNĐ</span>
+                  <span className={cn(
+                    "font-bold uppercase tracking-widest leading-none",
+                    isMobileView ? "text-[10px] text-muted-foreground" : "text-[10px] text-slate-400 dark:text-muted-foreground"
+                  )}>Tổng phải bằng:</span>
+                  <span className={cn(
+                    "font-black leading-none",
+                    isMobileView ? "text-xs text-primary" : "text-[10px] text-slate-900 dark:text-foreground"
+                  )}>{formatCurrencyInput(formData.amount)} VNĐ</span>
                 </div>
+              </div>
+            )}
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description" className={cn(
+                "font-medium ml-1",
+                isMobileView ? "text-muted-foreground text-sm" : "text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-muted-foreground"
+              )}>
+                Mô tả chi tiết (tùy chọn)
+              </Label>
+              {isMobileView ? (
+                <Textarea
+                  id="description"
+                  placeholder="Ăn tối, quà cáp, tiền vé..."
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                  className="min-h-[100px] rounded-2xl bg-card border-input resize-none transition-all px-4 py-3 text-base dark:bg-secondary"
+                />
+              ) : (
+                <Input
+                  id="description"
+                  className="h-12 rounded-xl border-slate-200 dark:border-border bg-white dark:bg-secondary focus:ring-2 focus:ring-primary font-medium text-slate-700 dark:text-foreground/90"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Nhập ghi chú thêm..."
+                />
+              )}
+            </div>
+
+            {/* Bottom Button inside scroll area for PWA */}
+            {isMobileView && (
+              <div className="pt-4 pb-10">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={loading || membersLoading}
+                  className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold text-lg shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
+                >
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                  ) : null}
+                  {loading ? 'Đang lưu...' : 'Cập nhật chi phí'}
+                </Button>
               </div>
             )}
           </div>
@@ -420,7 +518,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
 
         {/* Footer */}
         {!isMobileView && (
-          <div className={cn("p-6 pt-2 border-t border-slate-50 dark:border-border bg-white dark:bg-card flex-shrink-0", isMobileView && "px-4 pb-4")}>
+          <div className={cn("p-6 pt-2 border-t border-slate-50 dark:border-border bg-white dark:bg-card flex-shrink-0")}>
             <div className="flex items-center gap-3">
               <Button
                 type="button"

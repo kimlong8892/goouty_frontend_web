@@ -7,8 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, Mail, User, Lock } from 'lucide-react';
+import { Eye, EyeOff, Mail, User, Lock, MapPin, Calendar, Users, AlertCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
 
 interface InvitationDetails {
   id: string;
@@ -43,6 +46,7 @@ const InviteAcceptPage: React.FC = () => {
   const [loadingInvitation, setLoadingInvitation] = useState(true);
   const [invitation, setInvitation] = useState<InvitationDetails | null>(null);
   const [showSignupForm, setShowSignupForm] = useState(false);
+  const [showAcceptConfirm, setShowAcceptConfirm] = useState(false);
 
   // Form states
   const [fullName, setFullName] = useState('');
@@ -55,6 +59,18 @@ const InviteAcceptPage: React.FC = () => {
     if (!token) {
       toast.error('Token không hợp lệ');
       navigate('/');
+      return;
+    }
+
+    // Skip if already loading or if invitation is already fetched
+    if (invitation) {
+      if (!authLoading) {
+        if (isAuthenticated && !processing) {
+          setShowAcceptConfirm(true);
+        } else if (!isAuthenticated) {
+          setShowSignupForm(true);
+        }
+      }
       return;
     }
 
@@ -71,9 +87,9 @@ const InviteAcceptPage: React.FC = () => {
           return;
         }
 
-        // If user is authenticated, proceed to accept invitation
+        // If user is authenticated, show confirmation
         if (isAuthenticated) {
-          await acceptInvitation(token);
+          setShowAcceptConfirm(true);
         } else {
           // Show signup form for unauthenticated users
           setShowSignupForm(true);
@@ -120,7 +136,10 @@ const InviteAcceptPage: React.FC = () => {
         return;
       }
 
-      // After successful signup, automatically accept invitation
+      // After successful signup, the user is authenticated. 
+      // The useEffect will pick this up and show the confirmation screen
+      // or we can just proceed if that was the "Register and Join" intent.
+      // Given the button says "Register and join trip", we proceed.
       const token = searchParams.get('token');
       if (token) {
         toast.success('Đăng ký thành công! Đang tham gia chuyến đi...');
@@ -136,10 +155,10 @@ const InviteAcceptPage: React.FC = () => {
 
   if (loadingInvitation) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Đang tải thông tin lời mời...</p>
+          <p className="dark:text-slate-300">Đang tải thông tin lời mời...</p>
         </div>
       </div>
     );
@@ -147,10 +166,10 @@ const InviteAcceptPage: React.FC = () => {
 
   if (!invitation) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <Card className="w-full max-w-md">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900">
+        <Card className="w-full max-w-md dark:bg-slate-900 dark:border-slate-800">
           <CardContent className="pt-6 text-center">
-            <p className="text-red-600">Lời mời không hợp lệ hoặc đã hết hạn</p>
+            <p className="text-red-600 dark:text-red-400">Lời mời không hợp lệ hoặc đã hết hạn</p>
             <Button onClick={() => navigate('/')} className="mt-4">
               Về trang chủ
             </Button>
@@ -162,9 +181,12 @@ const InviteAcceptPage: React.FC = () => {
 
   if (showSignupForm && !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md dark:bg-slate-900 dark:border-slate-800">
           <CardHeader className="text-center">
+            <div className="p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden">
+              <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="w-full h-full object-contain" />
+            </div>
             <CardTitle className="text-2xl font-bold text-primary">
               Tham gia chuyến đi
             </CardTitle>
@@ -189,7 +211,7 @@ const InviteAcceptPage: React.FC = () => {
                     placeholder="Nhập họ và tên"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 rounded-xl border-slate-200 focus-visible:ring-primary"
+                    className="pl-10 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus-visible:ring-primary"
                     required
                   />
                 </div>
@@ -203,14 +225,14 @@ const InviteAcceptPage: React.FC = () => {
                     id="email"
                     type="email"
                     placeholder="your@email.com"
-                    value={email}
+                    value={email || invitation.invitedEmail}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 rounded-xl border-slate-200 focus-visible:ring-primary"
+                    className="pl-10 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus-visible:ring-primary"
                     required
                     disabled
                   />
                 </div>
-                <p className="text-xs text-slate-500">Email này đã được mời tham gia chuyến đi</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Email này đã được mời tham gia chuyến đi</p>
               </div>
 
               <div className="space-y-2">
@@ -223,7 +245,7 @@ const InviteAcceptPage: React.FC = () => {
                     placeholder="Nhập mật khẩu"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 rounded-xl border-slate-200 focus-visible:ring-primary"
+                    className="pl-10 pr-10 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus-visible:ring-primary"
                     required
                     minLength={6}
                   />
@@ -235,7 +257,7 @@ const InviteAcceptPage: React.FC = () => {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-500">Mật khẩu tối thiểu 6 ký tự</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Mật khẩu tối thiểu 6 ký tự</p>
               </div>
 
               <Button
@@ -247,7 +269,7 @@ const InviteAcceptPage: React.FC = () => {
               </Button>
 
               <div className="text-center">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-slate-600 dark:text-slate-400">
                   Đã có tài khoản?{' '}
                   <button
                     type="button"
@@ -265,12 +287,120 @@ const InviteAcceptPage: React.FC = () => {
     );
   }
 
-  // If authenticated, show loading while accepting
+  if (showAcceptConfirm && isAuthenticated && invitation) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-lg dark:bg-slate-900 dark:border-slate-800">
+          <CardHeader className="text-center">
+            <div className="p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden">
+              <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="w-full h-full object-contain" />
+            </div>
+            <CardTitle className="text-2xl">
+              Tham gia chuyến đi
+            </CardTitle>
+            <CardDescription>
+              Bạn được mời tham gia một chuyến đi thú vị
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-white dark:bg-slate-950 p-4 rounded-lg border dark:border-slate-800">
+              <div className="flex items-center space-x-3 mb-3">
+                <img src="/footer_badge_mascot.png" alt="Goouty Logo" className="h-5 w-5 object-contain" />
+                <h3 className="font-semibold dark:text-white">{invitation.trip.title}</h3>
+              </div>
+              <div className="space-y-2 text-sm text-muted-foreground dark:text-slate-400">
+                {invitation.trip.province && (
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <span>{invitation.trip.province.name}</span>
+                  </div>
+                )}
+                {invitation.trip.startDate && (
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <span>
+                      {format(new Date(invitation.trip.startDate), 'dd/MM/yyyy', { locale: vi })}
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-primary" />
+                  <span>Mời bởi: {invitation.inviter.fullName || invitation.inviter.email}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <div className="bg-blue-100 dark:bg-blue-900/40 p-2 rounded-full">
+                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-blue-900 dark:text-blue-100">
+                    Thông tin tham gia
+                  </h4>
+                  <ul className="text-sm text-blue-700 dark:text-blue-300 mt-2 space-y-1">
+                    <li>• Bạn sẽ trở thành thành viên của chuyến đi</li>
+                    <li>• Có thể xem và tương tác với lịch trình</li>
+                    <li>• Nhận thông báo về các hoạt động mới</li>
+                    <li>• Tham gia thảo luận với các thành viên khác</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+                <span>Tham gia với tài khoản:</span>
+                <Badge variant="secondary" className="font-medium text-primary dark:bg-slate-800 dark:text-indigo-300">
+                  {email || invitation.invitedEmail}
+                </Badge>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/')}
+                  disabled={processing}
+                  className="flex-1 rounded-xl h-11 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Hủy bỏ
+                </Button>
+                <Button
+                  onClick={() => {
+                    const token = searchParams.get('token');
+                    if (token) acceptInvitation(token);
+                  }}
+                  disabled={processing}
+                  className="flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white h-11 shadow-lg shadow-primary/20"
+                >
+                  {processing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Đang tham gia...
+                    </>
+                  ) : (
+                    <>
+                      <Users className="h-4 w-4 mr-2" />
+                      Tham gia ngay
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // If authenticated, show loading while loading invitation
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900">
       <div className="text-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
-        <p>Đang xử lý lời mời...</p>
+        <p className="dark:text-slate-300">Đang chuẩn bị...</p>
       </div>
     </div>
   );
