@@ -9,8 +9,12 @@ export const checkAndClearCache = async () => {
     if (storedVersion && storedVersion !== currentVersion) {
         console.log('[VersionCheck] New version detected. Clearing cache...');
 
-        // 1. Clear LocalStorage
+        // 1. Clear LocalStorage (but preserve authentication)
+        const token = localStorage.getItem('accessToken');
         localStorage.clear();
+        if (token) {
+            localStorage.setItem('accessToken', token);
+        }
 
         // 2. Clear SessionStorage
         sessionStorage.clear();

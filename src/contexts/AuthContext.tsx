@@ -39,10 +39,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const userData = await api.get<User>('/users/profile');
           setUser(userData);
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error fetching user data:', error);
-          localStorage.removeItem('accessToken');
-          setAccessToken(null);
+          // Only log out if it's a 401 Unauthorized error
+          // Other errors (500, network, etc.) should not destroy the session
+          if (error.status === 401) {
+            localStorage.removeItem('accessToken');
+            setAccessToken(null);
+            setUser(null);
+          }
         } finally {
           setIsLoading(false);
         }
@@ -65,11 +70,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           try {
             const userData = await api.get<User>('/users/profile');
             setUser(userData);
-          } catch (error) {
-            console.error('Error fetching user data:', error);
-            localStorage.removeItem('accessToken');
-            setAccessToken(null);
-            setUser(null);
+          } catch (error: any) {
+            console.error('Error fetching user data after storage change:', error);
+            if (error.status === 401) {
+              localStorage.removeItem('accessToken');
+              setAccessToken(null);
+              setUser(null);
+            }
           }
         };
 
@@ -93,11 +100,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const userData = await api.get<User>('/users/profile');
           setUser(userData);
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error fetching user data after token update:', error);
-          localStorage.removeItem('accessToken');
-          setAccessToken(null);
-          setUser(null);
+          if (error.status === 401) {
+            localStorage.removeItem('accessToken');
+            setAccessToken(null);
+            setUser(null);
+          }
         }
       }
     };

@@ -39,15 +39,19 @@ apiClient.interceptors.response.use(
     // Extract error message from backend response
     if (error.response?.data?.message) {
       // Create a new error with the backend message
-      const backendError = new Error(error.response.data.message);
+      const backendError = new Error(error.response.data.message) as any;
+      backendError.status = error.response.status;
       // Preserve validation errors if present
       if (error.response.data.errors) {
-        (backendError as any).errors = error.response.data.errors;
+        backendError.errors = error.response.data.errors;
       }
       return Promise.reject(backendError);
     }
 
-
+    // Even if no specific backend message, attach status to the error object if available
+    if (error.response?.status) {
+      (error as any).status = error.response.status;
+    }
 
     return Promise.reject(error);
   }
