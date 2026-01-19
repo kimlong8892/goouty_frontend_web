@@ -116,7 +116,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
                   ) : (
                     <Scan className="w-4 h-4 mr-1.5" />
                   )}
-                  {isMobileView ? "Quét" : "Quét hóa đơn"}
+                  {isMobileView ? "Quét HĐ" : "Quét hóa đơn"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[160px] border-slate-100 dark:border-white/10 shadow-2xl z-[100]">
@@ -126,7 +126,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
                   className="rounded-xl py-2.5 px-3 focus:bg-primary/10 focus:text-primary cursor-pointer transition-all font-bold"
                 >
                   <Upload className="w-4 h-4 mr-2.5" />
-                  <span className="text-sm">Tải hóa đơn</span>
+                  <span className="text-sm">Tải lên hóa đơn</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   disabled={usage?.remaining === 0}
