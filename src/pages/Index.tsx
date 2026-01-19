@@ -60,17 +60,7 @@ const Index = () => {
   }, [isMobileView]);
 
   useEffect(() => {
-    const hasVisited = sessionStorage.getItem('has_visited_index');
-    if (hasVisited) {
-      setLoading(false);
-    } else {
-      // Simulate loading only on first visit
-      const timer = setTimeout(() => {
-        setLoading(false);
-        sessionStorage.setItem('has_visited_index', 'true');
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
+    setLoading(false);
   }, []);
 
   if (loading) {

@@ -6,8 +6,8 @@ export const useAppLoading = () => {
 
   useEffect(() => {
     // Detect PWA mode
-    const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
-                     (window.navigator as any).standalone === true;
+    const isPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
     setIsPWA(isPWAMode);
 
     if (!isPWAMode) {
@@ -16,12 +16,8 @@ export const useAppLoading = () => {
       return;
     }
 
-    // PWA mode - simple loading with spinner
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000); // 1 second loading
-
-    return () => clearTimeout(timer);
+    // PWA mode - immediate loading
+    setIsLoading(false);
   }, []);
 
   return { isLoading, isPWA };
