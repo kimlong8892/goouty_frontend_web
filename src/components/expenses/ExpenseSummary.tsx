@@ -15,7 +15,8 @@ import { usePWA } from '@/pwa/hooks/usePWA';
 import { cn } from '@/lib/utils';
 import { api } from '@/integrations/api/client.ts';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, HelpCircle } from 'lucide-react';
+import { PWAExpenseScanGuide } from '@/pwa/components/PWAExpenseScanGuide';
 
 interface ExpenseSummaryProps {
   calculation: ExpenseCalculationResponse;
@@ -34,6 +35,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
   const cameraInputRef = React.useRef<HTMLInputElement>(null);
   const [isScanning, setIsScanning] = React.useState(false);
   const [usage, setUsage] = React.useState<{ usedCount: number; dailyLimit: number; remaining: number } | null>(null);
+  const [showGuide, setShowGuide] = React.useState(false);
   const { isPWA } = usePWA();
   const isMobile = useIsMobile();
   const isMobileView = isPWA || isMobile;
@@ -54,6 +56,22 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
       fetchUsage();
     }
   }, [canAddExpense]);
+
+  React.useEffect(() => {
+    // Show guide only once for PWA users
+    if (isPWA) {
+      const hasSeenGuide = localStorage.getItem('pwa_expense_scan_guide_seen');
+      if (!hasSeenGuide) {
+        const timer = setTimeout(() => setShowGuide(true), 1500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isPWA]);
+
+  const handleCompleteGuide = () => {
+    localStorage.setItem('pwa_expense_scan_guide_seen', 'true');
+    setShowGuide(false);
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -141,7 +159,7 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
                     <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-muted-foreground uppercase tracking-widest font-black">
                       <div className="flex items-center gap-1">
                         <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
-                        <span>Hết hạn trong ngày</span>
+                        <span>Hết hạn trong ngày </span>
                       </div>
                       <span className={cn(usage.remaining === 0 ? "text-red-500" : "text-primary")}>
                         {usage.remaining}/{usage.dailyLimit}
@@ -277,6 +295,14 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
           </CardContent>
         </Card>
       </div>
+
+      {isPWA && (
+        <PWAExpenseScanGuide
+          isOpen={showGuide}
+          onClose={() => setShowGuide(false)}
+          onComplete={handleCompleteGuide}
+        />
+      )}
     </div>
   );
 };

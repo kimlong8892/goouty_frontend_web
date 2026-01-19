@@ -57,7 +57,7 @@ export const PaymentHistoryDialog: React.FC<PaymentHistoryDialogProps> = ({
             <DialogContent className={cn(
                 "bg-white dark:bg-slate-900 border-none shadow-2xl overflow-hidden flex flex-col transition-all duration-300",
                 isPWA
-                    ? "w-[92vw] max-w-lg h-[80vh] rounded-[32px] p-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                    ? "w-[90vw] max-w-[400px] h-[75dvh] rounded-[32px] p-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                     : "max-w-2xl h-[80vh] rounded-[32px] p-0"
             )}>
                 <DialogHeader className="flex-shrink-0 border-b border-slate-100 dark:border-white/10 p-6 relative">

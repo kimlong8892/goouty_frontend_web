@@ -99,6 +99,16 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: "dist",
       sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover', '@radix-ui/react-tooltip', 'lucide-react'],
+            'query-vendor': ['@tanstack/react-query'],
+            'utils-vendor': ['date-fns', 'clsx', 'tailwind-merge'],
+          },
+        },
+      },
     },
 
     resolve: {

@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner.tsx";
 import { TooltipProvider } from "@/components/ui/tooltip.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext.tsx";
 import { ThemeProvider } from "@/contexts/ThemeContext.tsx";
 import { NotificationCountProvider } from "@/contexts/NotificationCountContext.tsx";
@@ -19,49 +19,48 @@ import { PWANotificationProvider, usePWANotificationContext } from "@/pwa/contex
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt.tsx";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton.tsx";
 import { FeedbackPrompter } from "@/components/common/FeedbackPrompter.tsx";
-import Index from "./pages/Index.tsx";
-import CreateTripPage from "./pages/CreateTripPage.tsx";
-import PWACreateTripPage from "@/pwa/pages/PWACreateTripPage.tsx";
-import PWAEditTripPage from "@/pwa/pages/PWAEditTripPage.tsx";
-import PWAAddDayPage from "@/pwa/pages/PWAAddDayPage.tsx";
-import PWAEditDayPage from "@/pwa/pages/PWAEditDayPage.tsx";
-import PWAAddActivityPage from "@/pwa/pages/PWAAddActivityPage.tsx";
-import PWAEditActivityPage from "@/pwa/pages/PWAEditActivityPage.tsx";
-import PWAAddExpensePage from "@/pwa/pages/PWAAddExpensePage.tsx";
-import PWAInviteMemberPage from "@/pwa/pages/PWAInviteMemberPage.tsx";
-import PWAChangePasswordPage from "@/pwa/pages/PWAChangePasswordPage.tsx";
-import TemplateDetailsPage from "./pages/TemplateDetailsPage.tsx";
-import PWATemplateDetailsPage from "@/pwa/pages/PWATemplateDetailsPage.tsx";
-import PWAWishlistPage from "@/pwa/pages/PWAWishlistPage.tsx";
-import WishlistPage from "./pages/WishlistPage.tsx";
-import PWAForgotPasswordPage from "@/pwa/pages/PWAForgotPasswordPage.tsx";
-import PWATermsPage from "@/pwa/pages/PWATermsPage.tsx";
-import PWAPrivacyPage from "@/pwa/pages/PWAPrivacyPage.tsx";
-import PWAAboutPage from "@/pwa/pages/PWAAboutPage.tsx";
+// Lazy load pages
+const Index = lazy(() => import("./pages/Index.tsx"));
+const CreateTripPage = lazy(() => import("./pages/CreateTripPage.tsx"));
+const PWACreateTripPage = lazy(() => import("@/pwa/pages/PWACreateTripPage.tsx"));
+const PWAEditTripPage = lazy(() => import("@/pwa/pages/PWAEditTripPage.tsx"));
+const PWAAddDayPage = lazy(() => import("@/pwa/pages/PWAAddDayPage.tsx"));
+const PWAEditDayPage = lazy(() => import("@/pwa/pages/PWAEditDayPage.tsx"));
+const PWAAddActivityPage = lazy(() => import("@/pwa/pages/PWAAddActivityPage.tsx"));
+const PWAEditActivityPage = lazy(() => import("@/pwa/pages/PWAEditActivityPage.tsx"));
+const PWAAddExpensePage = lazy(() => import("@/pwa/pages/PWAAddExpensePage.tsx"));
+const PWAInviteMemberPage = lazy(() => import("@/pwa/pages/PWAInviteMemberPage.tsx"));
+const PWAChangePasswordPage = lazy(() => import("@/pwa/pages/PWAChangePasswordPage.tsx"));
+const TemplateDetailsPage = lazy(() => import("./pages/TemplateDetailsPage.tsx"));
+const PWATemplateDetailsPage = lazy(() => import("@/pwa/pages/PWATemplateDetailsPage.tsx"));
+const PWAWishlistPage = lazy(() => import("@/pwa/pages/PWAWishlistPage.tsx"));
+const WishlistPage = lazy(() => import("./pages/WishlistPage.tsx"));
+const PWAForgotPasswordPage = lazy(() => import("@/pwa/pages/PWAForgotPasswordPage.tsx"));
+const PWATermsPage = lazy(() => import("@/pwa/pages/PWATermsPage.tsx"));
+const PWAPrivacyPage = lazy(() => import("@/pwa/pages/PWAPrivacyPage.tsx"));
+const PWAAboutPage = lazy(() => import("@/pwa/pages/PWAAboutPage.tsx"));
+const MyTripsPage = lazy(() => import("./pages/MyTripsPage.tsx"));
+const PWATripListPage = lazy(() => import("@/pwa/pages/PWATripListPage.tsx"));
+const TripDetailsPage = lazy(() => import("./pages/TripDetailsPage.tsx"));
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const Profile = lazy(() => import("./pages/Profile.tsx"));
+const EditProfile = lazy(() => import("./pages/EditProfile.tsx"));
+const Settings = lazy(() => import("./pages/Settings.tsx"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage.tsx"));
+const AuthPage = lazy(() => import("./pages/AuthPage.tsx"));
+const GoogleCallbackPage = lazy(() => import("./pages/GoogleCallbackPage.tsx"));
+const JoinTripPage = lazy(() => import("./pages/JoinTripPage.tsx").then(m => ({ default: m.JoinTripPage })));
+const ChromePWATestPage = lazy(() => import("@/pwa/pages/ChromePWATestPage.tsx"));
+const InviteAcceptPage = lazy(() => import("./pages/InviteAcceptPage.tsx"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage.tsx"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.tsx"));
+const AboutPage = lazy(() => import("./pages/AboutPage.tsx"));
+const BlogPage = lazy(() => import("./pages/BlogPage.tsx"));
+const TermsPage = lazy(() => import("./pages/TermsPage.tsx"));
 
-
-
-import MyTripsPage from "./pages/MyTripsPage.tsx";
-import PWATripListPage from "@/pwa/pages/PWATripListPage.tsx";
-import TripDetailsPage from "./pages/TripDetailsPage.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import Profile from "./pages/Profile.tsx";
-import EditProfile from "./pages/EditProfile.tsx";
-import Settings from "./pages/Settings.tsx";
-import NotificationsPage from "./pages/NotificationsPage.tsx";
 import Navbar from "./components/Navbar.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.tsx";
 import { Footer } from "./components/landing/Footer.tsx";
-import AuthPage from "./pages/AuthPage.tsx";
-import GoogleCallbackPage from "./pages/GoogleCallbackPage.tsx";
-import { JoinTripPage } from "./pages/JoinTripPage.tsx";
-import ChromePWATestPage from "@/pwa/pages/ChromePWATestPage.tsx";
-import InviteAcceptPage from "./pages/InviteAcceptPage.tsx";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage.tsx";
-import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
-import AboutPage from "./pages/AboutPage.tsx";
-import BlogPage from "./pages/BlogPage.tsx";
-import TermsPage from "./pages/TermsPage.tsx";
 
 import { queryClient } from "@/lib/queryClient";
 
@@ -120,333 +119,335 @@ const ForgotPasswordRoute = () => {
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <AuthGuard>
+    <Suspense fallback={<PWASimpleLoading />}>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <Index />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/create-trip"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <CreateTripPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-create-trip"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWACreateTripPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-edit-trip/:id"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWAEditTripPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-add-day/:tripId"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWAAddDayPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-edit-day/:dayId"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWAEditDayPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-add-activity/:dayId"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWAAddActivityPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-edit-activity/:activityId"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWAEditActivityPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-add-expense/:tripId"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWAAddExpensePage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-invite-member/:tripId"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWAInviteMemberPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-change-password"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWAChangePasswordPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-terms"
+          element={
             <PageTransition>
-              <Index />
+              <PWATermsPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/create-trip"
-        element={
-          <AuthGuard forceWebAuth>
+          }
+        />
+        <Route
+          path="/pwa-privacy"
+          element={
             <PageTransition>
-              <CreateTripPage />
+              <PWAPrivacyPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-create-trip"
-        element={
-          <AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-about"
+          element={
             <PageTransition>
-              <PWACreateTripPage />
+              <PWAAboutPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-edit-trip/:id"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <PWAEditTripPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-add-day/:tripId"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <PWAAddDayPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-edit-day/:dayId"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <PWAEditDayPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-add-activity/:dayId"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <PWAAddActivityPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-edit-activity/:activityId"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <PWAEditActivityPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-add-expense/:tripId"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <PWAAddExpensePage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-invite-member/:tripId"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <PWAInviteMemberPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-change-password"
-        element={
-          <AuthGuard>
-            <PageTransition>
-              <PWAChangePasswordPage />
-            </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-terms"
-        element={
-          <PageTransition>
-            <PWATermsPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/pwa-privacy"
-        element={
-          <PageTransition>
-            <PWAPrivacyPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/pwa-about"
-        element={
-          <PageTransition>
-            <PWAAboutPage />
-          </PageTransition>
-        }
-      />
+          }
+        />
 
 
-      <Route
-        path="/my-trips"
-        element={
-          <AuthGuard forceWebAuth>
+        <Route
+          path="/my-trips"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <MyTripsPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-trips"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWATripListPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/trip/:id"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <TripDetailsPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/trip/:id/:shareToken"
+          element={
             <PageTransition>
-              <MyTripsPage />
+              <JoinTripPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-trips"
-        element={
-          <AuthGuard>
+          }
+        />
+        <Route
+          path="/invite"
+          element={
             <PageTransition>
-              <PWATripListPage />
+              <InviteAcceptPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/trip/:id"
-        element={
-          <AuthGuard forceWebAuth>
+          }
+        />
+        <Route
+          path="/auth"
+          element={
             <PageTransition>
-              <TripDetailsPage />
+              <AuthPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/trip/:id/:shareToken"
-        element={
-          <PageTransition>
-            <JoinTripPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/invite"
-        element={
-          <PageTransition>
-            <InviteAcceptPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/auth"
-        element={
-          <PageTransition>
-            <AuthPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/forgot-password"
-        element={
-          <PageTransition>
-            <ForgotPasswordRoute />
-          </PageTransition>
-        }
-      />
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PageTransition>
+              <ForgotPasswordRoute />
+            </PageTransition>
+          }
+        />
 
-      <Route
-        path="/reset-password"
-        element={
-          <PageTransition>
-            <ResetPasswordPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/auth/google/callback"
-        element={
-          <PageTransition>
-            <GoogleCallbackPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <AuthGuard forceWebAuth>
+        <Route
+          path="/reset-password"
+          element={
             <PageTransition>
-              <Profile />
+              <ResetPasswordPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/profile/edit"
-        element={
-          <AuthGuard forceWebAuth>
+          }
+        />
+        <Route
+          path="/auth/google/callback"
+          element={
             <PageTransition>
-              <EditProfile />
+              <GoogleCallbackPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/notifications"
-        element={
-          <AuthGuard forceWebAuth>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <Profile />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/profile/edit"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <EditProfile />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <NotificationsPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <WishlistRoute />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <Settings />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/chrome-pwa-test"
+          element={
             <PageTransition>
-              <NotificationsPage />
+              <ChromePWATestPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/wishlist"
-        element={
-          <AuthGuard forceWebAuth>
+          }
+        />
+        <Route
+          path="/template/:id"
+          element={
+            <AuthGuard forceWebAuth>
+              <PageTransition>
+                <TemplateDetailsPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/pwa-template-details/:id"
+          element={
+            <AuthGuard>
+              <PageTransition>
+                <PWATemplateDetailsPage />
+              </PageTransition>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/blog"
+          element={
             <PageTransition>
-              <WishlistRoute />
+              <BlogPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <AuthGuard forceWebAuth>
+          }
+        />
+        <Route
+          path="/terms"
+          element={
             <PageTransition>
-              <Settings />
+              <TermsPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/chrome-pwa-test"
-        element={
-          <PageTransition>
-            <ChromePWATestPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/template/:id"
-        element={
-          <AuthGuard forceWebAuth>
+          }
+        />
+        <Route
+          path="/about"
+          element={
             <PageTransition>
-              <TemplateDetailsPage />
+              <AboutPage />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/pwa-template-details/:id"
-        element={
-          <AuthGuard>
+          }
+        />
+        <Route
+          path="*"
+          element={
             <PageTransition>
-              <PWATemplateDetailsPage />
+              <NotFound />
             </PageTransition>
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/blog"
-        element={
-          <PageTransition>
-            <BlogPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/terms"
-        element={
-          <PageTransition>
-            <TermsPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/about"
-        element={
-          <PageTransition>
-            <AboutPage />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="*"
-        element={
-          <PageTransition>
-            <NotFound />
-          </PageTransition>
-        }
-      />
-    </Routes>
+          }
+        />
+      </Routes>
+    </Suspense>
   );
 };
 
