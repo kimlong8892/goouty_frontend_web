@@ -18,8 +18,10 @@ import { useGlobalToast } from '../utils/globalToast';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { CreateTripRequest, Trip } from '@/lib/types.ts';
 import { ProvinceSelector } from '@/components/ProvinceSelector.tsx';
-import { X, Image as ImageIcon, Camera } from 'lucide-react';
+import { X, Image as ImageIcon, Camera, Link2 } from 'lucide-react';
 import { cn } from '@/lib/utils.ts';
+import { CreateTripFromUrlDialog } from '@/components/dialogs/CreateTripFromUrlDialog.tsx';
+
 
 const CreateTripPage = () => {
   const { showToast } = useGlobalToast();
@@ -32,6 +34,7 @@ const CreateTripPage = () => {
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showUrlDialog, setShowUrlDialog] = useState(false);
   const navigate = useNavigate();
   const { user, isAuthenticated, isLoading } = useAuth();
 
@@ -330,6 +333,14 @@ const CreateTripPage = () => {
                     Sử dụng mẫu
                   </Button>
                   <Button
+                    variant="outline"
+                    className="flex-1 h-12 rounded-xl border-primary/50 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary transition-all"
+                    onClick={() => setShowUrlDialog(true)}
+                  >
+                    <Link2 className="mr-2 h-4 w-4" />
+                    Tạo từ URL
+                  </Button>
+                  <Button
                     onClick={handleCreateTrip}
 
                     className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-primary/20 transition-all font-bold"
@@ -350,6 +361,12 @@ const CreateTripPage = () => {
           </div>
         </AnimatedTransition>
       )}
+
+      {/* Create from URL Dialog */}
+      <CreateTripFromUrlDialog
+        open={showUrlDialog}
+        onOpenChange={setShowUrlDialog}
+      />
     </div>
   );
 };

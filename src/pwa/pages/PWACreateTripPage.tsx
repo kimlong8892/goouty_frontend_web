@@ -13,10 +13,12 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
-import { CalendarIcon, ChevronLeft, Camera, X } from 'lucide-react';
+import { CalendarIcon, ChevronLeft, Camera, X, Link2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { cn } from '@/lib/utils.ts';
+import { CreateTripFromUrlDialog } from '@/components/dialogs/CreateTripFromUrlDialog.tsx';
+
 
 const PWACreateTripPage = () => {
   const { showToast } = useGlobalToast();
@@ -32,6 +34,8 @@ const PWACreateTripPage = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showUrlDialog, setShowUrlDialog] = useState(false);
+
 
   useEffect(() => {
     document.title = 'Tạo chuyến đi - Goouty';
@@ -170,6 +174,12 @@ const PWACreateTripPage = () => {
         <h1 className="text-lg font-bold absolute left-1/2 -translate-x-1/2">
           Tạo chuyến đi
         </h1>
+        <button
+          onClick={() => setShowUrlDialog(true)}
+          className="p-2 -mr-2 text-primary hover:text-primary/80 active:scale-95 transition-transform rounded-full hover:bg-primary/10"
+        >
+          <Link2 className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Content */}
@@ -347,8 +357,15 @@ const PWACreateTripPage = () => {
           {loading ? "Đang tạo..." : "Tạo chuyến đi"}
         </Button>
       </div>
+
+      {/* Create from URL Dialog */}
+      <CreateTripFromUrlDialog
+        open={showUrlDialog}
+        onOpenChange={setShowUrlDialog}
+      />
     </div>
   );
 };
 
 export default PWACreateTripPage;
+

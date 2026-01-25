@@ -151,6 +151,9 @@ export const api = {
         method: 'DELETE',
       });
     },
+    createFromUrl: async (url: string) => {
+      return await api.post<{ message: string; tripId?: string }>('/trips/create-pending', { url });
+    },
   },
 
   // Member-specific API methods
