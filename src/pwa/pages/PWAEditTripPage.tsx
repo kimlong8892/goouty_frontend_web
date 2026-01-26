@@ -161,19 +161,20 @@ const PWAEditTripPage = () => {
     }
 
     return (
-        <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
+        <div className="fixed inset-0 bg-background flex flex-col z-10 text-foreground overflow-hidden">
             {/* Header */}
-            <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
+            <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
                 <button
                     onClick={handleCancel}
                     disabled={loading}
-                    className="p-2 -ml-2 text-foreground/80 hover:text-foreground active:scale-95 transition-transform rounded-full hover:bg-muted"
+                    className="p-2 -ml-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all outline-none"
                 >
                     <ChevronLeft className="w-6 h-6" />
                 </button>
-                <h1 className="text-lg font-bold absolute left-1/2 -translate-x-1/2">
+                <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-foreground">
                     Sửa chuyến đi
                 </h1>
+                <div className="w-10"></div>
             </div>
 
             {/* Content */}
@@ -334,7 +335,7 @@ const PWAEditTripPage = () => {
                 <Button
                     onClick={handleUpdateTrip}
                     disabled={loading}
-                    className="w-full h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary/25"
+                    className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/25 text-white active:scale-[0.98] transition-all"
                 >
                     {loading ? (
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>

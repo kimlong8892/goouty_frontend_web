@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
-import { CalendarIcon, ChevronLeft, Camera, X, Link2 } from 'lucide-react';
+import { CalendarIcon, ChevronLeft, Camera, X, Link2, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { cn } from '@/lib/utils.ts';
@@ -167,11 +167,11 @@ const PWACreateTripPage = () => {
         <button
           onClick={handleCancel}
           disabled={loading}
-          className="p-2 -ml-2 text-slate-600 hover:text-slate-900 active:scale-95 transition-all outline-none"
+          className="p-2 -ml-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all outline-none"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
-        <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900">
+        <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-foreground">
           Tạo chuyến đi
         </h1>
         <button
@@ -235,7 +235,7 @@ const PWACreateTripPage = () => {
                   if (errors.tripName) setErrors(p => ({ ...p, tripName: '' }));
                 }}
                 className={cn(
-                  "h-12 rounded-xl bg-card border-input focus:ring-primary/20 transition-all",
+                  "h-12 rounded-xl bg-card border-input focus:ring-primary/20 transition-all text-base",
                   errors.tripName && "border-destructive focus-visible:ring-destructive/20"
                 )}
               />
@@ -336,7 +336,7 @@ const PWACreateTripPage = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="min-h-[100px] rounded-xl bg-card border-input resize-none transition-all"
+                className="min-h-[100px] rounded-xl bg-card border-input resize-none transition-all text-base"
               />
             </div>
 
@@ -349,10 +349,10 @@ const PWACreateTripPage = () => {
         <Button
           onClick={handleCreateTrip}
           disabled={loading}
-          className="w-full h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary/25"
+          className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/25 text-white active:scale-[0.98] transition-all"
         >
           {loading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
           ) : null}
           {loading ? "Đang tạo..." : "Tạo chuyến đi"}
         </Button>

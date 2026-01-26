@@ -151,7 +151,7 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
             <DialogContent
                 className={cn(
                     "bg-card border-border flex flex-col p-0 overflow-hidden outline-none",
-                    isMobileView ? "h-full top-0 translate-y-0 w-full max-w-none rounded-none border-none bg-[#EDEEFF] shadow-none" : "sm:max-w-[600px] max-h-[90vh] rounded-[32px]"
+                    isMobileView ? "h-[calc(100dvh-5rem)] top-0 translate-y-0 w-full max-w-none rounded-none border-none bg-background shadow-none" : "sm:max-w-[600px] max-h-[90vh] rounded-[32px]"
                 )}
                 hideClose={isMobileView}
                 onInteractOutside={(e) => {
@@ -164,15 +164,15 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                     `}</style>
                 )}
                 {isMobileView ? (
-                    <div className="sticky top-0 z-50 bg-[#EDEEFF]/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
+                    <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
                         <button
                             onClick={() => handleOpenChange(false)}
                             disabled={loading}
-                            className="p-2 -ml-2 text-slate-600 hover:text-slate-900 active:scale-95 transition-all"
+                            className="p-2 -ml-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </button>
-                        <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900">
+                        <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-foreground">
                             Tạo chuyến đi từ URL
                         </h1>
                         <div className="w-10"></div>
@@ -231,7 +231,7 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                                         if (error) setError('');
                                     }}
                                     className={cn(
-                                        "h-14 rounded-[24px] bg-white border-none shadow-sm focus:ring-primary/20 transition-all text-base px-5",
+                                        "h-14 rounded-[24px] bg-card dark:bg-slate-900/50 border-none shadow-sm focus:ring-primary/20 transition-all text-base px-5",
                                         isMobileView ? "" : "border border-border",
                                         error && "ring-1 ring-destructive"
                                     )}
@@ -242,13 +242,13 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
 
                             {isMobileView && (
                                 <div className="bg-primary/5 rounded-[24px] p-6 space-y-4">
-                                    <p className="text-base font-black text-slate-900 flex items-center gap-2">
+                                    <p className="text-base font-black text-foreground flex items-center gap-2">
                                         <div className="w-1.5 h-4 bg-primary rounded-full"></div>
                                         Hỗ trợ các loại URL:
                                     </p>
                                     <div className="grid grid-cols-1 gap-2">
                                         {['Google Sheets', 'TikTok', 'YouTube'].map((type) => (
-                                            <div key={type} className="flex items-center gap-3 text-[15px] text-slate-700 bg-white/60 p-3.5 rounded-[18px] font-bold tracking-tight">
+                                            <div key={type} className="flex items-center gap-3 text-[15px] text-muted-foreground bg-card/60 dark:bg-slate-900/40 p-3.5 rounded-[18px] font-bold tracking-tight">
                                                 <div className="w-2 h-2 rounded-full bg-primary/30"></div>
                                                 {type}
                                             </div>
@@ -259,9 +259,9 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
 
                             <div className={cn(
                                 "rounded-[24px] p-6 transition-all",
-                                isMobileView ? "bg-[#FFF4E5]" : "bg-amber-500/10 border border-amber-500/20"
+                                isMobileView ? "bg-amber-500/10 dark:bg-amber-500/5" : "bg-amber-500/10 border border-amber-500/20"
                             )}>
-                                <p className={cn("text-[14px] leading-relaxed", isMobileView ? "text-[#B45309] font-bold" : "text-amber-700 dark:text-amber-400 font-medium")}>
+                                <p className={cn("text-[14px] leading-relaxed", isMobileView ? "text-amber-800 dark:text-amber-200 font-bold" : "text-amber-700 dark:text-amber-400 font-medium")}>
                                     <span className="font-black uppercase text-[12px] opacity-70">Lưu ý:</span> Sau khi gửi yêu cầu, bạn sẽ nhận được email thông báo trong vài phút khi chuyến đi được tạo thành công.
                                 </p>
                             </div>
@@ -270,7 +270,7 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                                 type="submit"
                                 disabled={loading}
                                 className={cn(
-                                    "w-full rounded-xl font-bold shadow-lg transition-all active:scale-[0.98]",
+                                    "w-full rounded-xl font-bold shadow-lg transition-all active:scale-[0.98] text-white",
                                     isMobileView ? "h-12 text-base bg-primary shadow-primary/25" : "h-12 bg-primary hover:bg-primary/90"
                                 )}
                             >
@@ -287,7 +287,7 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
 
                         <div className="space-y-6 pt-6">
                             <div className="flex items-center justify-between ml-1">
-                                <h3 className="text-base font-black text-slate-900">Lịch sử tạo gần đây</h3>
+                                <h3 className="text-base font-black text-foreground">Lịch sử tạo gần đây</h3>
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -300,20 +300,20 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                             </div>
 
                             {pendingTrips.length === 0 && !loadingPending ? (
-                                <div className="text-center py-14 bg-white rounded-[32px] border border-dashed border-slate-200">
-                                    <Clock className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                                    <p className="text-sm text-slate-400 font-bold">Chưa có lịch sử tạo trip nào.</p>
+                                <div className="text-center py-14 bg-card dark:bg-slate-900/50 rounded-[32px] border border-dashed border-border">
+                                    <Clock className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+                                    <p className="text-sm text-muted-foreground font-bold">Chưa có lịch sử tạo trip nào.</p>
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-[32px] shadow-sm border border-white overflow-hidden">
+                                <div className="bg-card dark:bg-slate-900/50 rounded-[32px] shadow-sm border border-border overflow-hidden">
                                     {pendingTrips.map((item, index) => {
                                         const { icon: Icon, color, badge, label, spin } = getStatusInfo(item.status);
                                         return (
                                             <div key={item.id}>
-                                                <div className="p-5 space-y-4 active:bg-slate-50 transition-all">
+                                                <div className="p-5 space-y-4 active:bg-muted/50 transition-all">
                                                     <div className="flex items-start justify-between gap-3">
                                                         <div className="min-w-0 flex-1">
-                                                            <p className="text-[14px] font-black truncate text-slate-800 tracking-tight" title={item.url}>
+                                                            <p className="text-[14px] font-black truncate text-foreground tracking-tight" title={item.url}>
                                                                 {item.url}
                                                             </p>
                                                             <div className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1.5 font-bold opacity-60">
@@ -321,7 +321,7 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                                                                 {item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[0].split('-').reverse().join('/') + ' ' + item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[1]}
                                                             </div>
                                                         </div>
-                                                        <Badge variant="secondary" className={cn("shrink-0 h-8 px-4 rounded-full font-black text-[10px] uppercase tracking-wider", badge)}>
+                                                        <Badge variant="secondary" className={cn("shrink-0 h-8 px-4 rounded-full font-black text-[10px] uppercase tracking-wider shadow-none", badge)}>
                                                             {spin && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
                                                             {!spin && <Icon className="mr-1.5 h-3 w-3" />}
                                                             {label}
@@ -335,7 +335,7 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                                                     )}
                                                 </div>
                                                 {index < pendingTrips.length - 1 && (
-                                                    <div className="h-[1px] bg-slate-50 mx-5" />
+                                                    <div className="h-[1px] bg-border/50 mx-5" />
                                                 )}
                                             </div>
                                         );
@@ -347,7 +347,7 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="w-full h-12 rounded-2xl text-slate-400 text-xs hover:bg-white font-black uppercase tracking-widest"
+                                    className="w-full h-12 rounded-2xl text-muted-foreground text-xs hover:bg-card/80 font-black uppercase tracking-widest"
                                     onClick={handleLoadMore}
                                     disabled={loadingPending}
                                 >

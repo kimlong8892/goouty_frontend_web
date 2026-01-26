@@ -283,17 +283,17 @@ const PWAAddExpensePage = () => {
     const selectedPayer = members.find(m => m.user.id.toString() === formData.payerId);
 
     return (
-        <div className="fixed inset-0 bg-background flex flex-col z-10 text-sidebar-foreground overflow-hidden">
+        <div className="fixed inset-0 bg-background flex flex-col z-10 text-foreground overflow-hidden">
             <AnimatedTransition show={showContent} animation="slide-up" className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-2 -ml-2 text-slate-600 hover:text-slate-900 active:scale-95 transition-all outline-none"
+                        className="p-2 -ml-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all outline-none"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
-                    <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900">
+                    <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900 dark:text-white">
                         Thêm chi phí
                     </h1>
 
@@ -305,7 +305,7 @@ const PWAAddExpensePage = () => {
                                 <Scan className="w-6 h-6" />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[200px] border-slate-100 shadow-2xl z-[100]">
+                        <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[200px] border-border dark:bg-slate-900 shadow-2xl z-[100]">
                             <DropdownMenuItem
                                 onClick={() => cameraInputRef.current?.click()}
                                 className="rounded-xl py-3 px-3 focus:bg-primary/5 cursor-pointer transition-all flex items-center gap-3"
@@ -330,7 +330,7 @@ const PWAAddExpensePage = () => {
 
                 {/* Content */}
                 <div className="flex-1 px-5 pt-4 pb-32 overflow-y-auto scrolling-touch">
-                    <div className="w-full max-w-md mx-auto space-y-6 text-slate-700">
+                    <div className="w-full max-w-md mx-auto space-y-6 text-foreground">
                         {/* Title */}
                         <div className="space-y-2">
                             <Label htmlFor="title" className="text-muted-foreground text-sm font-bold ml-1">
@@ -342,7 +342,7 @@ const PWAAddExpensePage = () => {
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 className={cn(
-                                    "h-14 rounded-[20px] bg-white border-none shadow-sm focus:ring-primary/20 transition-all text-base px-5",
+                                    "h-14 rounded-[20px] bg-card dark:bg-slate-900/50 border-none shadow-sm focus:ring-primary/20 transition-all text-base px-5",
                                     errors.title && "ring-1 ring-destructive"
                                 )}
                             />
@@ -365,7 +365,7 @@ const PWAAddExpensePage = () => {
                                         value={formatCurrencyInput(formData.amount)}
                                         onChange={(e) => setFormData({ ...formData, amount: e.target.value.replace(/[^0-9]/g, '') })}
                                         className={cn(
-                                            "h-14 rounded-[20px] bg-white border-none shadow-sm focus:ring-primary/20 transition-all font-black pr-12 text-base px-5",
+                                            "h-14 rounded-[20px] bg-card dark:bg-slate-900/50 border-none shadow-sm focus:ring-primary/20 transition-all font-black pr-12 text-base px-5",
                                             errors.amount && "ring-1 ring-destructive"
                                         )}
                                     />
@@ -381,7 +381,7 @@ const PWAAddExpensePage = () => {
                                         <Button
                                             variant="outline"
                                             className={cn(
-                                                "w-full h-14 justify-start text-left font-bold rounded-[20px] bg-white border-none shadow-sm hover:bg-white/80 transition-all text-base px-5",
+                                                "w-full h-14 justify-start text-left font-bold rounded-[20px] bg-card dark:bg-slate-900/50 border-none shadow-sm hover:bg-card/80 transition-all text-base px-5",
                                                 !formData.date && "text-muted-foreground"
                                             )}
                                         >
@@ -406,7 +406,7 @@ const PWAAddExpensePage = () => {
                             <Label className="text-muted-foreground text-sm font-bold ml-1">Người trả tiền</Label>
                             <Select value={formData.payerId} onValueChange={(v) => setFormData({ ...formData, payerId: v })}>
                                 <SelectTrigger className={cn(
-                                    "h-16 rounded-[20px] bg-white border-none shadow-sm focus:ring-primary/20 transition-all text-base px-4 [&>span]:flex [&>span]:items-center",
+                                    "h-16 rounded-[20px] bg-card dark:bg-slate-900/50 border-none shadow-sm focus:ring-primary/20 transition-all text-base px-4 [&>span]:flex [&>span]:items-center",
                                     errors.payerId && "ring-1 ring-destructive"
                                 )}>
                                     {selectedPayer ? (
@@ -417,7 +417,7 @@ const PWAAddExpensePage = () => {
                                                     {selectedPayer.user.fullName.charAt(0)}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <span className="font-bold text-slate-900">
+                                            <span className="font-bold text-foreground">
                                                 {selectedPayer.user.fullName} {user?.id.toString() === selectedPayer.user.id.toString() && '(bạn)'}
                                             </span>
                                         </div>
@@ -440,7 +440,7 @@ const PWAAddExpensePage = () => {
                                                             {m.user.fullName.charAt(0).toUpperCase()}
                                                         </AvatarFallback>
                                                     </Avatar>
-                                                    <span className="text-sm font-bold text-slate-700">{m.user.fullName} {user?.id.toString() === m.user.id.toString() && '(bạn)'}</span>
+                                                    <span className="text-sm font-bold text-foreground">{m.user.fullName} {user?.id.toString() === m.user.id.toString() && '(bạn)'}</span>
                                                 </div>
                                             </SelectItem>
                                         ))
@@ -451,39 +451,39 @@ const PWAAddExpensePage = () => {
 
                         <div className="space-y-3">
                             <Label className="text-muted-foreground text-sm font-bold ml-1">Người cùng tham gia</Label>
-                            <div className="bg-white rounded-[24px] shadow-sm overflow-hidden divide-y divide-slate-50 border border-white">
+                            <div className="bg-card dark:bg-slate-900/50 rounded-[24px] shadow-sm overflow-hidden divide-y divide-border/50 border border-border/50">
                                 {membersLoading && members.length === 0 ? (
-                                    <div className="h-20 flex items-center justify-center bg-white animate-pulse">
+                                    <div className="h-20 flex items-center justify-center bg-muted/30 rounded-2xl animate-pulse">
                                         <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                                     </div>
                                 ) : members.map((m) => (
                                     <label
                                         key={m.user.id}
                                         className={cn(
-                                            "flex items-center justify-between p-4 cursor-pointer transition-all active:bg-slate-50",
-                                            formData.participantIds.includes(m.user.id.toString()) ? "bg-primary/[0.02]" : "bg-white"
+                                            "flex items-center justify-between p-4 cursor-pointer transition-all active:bg-muted",
+                                            formData.participantIds.includes(m.user.id.toString()) ? "bg-primary/[0.04]" : "bg-transparent"
                                         )}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <Avatar className="w-10 h-10 shrink-0 border-2 border-slate-50 shadow-sm">
+                                            <Avatar className="w-10 h-10 shrink-0 border-2 border-border/50 shadow-sm">
                                                 <AvatarImage src={m.user.profilePicture} />
-                                                <AvatarFallback className="bg-slate-100 text-slate-500 text-xs font-bold uppercase">
+                                                <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold uppercase">
                                                     {m.user.fullName.charAt(0)}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <span className="text-sm font-black text-slate-800 tracking-tight">
+                                            <span className="text-sm font-black text-foreground tracking-tight">
                                                 {m.user.fullName} {user?.id.toString() === m.user.id.toString() && '(bạn)'}
                                             </span>
                                         </div>
                                         <Checkbox
                                             checked={formData.participantIds.includes(m.user.id.toString())}
                                             onCheckedChange={() => toggleParticipant(m.user.id.toString())}
-                                            className="rounded-full h-7 w-7 border-slate-200 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all shadow-inner"
+                                            className="rounded-full h-7 w-7 border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all shadow-inner"
                                         />
                                     </label>
                                 ))}
                                 {members.length === 0 && !membersLoading && (
-                                    <div className="p-8 text-center bg-white italic text-xs text-muted-foreground font-medium">Không tìm thấy thành viên để tham gia</div>
+                                    <div className="p-8 text-center bg-transparent italic text-xs text-muted-foreground font-medium">Không tìm thấy thành viên để tham gia</div>
                                 )}
                             </div>
                         </div>
@@ -495,7 +495,7 @@ const PWAAddExpensePage = () => {
                                     <Info className="w-4 h-4" />
                                     <Label className="text-sm font-bold">Chia chi tiết</Label>
                                 </div>
-                                <div className="bg-white rounded-[24px] overflow-hidden shadow-sm divide-y divide-slate-50">
+                                <div className="bg-card dark:bg-slate-900/50 rounded-[24px] overflow-hidden shadow-sm divide-y divide-border/50">
                                     {formData.participantIds.map((pid) => {
                                         const m = members.find(mm => mm.user.id === pid);
                                         if (!m) return null;
@@ -504,11 +504,11 @@ const PWAAddExpensePage = () => {
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="w-7 h-7 shrink-0">
                                                         <AvatarImage src={m.user.profilePicture} />
-                                                        <AvatarFallback className="text-[10px] font-bold uppercase bg-slate-100">{m.user.fullName.charAt(0)}</AvatarFallback>
+                                                        <AvatarFallback className="text-[10px] font-bold uppercase bg-muted text-muted-foreground">{m.user.fullName.charAt(0)}</AvatarFallback>
                                                     </Avatar>
-                                                    <span className="text-xs font-black text-slate-600 truncate max-w-[120px]">{m.user.fullName}</span>
+                                                    <span className="text-xs font-black text-muted-foreground truncate max-w-[120px]">{m.user.fullName}</span>
                                                 </div>
-                                                <div className="flex items-center gap-1.5 bg-slate-50/80 px-4 py-2 rounded-xl ring-1 ring-slate-100 focus-within:ring-primary/30 transition-all">
+                                                <div className="flex items-center gap-1.5 bg-muted/50 px-4 py-2 rounded-xl ring-1 ring-border focus-within:ring-primary/30 transition-all">
                                                     <input
                                                         type="text"
                                                         inputMode="numeric"
@@ -540,7 +540,7 @@ const PWAAddExpensePage = () => {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows={3}
-                                className="min-h-[120px] rounded-[24px] bg-white border-none shadow-sm resize-none transition-all px-5 py-4 text-base"
+                                className="min-h-[120px] rounded-[24px] bg-card dark:bg-slate-900/50 border-none shadow-sm resize-none transition-all px-5 py-4 text-base"
                             />
                         </div>
                     </div>
@@ -549,7 +549,7 @@ const PWAAddExpensePage = () => {
                 {/* Global Scanning Overlay */}
                 {isScanning && createPortal(
                     <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center animate-fade-in bg-slate-950/40 backdrop-blur-sm">
-                        <div className="bg-white dark:bg-card p-10 rounded-[48px] shadow-2xl flex flex-col items-center gap-8 border border-slate-100 dark:border-white/10 animate-slide-up mx-6 max-w-[400px]">
+                        <div className="bg-card p-10 rounded-[48px] shadow-2xl flex flex-col items-center gap-8 border border-border animate-slide-up mx-6 max-w-[400px]">
                             <div className="relative">
                                 <div className="w-24 h-24 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
                                 <div className="absolute inset-0 flex items-center justify-center">

@@ -46,7 +46,7 @@ export const PWASelectTripDialog = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-[90vw] w-[380px] p-0 border-none overflow-hidden rounded-[32px] bg-background shadow-2xl flex flex-col max-h-[85vh]">
+            <DialogContent className="max-w-[90vw] w-[380px] p-0 border border-border/50 overflow-hidden rounded-[32px] bg-card shadow-2xl flex flex-col max-h-[85vh]">
                 <DialogHeader className="p-6 pb-2">
                     <DialogTitle className="text-xl font-extrabold text-foreground tracking-tight text-center">
                         Chọn chuyến đi
