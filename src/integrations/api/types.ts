@@ -204,4 +204,15 @@ export namespace DATABASE_TYPES {
       profilePicture?: string;
     };
   }
+
+  export interface pendingTrips {
+    id: string;
+    url: string;
+    userId: string;
+    tripId?: string | null;
+    status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+    error?: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }
 }

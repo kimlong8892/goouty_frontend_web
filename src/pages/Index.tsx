@@ -60,6 +60,7 @@ const Index = () => {
   }, [isMobileView]);
 
   useEffect(() => {
+    console.log("App Version: Green UI Update");
     setLoading(false);
   }, []);
 

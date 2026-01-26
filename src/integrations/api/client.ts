@@ -128,6 +128,15 @@ export const api = {
     deleteAvatar: async (id: string) => {
       return await api.delete(`/trips/${id}/avatar`);
     },
+    getPending: async (params?: { page?: number; limit?: number }) => {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+      const queryString = queryParams.toString();
+      const endpoint = queryString ? `/trips/pending?${queryString}` : '/trips/pending';
+      return await api.get<{ data: any[]; pagination: any }>(endpoint); // Replace 'any' with proper PendingTrip type if available
+    }
   },
 
   // Member-specific API methods

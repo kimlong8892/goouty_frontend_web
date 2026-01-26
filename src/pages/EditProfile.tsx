@@ -93,8 +93,12 @@ const EditProfile = () => {
       console.log('Updating profile with data:', updateData);
       const updatedProfile = await api.put<UserProfile>('/users/profile', updateData);
       setProfile(updatedProfile);
-      setIsEditing(false);
       toast.success('Cập nhật thông tin thành công');
+      if (isPWA) {
+        navigate('/profile');
+      } else {
+        setIsEditing(false);
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Không thể cập nhật hồ sơ');
       console.error('Error updating profile:', error);

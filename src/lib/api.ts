@@ -151,6 +151,12 @@ export const api = {
         method: 'DELETE',
       });
     },
+    createFromUrl: async (url: string) => {
+      return await api.post<{ message: string; tripId?: string }>('/trips/create-pending', { url });
+    },
+    getPending: async (params?: { page?: number; limit?: number }) => {
+      return await api.get<{ data: DATABASE_TYPES.pendingTrips[]; pagination: any }>('/trips/pending', params);
+    },
   },
 
   // Member-specific API methods

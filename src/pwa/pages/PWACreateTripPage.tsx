@@ -13,10 +13,13 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
-import { CalendarIcon, ChevronLeft, Camera, X } from 'lucide-react';
+import { CalendarIcon, ChevronLeft, Camera, X, Link2, Loader2, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { cn } from '@/lib/utils.ts';
+import { CreateTripFromUrlDialog } from '@/components/dialogs/CreateTripFromUrlDialog.tsx';
+import { PWACreateTripFromUrlGuide } from '@/pwa/components/PWACreateTripFromUrlGuide.tsx';
+
 
 const PWACreateTripPage = () => {
   const { showToast } = useGlobalToast();
@@ -32,6 +35,24 @@ const PWACreateTripPage = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showUrlDialog, setShowUrlDialog] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    if (isPWA) {
+      const hasSeen = localStorage.getItem('hasSeenUrlGuide');
+      if (!hasSeen) {
+        setShowGuide(true);
+      }
+    }
+  }, [isPWA]);
+
+  const handleGuideComplete = () => {
+    localStorage.setItem('hasSeenUrlGuide', 'true');
+    setShowGuide(false);
+    setShowUrlDialog(true);
+  };
+
 
   useEffect(() => {
     document.title = 'Tạo chuyến đi - Goouty';
@@ -157,19 +178,33 @@ const PWACreateTripPage = () => {
   }
 
   return (
-    <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
+    <div className="fixed inset-0 bg-background flex flex-col z-10 text-foreground overflow-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
+      <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
         <button
           onClick={handleCancel}
           disabled={loading}
-          className="p-2 -ml-2 text-foreground/80 hover:text-foreground active:scale-95 transition-transform rounded-full hover:bg-muted"
+          className="p-2 -ml-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all outline-none"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
-        <h1 className="text-lg font-bold absolute left-1/2 -translate-x-1/2">
+        <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-foreground">
           Tạo chuyến đi
         </h1>
+        <div className="flex items-center -mr-2">
+          <button
+            onClick={() => setShowUrlDialog(true)}
+            className="p-2 text-primary hover:text-primary/80 active:scale-95 transition-all outline-none"
+          >
+            <Link2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowGuide(true)}
+            className="p-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all outline-none"
+          >
+            <Info className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Content */}
@@ -225,7 +260,7 @@ const PWACreateTripPage = () => {
                   if (errors.tripName) setErrors(p => ({ ...p, tripName: '' }));
                 }}
                 className={cn(
-                  "h-12 rounded-xl bg-card border-input focus:ring-primary/20 transition-all",
+                  "h-12 rounded-xl bg-card border-input focus:ring-primary/20 transition-all text-base",
                   errors.tripName && "border-destructive focus-visible:ring-destructive/20"
                 )}
               />
@@ -326,7 +361,7 @@ const PWACreateTripPage = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="min-h-[100px] rounded-xl bg-card border-input resize-none transition-all"
+                className="min-h-[100px] rounded-xl bg-card border-input resize-none transition-all text-base"
               />
             </div>
 
@@ -335,20 +370,33 @@ const PWACreateTripPage = () => {
       </div>
 
       {/* Bottom Button - Positioned above PWA Navbar */}
-      <div className="p-4 bg-background border-t border-border/50 pb-safe z-40">
+      <div className="p-4 bg-background border-t border-border/50 pb-24 z-40">
         <Button
           onClick={handleCreateTrip}
           disabled={loading}
-          className="w-full h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary/25"
+          className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/25 text-white active:scale-[0.98] transition-all"
         >
           {loading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
           ) : null}
           {loading ? "Đang tạo..." : "Tạo chuyến đi"}
         </Button>
       </div>
+
+      {/* Create from URL Dialog */}
+      <CreateTripFromUrlDialog
+        open={showUrlDialog}
+        onOpenChange={setShowUrlDialog}
+      />
+
+      <PWACreateTripFromUrlGuide
+        isOpen={showGuide}
+        onClose={() => setShowGuide(false)}
+        onComplete={handleGuideComplete}
+      />
     </div>
   );
 };
 
 export default PWACreateTripPage;
+

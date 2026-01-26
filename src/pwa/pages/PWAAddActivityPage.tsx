@@ -132,19 +132,20 @@ const PWAAddActivityPage = () => {
     }
 
     return (
-        <div className="h-full bg-background transition-colors duration-300 flex flex-col overflow-hidden">
-            <AnimatedTransition show={showContent} animation="slide-up">
+        <div className="fixed inset-0 bg-background flex flex-col z-10 text-foreground overflow-hidden">
+            <AnimatedTransition show={showContent} animation="slide-up" className="flex-1 flex flex-col overflow-hidden">
                 {/* Header part of flex flow */}
-                <div className="bg-background/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-border/50">
+                <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full hover:bg-secondary/80 text-foreground transition-all active:scale-95"
+                        className="p-2 -ml-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all outline-none"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
-                    <h1 className="text-lg font-bold absolute left-1/2 -translate-x-1/2 text-nowrap">
+                    <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-foreground">
                         {initialData ? 'Sao chép hoạt động' : 'Thêm hoạt động'}
                     </h1>
+                    <div className="w-10"></div>
                 </div>
 
                 {/* Content */}
@@ -268,20 +269,20 @@ const PWAAddActivityPage = () => {
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Bottom Button */}
-                    <div className="px-5 py-4 bg-background border-t border-border/50 pb-safe z-40">
-                        <Button
-                            onClick={handleSubmit}
-                            disabled={loading}
-                            className="w-full h-14 rounded-xl bg-[#6347f9] hover:bg-[#5136db] text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
-                        >
-                            {loading ? (
-                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                            ) : null}
-                            {loading ? (initialData ? 'Đang sao chép...' : 'Đang thêm...') : (initialData ? 'Sao chép' : 'Thêm hoạt động')}
-                        </Button>
-                    </div>
+                {/* Bottom Button - Positioned above PWA Navbar */}
+                <div className="p-4 bg-background border-t border-border/50 pb-24 z-40">
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/25 text-white active:scale-[0.98] transition-all"
+                    >
+                        {loading ? (
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                        ) : null}
+                        {loading ? (initialData ? 'Đang sao chép...' : 'Đang thêm...') : (initialData ? 'Sao chép' : 'Thêm hoạt động')}
+                    </Button>
                 </div>
             </AnimatedTransition>
         </div>
