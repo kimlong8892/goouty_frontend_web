@@ -272,19 +272,20 @@ const PWAAddExpensePage = () => {
     const selectedPayer = members.find(m => m.user.id.toString() === formData.payerId);
 
     return (
-        <div className="h-full bg-[#F8F9FE] flex flex-col relative text-sidebar-foreground overflow-hidden">
-            <AnimatedTransition show={showContent} animation="slide-up">
+        <div className="fixed inset-0 bg-background flex flex-col z-[60] text-sidebar-foreground overflow-hidden">
+            <AnimatedTransition show={showContent} animation="slide-up" className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md px-4 py-4 flex items-center justify-between">
+                <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-2 -ml-2 text-foreground/80 transition-transform rounded-full"
+                        className="p-2 -ml-2 text-slate-600 hover:text-slate-900 active:scale-95 transition-all outline-none"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
-                    <h1 className="text-xl font-black absolute left-1/2 -translate-x-1/2 text-slate-900">
+                    <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900">
                         Thêm chi phí
                     </h1>
+                    <div className="w-10"></div>
                 </div>
 
                 {/* Content */}
@@ -506,14 +507,14 @@ const PWAAddExpensePage = () => {
                 </div>
 
                 {/* Bottom Navbar & Action Button */}
-                <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-white via-white to-transparent pb-10 z-[60]">
+                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-safe z-40">
                     <Button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="w-full h-16 rounded-[24px] bg-primary hover:bg-primary/95 text-white font-black text-lg shadow-xl shadow-primary/30 active:scale-[0.97] transition-all transform-gpu"
+                        className="w-full h-12 rounded-xl text-base font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
                     >
                         {loading ? (
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-3" />
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-2" />
                         ) : null}
                         {loading ? 'Đang lưu...' : 'Thêm chi phí'}
                     </Button>

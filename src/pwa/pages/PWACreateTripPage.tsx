@@ -161,22 +161,22 @@ const PWACreateTripPage = () => {
   }
 
   return (
-    <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
+    <div className="fixed inset-0 bg-background flex flex-col z-[60] text-foreground overflow-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
+      <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
         <button
           onClick={handleCancel}
           disabled={loading}
-          className="p-2 -ml-2 text-foreground/80 hover:text-foreground active:scale-95 transition-transform rounded-full hover:bg-muted"
+          className="p-2 -ml-2 text-slate-600 hover:text-slate-900 active:scale-95 transition-all outline-none"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
-        <h1 className="text-lg font-bold absolute left-1/2 -translate-x-1/2">
+        <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900">
           Tạo chuyến đi
         </h1>
         <button
           onClick={() => setShowUrlDialog(true)}
-          className="p-2 -mr-2 text-primary hover:text-primary/80 active:scale-95 transition-transform rounded-full hover:bg-primary/10"
+          className="p-2 -mr-2 text-primary hover:text-primary/80 active:scale-95 transition-all outline-none"
         >
           <Link2 className="w-5 h-5" />
         </button>

@@ -427,7 +427,7 @@ export const Navbar = () => {
 
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (
-            <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-background/90 backdrop-blur-lg px-4 py-2 pb-6 border-t border-border/50">
+            <nav className="fixed bottom-0 left-0 right-0 z-[110] bg-background/90 backdrop-blur-lg px-4 py-2 pb-6">
               <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
                 <div className="pointer-events-auto">
                   {/* Removed SyncStatus icon from PWA nav as requested */}

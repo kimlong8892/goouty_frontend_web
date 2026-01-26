@@ -6,17 +6,20 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogOverlay,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Link2, Loader2, Clock, CheckCircle, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Link2, Loader2, Clock, CheckCircle, XCircle, AlertCircle, RefreshCw, ChevronLeft, X, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
 import { useGlobalToast } from '@/utils/globalToast';
 import { DATABASE_TYPES } from '@/integrations/api/types';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { usePWA } from '@/pwa/hooks/usePWA';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CreateTripFromUrlDialogProps {
     open: boolean;
@@ -31,6 +34,9 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { showToast } = useGlobalToast();
+    const { isPWA } = usePWA();
+    const isMobile = useIsMobile();
+    const isMobileView = isPWA || isMobile;
 
     // Pending trips state
     const [pendingTrips, setPendingTrips] = useState<DATABASE_TYPES.pendingTrips[]>([]);
@@ -141,150 +147,229 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
     };
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-[600px] bg-card border-border max-h-[90vh] flex flex-col">
-                <DialogHeader>
-                    <DialogTitle className="text-foreground flex items-center gap-2">
-                        <Link2 className="w-5 h-5 text-primary" />
-                        Tạo chuyến đi từ URL
-                    </DialogTitle>
-                    <DialogDescription className="text-muted-foreground">
-                        Nhập URL từ Google Sheets, TikTok hoặc YouTube để tạo chuyến đi tự động
-                    </DialogDescription>
-                </DialogHeader>
-
-                <div className="flex-1 overflow-y-auto pr-1">
-                    <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="url" className="text-muted-foreground font-medium text-sm">
-                                URL <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                id="url"
-                                type="url"
-                                placeholder="https://docs.google.com/spreadsheets/d/..."
-                                value={url}
-                                onChange={(e) => {
-                                    setUrl(e.target.value);
-                                    if (error) setError('');
-                                }}
-                                className={cn(
-                                    "h-12 rounded-xl bg-secondary border-border text-foreground placeholder:text-muted-foreground/60",
-                                    error && "border-red-500 focus-visible:ring-red-500/20"
-                                )}
-                                disabled={loading}
-                            />
-                            {error && <p className="text-sm text-red-500">{error}</p>}
-                        </div>
-
-                        <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-2">
-                            <p className="text-sm font-medium text-foreground">Hỗ trợ các loại URL:</p>
-                            <ul className="text-sm text-muted-foreground space-y-1 ml-4">
-                                <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                                    Google Sheets
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                                    TikTok
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                                    YouTube
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-                            <p className="text-sm text-amber-700 dark:text-amber-400">
-                                <strong>Lưu ý:</strong> Sau khi gửi yêu cầu, bạn sẽ nhận được email thông báo trong vài phút khi chuyến đi được tạo thành công.
-                            </p>
-                        </div>
-
-                        <Button
-                            type="submit"
+        <Dialog open={open} onOpenChange={handleOpenChange} modal={!isMobileView}>
+            <DialogContent
+                className={cn(
+                    "bg-card border-border flex flex-col p-0 overflow-hidden outline-none",
+                    isMobileView ? "h-full top-0 translate-y-0 w-full max-w-none rounded-none border-none bg-[#EDEEFF] shadow-none" : "sm:max-w-[600px] max-h-[90vh] rounded-[32px]"
+                )}
+                hideClose={isMobileView}
+                onInteractOutside={(e) => {
+                    if (isMobileView) e.preventDefault();
+                }}
+            >
+                {isMobileView && (
+                    <style>{`
+                        [data-radix-portal] > [data-state=open] { background-color: transparent !important; }
+                    `}</style>
+                )}
+                {isMobileView ? (
+                    <div className="sticky top-0 z-50 bg-[#EDEEFF]/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
+                        <button
+                            onClick={() => handleOpenChange(false)}
                             disabled={loading}
-                            className="w-full rounded-xl bg-primary hover:bg-primary/90 h-12"
+                            className="p-2 -ml-2 text-slate-600 hover:text-slate-900 active:scale-95 transition-all"
                         >
-                            {loading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Đang xử lý...
-                                </>
-                            ) : (
-                                'Tạo chuyến đi'
-                            )}
-                        </Button>
-                    </form>
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900">
+                            Tạo chuyến đi từ URL
+                        </h1>
+                        <div className="w-10"></div>
+                    </div>
+                ) : (
+                    <DialogHeader className="p-8 pb-0">
+                        <DialogTitle className="text-foreground flex items-center gap-2 text-2xl font-black italic">
+                            <Link2 className="w-7 h-7 text-primary" />
+                            Tạo chuyến đi từ URL
+                        </DialogTitle>
+                        <DialogDescription className="text-muted-foreground text-base mt-2">
+                            Nhập URL từ Google Sheets, TikTok hoặc YouTube để tạo chuyến đi tự động
+                        </DialogDescription>
+                    </DialogHeader>
+                )}
 
-                    <Separator className="my-4" />
-
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-medium text-foreground">Lịch sử tạo gần đây</h3>
-                            <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={loadingPending}>
-                                <RefreshCw className={cn("h-4 w-4", loadingPending && "animate-spin")} />
-                            </Button>
-                        </div>
-
-                        {pendingTrips.length === 0 && !loadingPending ? (
-                            <p className="text-sm text-muted-foreground text-center py-4">Chưa có lịch sử tạo trip nào.</p>
-                        ) : (
-                            <div className="space-y-3">
-                                {pendingTrips.map((item) => {
-                                    const { icon: Icon, color, badge, label, spin } = getStatusInfo(item.status);
-                                    return (
-                                        <div key={item.id} className="bg-secondary/50 rounded-xl p-3 space-y-2">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="text-sm font-medium truncate text-foreground" title={item.url}>
-                                                        {item.url}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        {item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[0].split('-').reverse().join('/') + ' ' + item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[1]}
-                                                    </p>
-                                                </div>
-                                                <Badge variant="secondary" className={cn("shrink-0", badge)}>
-                                                    {spin && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
-                                                    {!spin && <Icon className="mr-1 h-3 w-3" />}
-                                                    {label}
-                                                </Badge>
-                                            </div>
-                                            {item.error && (
-                                                <div className="bg-red-500/10 text-red-500 text-xs p-2 rounded-lg break-words">
-                                                    Lỗi: {item.error}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                <div
+                    className={cn(
+                        "flex-1 overflow-y-auto pt-2",
+                        isMobileView ? "px-5 pb-32 overscroll-contain" : "px-8 py-6 custom-scrollbar"
+                    )}
+                    style={{ WebkitOverflowScrolling: 'touch' }}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onTouchMove={(e) => e.stopPropagation()}
+                >
+                    <div className={cn("w-full mx-auto space-y-6", isMobileView ? "max-w-md" : "")}>
+                        {!isMobileView && (
+                            <div className="bg-primary/5 border border-primary/10 rounded-[24px] p-6 space-y-3">
+                                <p className="text-sm font-black text-primary uppercase tracking-wider flex items-center gap-2">
+                                    <Info className="w-4 h-4" />
+                                    Hỗ trợ các loại URL:
+                                </p>
+                                <ul className="text-sm text-slate-600 space-y-2 ml-1">
+                                    {['Google Sheets', 'TikTok', 'YouTube'].map(t => (
+                                        <li key={t} className="flex items-center gap-2 font-medium">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
+                                            {t}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         )}
 
-                        {hasMore && (
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="url" className="text-muted-foreground text-sm font-bold ml-1">
+                                    URL <span className="text-red-500">*</span>
+                                </Label>
+                                <Input
+                                    id="url"
+                                    type="url"
+                                    placeholder="https://docs.google.com/spreadsheets/d/..."
+                                    value={url}
+                                    onChange={(e) => {
+                                        setUrl(e.target.value);
+                                        if (error) setError('');
+                                    }}
+                                    className={cn(
+                                        "h-14 rounded-[24px] bg-white border-none shadow-sm focus:ring-primary/20 transition-all text-base px-5",
+                                        isMobileView ? "" : "border border-border",
+                                        error && "ring-1 ring-destructive"
+                                    )}
+                                    disabled={loading}
+                                />
+                                {error && <p className="text-xs text-destructive ml-1 font-bold">{error}</p>}
+                            </div>
+
+                            {isMobileView && (
+                                <div className="bg-primary/5 rounded-[24px] p-6 space-y-4">
+                                    <p className="text-base font-black text-slate-900 flex items-center gap-2">
+                                        <div className="w-1.5 h-4 bg-primary rounded-full"></div>
+                                        Hỗ trợ các loại URL:
+                                    </p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {['Google Sheets', 'TikTok', 'YouTube'].map((type) => (
+                                            <div key={type} className="flex items-center gap-3 text-[15px] text-slate-700 bg-white/60 p-3.5 rounded-[18px] font-bold tracking-tight">
+                                                <div className="w-2 h-2 rounded-full bg-primary/30"></div>
+                                                {type}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className={cn(
+                                "rounded-[24px] p-6 transition-all",
+                                isMobileView ? "bg-[#FFF4E5]" : "bg-amber-500/10 border border-amber-500/20"
+                            )}>
+                                <p className={cn("text-[14px] leading-relaxed", isMobileView ? "text-[#B45309] font-bold" : "text-amber-700 dark:text-amber-400 font-medium")}>
+                                    <span className="font-black uppercase text-[12px] opacity-70">Lưu ý:</span> Sau khi gửi yêu cầu, bạn sẽ nhận được email thông báo trong vài phút khi chuyến đi được tạo thành công.
+                                </p>
+                            </div>
+
                             <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-full text-muted-foreground text-xs"
-                                onClick={handleLoadMore}
-                                disabled={loadingPending}
+                                type="submit"
+                                disabled={loading}
+                                className={cn(
+                                    "w-full rounded-xl font-bold shadow-lg transition-all active:scale-[0.98]",
+                                    isMobileView ? "h-12 text-base bg-primary shadow-primary/25" : "h-12 bg-primary hover:bg-primary/90"
+                                )}
                             >
-                                {loadingPending ? 'Đang tải...' : 'Tải thêm'}
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                                        Đang xử lý...
+                                    </>
+                                ) : (
+                                    'Tạo chuyến đi'
+                                )}
                             </Button>
-                        )}
+                        </form>
+
+                        <div className="space-y-6 pt-6">
+                            <div className="flex items-center justify-between ml-1">
+                                <h3 className="text-base font-black text-slate-900">Lịch sử tạo gần đây</h3>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleRefresh}
+                                    disabled={loadingPending}
+                                    className="h-9 w-9 p-0 rounded-full hover:bg-background/80 transition-colors"
+                                >
+                                    <RefreshCw className={cn("h-4 w-4 text-muted-foreground", loadingPending && "animate-spin")} />
+                                </Button>
+                            </div>
+
+                            {pendingTrips.length === 0 && !loadingPending ? (
+                                <div className="text-center py-14 bg-white rounded-[32px] border border-dashed border-slate-200">
+                                    <Clock className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                                    <p className="text-sm text-slate-400 font-bold">Chưa có lịch sử tạo trip nào.</p>
+                                </div>
+                            ) : (
+                                <div className="bg-white rounded-[32px] shadow-sm border border-white overflow-hidden">
+                                    {pendingTrips.map((item, index) => {
+                                        const { icon: Icon, color, badge, label, spin } = getStatusInfo(item.status);
+                                        return (
+                                            <div key={item.id}>
+                                                <div className="p-5 space-y-4 active:bg-slate-50 transition-all">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="text-[14px] font-black truncate text-slate-800 tracking-tight" title={item.url}>
+                                                                {item.url}
+                                                            </p>
+                                                            <div className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1.5 font-bold opacity-60">
+                                                                <Clock className="w-3 h-3" />
+                                                                {item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[0].split('-').reverse().join('/') + ' ' + item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[1]}
+                                                            </div>
+                                                        </div>
+                                                        <Badge variant="secondary" className={cn("shrink-0 h-8 px-4 rounded-full font-black text-[10px] uppercase tracking-wider", badge)}>
+                                                            {spin && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
+                                                            {!spin && <Icon className="mr-1.5 h-3 w-3" />}
+                                                            {label}
+                                                        </Badge>
+                                                    </div>
+                                                    {item.error && (
+                                                        <div className="bg-destructive/5 text-destructive text-[11px] font-bold p-3 px-4 rounded-xl border border-destructive/10 break-words flex items-start gap-2">
+                                                            <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                                            Lỗi: {item.error}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {index < pendingTrips.length - 1 && (
+                                                    <div className="h-[1px] bg-slate-50 mx-5" />
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {hasMore && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full h-12 rounded-2xl text-slate-400 text-xs hover:bg-white font-black uppercase tracking-widest"
+                                    onClick={handleLoadMore}
+                                    disabled={loadingPending}
+                                >
+                                    {loadingPending ? 'Đang tải...' : 'Xem thêm lịch sử'}
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                <DialogFooter className="mt-4">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => handleOpenChange(false)}
-                        className="rounded-xl w-full sm:w-auto"
-                    >
-                        Đóng
-                    </Button>
-                </DialogFooter>
+                {!isMobileView && (
+                    <DialogFooter className="p-8 pt-0">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleOpenChange(false)}
+                            className="rounded-2xl w-full sm:w-auto px-8 h-12 font-black uppercase text-xs tracking-widest"
+                        >
+                            Đóng
+                        </Button>
+                    </DialogFooter>
+                )}
             </DialogContent>
         </Dialog>
     );
