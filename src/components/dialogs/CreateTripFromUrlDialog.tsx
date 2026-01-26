@@ -280,8 +280,8 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                                 type="submit"
                                 disabled={loading}
                                 className={cn(
-                                    "w-full rounded-xl font-bold shadow-lg transition-all active:scale-[0.98] text-white",
-                                    isMobileView ? "h-12 text-base bg-primary shadow-primary/25" : "h-12 bg-primary hover:bg-primary/90"
+                                    "w-full rounded-[24px] font-bold shadow-lg transition-all active:scale-[0.98] text-white",
+                                    isMobileView ? "h-14 text-base bg-primary shadow-primary/25" : "h-12 bg-primary hover:bg-primary/90"
                                 )}
                             >
                                 {loading ? (
@@ -315,37 +315,35 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                                     <p className="text-sm text-muted-foreground font-bold">Chưa có lịch sử tạo trip nào.</p>
                                 </div>
                             ) : (
-                                <div className="bg-card dark:bg-slate-900/50 rounded-[32px] shadow-sm border border-border overflow-hidden">
+                                <div className="space-y-3">
                                     {pendingTrips.map((item, index) => {
                                         const { icon: Icon, color, badge, label, spin } = getStatusInfo(item.status);
                                         return (
-                                            <div key={item.id}>
-                                                <div className="p-5 space-y-4 active:bg-muted/50 transition-all">
-                                                    <div className="flex items-start justify-between gap-3">
-                                                        <div className="min-w-0 flex-1">
-                                                            <p className="text-[14px] font-black truncate text-foreground tracking-tight" title={item.url}>
-                                                                {item.url}
-                                                            </p>
-                                                            <div className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1.5 font-bold opacity-60">
-                                                                <Clock className="w-3 h-3" />
-                                                                {item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[0].split('-').reverse().join('/') + ' ' + item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[1]}
-                                                            </div>
+                                            <div
+                                                key={item.id}
+                                                className="bg-card dark:bg-slate-900/50 rounded-[24px] p-5 border border-border/60 shadow-sm active:scale-[0.99] transition-all"
+                                            >
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-[14px] font-black truncate text-foreground tracking-tight" title={item.url}>
+                                                            {item.url}
+                                                        </p>
+                                                        <div className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1.5 font-bold opacity-60">
+                                                            <Clock className="w-3 h-3" />
+                                                            {item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[0].split('-').reverse().join('/') + ' ' + item.createdAt.replace('T', ' ').slice(0, 19).split(' ')[1]}
                                                         </div>
-                                                        <Badge variant="secondary" className={cn("shrink-0 h-8 px-4 rounded-full font-black text-[10px] uppercase tracking-wider shadow-none", badge)}>
-                                                            {spin && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
-                                                            {!spin && <Icon className="mr-1.5 h-3 w-3" />}
-                                                            {label}
-                                                        </Badge>
                                                     </div>
-                                                    {item.error && (
-                                                        <div className="bg-destructive/5 text-destructive text-[11px] font-bold p-3 px-4 rounded-xl border border-destructive/10 break-words flex items-start gap-2">
-                                                            <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                                                            Lỗi: {item.error}
-                                                        </div>
-                                                    )}
+                                                    <Badge variant="secondary" className={cn("shrink-0 h-8 px-4 rounded-full font-black text-[10px] uppercase tracking-wider shadow-none", badge)}>
+                                                        {spin && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
+                                                        {!spin && <Icon className="mr-1.5 h-3 w-3" />}
+                                                        {label}
+                                                    </Badge>
                                                 </div>
-                                                {index < pendingTrips.length - 1 && (
-                                                    <div className="h-[1px] bg-border/50 mx-5" />
+                                                {item.error && (
+                                                    <div className="bg-destructive/5 text-destructive text-[11px] font-bold p-3 px-4 rounded-xl border border-destructive/10 break-words flex items-start gap-2 mt-3">
+                                                        <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                                        Lỗi: {item.error}
+                                                    </div>
                                                 )}
                                             </div>
                                         );
