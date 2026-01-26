@@ -169,29 +169,8 @@ const TripDetailsPage = () => {
   const [apiData, setApiData] = useState<ApiTrip | null>(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
-  // Scroll direction logic for hiding/showing tabs
+  // Scroll direction logic - disabled to keep tabs pinned
   const [isTabsVisible, setIsTabsVisible] = useState(true);
-  const lastScrollY = React.useRef(0);
-
-  useEffect(() => {
-    if (!isMobileView) return;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      // Scroll down -> hide
-      if (currentScrollY > lastScrollY.current + 5 && currentScrollY > 60) {
-        setIsTabsVisible(false);
-      }
-      // Scroll up -> show
-      else if (currentScrollY < lastScrollY.current - 5) {
-        setIsTabsVisible(true);
-      }
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isMobileView]);
 
   // [EXISTING CODE] ...
   const [expandedDayIds, setExpandedDayIds] = useState<string[]>([]);

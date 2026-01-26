@@ -12,7 +12,6 @@ import { PWASimpleLoading } from "@/pwa/components/PWASimpleLoading.tsx";
 import { useAppLoading } from "@/hooks/useAppLoading.ts";
 import { cn } from "@/lib/utils.ts";
 import { usePWA } from "@/pwa/hooks/usePWA";
-import { PWAPullToRefresh } from "@/pwa/components/PWAPullToRefresh.tsx";
 import { PWANotificationToast } from "@/pwa/components/PWANotificationToast.tsx";
 import { PWAAlertNotification } from "@/pwa/components/PWAAlertNotification.tsx";
 import { PWANotificationProvider, usePWANotificationContext } from "@/pwa/contexts/PWANotificationContext.tsx";
@@ -480,26 +479,24 @@ const AppContentWithRouter = ({ isPWAMode }: { isPWAMode: boolean }) => {
   const isHomePage = location.pathname === '/';
 
   return (
-    <div className={cn(
-      "min-h-screen flex flex-col animate-fade-in bg-background",
-      isMobileView ? "pb-24 min-h-dvh" : "" // Add bottom padding and dynamic viewport height for Mobile/PWA
-    )}>
-      {/* PWA Alert Notification - positioned above navbar */}
+    <>
       <PWAAlertNotification />
       <Navbar />
-      <PWAPullToRefresh>
+      <div className={cn(
+        "min-h-screen flex flex-col animate-fade-in bg-background",
+        isMobileView ? "pb-24 min-h-dvh" : ""
+      )}>
         <main className="flex-1">
           <AppRoutes />
         </main>
-        {/* Only show Footer if not in Mobile/PWA mode */}
         {!isMobileView && (
           <>
             <Footer />
             <ScrollToTopButton />
           </>
         )}
-      </PWAPullToRefresh>
-    </div>
+      </div>
+    </>
   );
 };
 

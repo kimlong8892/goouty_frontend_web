@@ -401,7 +401,7 @@ const Profile = () => {
 
         {/* Sub-page: Settings */}
         <AnimatedTransition show={subPage === 'settings'} animation="slide-up">
-          <div className={`fixed inset-0 bg-background z-50 overflow-y-auto ${subPage === 'settings' ? 'block' : 'hidden'}`}>
+          <div className={`fixed inset-0 bg-background z-[150] overflow-y-auto ${subPage === 'settings' ? 'block' : 'hidden'}`}>
             <div className="px-6 pt-12 pb-6 flex items-center gap-4 border-b border-border/40">
               <Button
                 variant="ghost"
@@ -452,7 +452,7 @@ const Profile = () => {
 
         {/* Sub-page: Experience Review */}
         <AnimatedTransition show={subPage === 'review'} animation="slide-up">
-          <div className={`fixed inset-0 bg-background z-50 overflow-y-auto ${subPage === 'review' ? 'block' : 'hidden'}`}>
+          <div className={`fixed inset-0 bg-background z-[150] overflow-y-auto ${subPage === 'review' ? 'block' : 'hidden'}`}>
             <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50 px-4 py-4">
               <div className="flex items-center justify-between relative">
                 <button
@@ -484,7 +484,7 @@ const Profile = () => {
         {/* Sub-page: Change Password (Web only, PWA uses separate page) */}
         {!isPWA && (
           <AnimatedTransition show={subPage === 'change-password'} animation="slide-up">
-            <div className={`fixed inset-0 bg-background z-[60] overflow-y-auto ${subPage === 'change-password' ? 'block' : 'hidden'}`}>
+            <div className={`fixed inset-0 bg-background z-[150] overflow-y-auto ${subPage === 'change-password' ? 'block' : 'hidden'}`}>
               <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50 px-4 py-4">
                 <div className="flex items-center justify-between relative">
                   <button

@@ -16,7 +16,10 @@ import {
     Info,
     DollarSign,
     Users,
-    Wallet
+    Wallet,
+    Scan,
+    Upload,
+    Camera
 } from 'lucide-react';
 import { cn } from '@/lib/utils.ts';
 import { AnimatedTransition } from '@/components/AnimatedTransition.tsx';
@@ -27,6 +30,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { createPortal } from 'react-dom';
+import { toast } from 'sonner';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu.tsx';
 
 interface Member {
     id: string;
@@ -63,8 +74,11 @@ const PWAAddExpensePage = () => {
     const [amountByUserId, setAmountByUserId] = useState<Record<string, string>>({});
     const [splitMethod, setSplitMethod] = useState<'equal' | 'custom'>('equal');
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [isScanning, setIsScanning] = useState(false);
+    const cameraInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const isInitialized = useRef<string | null>(null);
+    const isInitialized = useRef<boolean>(false);
 
     useEffect(() => {
         document.title = 'Thêm chi phí mới - Goouty';
@@ -117,28 +131,14 @@ const PWAAddExpensePage = () => {
 
     // Initialize form data when members or initialData change
     useEffect(() => {
-        if (!tripId || membersLoading || isInitialized.current === tripId) return;
+        if (!tripId || membersLoading || isInitialized.current) return;
 
         // Wait for members to load
-        if (members.length === 0 && !membersLoading) {
-            // No members found even after loading
-        } else if (members.length === 0) {
-            return;
-        }
-
-        const draftKey = `expense_draft_${tripId}`;
-        const savedDraft = localStorage.getItem(draftKey);
-
-        if (savedDraft) {
-            try {
-                const { formData: savedForm, amountByUserId: savedAmounts, splitMethod: savedSplit } = JSON.parse(savedDraft);
-                if (savedForm) {
-                    setFormData(prev => ({ ...prev, ...savedForm }));
-                    isInitialized.current = tripId;
-                    return;
-                }
-            } catch (e) {
-                console.error('Error parsing draft:', e);
+        if (members.length === 0) {
+            if (!membersLoading) {
+                // No members found even after loading
+            } else {
+                return;
             }
         }
 
@@ -156,21 +156,9 @@ const PWAAddExpensePage = () => {
         });
         setAmountByUserId({});
         setSplitMethod('equal');
-        isInitialized.current = tripId;
+        isInitialized.current = true;
     }, [tripId, members, membersLoading, user, initialData]);
 
-    // Save draft when formData changes
-    useEffect(() => {
-        if (tripId && isInitialized.current === tripId) {
-            const draftKey = `expense_draft_${tripId}`;
-            const dataToSave = {
-                formData,
-                amountByUserId,
-                splitMethod
-            };
-            localStorage.setItem(draftKey, JSON.stringify(dataToSave));
-        }
-    }, [formData, amountByUserId, splitMethod, tripId]);
 
     useEffect(() => {
         const total = Number(formData.amount || '0');
@@ -250,14 +238,37 @@ const PWAAddExpensePage = () => {
             });
 
             showToast('Đã thêm chi phí thành công', 'success');
-            const draftKey = `expense_draft_${tripId}`;
-            localStorage.removeItem(draftKey);
             navigate(-1);
         } catch (error: any) {
             console.error('Add expense error:', error);
             showToast(error.message || 'Không thể thêm chi phí', 'error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleScanInvoice = () => {
+        cameraInputRef.current?.click();
+    };
+
+    const processFile = async (file: File) => {
+        try {
+            setIsScanning(true);
+            const result = await api.ai.processBill(file);
+
+            if (result.success) {
+                toast.success('Xử lý hóa đơn thành công!');
+                setFormData(prev => ({
+                    ...prev,
+                    title: result.data.name || prev.title,
+                    amount: result.data.total.toString() || prev.amount
+                }));
+            }
+        } catch (error: any) {
+            const message = error.response?.data?.message || error.message || 'Không thể xử lý hóa đơn';
+            toast.error(message);
+        } finally {
+            setIsScanning(false);
         }
     };
 
@@ -272,7 +283,7 @@ const PWAAddExpensePage = () => {
     const selectedPayer = members.find(m => m.user.id.toString() === formData.payerId);
 
     return (
-        <div className="fixed inset-0 bg-background flex flex-col z-[60] text-sidebar-foreground overflow-hidden">
+        <div className="fixed inset-0 bg-background flex flex-col z-10 text-sidebar-foreground overflow-hidden">
             <AnimatedTransition show={showContent} animation="slide-up" className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
@@ -285,7 +296,36 @@ const PWAAddExpensePage = () => {
                     <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900">
                         Thêm chi phí
                     </h1>
-                    <div className="w-10"></div>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button
+                                className="p-2 text-primary active:scale-95 transition-all outline-none"
+                            >
+                                <Scan className="w-6 h-6" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[200px] border-slate-100 shadow-2xl z-[100]">
+                            <DropdownMenuItem
+                                onClick={() => cameraInputRef.current?.click()}
+                                className="rounded-xl py-3 px-3 focus:bg-primary/5 cursor-pointer transition-all flex items-center gap-3"
+                            >
+                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <Camera className="w-4 h-4 text-primary" />
+                                </div>
+                                <span className="font-bold text-sm">Chụp hóa đơn</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => fileInputRef.current?.click()}
+                                className="rounded-xl py-3 px-3 focus:bg-primary/5 cursor-pointer transition-all flex items-center gap-3"
+                            >
+                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <Upload className="w-4 h-4 text-primary" />
+                                </div>
+                                <span className="font-bold text-sm">Tải lên hóa đơn</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
 
                 {/* Content */}
@@ -506,8 +546,58 @@ const PWAAddExpensePage = () => {
                     </div>
                 </div>
 
+                {/* Global Scanning Overlay */}
+                {isScanning && createPortal(
+                    <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center animate-fade-in bg-slate-950/40 backdrop-blur-sm">
+                        <div className="bg-white dark:bg-card p-10 rounded-[48px] shadow-2xl flex flex-col items-center gap-8 border border-slate-100 dark:border-white/10 animate-slide-up mx-6 max-w-[400px]">
+                            <div className="relative">
+                                <div className="w-24 h-24 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Scan className="w-10 h-10 text-primary" />
+                                </div>
+                            </div>
+                            <div className="text-center space-y-3">
+                                <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight">AI ĐANG QUÉT HÓA ĐƠN</h3>
+                                <p className="text-base text-slate-500 dark:text-muted-foreground font-medium px-2">
+                                    Vui lòng đợi trong giây lát, Goouty đang trích xuất thông tin chi phí giúp bạn...
+                                </p>
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )}
+
+                <input
+                    type="file"
+                    ref={cameraInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            processFile(file);
+                        }
+                        if (e.target) e.target.value = '';
+                    }}
+                />
+
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*,.pdf"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            processFile(file);
+                        }
+                        if (e.target) e.target.value = '';
+                    }}
+                />
+
                 {/* Bottom Navbar & Action Button */}
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-safe z-40">
+                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-24 z-40">
                     <Button
                         onClick={handleSubmit}
                         disabled={loading}

@@ -161,7 +161,7 @@ const PWACreateTripPage = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col z-[60] text-foreground overflow-hidden">
+    <div className="fixed inset-0 bg-background flex flex-col z-10 text-foreground overflow-hidden">
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md px-4 py-0.5 flex items-center justify-between min-h-[40px]">
         <button
@@ -345,7 +345,7 @@ const PWACreateTripPage = () => {
       </div>
 
       {/* Bottom Button - Positioned above PWA Navbar */}
-      <div className="p-4 bg-background border-t border-border/50 pb-safe z-40">
+      <div className="p-4 bg-background border-t border-border/50 pb-24 z-40">
         <Button
           onClick={handleCreateTrip}
           disabled={loading}

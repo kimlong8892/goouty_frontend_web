@@ -338,7 +338,7 @@ const PWAForgotPasswordPage = () => {
     );
 
     return (
-        <div className="min-h-screen bg-white flex flex-col px-6 pt-4 pb-8 overflow-hidden relative">
+        <div className="fixed inset-0 bg-background flex flex-col z-10 text-foreground overflow-hidden relative">
             <AnimatedTransition show={show} animation="slide-up">
                 {/* Header */}
                 <div className="mb-8">

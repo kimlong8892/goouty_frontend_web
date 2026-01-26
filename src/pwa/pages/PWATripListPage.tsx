@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.tsx';
 import { usePWA } from '@/pwa/hooks/usePWA';
 import { api } from '@/integrations/api/client.ts';
@@ -86,6 +86,8 @@ const PWATripListPage = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { isPWA } = usePWA();
   const navigate = useNavigate();
+  const location = useLocation();
+  const selectingForExpense = location.state?.selectingForExpense;
   const { t } = useTranslation();
   // const { unreadCount } = useNotificationCountContext(); // Removed unused context
 
@@ -259,7 +261,11 @@ const PWATripListPage = () => {
   }, [fetchTrips]);
 
   const handleTripClick = (trip: TripWithMember) => {
-    navigate(`/trip/${trip.id}`);
+    if (selectingForExpense) {
+      navigate(`/pwa-add-expense/${trip.id}`);
+    } else {
+      navigate(`/trip/${trip.id}`);
+    }
   };
 
   const handleCreateTrip = () => {
@@ -304,7 +310,7 @@ const PWATripListPage = () => {
                 {t('common.greeting', { defaultValue: 'Xin chào' })}, {user?.fullName?.split(' ')[0] || t('common.guest', { defaultValue: 'Bạn' })} <span className="animate-wave">👋</span>
               </span>
               <h1 className="text-xl font-bold text-foreground leading-tight">
-                Đây là những chuyến đi của bạn
+                {selectingForExpense ? 'Hãy chọn chuyến đi để thêm chi phí' : 'Đây là những chuyến đi của bạn'}
               </h1>
             </div>
           </div>

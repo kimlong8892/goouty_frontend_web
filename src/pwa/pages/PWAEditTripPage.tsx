@@ -330,7 +330,7 @@ const PWAEditTripPage = () => {
             </div>
 
             {/* Bottom Button - Positioned above PWA Navbar */}
-            <div className="p-4 bg-background border-t border-border/50 pb-safe z-40">
+            <div className="p-4 bg-background border-t border-border/50 pb-24 z-40">
                 <Button
                     onClick={handleUpdateTrip}
                     disabled={loading}

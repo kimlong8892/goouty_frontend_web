@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Plane, LogIn, Search, Upload, User, Settings, LogOut, Map, Plus, List, Users, MapPin, Home, Bell, CloudOff, Info, Heart } from 'lucide-react';
+import { Plane, LogIn, Search, Upload, User, Settings, LogOut, Map, Plus, List, Users, MapPin, Home, Bell, CloudOff, Info, Heart, DollarSign } from 'lucide-react';
 import { useRippleEffect } from '@/lib/animations.ts';
 import { cn } from '@/lib/utils.ts';
 import { useAuth } from '@/contexts/AuthContext.tsx';
@@ -9,6 +9,7 @@ import AuthModal from '@/components/AuthModal.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { api } from '@/integrations/api/client.ts';
 
 import {
   NavigationMenu,
@@ -22,6 +23,15 @@ import { TooltipProvider } from '@/components/ui/tooltip.tsx';
 import { useIsMobile } from '@/hooks/use-mobile.tsx';
 import { PWAInstallButton } from '@/pwa/components/PWAInstallButton';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useGlobalToast } from '@/utils/globalToast.ts';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { PWAPromptDialog } from '@/pwa/components/PWAPromptDialog';
+import { PWASelectTripDialog } from '@/pwa/components/PWASelectTripDialog';
 
 interface NavItemProps {
   to: string;
@@ -281,6 +291,9 @@ export const Navbar = () => {
   const { isAuthenticated, logout, user, isLoading } = useAuth();
 
   const { isPWA } = usePWA();
+  const { showToast } = useGlobalToast();
+  const [isNoTripDialogOpen, setIsNoTripDialogOpen] = useState(false);
+  const [isSelectTripDialogOpen, setIsSelectTripDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   const isMobileView = isPWA || isMobile;
 
@@ -384,10 +397,36 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isPWA]);
 
-  const handleNavItemClick = (id: string) => {
+  const currentTripId = location.pathname.match(/\/trip\/([^\/]+)/)?.[1];
+
+  const handleAddExpense = async () => {
+    if (currentTripId) {
+      navigate(`/pwa-add-expense/${currentTripId}`);
+    } else {
+      try {
+        // Quick check to see if user has any trips
+        const response = await api.trips.getAll({ limit: 1 });
+        if (!response.trips || response.trips.length === 0) {
+          setIsNoTripDialogOpen(true);
+        } else {
+          setIsSelectTripDialogOpen(true);
+        }
+      } catch (error) {
+        // Fallback if API fails
+        navigate('/pwa-trips');
+      }
+    }
+  };
+
+  const handleNavItemClick = (id: string, to?: string) => {
     setActive(id);
     if (id === 'home' || id === 'pwa-trips' || id === 'my-trips') { // Scroll to top for main tabs
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Explicitly navigate for PWA tabs to clear state if needed
+    if (to && (id === 'pwa-trips' || id === 'my-trips')) {
+      navigate(to);
     }
   };
 
@@ -427,29 +466,91 @@ export const Navbar = () => {
 
           {/* Bottom Navigation for Mobile/PWA - Only show when authenticated */}
           {isAuthenticated && (
-            <nav className="fixed bottom-0 left-0 right-0 z-[110] bg-background/90 backdrop-blur-lg px-4 py-2 pb-6">
+            <nav className="fixed bottom-0 left-0 right-0 z-[2000] bg-background/95 backdrop-blur-xl border-t border-border/40 px-4 py-2 safe-area-pb shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
               <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
                 <div className="pointer-events-auto">
                   {/* Removed SyncStatus icon from PWA nav as requested */}
                 </div>
               </div>
               <div className="flex items-center justify-around max-w-6xl mx-auto">
-                {pwaNavItems.map((item) => (
-                  <PWANavItem
-                    key={item.id}
-                    id={item.id}
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.label}
-                    active={active === item.id}
-                    onClick={() => handleNavItemClick(item.id)}
-                    isHighlighted={item.isHighlighted}
-                  />
-                ))}
+                {pwaNavItems.map((item) => {
+                  if (item.id === 'create-trip') {
+                    return (
+                      <DropdownMenu key={item.id}>
+                        <DropdownMenuTrigger asChild>
+                          <div className="outline-none">
+                            <PWANavItem
+                              id={item.id}
+                              to="#"
+                              icon={item.icon}
+                              label={item.label}
+                              active={active === item.id}
+                              onClick={() => { }}
+                              isHighlighted={item.isHighlighted}
+                            />
+                          </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="center"
+                          side="top"
+                          sideOffset={15}
+                          className="w-52 mb-2 rounded-[20px] p-2 border-primary/20 shadow-[0_10px_40px_rgba(0,0,0,0.1)] bg-background/95 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-300"
+                        >
+                          <DropdownMenuItem
+                            className="flex items-center gap-3 py-3 px-4 rounded-xl cursor-pointer focus:bg-primary focus:text-primary-foreground transition-all group"
+                            onClick={() => navigate('/pwa-create-trip')}
+                          >
+                            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center group-focus:bg-white/20 transition-colors">
+                              <Plus className="w-5 h-5 text-primary group-focus:text-white" />
+                            </div>
+                            <span className="font-bold text-sm">Tạo chuyến đi</span>
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            className="flex items-center gap-3 py-3 px-4 rounded-xl cursor-pointer focus:bg-primary focus:text-primary-foreground transition-all mt-1 group"
+                            onClick={handleAddExpense}
+                          >
+                            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center group-focus:bg-white/20 transition-colors">
+                              <DollarSign className="w-5 h-5 text-primary group-focus:text-white" />
+                            </div>
+                            <span className="font-bold text-sm">Thêm chi phí</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    );
+                  }
+                  return (
+                    <PWANavItem
+                      key={item.id}
+                      id={item.id}
+                      to={item.to}
+                      icon={item.icon}
+                      label={item.label}
+                      active={active === item.id}
+                      onClick={() => handleNavItemClick(item.id, item.to)}
+                      isHighlighted={item.isHighlighted}
+                    />
+                  );
+                })}
               </div>
             </nav >
           )}
         </TooltipProvider >
+
+        <PWAPromptDialog
+          isOpen={isNoTripDialogOpen}
+          onClose={() => setIsNoTripDialogOpen(false)}
+          title="Lời nhắc nhỏ"
+          message="Hãy tạo chuyến đi trước khi thêm chi phí giao dịch"
+          actionLabel="TẠO CHUYẾN ĐI"
+          onAction={() => navigate('/pwa-create-trip')}
+        />
+
+        <PWASelectTripDialog
+          isOpen={isSelectTripDialogOpen}
+          onClose={() => setIsSelectTripDialogOpen(false)}
+          onSelect={(tripId) => navigate(`/pwa-add-expense/${tripId}`)}
+        />
 
         <AuthModal isOpen={isAuthModalOpen} onClose={handleCloseAuthModal} />
       </>
