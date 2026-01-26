@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Link2, Loader2, Clock, CheckCircle, XCircle, AlertCircle, RefreshCw, ChevronLeft, X, Info } from 'lucide-react';
+import { Link2, Loader2, Clock, CheckCircle, XCircle, AlertCircle, RefreshCw, ChevronLeft, X, Info, FileSpreadsheet, Youtube, Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
 import { useGlobalToast } from '@/utils/globalToast';
@@ -146,6 +146,12 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
         }
     };
 
+    const supportedPlatforms = [
+        { name: 'Google Sheets', icon: FileSpreadsheet, color: 'text-emerald-600 dark:text-emerald-400' },
+        { name: 'TikTok', icon: Music, color: 'text-pink-600 dark:text-pink-400' },
+        { name: 'YouTube', icon: Youtube, color: 'text-red-600 dark:text-red-400' },
+    ];
+
     return (
         <Dialog open={open} onOpenChange={handleOpenChange} modal={!isMobileView}>
             <DialogContent
@@ -200,19 +206,21 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                 >
                     <div className={cn("w-full mx-auto space-y-6", isMobileView ? "max-w-md" : "")}>
                         {!isMobileView && (
-                            <div className="bg-primary/5 border border-primary/10 rounded-[24px] p-6 space-y-3">
-                                <p className="text-sm font-black text-primary uppercase tracking-wider flex items-center gap-2">
-                                    <Info className="w-4 h-4" />
+                            <div className="space-y-3">
+                                <Label className="text-muted-foreground text-sm font-bold ml-1">
                                     Hỗ trợ các loại URL:
-                                </p>
-                                <ul className="text-sm text-slate-600 space-y-2 ml-1">
-                                    {['Google Sheets', 'TikTok', 'YouTube'].map(t => (
-                                        <li key={t} className="flex items-center gap-2 font-medium">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
-                                            {t}
-                                        </li>
+                                </Label>
+                                <div className="flex flex-wrap gap-2">
+                                    {supportedPlatforms.map((platform) => (
+                                        <div
+                                            key={platform.name}
+                                            className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-secondary/40 border border-secondary/20 select-none"
+                                        >
+                                            <platform.icon className={cn("w-4 h-4", platform.color)} />
+                                            <span className="text-xs font-bold text-foreground/80">{platform.name}</span>
+                                        </div>
                                     ))}
-                                </ul>
+                                </div>
                             </div>
                         )}
 
@@ -241,16 +249,18 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
                             </div>
 
                             {isMobileView && (
-                                <div className="bg-primary/5 rounded-[24px] p-6 space-y-4">
-                                    <p className="text-base font-black text-foreground flex items-center gap-2">
-                                        <div className="w-1.5 h-4 bg-primary rounded-full"></div>
+                                <div className="space-y-2">
+                                    <p className="text-xs font-bold text-muted-foreground ml-1">
                                         Hỗ trợ các loại URL:
                                     </p>
-                                    <div className="grid grid-cols-1 gap-2">
-                                        {['Google Sheets', 'TikTok', 'YouTube'].map((type) => (
-                                            <div key={type} className="flex items-center gap-3 text-[15px] text-muted-foreground bg-card/60 dark:bg-slate-900/40 p-3.5 rounded-[18px] font-bold tracking-tight">
-                                                <div className="w-2 h-2 rounded-full bg-primary/30"></div>
-                                                {type}
+                                    <div className="flex flex-wrap gap-2">
+                                        {supportedPlatforms.map((platform) => (
+                                            <div
+                                                key={platform.name}
+                                                className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-secondary/40 border border-border/40"
+                                            >
+                                                <platform.icon className={cn("w-4 h-4", platform.color)} />
+                                                <span className="text-[13px] font-bold text-foreground/80 tracking-tight">{platform.name}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -259,10 +269,10 @@ export const CreateTripFromUrlDialog: React.FC<CreateTripFromUrlDialogProps> = (
 
                             <div className={cn(
                                 "rounded-[24px] p-6 transition-all",
-                                isMobileView ? "bg-amber-500/10 dark:bg-amber-500/5" : "bg-amber-500/10 border border-amber-500/20"
+                                isMobileView ? "bg-amber-500/10 dark:bg-red-500/10" : "bg-amber-500/10 dark:bg-red-500/10 border border-amber-500/20 dark:border-red-500/20"
                             )}>
-                                <p className={cn("text-[14px] leading-relaxed", isMobileView ? "text-amber-800 dark:text-amber-200 font-bold" : "text-amber-700 dark:text-amber-400 font-medium")}>
-                                    <span className="font-black uppercase text-[12px] opacity-70">Lưu ý:</span> Sau khi gửi yêu cầu, bạn sẽ nhận được email thông báo trong vài phút khi chuyến đi được tạo thành công.
+                                <p className={cn("text-[12px] leading-relaxed", isMobileView ? "text-amber-800 dark:text-red-500 font-bold" : "text-amber-700 dark:text-red-500 font-medium")}>
+                                    Sau khi gửi yêu cầu, bạn sẽ nhận được email thông báo trong vài phút khi chuyến đi được tạo thành công.
                                 </p>
                             </div>
 

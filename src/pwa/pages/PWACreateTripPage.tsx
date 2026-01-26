@@ -13,11 +13,12 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
-import { CalendarIcon, ChevronLeft, Camera, X, Link2, Loader2 } from 'lucide-react';
+import { CalendarIcon, ChevronLeft, Camera, X, Link2, Loader2, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { cn } from '@/lib/utils.ts';
 import { CreateTripFromUrlDialog } from '@/components/dialogs/CreateTripFromUrlDialog.tsx';
+import { PWACreateTripFromUrlGuide } from '@/pwa/components/PWACreateTripFromUrlGuide.tsx';
 
 
 const PWACreateTripPage = () => {
@@ -35,6 +36,22 @@ const PWACreateTripPage = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showUrlDialog, setShowUrlDialog] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    if (isPWA) {
+      const hasSeen = localStorage.getItem('hasSeenUrlGuide');
+      if (!hasSeen) {
+        setShowGuide(true);
+      }
+    }
+  }, [isPWA]);
+
+  const handleGuideComplete = () => {
+    localStorage.setItem('hasSeenUrlGuide', 'true');
+    setShowGuide(false);
+    setShowUrlDialog(true);
+  };
 
 
   useEffect(() => {
@@ -174,12 +191,20 @@ const PWACreateTripPage = () => {
         <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-foreground">
           Tạo chuyến đi
         </h1>
-        <button
-          onClick={() => setShowUrlDialog(true)}
-          className="p-2 -mr-2 text-primary hover:text-primary/80 active:scale-95 transition-all outline-none"
-        >
-          <Link2 className="w-5 h-5" />
-        </button>
+        <div className="flex items-center -mr-2">
+          <button
+            onClick={() => setShowUrlDialog(true)}
+            className="p-2 text-primary hover:text-primary/80 active:scale-95 transition-all outline-none"
+          >
+            <Link2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowGuide(true)}
+            className="p-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all outline-none"
+          >
+            <Info className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Content */}
@@ -362,6 +387,12 @@ const PWACreateTripPage = () => {
       <CreateTripFromUrlDialog
         open={showUrlDialog}
         onOpenChange={setShowUrlDialog}
+      />
+
+      <PWACreateTripFromUrlGuide
+        isOpen={showGuide}
+        onClose={() => setShowGuide(false)}
+        onComplete={handleGuideComplete}
       />
     </div>
   );
