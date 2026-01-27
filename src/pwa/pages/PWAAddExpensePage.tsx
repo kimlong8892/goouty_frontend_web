@@ -551,6 +551,30 @@ const PWAAddExpensePage = () => {
                                 className="min-h-[120px] rounded-[24px] bg-card dark:bg-slate-900/50 border-none shadow-sm resize-none transition-all px-5 py-4 text-base"
                             />
                         </div>
+
+                        {/* Add Button - Moved inside scrollable area */}
+                        <div className="pt-1 flex justify-center pb-20">
+                            <Button
+                                onClick={handleSubmit}
+                                disabled={loading}
+                                className="w-fit min-w-[200px] h-12 px-10 rounded-full text-base font-black bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-[0_8px_25px_-5px_rgba(99,102,241,0.5)] active:scale-[0.96] transition-all duration-300 border-none relative overflow-hidden group"
+                            >
+                                <div className="flex items-center justify-center gap-2 relative z-10">
+                                    {loading ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                            <span>Đang lưu...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Thêm chi phí</span>
+                                        </>
+                                    )}
+                                </div>
+                                {/* Shine Effect Overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform pointer-events-none" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -603,20 +627,6 @@ const PWAAddExpensePage = () => {
                         if (e.target) e.target.value = '';
                     }}
                 />
-
-                {/* Bottom Navbar & Action Button - Use flex instead of fixed to prevent covering content */}
-                <div className="p-4 bg-background border-t border-border/50 pb-24 z-40">
-                    <Button
-                        onClick={handleSubmit}
-                        disabled={loading}
-                        className="w-full h-12 rounded-xl text-base font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
-                    >
-                        {loading ? (
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-2" />
-                        ) : null}
-                        {loading ? 'Đang lưu...' : 'Thêm chi phí'}
-                    </Button>
-                </div>
             </AnimatedTransition>
         </div>
     );

@@ -365,23 +365,35 @@ const PWACreateTripPage = () => {
               />
             </div>
 
+            {/* Create Button - Moved inside scrollable area */}
+            <div className="pt-1 flex justify-center pb-20">
+              <Button
+                onClick={handleCreateTrip}
+                disabled={loading}
+                className="w-fit min-w-[200px] h-12 px-10 rounded-full text-base font-black bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-[0_8px_25px_-5px_rgba(99,102,241,0.5)] active:scale-[0.96] transition-all duration-300 border-none relative overflow-hidden group"
+              >
+                <div className="flex items-center justify-center gap-2 relative z-10">
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Đang tạo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Tạo chuyến đi</span>
+                    </>
+                  )}
+                </div>
+                {/* Shine Effect Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform pointer-events-none" />
+              </Button>
+            </div>
+
           </div>
         </div>
       </div>
 
-      {/* Bottom Button - Positioned above PWA Navbar */}
-      <div className="p-4 bg-background border-t border-border/50 pb-24 z-40">
-        <Button
-          onClick={handleCreateTrip}
-          disabled={loading}
-          className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/25 text-white active:scale-[0.98] transition-all"
-        >
-          {loading ? (
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-          ) : null}
-          {loading ? "Đang tạo..." : "Tạo chuyến đi"}
-        </Button>
-      </div>
+
 
       {/* Create from URL Dialog */}
       <CreateTripFromUrlDialog
