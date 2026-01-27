@@ -214,7 +214,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
-        "max-w-md bg-white dark:bg-card rounded-[32px] border-none shadow-2xl p-0 overflow-hidden flex flex-col z-[100]",
+        "max-w-md bg-white dark:bg-card rounded-[32px] border-none shadow-2xl p-0 overflow-hidden flex flex-col",
         isMobileView ? "h-full w-full max-w-none rounded-none [&>button]:hidden bg-[#eeedfe] dark:bg-background" : "max-h-[90vh]"
       )}>
         {isMobileView ? (
