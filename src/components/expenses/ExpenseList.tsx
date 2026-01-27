@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card.tsx';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { Users, Calendar, User, Edit, Trash2, Lock, Handshake, ReceiptText } from 'lucide-react';
@@ -45,6 +46,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
   onExpenseChange
 }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { isPWA } = usePWA();
   const [expenses, setExpenses] = useState<DATABASE_TYPES.expenses[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
@@ -188,7 +190,13 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
               </p>
               {(isOwner || isMember) && (
                 <Button
-                  onClick={() => setShowAddDialog(true)}
+                  onClick={() => {
+                    if (isPWA) {
+                      navigate(`/pwa-add-expense/${tripId}`);
+                    } else {
+                      setShowAddDialog(true);
+                    }
+                  }}
                   className="rounded-xl bg-primary hover:bg-primary/90 text-white"
                 >
                   <Handshake className="w-4 h-4 mr-2" />

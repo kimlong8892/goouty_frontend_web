@@ -61,6 +61,7 @@ const PWAAddExpensePage = () => {
     const initialData = location.state?.initialData;
 
     const [loading, setLoading] = useState(false);
+    const [realTripId, setRealTripId] = useState<string | null>(null);
     const [members, setMembers] = useState<Member[]>([]);
     const [membersLoading, setMembersLoading] = useState(true);
     const [formData, setFormData] = useState({
@@ -96,7 +97,13 @@ const PWAAddExpensePage = () => {
             if (!tripId) return;
             try {
                 setMembersLoading(true);
-                const data = await api.members.getByTrip(tripId);
+
+                // First, ensure we have the real numeric trip ID (in case slug was used)
+                const tripData = await api.trips.getById(tripId);
+                const actualId = tripData.id.toString();
+                setRealTripId(actualId);
+
+                const data = await api.members.getByTrip(actualId);
                 // Allow owner or accepted members
                 const acceptedMembers = data.filter((m: any) => m && (m.status === 'accepted' || !m.status || m.role === 'owner'));
 
@@ -145,6 +152,7 @@ const PWAAddExpensePage = () => {
         // Default initialization
         const currentUserMember = user ? members.find((m: any) => m.user.id.toString() === user.id.toString()) : null;
         const defaultPayerId = currentUserMember ? currentUserMember.user.id.toString() : (members[0]?.user.id.toString() || '');
+        const allMemberIds = members.map(m => m.user.id.toString());
 
         setFormData({
             title: initialData?.title || '',
@@ -152,7 +160,7 @@ const PWAAddExpensePage = () => {
             date: new Date().toISOString().split('T')[0],
             description: '',
             payerId: defaultPayerId,
-            participantIds: defaultPayerId ? [defaultPayerId] : []
+            participantIds: allMemberIds
         });
         setAmountByUserId({});
         setSplitMethod('equal');
@@ -233,7 +241,7 @@ const PWAAddExpensePage = () => {
             await api.expenses.create({
                 ...formData,
                 amount: parseFloat(formData.amount),
-                tripId,
+                tripId: realTripId || tripId,
                 amounts: rawAmounts
             });
 
@@ -328,8 +336,8 @@ const PWAAddExpensePage = () => {
                     </DropdownMenu>
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 px-5 pt-4 pb-32 overflow-y-auto scrolling-touch">
+                {/* Content - Removed pb-48 as footer is no longer fixed */}
+                <div className="flex-1 px-5 pt-4 pb-10 overflow-y-auto scrolling-touch">
                     <div className="w-full max-w-md mx-auto space-y-6 text-foreground">
                         {/* Title */}
                         <div className="space-y-2">
@@ -596,8 +604,8 @@ const PWAAddExpensePage = () => {
                     }}
                 />
 
-                {/* Bottom Navbar & Action Button */}
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-24 z-40">
+                {/* Bottom Navbar & Action Button - Use flex instead of fixed to prevent covering content */}
+                <div className="p-4 bg-background border-t border-border/50 pb-24 z-40">
                     <Button
                         onClick={handleSubmit}
                         disabled={loading}
