@@ -37,6 +37,7 @@ import {
     Car,
     ChevronDown,
     FileText,
+    Sparkles,
 } from 'lucide-react';
 import { api } from '@/integrations/api/client';
 import { DATABASE_TYPES } from '@/integrations/api/types';
@@ -735,28 +736,68 @@ const PWATemplateDetailsPage = () => {
 
             {createPortal(
                 <>
+                    {/* Full Screen Loading Overlay for Trip Creation */}
+                    {usingTemplate && createPortal(
+                        <div className="fixed inset-0 z-[10000] bg-white/60 dark:bg-black/60 backdrop-blur-md flex items-center justify-center animate-in fade-in duration-300">
+                            <div className="flex flex-col items-center gap-4 bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] shadow-2xl border border-white/20">
+                                {/* Car Loader (Oto Goouty) */}
+                                <div className="flex flex-col items-center mb-8">
+                                    <div className="car-wrapper">
+                                        <div className="smoke-container" style={{ left: '-10px' }}>
+                                            <div className="smoke" style={{ animationDelay: '0s' }}></div>
+                                            <div className="smoke" style={{ animationDelay: '0.2s' }}></div>
+                                        </div>
+                                        <div className="car-body">
+                                            <div className="car-top">
+                                                <div className="car-window"></div>
+                                            </div>
+                                            <span className="car-goouty-text tracking-widest">Goouty</span>
+                                            <div className="car-wheel wheel-1"></div>
+                                            <div className="car-wheel wheel-2"></div>
+                                        </div>
+                                    </div>
+                                    <div className="motorcycle-road w-32"></div>
+                                </div>
+
+                                <div className="flex flex-col items-center gap-1 text-center">
+                                    <p className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Đang chuẩn bị</p>
+                                    <p className="text-sm font-bold text-slate-500 dark:text-zinc-400 leading-relaxed">
+                                        Chuyến đi của bạn sắp sẵn sàng<br />
+                                        Đợi 1 chút nhé
+                                    </p>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+
                     {/* Fixed Bottom Action for PWA */}
                     <div className={cn(
-                        "fixed left-0 w-full bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-border/50 p-4 z-[9997] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] transition-all duration-300",
-                        isAuthenticated ? "bottom-[70px]" : "bottom-0 pb-8 safe-area-bottom",
-                        isShareSheetOpen ? "opacity-0 pointer-events-none translate-y-10" : "opacity-100 translate-y-0"
+                        "fixed left-0 w-full px-5 z-[9997] pointer-events-none transition-all duration-500",
+                        isAuthenticated ? "bottom-[95px]" : "bottom-12 pb-8 safe-area-bottom",
+                        isShareSheetOpen ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
                     )}>
-                        <div className="max-w-md mx-auto">
+                        <div className="max-w-md mx-auto pointer-events-auto flex justify-center">
                             <Button
-                                size="lg"
-                                className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-indigo-200/50 rounded-xl active:scale-[0.98] transition-transform"
+                                className="w-fit h-11 px-8 text-sm font-black bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-[0_8px_25px_-5px_rgba(99,102,241,0.5)] rounded-full active:scale-[0.96] transition-all duration-300 border-none group relative overflow-hidden"
                                 onClick={handleUseTemplate}
                                 disabled={usingTemplate}
                             >
-                                {usingTemplate ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Đang tạo...
-                                    </>
-                                ) : (
-                                    <>
-                                        Sử dụng Template này <ChevronRight className="w-5 h-5 ml-1" />
-                                    </>
-                                )}
+                                <div className="flex items-center justify-center gap-2 relative z-10">
+                                    {usingTemplate ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" /> <span>Đang chuẩn bị...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="w-4 h-4 text-white/90" />
+                                            <span>Sử dụng mẫu</span>
+                                            <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                                        </>
+                                    )}
+                                </div>
+                                {/* Shine Effect Overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform pointer-events-none" />
                             </Button>
                         </div>
                     </div>
