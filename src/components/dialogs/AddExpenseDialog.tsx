@@ -62,6 +62,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
     payerId: '',
     participantIds: [] as string[]
   });
+  const [realTripId, setRealTripId] = useState<string | null>(null);
   const [amountByUserId, setAmountByUserId] = useState<Record<string, string>>({});
   const [splitMethod, setSplitMethod] = useState<'equal' | 'custom'>('equal');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -69,7 +70,13 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
   const fetchMembers = async () => {
     try {
       setMembersLoading(true);
-      const data = await api.members.getByTrip(tripId);
+
+      // Get real trip ID in case slug was provided
+      const tripData = await api.trips.getById(tripId);
+      const actualId = tripData.id.toString();
+      setRealTripId(actualId);
+
+      const data = await api.members.getByTrip(actualId);
       // Chỉ lấy những thành viên đã accepted để đưa vào chi phí
       setMembers(data.filter((m: any) => m && (m.status === 'accepted' || !m.status)));
     } catch (error: any) {
@@ -100,18 +107,20 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
 
   useEffect(() => {
     if (open && user && members.length > 0) {
-      const currentUserMember = members.find(m => m.user.id === user.id.toString());
+      const currentUserMember = members.find(m => m.user.id.toString() === user.id.toString());
+      const allMemberIds = members.map(m => m.user.id.toString());
+
       if (currentUserMember) {
         setFormData(prev => ({
           ...prev,
-          payerId: currentUserMember.user.id,
-          participantIds: [currentUserMember.user.id]
+          payerId: currentUserMember.user.id.toString(),
+          participantIds: allMemberIds
         }));
-      } else if (members.length > 0) {
+      } else {
         setFormData(prev => ({
           ...prev,
-          payerId: members[0].user.id,
-          participantIds: [members[0].user.id]
+          payerId: members[0].user.id.toString(),
+          participantIds: allMemberIds
         }));
       }
     }
@@ -171,7 +180,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
       await api.expenses.create({
         ...formData,
         amount: parseFloat(formData.amount),
-        tripId,
+        tripId: realTripId || tripId,
         amounts: rawAmounts
       });
 
