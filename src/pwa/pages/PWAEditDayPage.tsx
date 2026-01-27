@@ -26,9 +26,8 @@ const PWAEditDayPage = () => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        date: ''
     });
-    const [errors, setErrors] = useState<{ title?: string; date?: string }>({});
+    const [errors, setErrors] = useState<{ title?: string }>({});
     const titleRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -55,7 +54,6 @@ const PWAEditDayPage = () => {
                     setFormData({
                         title: dayData.title || '',
                         description: dayData.description || '',
-                        date: dayData.date ? format(new Date(dayData.date), 'yyyy-MM-dd') : ''
                     });
                 }
             } catch (error) {
@@ -74,12 +72,9 @@ const PWAEditDayPage = () => {
         if (e) e.preventDefault();
         if (!dayId) return;
 
-        const newErrors: { title?: string; date?: string } = {};
+        const newErrors: { title?: string } = {};
         if (!formData.title.trim()) {
             newErrors.title = 'Vui lòng nhập tiêu đề ngày';
-        }
-        if (!formData.date) {
-            newErrors.date = 'Vui lòng chọn ngày';
         }
 
         setErrors(newErrors);
@@ -90,8 +85,7 @@ const PWAEditDayPage = () => {
             await api.days.update(dayId, {
                 title: formData.title.trim(),
                 description: formData.description.trim() || undefined,
-                date: formData.date
-            });
+            } as any);
 
             showToast('Cập nhật ngày thành công', 'success');
             navigate(-1);
@@ -112,7 +106,7 @@ const PWAEditDayPage = () => {
     }
 
     return (
-        <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
+        <div className="fixed inset-0 bg-background flex flex-col z-10 text-foreground overflow-hidden">
             {/* Header */}
             <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
                 <button
@@ -166,22 +160,34 @@ const PWAEditDayPage = () => {
                             className="resize-none rounded-xl bg-card border-input px-4 py-3 text-base focus:ring-primary/20 transition-all shadow-sm"
                         />
                     </div>
+
+                    {/* Update Button - Moved inside scrollable area */}
+                    <div className="pt-4 flex justify-center pb-20">
+                        <Button
+                            onClick={() => handleSubmit()}
+                            disabled={saving}
+                            className="w-fit min-w-[200px] h-12 px-10 rounded-full text-base font-black bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-[0_8px_25px_-5px_rgba(99,102,241,0.5)] active:scale-[0.96] transition-all duration-300 border-none relative overflow-hidden group"
+                        >
+                            <div className="flex items-center justify-center gap-2 relative z-10">
+                                {saving ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        <span>Đang cập nhật...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Cập nhật</span>
+                                    </>
+                                )}
+                            </div>
+                            {/* Shine Effect Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform pointer-events-none" />
+                        </Button>
+                    </div>
                 </div>
             </div>
 
-            {/* Bottom Button */}
-            <div className="p-4 bg-background border-t border-border/50 pb-24 z-40">
-                <Button
-                    onClick={() => handleSubmit()}
-                    disabled={saving}
-                    className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
-                >
-                    {saving ? (
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                    ) : null}
-                    {saving ? 'Đang cập nhật...' : 'Cập nhật'}
-                </Button>
-            </div>
+
         </div>
     );
 };

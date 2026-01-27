@@ -222,20 +222,21 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
-        "max-w-md bg-white dark:bg-card rounded-[32px] border-none shadow-2xl p-0 overflow-hidden flex flex-col z-[100]",
-        isMobileView ? "h-full w-full max-w-none rounded-none [&>button]:hidden bg-[#eeedfe] dark:bg-background z-[90]" : "max-h-[90vh]"
+        "max-w-md bg-white dark:bg-card rounded-[32px] border-none shadow-2xl p-0 overflow-hidden flex flex-col z-[3100]",
+        isMobileView ? "h-full w-full max-w-none rounded-none [&>button]:hidden bg-background dark:bg-background" : "max-h-[90vh]"
       )}>
         {isMobileView ? (
-          <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
+          <div className="sticky top-0 z-50 bg-background px-4 py-3 flex items-center justify-between border-b border-border/50">
             <button
               onClick={() => onOpenChange(false)}
-              className="p-2 -ml-2 text-foreground/80 hover:text-foreground active:scale-95 transition-transform rounded-full hover:bg-muted"
+              className="p-2 -ml-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all outline-none"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-lg font-bold absolute left-1/2 -translate-x-1/2 dark:text-foreground">
+            <h1 className="text-base font-black absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-slate-900 dark:text-white">
               Chỉnh sửa chi phí
             </h1>
+            <div className="w-10"></div>
           </div>
         ) : (
           <DialogHeader className={cn("p-6 pb-2 flex-shrink-0", isMobileView && "px-4 pt-4")}>
@@ -323,7 +324,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                       )}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 z-[200]" align="start">
+                  <PopoverContent className="w-auto p-0 z-[4000]" align="start">
                     <Calendar
                       mode="single"
                       selected={formData.date ? new Date(formData.date + 'T00:00:00') : undefined}
@@ -348,7 +349,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
                 )}>
                   <SelectValue placeholder="Chọn người trả" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-slate-100 dark:border-border bg-white dark:bg-popover shadow-xl z-[200]">
+                <SelectContent className="rounded-xl border-slate-100 dark:border-border bg-white dark:bg-popover shadow-xl z-[4000]">
                   {members.map((m) => (
                     <SelectItem key={m.user.id} value={m.user.id.toString()} className="rounded-xl py-3 px-3 m-1">
                       <div className="flex items-center gap-3">
@@ -514,16 +515,26 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
 
             {/* Bottom Button inside scroll area for PWA */}
             {isMobileView && (
-              <div className="pt-4 pb-10">
+              <div className="pt-2 flex justify-center pb-20">
                 <Button
                   onClick={handleSubmit}
                   disabled={loading || membersLoading}
-                  className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold text-lg shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
+                  className="w-fit min-w-[200px] h-12 px-10 rounded-full text-base font-black bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-[0_8px_25px_-5px_rgba(99,102,241,0.5)] active:scale-[0.96] transition-all duration-300 border-none relative overflow-hidden group"
                 >
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                  ) : null}
-                  {loading ? 'Đang lưu...' : 'Cập nhật chi phí'}
+                  <div className="flex items-center justify-center gap-2 relative z-10">
+                    {loading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>Đang lưu...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Lưu thay đổi</span>
+                      </>
+                    )}
+                  </div>
+                  {/* Shine Effect Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform pointer-events-none" />
                 </Button>
               </div>
             )}
@@ -557,6 +568,6 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
           </div>
         )}
       </DialogContent>
-    </Dialog>
+    </Dialog >
   );
 };

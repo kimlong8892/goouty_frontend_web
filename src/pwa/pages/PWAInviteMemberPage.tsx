@@ -82,7 +82,7 @@ const PWAInviteMemberPage = () => {
     }
 
     return (
-        <div className="h-full bg-background flex flex-col relative text-foreground overflow-hidden">
+        <div className="fixed inset-0 bg-background flex flex-col z-10 text-foreground overflow-hidden">
             <AnimatedTransition show={showContent} animation="slide-up">
                 {/* Header */}
                 <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-border/50">
@@ -131,22 +131,34 @@ const PWAInviteMemberPage = () => {
                                 </p>
                             </div>
                         </div>
+
+                        {/* Submit Button - Moved inside scrollable area */}
+                        <div className="pt-4 flex justify-center pb-20">
+                            <Button
+                                onClick={() => handleSubmit()}
+                                disabled={loading}
+                                className="w-fit min-w-[200px] h-12 px-10 rounded-full text-base font-black bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-[0_8px_25px_-5px_rgba(99,102,241,0.5)] active:scale-[0.96] transition-all duration-300 border-none relative overflow-hidden group"
+                            >
+                                <div className="flex items-center justify-center gap-2 relative z-10">
+                                    {loading ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                            <span>Đang gửi...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Gửi lời mời</span>
+                                        </>
+                                    )}
+                                </div>
+                                {/* Shine Effect Overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform pointer-events-none" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
-                {/* Bottom Button - Positioned above PWA Navbar */}
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border/50 pb-24 z-40">
-                    <Button
-                        onClick={() => handleSubmit()}
-                        disabled={loading || !email.trim()}
-                        className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold text-lg shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
-                    >
-                        {loading ? (
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                        ) : null}
-                        {loading ? 'Đang gửi...' : 'Gửi lời mời'}
-                    </Button>
-                </div>
+
             </AnimatedTransition>
         </div>
     );
