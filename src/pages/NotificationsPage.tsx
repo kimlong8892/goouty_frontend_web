@@ -99,10 +99,12 @@ function NotificationsPage() {
   };
 
   const handleMarkAllAsRead = async () => {
-    // Use context method for immediate UI update
-    await markAllAsReadContext();
-    // Also update local notifications state
-    await markAllAsRead();
+    // Both functions now implement optimistic updates, so we can trigger them in parallel
+    // and don't strictly need to await them for the UI to update immediately
+    Promise.all([
+      markAllAsReadContext(),
+      markAllAsRead()
+    ]);
   };
 
   const handleDelete = async (id: string) => {

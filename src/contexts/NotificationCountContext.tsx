@@ -68,18 +68,17 @@ export function NotificationCountProvider({ children }: { children: React.ReactN
   }, [refreshCount]);
 
   const markAllAsRead = useCallback(async () => {
+    // Update local count immediately (Optimistic Update)
+    setUnreadCount(0);
+
     try {
-      const result = await notificationService.markAllAsRead();
-
-      // Update local count immediately
-      setUnreadCount(0);
-
-      // Refresh from server to ensure accuracy
-      await refreshCount();
+      await notificationService.markAllAsRead();
+      // Background refresh, don't await to avoid blocking
+      refreshCount();
     } catch (err) {
       console.error('Error marking all notifications as read:', err);
-      // Refresh count to get accurate state
-      await refreshCount();
+      // Refresh count from server to sync state if failed
+      refreshCount();
     }
   }, [refreshCount]);
 
