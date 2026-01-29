@@ -97,14 +97,38 @@ export function NotificationCard({
       const date = new Date(dateString);
       const now = new Date();
       const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+      const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-      if (diffInHours < 1) return 'Vừa xong';
-      if (diffInHours < 24) return `${diffInHours}h`;
+      const timeStr = date.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
 
-      return formatDistanceToNow(date, {
-        addSuffix: false,
-        locale: vi
-      }).replace('khoảng ', '');
+      if (diffInMinutes < 1) return 'Vừa xong';
+
+      if (diffInHours < 24) {
+        const distance = formatDistanceToNow(date, {
+          addSuffix: true,
+          locale: vi
+        }).replace('khoảng ', '');
+
+        return `${distance} • ${timeStr}`;
+      }
+
+      if (diffInHours < 48) {
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (date.toDateString() === yesterday.toDateString()) {
+          return `Hôm qua • ${timeStr}`;
+        }
+      }
+
+      const dateStr = date.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit'
+      });
+      return `${dateStr} • ${timeStr}`;
     } catch {
       return '—';
     }
@@ -320,11 +344,12 @@ export function NotificationCard({
             </p>
           )}
 
-          {!isPWA && (
-            <span className="text-[13px] text-gray-500 dark:text-gray-400 mt-1 block">
-              {formatDate(notification.createdAt)}
-            </span>
-          )}
+          <span className={cn(
+            "text-[12px] text-gray-400 dark:text-gray-500 mt-1 block font-medium",
+            isUnread && isPWA && "text-blue-500/80"
+          )}>
+            {formatDate(notification.createdAt)}
+          </span>
         </div>
       </div>
 

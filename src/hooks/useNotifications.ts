@@ -129,72 +129,80 @@ export function useNotifications(): UseNotificationsReturn {
 
   // Mark notifications as read
   const markAsRead = useCallback(async (notificationIds: string[]) => {
+    // Optimistic Update
+    setNotifications(prev =>
+      prev.map(notification =>
+        notificationIds.includes(notification.id)
+          ? { ...notification, status: NotificationStatus.READ, readAt: new Date().toISOString() }
+          : notification
+      )
+    );
+    // Approximate unread count update
+    setUnreadCount(prev => Math.max(0, prev - notificationIds.length));
+
     try {
       await notificationService.markAsRead(notificationIds);
-
-      // Update local state
-      setNotifications(prev =>
-        prev.map(notification =>
-          notificationIds.includes(notification.id)
-            ? { ...notification, status: NotificationStatus.READ, readAt: new Date().toISOString() }
-            : notification
-        )
-      );
-
-      // Update stats
-      await refreshStats();
+      // Background update stats
+      refreshStats();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to mark as read';
       console.error('Error marking as read:', err);
       showToast('Không thể đánh dấu đã đọc', 'error');
+      // Sync state back from server
+      fetchNotifications();
+      refreshStats();
     }
-  }, [refreshStats]);
+  }, [refreshStats, fetchNotifications]);
 
   // Mark notification as unread
   const markAsUnread = useCallback(async (id: string) => {
+    // Optimistic Update
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === id
+          ? { ...notification, status: NotificationStatus.UNREAD, readAt: undefined }
+          : notification
+      )
+    );
+    setUnreadCount(prev => prev + 1);
+
     try {
       await notificationService.markAsUnread(id);
-
-      // Update local state
-      setNotifications(prev =>
-        prev.map(notification =>
-          notification.id === id
-            ? { ...notification, status: NotificationStatus.UNREAD, readAt: undefined }
-            : notification
-        )
-      );
-
-      // Update stats
-      await refreshStats();
+      // Background update stats
+      refreshStats();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to mark as unread';
       console.error('Error marking as unread:', err);
       showToast('Không thể đánh dấu chưa đọc', 'error');
+      // Sync state back from server
+      fetchNotifications();
+      refreshStats();
     }
-  }, [refreshStats]);
+  }, [refreshStats, fetchNotifications]);
 
   // Mark all as read
   const markAllAsRead = useCallback(async () => {
+    // Update local state immediately (Optimistic Update)
+    setNotifications(prev =>
+      prev.map(notification => ({
+        ...notification,
+        status: NotificationStatus.READ,
+        readAt: new Date().toISOString()
+      }))
+    );
+    setUnreadCount(0);
+
     try {
-      const result = await notificationService.markAllAsRead();
-
-      // Update local state
-      setNotifications(prev =>
-        prev.map(notification => ({
-          ...notification,
-          status: NotificationStatus.READ,
-          readAt: new Date().toISOString()
-        }))
-      );
-
-      // Update stats
-      await refreshStats();
+      await notificationService.markAllAsRead();
+      // Background refresh stats, don't await to avoid UI blocking if it's slow
+      refreshStats();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to mark all as read';
       console.error('Error marking all as read:', err);
       showToast('Không thể đánh dấu tất cả đã đọc', 'error');
+      // Re-fetch on error to sync state
+      fetchNotifications();
+      refreshStats();
     }
-  }, [refreshStats]);
+  }, [refreshStats, fetchNotifications]);
 
   // Delete notification
   const deleteNotification = useCallback(async (id: string) => {
