@@ -157,7 +157,7 @@ export function ProvinceSelector({
 
       {isOpen && (
         <div className={cn(
-          "absolute z-[100] w-full mt-2 border border-border rounded-2xl shadow-2xl max-h-[50vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 bg-card",
+          "absolute z-[5000] w-full mt-2 border border-border rounded-2xl shadow-2xl max-h-[50vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 bg-card",
           darkMode ? "bg-card" : "bg-card"
         )}>
           {/* Loading state */}
