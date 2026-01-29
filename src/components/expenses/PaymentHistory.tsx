@@ -103,7 +103,7 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
 
   const content = (
     <div className="space-y-4">
-      {settlements.map((settlement) => {
+      {settlements.filter(settlement => settlement.amount > 0).map((settlement) => {
         const isCompleted = settlement.status === 'completed';
         const debtorName = (settlement.debtor.fullName || settlement.debtor.email) + (user && settlement.debtor.id === user.id ? ' (bạn)' : '');
         const creditorName = (settlement.creditor.fullName || settlement.creditor.email) + (user && settlement.creditor.id === user.id ? ' (bạn)' : '');
@@ -251,7 +251,7 @@ export const PaymentHistory: React.FC<PaymentHistoryProps> = ({ settlements }) =
         </div>
         <div className="flex gap-2">
           <Badge variant="secondary" className="bg-primary/10 text-primary border-transparent rounded-full px-3">
-            {settlements.length} giao dịch
+            {settlements.filter(s => s.amount > 0).length} giao dịch
           </Badge>
         </div>
       </CardHeader>
