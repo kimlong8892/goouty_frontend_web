@@ -138,8 +138,8 @@ export function PWANotificationToast({ onClose }: PWANotificationToastProps) {
 
   return (
     <div className={cn(
-      "fixed bottom-20 left-4 right-4 z-50 transform transition-all duration-300",
-      isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+      "fixed top-0 left-4 right-4 z-[100] transform transition-all duration-300 safe-area-pt pt-4",
+      isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
     )}>
       <div className={cn(
         "bg-white rounded-lg shadow-lg border-l-4 p-4 flex items-start gap-3",
