@@ -65,6 +65,7 @@ interface PWATripItineraryProps {
     onDayDrop?: (e: React.DragEvent, dayId: string) => void;
 
     isOwner?: boolean;
+    isMember?: boolean;
     isTabsVisible?: boolean;
     activeDayId?: string;
     onActiveDayChange?: (dayId: string) => void;
@@ -103,6 +104,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
     onDayDrop,
 
     isOwner,
+    isMember,
     isTabsVisible = true,
     activeDayId: propActiveDayId,
     onActiveDayChange
@@ -321,7 +323,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                 >
                     <div className="flex items-center justify-center min-w-full w-fit gap-1 py-2 px-2">
                         {/* Spacer for centering balance */}
-                        {days.length > 0 && isOwner && (
+                        {days.length > 0 && (
                             <div className="w-12 flex-shrink-0" />
                         )}
 
@@ -335,7 +337,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                     key={day.id}
                                     data-day-id={day.id} // Added for scrolling
                                     onClick={() => setSelectedDayId(day.id)}
-                                    draggable={isOwner}
+                                    draggable={true}
                                     onDragStart={(e) => onDayDragStart?.(e, day.id)}
                                     onDragOver={(e) => onDayDragOver?.(e, day.id)}
                                     onDragEnd={(e) => onDayDragEnd?.(e)}
@@ -369,7 +371,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                         <Pencil className="w-3.5 h-3.5" />
                                                         Chỉnh sửa
                                                     </DropdownMenuItem>
-                                                    {isOwner && index > 0 && (
+                                                    {index > 0 && (
                                                         <DropdownMenuItem
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -381,7 +383,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                             Đưa lên trước
                                                         </DropdownMenuItem>
                                                     )}
-                                                    {isOwner && index < days.length - 1 && (
+                                                    {index < days.length - 1 && (
                                                         <DropdownMenuItem
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -423,7 +425,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                         })}
 
                         {/* Spacer for right button clearance */}
-                        {days.length > 0 && isOwner && (
+                        {days.length > 0 && (
                             <div className="w-12 flex-shrink-0" />
                         )}
                     </div>
@@ -470,15 +472,13 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                             <Clock className="w-8 h-8 opacity-20" />
                                         </div>
                                         <p className="text-sm font-medium">Chưa có hoạt động nào</p>
-                                        {isOwner && (
-                                            <Button
-                                                variant="outline"
-                                                className="mt-4 rounded-xl border-dashed border-2 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary hover:border-primary transition-all"
-                                                onClick={() => onAddActivity(day.id)}
-                                            >
-                                                <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
-                                            </Button>
-                                        )}
+                                        <Button
+                                            variant="outline"
+                                            className="mt-4 rounded-xl border-dashed border-2 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary hover:border-primary transition-all"
+                                            onClick={() => onAddActivity(day.id)}
+                                        >
+                                            <Plus className="w-4 h-4 mr-2" /> Thêm hoạt động
+                                        </Button>
                                     </div>
                                 ) : (
                                     <div className="relative pl-10">
@@ -531,7 +531,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                                             <Pencil className="w-3.5 h-3.5 text-primary" />
                                                                             Chỉnh sửa
                                                                         </DropdownMenuItem>
-                                                                        {isOwner && index > 0 && (
+                                                                        {index > 0 && (
                                                                             <DropdownMenuItem
                                                                                 onClick={(e) => {
                                                                                     e.stopPropagation();
@@ -543,7 +543,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                                                 Chuyển lên trên
                                                                             </DropdownMenuItem>
                                                                         )}
-                                                                        {isOwner && index < dayActivities.length - 1 && (
+                                                                        {index < dayActivities.length - 1 && (
                                                                             <DropdownMenuItem
                                                                                 onClick={(e) => {
                                                                                     e.stopPropagation();
@@ -578,7 +578,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                                 dragOverActivityId === activity.id && "border-primary border-t-2",
                                                                 justDroppedId === activity.id && "ring-2 ring-primary/40 bg-primary/[0.03] border-primary/50 scale-[1.01] shadow-lg z-20"
                                                             )}
-                                                            draggable={isOwner}
+                                                            draggable={true}
                                                             onDragStart={(e) => onDragStart?.(e, activity.id, activity.dayId)}
                                                             onDragOver={(e) => onDragOver?.(e, activity.id, activity.dayId)}
                                                             onDragEnd={(e) => onDragEnd?.(e)}
@@ -586,11 +586,9 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                             onClick={() => onEditActivity(activity.id)}
                                                         >
                                                             {/* Drag Handle for Owner */}
-                                                            {isOwner && (
-                                                                <div className="absolute -left-10 top-[42px] -translate-y-1/2 w-8 h-8 bg-background shadow-sm border border-border/60 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing z-20 hover:scale-105 transition-all">
-                                                                    <GripVertical className="w-4 h-4 text-muted-foreground" />
-                                                                </div>
-                                                            )}
+                                                            <div className="absolute -left-10 top-[42px] -translate-y-1/2 w-8 h-8 bg-background shadow-sm border border-border/60 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing z-20 hover:scale-105 transition-all">
+                                                                <GripVertical className="w-4 h-4 text-muted-foreground" />
+                                                            </div>
 
                                                             {/* Image */}
                                                             <div className="w-[85px] h-[85px] rounded-xl overflow-hidden flex-shrink-0 shadow-sm border border-border">
@@ -645,7 +643,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                                                     </div>
                                                                 )}
 
-                                                                {!activity.notes && isOwner && (
+                                                                {!activity.notes && (
                                                                     <div className="text-primary text-[10px] font-bold mt-2">
                                                                         Thêm ghi chú, thời lượng & chi phí
                                                                     </div>
@@ -657,17 +655,15 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
                                             ))}
 
                                             {/* Bottom Add Activity Button */}
-                                            {isOwner && (
-                                                <div className="pt-4 pb-10">
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full rounded-2xl border-dashed border-2 border-border text-muted-foreground h-14 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary hover:border-primary transition-all font-bold group"
-                                                        onClick={() => onAddActivity(day.id)}
-                                                    >
-                                                        <Plus className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" /> Thêm hoạt động
-                                                    </Button>
-                                                </div>
-                                            )}
+                                            <div className="pt-4 pb-10">
+                                                <Button
+                                                    variant="outline"
+                                                    className="w-full rounded-2xl border-dashed border-2 border-border text-muted-foreground h-14 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary hover:border-primary transition-all font-bold group"
+                                                    onClick={() => onAddActivity(day.id)}
+                                                >
+                                                    <Plus className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" /> Thêm hoạt động
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -678,7 +674,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
             </div>
 
             {/* Floating Add Day Button */}
-            {isOwner && createPortal(
+            {createPortal(
                 <div className="fixed bottom-24 right-4 z-[100] group flex flex-col items-center">
                     {/* Tooltip */}
                     <div className="mb-2 px-3 py-1.5 bg-slate-900/90 backdrop-blur-sm text-white text-[11px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap -translate-y-2 group-hover:translate-y-0">
