@@ -396,7 +396,7 @@ const TripDetailsPage = () => {
   // Check for edit query param and open dialog
   useEffect(() => {
     const editParam = searchParams.get('edit');
-    if (editParam === 'true' && trip && trip.userRole === 'owner') {
+    if (editParam === 'true' && trip) {
       setEditTripDialogOpen(true);
       // Remove edit param from URL
       const next = new URLSearchParams(searchParams);
@@ -809,14 +809,12 @@ const TripDetailsPage = () => {
             </h1>
           </div>
           <div className="flex items-center gap-1">
-            {trip.userRole === 'owner' && (
-              <button
-                onClick={() => navigate(`/pwa-edit-trip/${id}`)}
-                className="p-2 rounded-full hover:bg-secondary active:bg-secondary"
-              >
-                <Edit className="w-5 h-5 text-muted-foreground" />
-              </button>
-            )}
+            <button
+              onClick={() => navigate(`/pwa-edit-trip/${id}`)}
+              className="p-2 rounded-full hover:bg-secondary active:bg-secondary"
+            >
+              <Edit className="w-5 h-5 text-muted-foreground" />
+            </button>
           </div>
         </div>
       )}
@@ -868,7 +866,7 @@ const TripDetailsPage = () => {
                 <h1 className="text-3xl md:text-5xl lg:text-[3.5rem] font-black text-white leading-tight tracking-tight drop-shadow-sm max-w-4xl">
                   {trip.name}
                 </h1>
-                {trip.userRole === 'owner' && !isMobileView && (
+                {!isMobileView && (
                   <EditTripDialog
                     trip={{
                       ...trip as any,
@@ -987,20 +985,19 @@ const TripDetailsPage = () => {
                       <Users className="mr-2 w-5 h-5" />
                       Thành viên ({trip.memberCount || 1})
                     </TabsTrigger>
-                    {trip.userRole === 'owner' && (
-                      <TabsTrigger
-                        value="share"
-                        className={cn(
-                          "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
-                          isMobileView
-                            ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
-                            : "flex-1 px-8 py-4 text-base"
-                        )}
-                      >
-                        <Share2 className="mr-2 w-5 h-5" />
-                        Chia sẻ
-                      </TabsTrigger>
-                    )}
+                    {/* Share Tab */}
+                    <TabsTrigger
+                      value="share"
+                      className={cn(
+                        "rounded-full h-auto font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md bg-white dark:bg-secondary dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-slate-600 dark:text-foreground shadow-sm border border-transparent hover:bg-white/80 dark:hover:bg-secondary/80 transition-all active:scale-95",
+                        isMobileView
+                          ? cn("whitespace-nowrap", isPWA ? "px-5 py-2.5 text-sm" : "px-6 py-3.5 text-base")
+                          : "flex-1 px-8 py-4 text-base"
+                      )}
+                    >
+                      <Share2 className="mr-2 w-5 h-5" />
+                      Chia sẻ
+                    </TabsTrigger>
                   </TabsList>
                 </div>
               </div>
@@ -1027,7 +1024,8 @@ const TripDetailsPage = () => {
                     draggedActivity={draggedActivity}
                     dragOverActivityId={dragOverActivityId}
                     justDroppedId={justDroppedId}
-                    isOwner={trip.userRole === 'owner'}
+                    isOwner={true}
+                    isMember={true}
                     onDeleteDay={openDeleteDayDialog}
                     onReorderDays={handlePWAReorderDays}
                     onReorderActivities={handlePWAReorderActivities}
@@ -1105,14 +1103,14 @@ const TripDetailsPage = () => {
                                   dragOverDayId === day.id && "translate-y-2 scale-[1.01]",
                                   justDroppedDayId === day.id && "ring-2 ring-primary/40 bg-primary/[0.03] rounded-xl"
                                 )}
-                                draggable={trip.userRole === 'owner'}
+                                draggable={true}
                                 onDragStart={(e) => handleDayDragStart(e, day.id)}
                                 onDragOver={(e) => handleDayDragOver(e, day.id)}
                                 onDragEnd={handleDayDragEnd}
                                 onDrop={(e) => handleDayDrop(e, day.id)}
                               >
                                 {/* Drag Handle Indicator */}
-                                {trip.userRole === 'owner' && !isMobileView && (
+                                {!isMobileView && (
                                   <div className="absolute -left-8 top-6 p-2 cursor-grab active:cursor-grabbing text-muted-foreground/20 hover:text-primary transition-colors opacity-0 hover:opacity-100 hidden lg:block" title="Kéo để sắp xếp ngày">
                                     <GripVertical className="w-5 h-5" />
                                   </div>
@@ -1203,7 +1201,7 @@ const TripDetailsPage = () => {
                                       activitiesByDay[day.id].map((activity) => (
                                         <div
                                           key={activity.id}
-                                          draggable={trip.userRole === 'owner'}
+                                          draggable={true}
                                           onDragStart={(e) => handleDragStart(e, activity.id, day.id)}
                                           onDragOver={(e) => handleDragOver(e, activity.id, day.id)}
                                           onDragEnd={handleDragEnd}
@@ -1215,15 +1213,13 @@ const TripDetailsPage = () => {
                                             draggedActivity?.id === activity.id && "opacity-40",
                                             dragOverActivityId === activity.id && "border-primary border-t-4",
                                             justDroppedId === activity.id && "ring-2 ring-primary/40 bg-primary/[0.03] border-primary/50 scale-[1.01] shadow-lg z-20",
-                                            trip.userRole === 'owner' && "cursor-grab active:cursor-grabbing"
+                                            "cursor-grab active:cursor-grabbing"
                                           )}
                                         >
                                           <div className="flex justify-between items-start gap-3">
-                                            {trip.userRole === 'owner' && (
-                                              <div className="pt-1.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0">
-                                                <GripVertical className="w-5 h-5" />
-                                              </div>
-                                            )}
+                                            <div className="pt-1.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0">
+                                              <GripVertical className="w-5 h-5" />
+                                            </div>
 
                                             {/* Activity Image */}
                                             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-sm border border-border">
@@ -1424,8 +1420,8 @@ const TripDetailsPage = () => {
                   <CardContent className={isMobileView ? "p-4" : "p-8"}>
                     <ExpenseSection
                       tripId={id || ''}
-                      isOwner={trip?.userRole === 'owner'}
-                      isMember={trip?.userRole === 'member'}
+                      isOwner={true}
+                      isMember={true}
                     />
                   </CardContent>
                 </Card>
