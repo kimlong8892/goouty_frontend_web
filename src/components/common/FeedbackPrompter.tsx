@@ -120,7 +120,9 @@ export const FeedbackPrompter = () => {
                         onClick={(e) => {
                             e.stopPropagation();
                             setShowPrompt(false);
+                            // Save dismissal to localStorage so it doesn't show again
                             localStorage.setItem('goouty_feedback_dismissed', 'true');
+                            // Specifically for PWA, we want this to be permanent per device
                         }}
                         className="p-1 hover:bg-secondary rounded-lg transition-colors group/close"
                     >
