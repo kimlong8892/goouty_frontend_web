@@ -403,7 +403,10 @@ const PWACreateTripPage = () => {
 
       <PWACreateTripFromUrlGuide
         isOpen={showGuide}
-        onClose={() => setShowGuide(false)}
+        onClose={() => {
+          setShowGuide(false);
+          localStorage.setItem('hasSeenUrlGuide', 'true');
+        }}
         onComplete={handleGuideComplete}
       />
     </div>

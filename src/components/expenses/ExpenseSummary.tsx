@@ -299,7 +299,10 @@ export const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({
       {isPWA && (
         <PWAExpenseScanGuide
           isOpen={showGuide}
-          onClose={() => setShowGuide(false)}
+          onClose={() => {
+            setShowGuide(false);
+            localStorage.setItem('pwa_expense_scan_guide_seen', 'true');
+          }}
           onComplete={handleCompleteGuide}
         />
       )}

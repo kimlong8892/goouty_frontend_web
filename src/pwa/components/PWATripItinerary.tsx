@@ -121,9 +121,7 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
             // Check if we've shown the guide before
             const hasSeen = localStorage.getItem('hasSeenTripGuide_v2');
             if (!hasSeen) {
-                if (!hasSeen) {
-                    setShowGuide(true);
-                }
+                setShowGuide(true);
             }
         }
     }, [isOwner, days.length]);
@@ -434,8 +432,10 @@ export const PWATripItinerary: React.FC<PWATripItineraryProps> = ({
 
             <PWATripGuide
                 isOpen={showGuide}
-                onClose={() => setShowGuide(false)}
-                onComplete={() => localStorage.setItem('hasSeenTripGuide_v2', 'true')}
+                onClose={() => {
+                    setShowGuide(false);
+                    localStorage.setItem('hasSeenTripGuide_v2', 'true');
+                }}
             />
 
             {/* Activities Timeline */}
