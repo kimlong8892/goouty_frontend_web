@@ -158,7 +158,7 @@ export const Footer = () => {
                         <h3 className="font-bold text-gray-900 dark:text-white text-lg">Kết nối</h3>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
-                                <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                                <a href="https://www.tiktok.com/@hi.goouty" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
                                     <img
                                         src="https://www.vectorlogo.zone/logos/tiktok/tiktok-icon.svg"
                                         alt="TikTok"
@@ -168,7 +168,17 @@ export const Footer = () => {
                                 </a>
                             </li>
                             <li>
-                                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                                <a href="https://www.threads.net/@hi.goouty" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                                    <img
+                                        src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Threads_%28app%29_logo.svg"
+                                        alt="Threads"
+                                        className="w-6 h-6 object-contain dark:invert"
+                                    />
+                                    <span>Threads</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.instagram.com/hi.goouty" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
                                     <img
                                         src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg"
                                         alt="Instagram"
@@ -178,7 +188,7 @@ export const Footer = () => {
                                 </a>
                             </li>
                             <li>
-                                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                                <a href="https://www.facebook.com/hii.goouty" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
                                     <img
                                         src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg"
                                         alt="Facebook"
