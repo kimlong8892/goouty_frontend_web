@@ -16,15 +16,23 @@ export const FeedbackPrompter = () => {
 
     useEffect(() => {
         const checkRatingStatus = async () => {
-            if (user?.id && !localStorage.getItem('goouty_feedback_submitted')) {
-                try {
-                    const res = await api.ratings.check();
-                    if (res.hasRated) {
-                        localStorage.setItem('goouty_feedback_submitted', 'true');
-                        setShowPrompt(false);
+            if (user?.id) {
+                // If there's a pending feedback trigger after login, prioritize it
+                if (localStorage.getItem('open_feedback_after_login')) {
+                    localStorage.removeItem('open_feedback_after_login');
+                    setShowForm(true);
+                }
+
+                if (!localStorage.getItem('goouty_feedback_submitted')) {
+                    try {
+                        const res = await api.ratings.check();
+                        if (res.hasRated) {
+                            localStorage.setItem('goouty_feedback_submitted', 'true');
+                            setShowPrompt(false);
+                        }
+                    } catch (e) {
+                        console.error("Failed to check feedback status", e);
                     }
-                } catch (e) {
-                    console.error("Failed to check feedback status", e);
                 }
             }
         };
@@ -68,6 +76,15 @@ export const FeedbackPrompter = () => {
             return true;
         });
     }, [showForm]);
+
+    useEffect(() => {
+        const handleOpenEvent = () => {
+            setShowPrompt(false);
+            setShowForm(true);
+        };
+        window.addEventListener('open-feedback-form', handleOpenEvent);
+        return () => window.removeEventListener('open-feedback-form', handleOpenEvent);
+    }, []);
 
     const handleOpenForm = () => {
         setShowPrompt(false);

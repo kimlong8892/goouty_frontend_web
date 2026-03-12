@@ -1,6 +1,6 @@
-
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import {
     Map,
     Split,
@@ -16,6 +16,18 @@ import {
 
 export const Footer = () => {
     const currentYear = new Date().getFullYear();
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+
+    const handleFeedbackClick = () => {
+        if (!isAuthenticated) {
+            localStorage.setItem('open_feedback_after_login', 'true');
+            window.scrollTo(0, 0);
+            navigate('/auth');
+        } else {
+            window.dispatchEvent(new CustomEvent('open-feedback-form'));
+        }
+    };
 
     return (
         <footer className="bg-secondary/50 border-t border-border pt-16 pb-8">
@@ -145,10 +157,13 @@ export const Footer = () => {
                                 </div>
                             </li>
                             <li>
-                                <a href="https://forms.gle/placeholder" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                                <button
+                                    onClick={handleFeedbackClick}
+                                    className="flex items-center gap-2 hover:text-primary transition-colors text-sm text-left"
+                                >
                                     <MessageCircle className="w-4 h-4" />
                                     <span>Góp ý / Báo lỗi</span>
-                                </a>
+                                </button>
                             </li>
                         </ul>
                     </div>
