@@ -39,8 +39,9 @@ jobs:
             User ${{ secrets.SSH_USER }}
             ProxyCommand /usr/bin/cloudflared access ssh --hostname %h
             StrictHostKeyChecking no
-            ServerAliveInterval 60
-            ServerAliveCountMax 120
+            ServerAliveInterval 10
+            ServerAliveCountMax 1000
+            ConnectTimeout 120
             TCPKeepAlive yes
           EOF
 
@@ -72,19 +73,23 @@ jobs:
           echo "Preview of generated keys (values hidden):"
           cut -d= -f1 .env.prod
 
-      - name: Copy files to server (rsync)
+      - name: Archive and Transfer files (More robust for Tunnel)
         run: |
-          # Create directory if not exists
-          sshpass -p "${{ secrets.SSH_PASS }}" ssh prod-server "mkdir -p ${{ secrets.PROJECT_PATH }}"
+          echo "Archiving project..."
+          tar -czf project.tar.gz \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='dist' \
+            --exclude='dev-dist' \
+            --exclude='.next' \
+            .
           
-          # Sync files (including generated .env.prod)
-          sshpass -p "${{ secrets.SSH_PASS }}" rsync -avz \
-            --exclude 'node_modules' \
-            --exclude '.git' \
-            --exclude 'dist' \
-            --exclude 'dev-dist' \
-            --exclude '.next' \
-            -e ssh ./ prod-server:${{ secrets.PROJECT_PATH }}
+          echo "Transferring archive..."
+          sshpass -p "${{ secrets.SSH_PASS }}" ssh prod-server "mkdir -p ${{ secrets.PROJECT_PATH }}"
+          sshpass -p "${{ secrets.SSH_PASS }}" rsync -avz -e ssh project.tar.gz prod-server:${{ secrets.PROJECT_PATH }}/
+          
+          echo "Extracting archive on server..."
+          sshpass -p "${{ secrets.SSH_PASS }}" ssh prod-server "cd ${{ secrets.PROJECT_PATH }} && tar -xzf project.tar.gz && rm project.tar.gz"
 
       - name: Deploy with Docker Compose
         run: |
