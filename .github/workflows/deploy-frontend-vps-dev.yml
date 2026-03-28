@@ -82,6 +82,7 @@ jobs:
             --exclude='dist' \
             --exclude='dev-dist' \
             --exclude='.next' \
+            --exclude='project.tar.gz' \
             .
           
           echo "Transferring archive..."
