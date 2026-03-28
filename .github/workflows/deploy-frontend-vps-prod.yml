@@ -73,24 +73,19 @@ jobs:
           echo "Preview of generated keys (values hidden):"
           cut -d= -f1 .env.prod
 
-      - name: Archive and Transfer files (More robust for Tunnel)
+      - name: Copy files to server (rsync)
         run: |
-          echo "Archiving project..."
-          tar -czf project.tar.gz \
-            --exclude='node_modules' \
-            --exclude='.git' \
-            --exclude='dist' \
-            --exclude='dev-dist' \
-            --exclude='.next' \
-            --exclude='project.tar.gz' \
-            .
-          
-          echo "Transferring archive..."
+          # Create directory if not exists
           sshpass -p "${{ secrets.SSH_PASS }}" ssh prod-server "mkdir -p ${{ secrets.PROJECT_PATH }}"
-          sshpass -p "${{ secrets.SSH_PASS }}" rsync -avz -e ssh project.tar.gz prod-server:${{ secrets.PROJECT_PATH }}/
           
-          echo "Extracting archive on server..."
-          sshpass -p "${{ secrets.SSH_PASS }}" ssh prod-server "cd ${{ secrets.PROJECT_PATH }} && tar -xzf project.tar.gz && rm project.tar.gz"
+          # Sync files (including generated .env.prod)
+          sshpass -p "${{ secrets.SSH_PASS }}" rsync -avz --timeout=1000 \
+            --exclude 'node_modules' \
+            --exclude 'dist' \
+            --exclude '.git' \
+            --exclude 'dev-dist' \
+            --exclude '.next' \
+            -e ssh ./ prod-server:${{ secrets.PROJECT_PATH }}
 
       - name: Deploy with Docker Compose
         run: |
