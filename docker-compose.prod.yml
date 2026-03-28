@@ -8,7 +8,7 @@ services:
     container_name: vite_react_app_prod
     working_dir: /usr/src/app
     ports:
-      - "8082:8080"
+      - "${EXTERNAL_PORT:-8082}:8080"
     env_file:
       - .env.prod
     restart: unless-stopped
