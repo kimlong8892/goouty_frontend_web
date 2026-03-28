@@ -22,8 +22,11 @@ jobs:
 
       - name: Install cloudflared
         run: |
-          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-          sudo dpkg -i cloudflared.deb
+          sudo mkdir -p /usr/share/keyrings
+          curl -L https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+          echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          sudo apt-get update
+          sudo apt-get install -y cloudflared
 
       - name: Setup SSH Config
         run: |
